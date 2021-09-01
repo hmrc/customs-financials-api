@@ -1,0 +1,73 @@
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ */
+
+package controllers
+
+import connectors.Acc27Connector
+import org.mockito.ArgumentMatchers.{eq => meq}
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json._
+import play.api.mvc.AnyContentAsJson
+import play.api.test.Helpers._
+import play.api.test._
+import play.api.{Application, inject}
+import uk.gov.hmrc.http.RequestId
+import utils.SpecBase
+
+import scala.concurrent._
+
+class CustomsAccountsControllerSpec extends SpecBase {
+
+  "get customs accounts" should {
+
+    "return success response" in new Setup {
+      running(app) {
+        val result = route(app, request).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("response" -> expectedResponse)
+      }
+    }
+
+    "return bad request error" when {
+      "request bad request if EORINo not present" in  {
+
+        val app: Application = GuiceApplicationBuilder()
+          .overrides()
+          .configure(
+          "microservice.metrics.enabled" -> false,
+          "metrics.enabled" -> false,
+          "auditing.enabled" -> false
+        ).build()
+
+        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.CustomsAccountsController.getCustomsAccountsDod09().url)
+          .withJsonBody(Json.obj("invalid" -> "request"))
+
+        running(app) {
+          val result = route(app, invalidRequest).value
+          status(result) mustBe BAD_REQUEST
+        }
+      }
+    }
+  }
+
+  trait Setup {
+    val EORI = "testEORI"
+    val expectedResponse: JsString = JsString("TheGoodResponse")
+    val requestBody: JsObject = Json.obj("EORINo" -> JsString(EORI))
+    val request: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.CustomsAccountsController.getCustomsAccountsDod09().url).withJsonBody(requestBody)
+
+    val mockAcc27Connector: Acc27Connector = mock[Acc27Connector]
+
+    when(mockAcc27Connector.getAccounts(meq(requestBody), any[Option[RequestId]])).thenReturn(Future.successful(Json.obj("response" -> expectedResponse)))
+
+    val app: Application = GuiceApplicationBuilder().overrides(
+      inject.bind[Acc27Connector].toInstance(mockAcc27Connector)
+    ).configure(
+      "microservice.metrics.enabled" -> false,
+      "metrics.enabled" -> false,
+      "auditing.enabled" -> false
+    ).build()
+  }
+}
