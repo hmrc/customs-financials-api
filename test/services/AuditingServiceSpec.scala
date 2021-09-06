@@ -1,19 +1,31 @@
 /*
  * Copyright 2021 HM Revenue & Customs
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package services
 
-import domain.{AuditModel, StandingAuthority}
-import models.{AccountNumber, EORI, FileRole}
+import domain.StandingAuthority
 import models.requests.HistoricDocumentRequest
-import models.requests.manageAuthorities.{Accounts, AuthorisedUser, CdsCashAccount, CdsDutyDefermentAccount, CdsGeneralGuaranteeAccount, GrantAuthorityRequest, RevokeAuthorityRequest}
+import models.requests.manageAuthorities._
+import models._
 import org.mockito.ArgumentCaptor
+import org.scalatest.matchers.should.Matchers._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
-import play.api.{Application, inject}
+import play.api._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -283,28 +295,27 @@ class AuditingServiceSpec extends SpecBase {
       }
     }
 
+    "not throw an exception when failing to audit the events" in new Setup {
+      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
 
-    //    "audit the events" in new Setup {
-    //      running(app) {
-    //        when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.successful(AuditResult.Success))
-    //        await(service.audit(AuditModel("transactionName", JsNull, "auditType"))) mustBe AuditResult.Success
-    //      }
-    //    }
-    //
-    //    "not throw an exception when failed to audit the events" in new Setup {
-    //      running(app) {
-    //        val auditResult = AuditResult.Failure("failed to audit", Some(new Exception("error")))
-    //        when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.successful(auditResult))
-    //        await(service.audit(AuditModel("transactionName", JsNull, "auditType"))) mustBe auditResult
-    //      }
-    //    }
-    //
-    //    "not audit if auditing is disabled" in new Setup {
-    //      running(app) {
-    //        when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.successful(AuditResult.Disabled))
-    //        await(service.audit(AuditModel("transactionName", JsNull, "auditType"))) mustBe AuditResult.Disabled
-    //      }
-    //    }
+      running(app) {
+        val auditResult = AuditResult.Failure("failed to audit", Some(new Exception("error")))
+        when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.successful(auditResult))
+        await(service.auditHistoricStatementRequest(historicDocumentRequest))
+        auditResult.msg must be("failed to audit")
+      }
+    }
+
+    "throw an exception when send fails to connect" in new Setup {
+      when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.failed(new Exception("An audit failure occurred")))
+      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
+
+      running(app) {
+        intercept[Exception] {
+          await(service.auditHistoricStatementRequest(historicDocumentRequest))
+        }
+      }
+    }
   }
 
   trait Setup {
