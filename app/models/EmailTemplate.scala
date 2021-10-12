@@ -42,6 +42,7 @@ object EmailTemplate {
       case "C79Certificate" => Some(C79CertificateEmail(emailAddress, notification.eori.value))
       case "SecurityStatement" if isHistoricStatement => Some(HistoricSecurityStatementEmail(emailAddress, notification.eori.value))
       case "SecurityStatement" => Some(SecurityStatementEmail(emailAddress, notification.eori.value))
+      case "PostponedVATStatement" if isHistoricStatement => Some(HistoricPostponedVATStatementEmail(emailAddress, notification.eori.value))
       case "PostponedVATStatement" => Some(PostponedVatEmail(emailAddress, notification.eori.value))
       case _ => Some(Unknown(emailAddress, notification.eori.value))
     }
@@ -90,6 +91,10 @@ case class HistoricDutyDefermentStatementEmail(email: EmailAddress, eori: String
 
 case class HistoricC79CertificateEmail(email: EmailAddress, eori: String) extends EmailTemplate {
   override val templateId: String = "customs_financials_historic_c79_certificate"
+}
+
+case class HistoricPostponedVATStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+  override val templateId: String = "customs_financials_requested_postponed_vat_notification"
 }
 
 case class HistoricSecurityStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {

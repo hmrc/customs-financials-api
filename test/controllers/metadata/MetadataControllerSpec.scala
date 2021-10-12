@@ -408,6 +408,45 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+
+    "send email when a requested PVAT statement is available" in new Setup {
+      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
+        s"""
+          |[
+          |    {
+          |        "eori":"testEORI",
+          |		     "fileName": "vat-2018-05.pdf",
+          |        "fileSize": 75251,
+          |        "metadata": [
+          |            {"metadata": "PeriodStartYear", "value": "2017"},
+          |            {"metadata": "PeriodStartMonth", "value": "5"},
+          |            {"metadata": "PeriodStartDay", "value": "5"},
+          |            {"metadata": "PeriodEndYear", "value": "2018"},
+          |            {"metadata": "PeriodEndMonth", "value": "8"},
+          |            {"metadata": "PeriodEndDay", "value": "5"},
+          |            {"metadata": "FileType", "value": "PDF"},
+          |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
+          |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
+          |        ]
+          |    }
+          |]
+        """.stripMargin)
+
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockDataStore.getVerifiedEmail(any)(any))
+        .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
+        val result = route(app, req).value
+        status(result) mustBe OK
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map.empty[String, String], force = false, Some("testEORI"), None, None)
+        verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
+      }
+    }
+
     "return BadRequest when request doesn't contain a seq of notifications json" in new Setup {
       val requestWithBadPayload: FakeRequest[JsValue] = FakeRequest(POST, "/metadata").withBody[JsValue](Json.obj())
 
