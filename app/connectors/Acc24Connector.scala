@@ -22,7 +22,6 @@ import play.api.http.Status
 import services.MetricsReporterService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
