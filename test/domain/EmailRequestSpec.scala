@@ -183,6 +183,22 @@ class EmailRequestSpec extends SpecBase {
         actual mustBe expected
       }
 
+      "given a requested postponed VAT statement notification" in {
+        val requestedPVatNotification = Notification(
+          someEORI, FileRole("PostponedVATStatement"), someFilename, someFileSize, None, Map(
+            "statementRequestID" -> "someID",
+            "Something" -> "Random"
+          )
+        )
+
+        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map.empty, force = false, Some("someEORI"), None, None))
+
+        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), requestedPVatNotification).map(_.toEmailRequest)
+
+        actual mustBe expected
+      }
+
+
     }
   }
 
