@@ -32,12 +32,12 @@ class Sub09Connector @Inject()(httpClient: HttpClient,
 
     val url = s"${appConfig.sub09GetSubscriptionsEndpoint}?" +
       s"EORI=${eori.value}&" +
-      s"acknowledgementReference=${mdgHeaders.acknowledgementReference(requestId)}&" +
+      s"acknowledgementReference=${mdgHeaders.acknowledgementReference}&" +
       s"regime=CDS"
 
     httpClient.GET[SubscriptionResponse](
       url,
-      headers = mdgHeaders.headers(appConfig.sub09BearerToken, requestId, appConfig.sub09HostHeader)
+      headers = mdgHeaders.headers(appConfig.sub09BearerToken, appConfig.sub09HostHeader)
     )(implicitly, HeaderCarrier(), implicitly)
   }
 }

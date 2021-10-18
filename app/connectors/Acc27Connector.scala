@@ -32,7 +32,7 @@ class Acc27Connector @Inject()(httpClient: HttpClient,
     httpClient.POST[JsValue, JsObject](
       appConfig.hodsEndpoint,
       requestBody,
-      headers = mdgHeaders.headers(appConfig.bearerToken, requestId, None)
+      headers = mdgHeaders.headers(appConfig.bearerToken, None)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
 }

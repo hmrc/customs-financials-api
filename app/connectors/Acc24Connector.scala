@@ -37,7 +37,7 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
       httpClient.POST[HistoricStatementRequest, HttpResponse](
         appConfig.acc24HistoricalStatementRetrievalEndpoint,
         HistoricStatementRequest.from(historicDocumentRequest, UUID.randomUUID()),
-        mdgHeaders.headers(appConfig.acc24BearerToken, requestId, appConfig.acc24HostHeader)
+        mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
         response.status match {
           case Status.NO_CONTENT => true

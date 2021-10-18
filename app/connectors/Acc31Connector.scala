@@ -46,7 +46,7 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
     val requestCommon = CashTransactionsRequestCommon(
       "MDTP",
       dateTimeService.currentDateTimeAsIso8601,
-      mdgHeaders.acknowledgementReference(requestId)
+      mdgHeaders.acknowledgementReference
     )
 
     val requestDetail = CashTransactionsRequestDetail(
@@ -62,7 +62,7 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
       val eventualResponse = httpClient.POST[CashTransactionsRequest, CashTransactionsResponse](
         appConfig.acc31GetCashAccountTransactionListingEndpoint,
         cashTransactionsRequest,
-        headers = mdgHeaders.headers(appConfig.acc31BearerToken, requestId, appConfig.acc31HostHeader)
+        headers = mdgHeaders.headers(appConfig.acc31BearerToken, appConfig.acc31HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly)
       eventualResponse.map { ctr => cashAccountTransactions(ctr.getCashAccountTransactionListingResponse) }
     }

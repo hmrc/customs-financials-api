@@ -36,7 +36,7 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
 
     val commonRequest = acc38.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
-      acknowledgementReference = mdgHeaders.acknowledgementReference(requestId),
+      acknowledgementReference = mdgHeaders.acknowledgementReference,
       originatingSystem = "Digital"
     )
 
@@ -54,7 +54,7 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
     httpClient.POST[acc38.Request, acc38.Response](
       appConfig.acc38DutyDefermentContactDetailsEndpoint,
       request,
-      headers = mdgHeaders.headers(appConfig.acc38BearerToken, requestId, appConfig.acc38HostHeader)
+      headers = mdgHeaders.headers(appConfig.acc38BearerToken, appConfig.acc38HostHeader)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
 

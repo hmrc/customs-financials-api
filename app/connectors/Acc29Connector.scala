@@ -38,7 +38,7 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
     val commonRequest = AuthoritiesRequestCommon(
       "CDS",
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
-      acknowledgementReference = mdgHeaders.acknowledgementReference(requestId),
+      acknowledgementReference = mdgHeaders.acknowledgementReference,
       "MDTP"
     )
 
@@ -47,7 +47,7 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
       httpClient.POST[StandingAuthoritiesRequest, StandingAuthoritiesResponse](
         appConfig.acc29GetStandingAuthoritiesEndpoint,
         standingAuthoritiesRequest,
-        headers = mdgHeaders.headers(appConfig.acc29BearerToken, requestId, appConfig.acc29HostHeader)
+        headers = mdgHeaders.headers(appConfig.acc29BearerToken, appConfig.acc29HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map(_.accounts)
     }
   }

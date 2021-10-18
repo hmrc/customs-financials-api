@@ -40,7 +40,7 @@ class Acc28Connector @Inject()(httpClient: HttpClient,
 
     val requestCommon: RequestCommon = RequestCommon(
       dateTimeService.currentDateTimeAsIso8601,
-      mdgHeaders.acknowledgementReference(requestId),
+      mdgHeaders.acknowledgementReference,
       RequestParameters("REGIME", "CDS")
     )
     val guaranteeTransactionsRequest = GuaranteeTransactionsRequest(
@@ -51,7 +51,7 @@ class Acc28Connector @Inject()(httpClient: HttpClient,
       httpClient.POST[GuaranteeTransactionsRequest, GuaranteeTransactionsResponse](
         appConfig.acc28GetGGATransactionEndpoint,
         guaranteeTransactionsRequest,
-        headers = mdgHeaders.headers(appConfig.acc28BearerToken, requestId, appConfig.acc28HostHeader)
+        headers = mdgHeaders.headers(appConfig.acc28BearerToken, appConfig.acc28HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map {
         gtr => transactions(gtr.getGGATransactionResponse)
       }

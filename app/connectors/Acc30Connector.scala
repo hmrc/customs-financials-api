@@ -51,7 +51,7 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
     val requestCommon = AuthoritiesRequestCommon(
       "CDS",
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
-      acknowledgementReference = mdgHeaders.acknowledgementReference(requestId),
+      acknowledgementReference = mdgHeaders.acknowledgementReference,
       "MDTP"
     )
 
@@ -63,7 +63,7 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
       httpClient.POST[ManageStandingAuthoritiesRequestContainer, HttpResponse](
         appConfig.acc30ManageAccountAuthoritiesEndpoint,
         manageStandingAuthoritiesRequestContainer,
-        headers = mdgHeaders.headers(appConfig.acc30BearerToken, requestId, appConfig.acc30HostHeader)
+        headers = mdgHeaders.headers(appConfig.acc30BearerToken, appConfig.acc30HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map {
         _.status match {
           case Status.NO_CONTENT => true

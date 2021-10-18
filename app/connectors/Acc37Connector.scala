@@ -35,14 +35,14 @@ class Acc37Connector @Inject()(httpClient: HttpClient,
 
     val request = domain.acc37.Request(
       AmendCorrespondenceAddressRequest(
-        domain.acc37.RequestCommon("Digital", dateTimeService.currentDateTimeAsIso8601, headers.acknowledgementReference(requestId)),
+        domain.acc37.RequestCommon("Digital", dateTimeService.currentDateTimeAsIso8601, headers.acknowledgementReference),
         domain.acc37.RequestDetail(eori, AccountDetails(AccountType("DutyDeferment"), dan), contactInformation, None)
       ))
 
     httpClient.POST[domain.acc37.Request, domain.acc37.Response](
       appConfig.acc37UpdateAccountContactDetailsEndpoint,
       request,
-      headers = headers.headers(appConfig.acc37BearerToken, requestId, appConfig.acc37HostHeader)
+      headers = headers.headers(appConfig.acc37BearerToken, appConfig.acc37HostHeader)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
 }
