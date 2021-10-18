@@ -23,7 +23,7 @@ import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataE
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -39,8 +39,7 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
 
   def retrieveCashTransactions(can: String,
                                from: LocalDate,
-                               to: LocalDate,
-                               requestId: Option[RequestId]
+                               to: LocalDate
                               ): Future[Either[ErrorResponse, Option[CashTransactionsResponseDetail]]] = {
 
     val requestCommon = CashTransactionsRequestCommon(

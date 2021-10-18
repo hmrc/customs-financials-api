@@ -35,7 +35,7 @@ class Acc24ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
       running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest, hc.requestId))
+        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
         result mustBe true
       }
     }
@@ -45,7 +45,7 @@ class Acc24ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 
       running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest, hc.requestId))
+        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
         result mustBe false
       }
     }
@@ -55,7 +55,7 @@ class Acc24ConnectorSpec extends SpecBase {
         .thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest, hc.requestId))
+        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
         result mustBe false
       }
     }

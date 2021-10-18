@@ -33,7 +33,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   "GuaranteeTransactionsController" should {
     "delegate to the service and return a list of open guarantee transactions with a 200 status code" in new Setup {
       val guaranteeTransaction = Seq(GuaranteeTransaction("someDate", "mrn", Some("100.00"), Some("UCR"), EORI("Declarant EORI"), EORI("Consignee EORI"), "200.00", Some("300.00"), None, None, Nil))
-      when(mockService.retrieveGuaranteeTransactionsSummary(any)(any))
+      when(mockService.retrieveGuaranteeTransactionsSummary(any))
         .thenReturn(Future.successful(Right(guaranteeTransaction)))
 
       running(app) {
@@ -57,7 +57,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
   "return 413" when {
     "the requested dates request too much data" in new Setup {
-      when(mockService.retrieveGuaranteeTransactionsSummary(any)(any))
+      when(mockService.retrieveGuaranteeTransactionsSummary(any))
         .thenReturn(Future.successful(Left(ExceededThresholdErrorException)))
 
       running(app) {
@@ -69,7 +69,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
   "return NOT_FOUND" when {
     "the requested dates returns no content" in new Setup {
-      when(mockService.retrieveGuaranteeTransactionsSummary(any)(any))
+      when(mockService.retrieveGuaranteeTransactionsSummary(any))
         .thenReturn(Future.successful(Left(NoAssociatedDataException)))
 
       running(app) {
@@ -105,7 +105,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       )
     ))
 
-    when(mockService.retrieveGuaranteeTransactionsDetail(any)(any))
+    when(mockService.retrieveGuaranteeTransactionsDetail(any))
       .thenReturn(Future.successful(Right(guaranteeTransactionDetail)))
 
     running(app) {
@@ -116,7 +116,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   }
 
   "return 413 when the date range selected requests too much data" in new Setup {
-    when(mockService.retrieveGuaranteeTransactionsDetail(any)(any))
+    when(mockService.retrieveGuaranteeTransactionsDetail(any))
       .thenReturn(Future.successful(Left(ExceededThresholdErrorException)))
 
     running(app) {
@@ -126,7 +126,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   }
 
   "return NOT_FOUND when the date range selected returns no content" in new Setup {
-    when(mockService.retrieveGuaranteeTransactionsDetail(any)(any))
+    when(mockService.retrieveGuaranteeTransactionsDetail(any))
       .thenReturn(Future.successful(Left(NoAssociatedDataException)))
 
     running(app) {

@@ -37,7 +37,7 @@ class HistoricDocumentServiceSpec extends SpecBase {
           running(app) {
             val historicDocumentRequest = HistoricDocumentRequest(eori, FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
             val historicDocumentRequestCaptor: ArgumentCaptor[HistoricDocumentRequest] = ArgumentCaptor.forClass(classOf[HistoricDocumentRequest])
-            when(mockAcc24Connector.sendHistoricDocumentRequest(historicDocumentRequestCaptor.capture(), any)).thenReturn(Future.successful(expectedResult))
+            when(mockAcc24Connector.sendHistoricDocumentRequest(historicDocumentRequestCaptor.capture())).thenReturn(Future.successful(expectedResult))
             when(mockAuditingService.auditHistoricStatementRequest(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
             val actualResult = await(service.sendHistoricDocumentRequest(historicDocumentRequest))

@@ -21,8 +21,9 @@ import models.requests.EmailRequest
 import play.api.http.Status
 import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

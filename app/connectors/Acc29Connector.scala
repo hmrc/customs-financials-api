@@ -22,8 +22,8 @@ import models.EORI
 import models.requests.manageAuthorities.{AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest}
 import models.responses.StandingAuthoritiesResponse
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,7 +34,7 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def getStandingAuthorities(eori: EORI, requestId: Option[RequestId]): Future[Seq[AccountWithAuthorities]] = {
+  def getStandingAuthorities(eori: EORI): Future[Seq[AccountWithAuthorities]] = {
     val commonRequest = AuthoritiesRequestCommon(
       "CDS",
       receiptDate = dateTimeService.currentDateTimeAsIso8601,

@@ -36,7 +36,7 @@ class Acc31ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now(), hc.requestId))
+        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
         result mustBe Right(Some(CashTransactionsResponseDetail(None, None)))
       }
     }
@@ -46,7 +46,7 @@ class Acc31ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(noDataResponse))
 
       running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now(), hc.requestId))
+        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
         result mustBe Left(NoAssociatedDataException)
       }
     }
@@ -56,7 +56,7 @@ class Acc31ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(tooMuchDataRequestedResponse))
 
       running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now(), hc.requestId))
+        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
         result mustBe Left(ExceededThresholdErrorException)
       }
     }

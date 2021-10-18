@@ -22,7 +22,7 @@ import models.requests.manageAuthorities._
 import play.api.http.Status
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, RequestId}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,21 +33,19 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI, requestId: Option[RequestId]): Future[Boolean] = {
+  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI): Future[Boolean] = {
     makeRequest(
-      ManageStandingAuthoritiesRequestDetail.grantAuthority(grantAuthorityRequest, eori),
-      requestId
+      ManageStandingAuthoritiesRequestDetail.grantAuthority(grantAuthorityRequest, eori)
     )
   }
 
-  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI, requestId: Option[RequestId]): Future[Boolean] = {
+  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI): Future[Boolean] = {
     makeRequest(
-      ManageStandingAuthoritiesRequestDetail.revokeAuthority(revokeAuthorityRequest, eori),
-      requestId
+      ManageStandingAuthoritiesRequestDetail.revokeAuthority(revokeAuthorityRequest, eori)
     )
   }
 
-  private def makeRequest(detail: ManageStandingAuthoritiesRequestDetail, requestId: Option[RequestId]): Future[Boolean] = {
+  private def makeRequest(detail: ManageStandingAuthoritiesRequestDetail): Future[Boolean] = {
     val requestCommon = AuthoritiesRequestCommon(
       "CDS",
       receiptDate = dateTimeService.currentDateTimeAsIso8601,

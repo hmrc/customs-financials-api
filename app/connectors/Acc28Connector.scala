@@ -22,8 +22,8 @@ import models.responses.{GetGGATransactionResponse, GuaranteeTransactionDeclarat
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class Acc28Connector @Inject()(httpClient: HttpClient,
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def retrieveGuaranteeTransactions(request: GuaranteeAccountTransactionsRequest, requestId: Option[RequestId]): Future[Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]]] = {
+  def retrieveGuaranteeTransactions(request: GuaranteeAccountTransactionsRequest): Future[Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]]] = {
 
     val requestCommon: RequestCommon = RequestCommon(
       dateTimeService.currentDateTimeAsIso8601,

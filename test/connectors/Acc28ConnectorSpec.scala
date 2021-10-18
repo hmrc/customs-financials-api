@@ -37,7 +37,7 @@ class Acc28ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request, hc.requestId))
+        val result = await(connector.retrieveGuaranteeTransactions(request))
         result mustBe Right(List.empty)
       }
     }
@@ -47,7 +47,7 @@ class Acc28ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(noDataResponse))
 
       running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request, hc.requestId))
+        val result = await(connector.retrieveGuaranteeTransactions(request))
         result mustBe Left(NoAssociatedDataException)
       }
     }
@@ -57,7 +57,7 @@ class Acc28ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(tooMuchDataRequestedResponse))
 
       running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request, hc.requestId))
+        val result = await(connector.retrieveGuaranteeTransactions(request))
         result mustBe Left(ExceededThresholdErrorException)
       }
     }

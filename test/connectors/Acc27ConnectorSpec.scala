@@ -34,7 +34,7 @@ class Acc27ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(Json.obj("someOther" -> "value")))
 
       running(app) {
-        val result = await(connector.getAccounts(requestBody, hc.requestId))
+        val result = await(connector.getAccounts(requestBody))
         result mustBe Json.obj("someOther" -> "value")
       }
     }

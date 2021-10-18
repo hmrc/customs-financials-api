@@ -37,7 +37,7 @@ class SubscriptionControllerSpec extends SpecBase {
     "return 200 status code" in new Setup {
       val subscriptionResponse: EmailVerifiedResponse = EmailVerifiedResponse(None)
 
-      when(mockSubscriptionService.getVerifiedEmail(is(traderEORI))(any))
+      when(mockSubscriptionService.getVerifiedEmail(is(traderEORI)))
         .thenReturn(Future.successful(subscriptionResponse))
 
       running(app) {
@@ -47,7 +47,7 @@ class SubscriptionControllerSpec extends SpecBase {
     }
 
     "return 503 for any error" in new Setup {
-      when(mockSubscriptionService.getVerifiedEmail(is(traderEORI))(any))
+      when(mockSubscriptionService.getVerifiedEmail(is(traderEORI)))
         .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
 
       running(app) {

@@ -36,7 +36,7 @@ class Acc37ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo, hc.requestId))
+        val result = await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo))
         result mustBe response
       }
     }

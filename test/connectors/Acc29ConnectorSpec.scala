@@ -35,7 +35,7 @@ class Acc29ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.getStandingAuthorities(EORI("someEori"), hc.requestId))
+        val result = await(connector.getStandingAuthorities(EORI("someEori")))
         result mustBe Seq.empty
       }
     }

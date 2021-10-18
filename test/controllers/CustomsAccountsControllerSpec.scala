@@ -24,7 +24,6 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.{Application, inject}
-import uk.gov.hmrc.http.RequestId
 import utils.SpecBase
 
 import scala.concurrent._
@@ -71,7 +70,7 @@ class CustomsAccountsControllerSpec extends SpecBase {
 
     val mockAcc27Connector: Acc27Connector = mock[Acc27Connector]
 
-    when(mockAcc27Connector.getAccounts(meq(requestBody), any[Option[RequestId]])).thenReturn(Future.successful(Json.obj("response" -> expectedResponse)))
+    when(mockAcc27Connector.getAccounts(meq(requestBody))).thenReturn(Future.successful(Json.obj("response" -> expectedResponse)))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc27Connector].toInstance(mockAcc27Connector)

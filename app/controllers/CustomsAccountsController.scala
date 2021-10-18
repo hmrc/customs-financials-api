@@ -30,7 +30,7 @@ class CustomsAccountsController @Inject()(acc27Connector: Acc27Connector,
 
   def getCustomsAccountsDod09: Action[JsValue] = Action.async(parse.json) { implicit request =>
     if (eoriPresent)
-      acc27Connector.getAccounts(request.body, hc.requestId).map(Ok(_))
+      acc27Connector.getAccounts(request.body).map(Ok(_))
     else
       Future.successful(BadRequest)
   }

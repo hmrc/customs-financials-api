@@ -20,8 +20,8 @@ import config.AppConfig
 import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
 import play.api.http.Status
 import services.MetricsReporterService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import java.util.UUID
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest, requestId: Option[RequestId]): Future[Boolean] = {
+  def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] = {
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
       httpClient.POST[HistoricStatementRequest, HttpResponse](
         appConfig.acc24HistoricalStatementRetrievalEndpoint,

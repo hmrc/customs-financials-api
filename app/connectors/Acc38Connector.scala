@@ -21,8 +21,8 @@ import domain.acc38
 import domain.acc38.GetCorrespondenceAddressRequest
 import models.{AccountNumber, AccountType, EORI}
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +32,7 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def getAccountContactDetails(dan: AccountNumber, eori: EORI, requestId: Option[RequestId]): Future[acc38.Response] = {
+  def getAccountContactDetails(dan: AccountNumber, eori: EORI): Future[acc38.Response] = {
 
     val commonRequest = acc38.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,

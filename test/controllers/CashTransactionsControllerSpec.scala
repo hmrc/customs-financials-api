@@ -43,7 +43,7 @@ class CashTransactionsControllerSpec extends SpecBase {
       val aListOfPendingTransactions = Seq(Declaration("pendingDeclarationID", EORI("pendingDeclarantEORINumber"), Some("pendingDeclarantReference"), "pendingPostingDate", "pendingAmount", Nil))
       val expectedCashTransactions: CashTransactions = CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
 
-      when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate))(any))
+      when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Right(expectedCashTransactions)))
 
       running(app) {
@@ -54,7 +54,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "return not found with no associated data" in new Setup {
-      when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate))(any))
+      when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Left(NoAssociatedDataException)))
 
       running(app) {
@@ -79,7 +79,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val expectedCashTransactions: CashTransactions = CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
 
-      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate))(any))
+      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Right(expectedCashTransactions)))
 
       running(app) {
@@ -90,7 +90,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "retrieve cash transactions call fails with no associated data error" in new Setup {
-      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate))(any))
+      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Left(NoAssociatedDataException)))
 
       running(app) {
@@ -100,7 +100,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "retrieve cash transactions call fails with exceeded threshold error" in new Setup {
-      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate))(any))
+      when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Left(ExceededThresholdErrorException)))
 
       running(app) {

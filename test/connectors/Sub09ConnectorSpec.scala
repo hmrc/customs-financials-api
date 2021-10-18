@@ -35,7 +35,7 @@ class Sub09ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.getSubscriptions(EORI("someEori"), hc.requestId))
+        val result = await(connector.getSubscriptions(EORI("someEori")))
         result mustBe response
       }
     }

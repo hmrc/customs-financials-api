@@ -33,7 +33,7 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
 
   "retrieveGuaranteeTransactionsSummary" should {
     "return domain summary for a successful acc28 response" in new Setup {
-      when(mockAcc28Connector.retrieveGuaranteeTransactions(request, None))
+      when(mockAcc28Connector.retrieveGuaranteeTransactions(request))
         .thenReturn(Future.successful(Right(Seq(declaration))))
 
       running(app) {
@@ -46,7 +46,7 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
   "retrieveGuaranteeTransactionsDetail" should {
     "return domain detail for a successful acc28 response" in new Setup {
 
-      when(mockAcc28Connector.retrieveGuaranteeTransactions(request, None))
+      when(mockAcc28Connector.retrieveGuaranteeTransactions(request))
         .thenReturn(Future.successful(Right(Seq(declaration))))
 
       running(app) {

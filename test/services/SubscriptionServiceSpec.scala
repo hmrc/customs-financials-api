@@ -39,7 +39,7 @@ class SubscriptionServiceSpec extends SpecBase {
           cdsEstablishmentAddress, None, None, None,
           None, None, None, None, None, None, None, ETMP_Master_Indicator = true)
         val subscriptionResponse: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
-        when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"), None)).thenReturn(Future.successful(subscriptionResponse))
+        when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"))).thenReturn(Future.successful(subscriptionResponse))
 
         running(app) {
           val result = await(service.getVerifiedEmail(EORI("Trader EORI")))

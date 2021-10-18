@@ -37,7 +37,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
       running(app) {
-        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
         result mustBe true
       }
     }
@@ -46,7 +46,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 
       running(app) {
-        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
         result mustBe false
       }
     }
@@ -55,7 +55,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
-        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
         result mustBe false
       }
     }
@@ -67,7 +67,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
       running(app) {
-        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
         result mustBe true
       }
     }
@@ -76,7 +76,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 
       running(app) {
-        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
         result mustBe false
       }
     }
@@ -85,7 +85,7 @@ class Acc30ConnectorSpec extends SpecBase {
         .thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
-        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori"), hc.requestId))
+        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
         result mustBe false
       }
     }

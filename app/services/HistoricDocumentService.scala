@@ -28,6 +28,6 @@ class HistoricDocumentService @Inject()(acc24Connector: Acc24Connector,
                                         auditingService: AuditingService) {
   def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest)(implicit hc: HeaderCarrier): Future[Boolean] = {
     auditingService.auditHistoricStatementRequest(historicDocumentRequest)
-    acc24Connector.sendHistoricDocumentRequest(historicDocumentRequest, hc.requestId)
+    acc24Connector.sendHistoricDocumentRequest(historicDocumentRequest)
   }
 }

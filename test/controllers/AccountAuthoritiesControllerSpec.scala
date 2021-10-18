@@ -36,7 +36,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   "AccountAuthoritiesController.get" should {
     "delegate to the service and return a list of account authorities with a 200 status code" in new Setup {
       val accountWithAuthorities = Seq(AccountWithAuthorities(AccountType("CDSCash"), AccountNumber("12345"), AccountStatus("Open"), Seq.empty))
-      when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI))(any)).thenReturn(Future.successful(accountWithAuthorities))
+      when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI))).thenReturn(Future.successful(accountWithAuthorities))
 
       running(app) {
         val result = route(app, getRequest).value
@@ -58,7 +58,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "return 503 (service unavailable)" when {
       "get account authorities call fails with BadRequestException (4xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)(any)).thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
+        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
 
         running(app) {
           val result = route(app, getRequest).value
@@ -67,7 +67,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       }
 
       "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)(any)).thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
 
         running(app) {
           val result = route(app, getRequest).value
@@ -78,7 +78,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "return 500 (InternalServerError)" when {
       "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)(any)).thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", 500)))
+        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", 500)))
 
         running(app) {
           val result = route(app, getRequest).value

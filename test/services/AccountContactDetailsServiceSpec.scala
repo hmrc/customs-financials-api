@@ -32,7 +32,7 @@ class AccountContactDetailsServiceSpec extends SpecBase {
 
   "getAccountContactDetails" should {
     "return the response from the connector" in new Setup {
-      when(mockAcc38Connector.getAccountContactDetails(AccountNumber("dan"), EORI("someEori"), None))
+      when(mockAcc38Connector.getAccountContactDetails(AccountNumber("dan"), EORI("someEori")))
         .thenReturn(Future.successful(acc38Response))
 
       running(app){
@@ -44,7 +44,7 @@ class AccountContactDetailsServiceSpec extends SpecBase {
 
   "updateAccountContactDetails" should {
     "return the response from the connector" in new Setup {
-      when(mockAcc37Connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo, None))
+      when(mockAcc37Connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo))
         .thenReturn(Future.successful(acc37SuccessResponse))
 
       running(app){

@@ -21,7 +21,7 @@ import domain.acc37.{AccountDetails, AmendCorrespondenceAddressRequest}
 import models.{AccountNumber, AccountType, EORI}
 import services.DateTimeService
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,7 +31,7 @@ class Acc37Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                headers: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def updateAccountContactDetails(dan: AccountNumber, eori: EORI, contactInformation: domain.acc37.ContactDetails, requestId: Option[RequestId]): Future[domain.acc37.Response] = {
+  def updateAccountContactDetails(dan: AccountNumber, eori: EORI, contactInformation: domain.acc37.ContactDetails): Future[domain.acc37.Response] = {
 
     val request = domain.acc37.Request(
       AmendCorrespondenceAddressRequest(

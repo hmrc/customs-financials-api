@@ -19,8 +19,8 @@ package connectors
 import config.AppConfig
 import domain.sub09.SubscriptionResponse
 import models.EORI
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, RequestId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Sub09Connector @Inject()(httpClient: HttpClient,
                                appConfig: AppConfig,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
-  def getSubscriptions(eori: EORI, requestId: Option[RequestId]): Future[SubscriptionResponse] = {
+  def getSubscriptions(eori: EORI): Future[SubscriptionResponse] = {
 
     val url = s"${appConfig.sub09GetSubscriptionsEndpoint}?" +
       s"EORI=${eori.value}&" +

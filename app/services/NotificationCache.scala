@@ -22,7 +22,7 @@ import domain.NotificationsForEori
 import models.{EORI, FileRole}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, UpdateOptions, Updates}
+import org.mongodb.scala.model._
 import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}

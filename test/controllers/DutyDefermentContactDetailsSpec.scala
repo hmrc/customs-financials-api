@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.api.{Application, inject}
 import services.AccountContactDetailsService
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
 
 import scala.concurrent.Future
@@ -40,7 +40,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
   "DutyDefermentController.get" should {
     "delegate to the service and return contact details with a 200 status code" in new Setup {
-      when(mockAccountContactDetailsService.getAccountContactDetails(eqTo(traderDan), eqTo(traderEORI))(any))
+      when(mockAccountContactDetailsService.getAccountContactDetails(eqTo(traderDan), eqTo(traderEORI)))
         .thenReturn(Future.successful(acc38Response))
 
       running(app) {
@@ -53,7 +53,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
   "DutyDefermentController.updateContactDetails" should {
     "throw an exception when update account contact details fails with a fatal error" in new Setup {
-      when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any)(any))
+      when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
         .thenThrow(new RuntimeException("Boom1"))
 
       running(app) {
@@ -66,7 +66,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
     "return 503" when {
       "update account contact details fails with BadRequestException (4xx)" in new Setup {
-        when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any)(any))
+        when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
           .thenReturn(Future.failed(UpstreamErrorResponse("4xx", Status.FORBIDDEN, Status.FORBIDDEN)))
 
         running(app) {
@@ -76,7 +76,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       }
 
       "update account contact details fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any)(any))
+        when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
           .thenReturn(Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
 
         running(app) {
@@ -87,7 +87,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
     }
 
     "return success when update account contact details with a 200 status code" in new Setup {
-      when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any)(any))
+      when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
         .thenReturn(Future.successful(acc37SuccessResponse))
 
       running(app) {
@@ -96,7 +96,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
         contentAsJson(result) mustBe Json.toJson(UpdateContactDetailsResponse(true))
 
         verify(mockAccountContactDetailsService, Mockito.times(1))
-          .updateAccountContactDetails(any, any, any)(any[HeaderCarrier])
+          .updateAccountContactDetails(any, any, any)
       }
     }
   }

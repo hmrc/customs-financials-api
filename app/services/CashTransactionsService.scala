@@ -19,7 +19,6 @@ package services
 import connectors.Acc31Connector
 import domain.CashTransactions
 import models.ErrorResponse
-import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -27,8 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
                                         domainService: DomainService)(implicit executionContext: ExecutionContext) {
-  def retrieveCashTransactionsSummary(can: String, from: LocalDate, to: LocalDate)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, CashTransactions]] = {
-    acc31Connector.retrieveCashTransactions(can, from, to, hc.requestId).map {
+  def retrieveCashTransactionsSummary(can: String, from: LocalDate, to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+    acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainSummary(responseDetail))
@@ -38,8 +37,8 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
     }
   }
 
-  def retrieveCashTransactionsDetail(can: String, from: LocalDate, to: LocalDate)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, CashTransactions]] = {
-    acc31Connector.retrieveCashTransactions(can, from, to, hc.requestId).map {
+  def retrieveCashTransactionsDetail(can: String, from: LocalDate, to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+    acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainDetail(responseDetail))

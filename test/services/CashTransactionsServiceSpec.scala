@@ -18,11 +18,11 @@ package services
 
 import connectors.Acc31Connector
 import domain._
-import models.responses._
 import models._
+import models.responses._
+import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import play.api._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
 
@@ -33,7 +33,7 @@ class CashTransactionsServiceSpec extends SpecBase {
 
   "retrieveCashTransactionsSummary" should {
     "return Left with an error if the api request failed" in new Setup {
-      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo, None)).thenReturn(
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Left(NoAssociatedDataException))
       )
       running(app) {
@@ -43,7 +43,7 @@ class CashTransactionsServiceSpec extends SpecBase {
     }
 
     "return Right with the Cash transactions on a successful response from the API" in new Setup {
-      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo, None)).thenReturn(
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Right(Some(cashTransactionsResponseDetail)))
       )
       running(app) {
@@ -65,7 +65,7 @@ class CashTransactionsServiceSpec extends SpecBase {
   "retrieveCashTransactionsDetail" should {
     {
       "return Left with an error if the api request failed" in new Setup {
-        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo, None)).thenReturn(
+        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
           Future.successful(Left(NoAssociatedDataException))
         )
         running(app) {
@@ -75,7 +75,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       }
 
       "return Right with the Cash transactions on a successful response from the API" in new Setup {
-        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo, None)).thenReturn(
+        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
           Future.successful(Right(Some(cashTransactionsResponseDetail)))
         )
         running(app) {
