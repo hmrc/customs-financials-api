@@ -87,10 +87,10 @@ class Tpi01ConnectorSpec extends SpecBase {
 
     val response: Response = Response(GetReimbursementClaimsResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(ResponseDetail(CDFPayClaimsFound = true, Some(Array(cdfPayCase)))))
+        Some(ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCase))))))
     )
 
-    val cdfPayCase: CDFPayCase = CDFPayCase("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
+    val cdfPayCase: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
       Some("GB138153003838312"), Some("10.00"), Some("10.00"))
 
     val app: Application = GuiceApplicationBuilder().overrides(

@@ -18,12 +18,10 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.tpi02.{GetSpecificClaimRequest, GetSpecificClaimRequestWrapper, RequestCommon, Response}
-
+import domain.tpi02._
 import javax.inject.Inject
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import scala.concurrent.{ExecutionContext, Future}
 
 class Tpi02Connector @Inject()(httpClient: HttpClient,
@@ -37,7 +35,7 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
     val commonRequest = RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      originatingSystem = "Digital"
+      originatingSystem = "MDTP"
     )
 
     val request = GetSpecificClaimRequestWrapper(
@@ -47,13 +45,10 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
       )
     )
 
-    httpClient.POST[GetSpecificClaimRequestWrapper, HttpResponse](
+    httpClient.POST[GetSpecificClaimRequestWrapper, Response](
       appConfig.tpi02GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi02BearerToken, appConfig.tpi02HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly).map { value =>
-      println(value.body)
-      value.body.asInstanceOf[Response]
-    }
+    )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
 }

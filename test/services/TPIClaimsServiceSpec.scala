@@ -19,7 +19,7 @@ package services
 import java.time.LocalDate
 
 import connectors.{Tpi01Connector, Tpi02Connector}
-import domain.tpi01.{CDFPayCase, GetReimbursementClaimsResponse, Response, ResponseCommon, ResponseDetail}
+import domain.tpi01.{CDFPayCase, CDFPayCaseDetail, GetReimbursementClaimsResponse, Response, ResponseCommon, ResponseDetail}
 import domain.tpi02.{GetSpecificClaimResponse, Reimbursement, Response}
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -87,10 +87,10 @@ class TPIClaimsServiceSpec extends SpecBase {
 
     val service: TPIClaimsService = app.injector.instanceOf[TPIClaimsService]
 
-    val cdfPayCases: CDFPayCase = CDFPayCase("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
+    val cdfPayCaseDetails: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
       Some("GB138153003838312"), Some("10.00"), Some("10.00"))
     val response: domain.tpi01.Response = domain.tpi01.Response(GetReimbursementClaimsResponse(
       ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-      Some(ResponseDetail(CDFPayClaimsFound = true, Some(Array(cdfPayCases))))))
+      Some(ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCaseDetails)))))))
   }
 }

@@ -38,7 +38,7 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
     val commonRequest = tpi01.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      originatingSystem = "Digital"
+      originatingSystem = "MDTP"
     )
 
     val request = GetReimbursementClaimsRequest(GetReimbursementClaims(
@@ -46,13 +46,10 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
         tpi01.RequestDetail(eori)
     ))
 
-    httpClient.POST[GetReimbursementClaimsRequest, HttpResponse](
+    httpClient.POST[GetReimbursementClaimsRequest, Response](
       appConfig.tpi01GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi01BearerToken, appConfig.tpi01HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly).map { value =>
-      println(value.body)
-      Json.parse(value.body).as[Response]
-    }
+    )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
 }
