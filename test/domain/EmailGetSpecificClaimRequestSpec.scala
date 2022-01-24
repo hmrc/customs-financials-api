@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import models.requests.EmailRequest
 import models.{EORI, EmailAddress, EmailTemplate, FileRole}
 import utils.SpecBase
 
-class EmailRequestSpec extends SpecBase {
+class EmailGetSpecificClaimRequestSpec extends SpecBase {
 
   val someFileSize: Long = 1024L
   val someEORI: EORI = EORI("someEORI")

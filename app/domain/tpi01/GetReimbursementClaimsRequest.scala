@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,6 @@ package domain.tpi01
 
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
-
-case class Request(getCorrespondenceAddressRequest: GetReimbursementClaimsRequest)
-
-object Request {
-  implicit val format: OFormat[Request] = Json.format[Request]
-}
 
 case class GetReimbursementClaimsRequest(requestCommon: RequestCommon,
                                          requestDetail: RequestDetail)

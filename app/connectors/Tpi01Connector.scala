@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package connectors
 
 import config.AppConfig
-import domain.AccountWithAuthorities
 import domain._
+import domain.tpi01.{GetReimbursementClaimsRequest, GetReimbursementClaimsResponse}
 import javax.inject.Inject
 import models.EORI
-import services.{DateTimeService, MetricsReporterService}
+import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,7 +31,7 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def getReimbursementClaims(eori: EORI): Future[tpi01.Response] = {
+  def retrieveReimbursementClaims(eori: EORI): Future[GetReimbursementClaimsResponse] = {
 
     val commonRequest = tpi01.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -39,14 +39,12 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
       originatingSystem = "Digital"
     )
 
-    val request = tpi01.Request(
-      tpi01.GetReimbursementClaimsRequest(
+    val request = GetReimbursementClaimsRequest(
         commonRequest,
         tpi01.RequestDetail(eori)
-      )
     )
 
-    httpClient.POST[tpi01.Request, tpi01.Response](
+    httpClient.POST[GetReimbursementClaimsRequest, GetReimbursementClaimsResponse](
       appConfig.tpi01GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi01BearerToken, appConfig.tpi01HostHeader)

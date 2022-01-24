@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package connectors
 
 import config.AppConfig
 import domain._
+import domain.tpi02.{GetSpecificClaimRequest, GetSpecificClaimResponse, RequestCommon}
 import javax.inject.Inject
 import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class Tpi02Connector @Inject()(httpClient: HttpClient,
@@ -28,23 +30,21 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def getSpecificClaim(cdfPayService: String,
-                       cdfPayCaseNumber: String): Future[tpi02.Response] = {
+  def retrieveSpecificClaim(cdfPayService: String,
+                            cdfPayCaseNumber: String): Future[GetSpecificClaimResponse] = {
 
-    val commonRequest = tpi02.RequestCommon(
+    val commonRequest = RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
       originatingSystem = "Digital"
     )
 
-    val request = tpi02.Request(
-      tpi02.GetSpecificClaimRequest(
+    val request = GetSpecificClaimRequest(
         commonRequest,
         tpi02.RequestDetail(cdfPayService, cdfPayCaseNumber)
-      )
     )
 
-    httpClient.POST[tpi02.Request, tpi02.Response](
+    httpClient.POST[GetSpecificClaimRequest, GetSpecificClaimResponse](
       appConfig.tpi02GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi02BearerToken, appConfig.tpi02HostHeader)

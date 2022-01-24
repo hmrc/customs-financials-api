@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import utils.SpecBase
 
 import scala.concurrent.Future
 
-class EORIHistoryRequestControllerSpec extends SpecBase {
+class EORIHistoryGetSpecificClaimRequestControllerSpec extends SpecBase {
 
   "EORIHistoryRequestController.get" should {
     "validate the EORI and return 200 status code" in new Setup {

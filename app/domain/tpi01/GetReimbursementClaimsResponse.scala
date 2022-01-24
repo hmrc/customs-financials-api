@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
 
 package domain.tpi01
 
-import models.{AccountNumber, AccountType, EORI, EmailAddress}
 import play.api.libs.json._
 
-case class Response(getCorrespondenceAddressResponse: GetReimbursementClaimsResponse){
-  val mdtpError: Boolean = getCorrespondenceAddressResponse
-    .responseCommon
-    .returnParameters.exists(_.exists(_.paramName == "POSITION"))
-}
-
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
-}
 
 case class GetReimbursementClaimsResponse(responseCommon: ResponseCommon,
-                                          responseDetail: Option[ResponseDetail])
+                                          responseDetail: Option[ResponseDetail]){
+  val mdtpError: Boolean = responseCommon
+    .returnParameters.exists(_.exists(_.paramName == "POSITION"))
+}
 
 object GetReimbursementClaimsResponse {
   implicit val format: OFormat[GetReimbursementClaimsResponse] = Json.format[GetReimbursementClaimsResponse]
@@ -53,13 +46,13 @@ object ResponseCommon {
 }
 
 case class ResponseDetail(cdfPayClaimsFound: Boolean,
-                          cdfPayCases: Option[Array[cdfPayCase]])
+                          cdfPayCases: Option[Array[CDFPayCase]])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
 
-case class cdfPayCase(cdfPayCaseNumber: String,
+case class CDFPayCase(cdfPayCaseNumber: String,
                       cdfPayService: String,
                       caseStatus: String,
                       declarantEORI: String,
@@ -68,8 +61,8 @@ case class cdfPayCase(cdfPayCaseNumber: String,
                       claimAmountTotal: Option[String],
                       totalCaseReimburseAmnt: Option[String])
 
-object cdfPayCase {
-  implicit val format: OFormat[cdfPayCase] = Json.format[cdfPayCase]
+object CDFPayCase {
+  implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
 }
 
 
@@ -95,5 +88,3 @@ case class SourceFaultDetail(detail: Array[String])
 object SourceFaultDetail {
   implicit val format: OFormat[SourceFaultDetail] = Json.format[SourceFaultDetail]
 }
-
-

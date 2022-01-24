@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,11 @@ package domain.tpi02
 
 import play.api.libs.json._
 
-case class Response(getSpecificClaimResponse: GetSpecificClaimResponse){
-  val mdtpError: Boolean = getSpecificClaimResponse
-    .responseCommon
+case class GetSpecificClaimResponse(responseCommon: ResponseCommon,
+                                    responseDetail: Option[ResponseDetail]){
+  val mdtpError: Boolean = responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
 }
-
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
-}
-
-case class GetSpecificClaimResponse(responseCommon: ResponseCommon,
-                                    responseDetail: Option[ResponseDetail])
 
 object GetSpecificClaimResponse {
   implicit val format: OFormat[GetSpecificClaimResponse] = Json.format[GetSpecificClaimResponse]
@@ -51,8 +44,8 @@ object ResponseCommon {
   implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 }
 
-case class ResponseDetail(cdfPayClaimsFound: Boolean,
-                          cdfPayCases: Option[Array[CDFPayCase]])
+case class ResponseDetail(cdfPayService: String,
+                          cdfPayCases: Option[CDFPayCase])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
