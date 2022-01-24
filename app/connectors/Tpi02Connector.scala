@@ -18,7 +18,7 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.tpi02.{GetSpecificClaimRequest, GetSpecificClaimResponse, RequestCommon}
+import domain.tpi02.{GetSpecificClaimRequest, Response, RequestCommon}
 import javax.inject.Inject
 import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -31,7 +31,7 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
   def retrieveSpecificClaim(cdfPayService: String,
-                            cdfPayCaseNumber: String): Future[GetSpecificClaimResponse] = {
+                            cdfPayCaseNumber: String): Future[Response] = {
 
     val commonRequest = RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -44,7 +44,7 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
         tpi02.RequestDetail(cdfPayService, cdfPayCaseNumber)
     )
 
-    httpClient.POST[GetSpecificClaimRequest, GetSpecificClaimResponse](
+    httpClient.POST[GetSpecificClaimRequest, Response](
       appConfig.tpi02GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi02BearerToken, appConfig.tpi02HostHeader)

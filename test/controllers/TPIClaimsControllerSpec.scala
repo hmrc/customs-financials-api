@@ -18,8 +18,9 @@ package controllers
 
 import java.time.LocalDate
 
-import domain.tpi01.{CDFPayCase, GetReimbursementClaimsResponse, ResponseCommon, ResponseDetail}
-import domain.tpi02.{GetSpecificClaimResponse, Reimbursement, ReturnParameter}
+import domain.tpi01.{CDFPayCase, GetReimbursementClaimsResponse, Response, ResponseCommon, ResponseDetail}
+import domain.tpi02
+import domain.tpi02.{GetSpecificClaimResponse, Reimbursement, Response, ReturnParameter}
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -39,11 +40,11 @@ class TPIClaimsControllerSpec extends SpecBase {
     "return 200 status" in new Setup {
       val cdfPayCases: CDFPayCase = CDFPayCase("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
         Some("GB138153003838312"), Some("10.00"), Some("10.00"))
-      val responseDetail: ResponseDetail = ResponseDetail(cdfPayClaimsFound = true, Some(Array(cdfPayCases)))
+      val responseDetail: ResponseDetail = ResponseDetail(CDFPayClaimsFound = true, Some(Array(cdfPayCases)))
 
-      protected val response: GetReimbursementClaimsResponse = GetReimbursementClaimsResponse(
+      protected val response = domain.tpi01.Response(GetReimbursementClaimsResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(responseDetail))
+        Some(responseDetail)))
 
       when(mockTPIClaimsService.getClaims(any))
         .thenReturn(Future.successful(response))
@@ -57,11 +58,11 @@ class TPIClaimsControllerSpec extends SpecBase {
     }
 
     "return 204 status for no claims found" in new Setup {
-      val responseDetail: ResponseDetail = ResponseDetail(cdfPayClaimsFound = false, None)
+      val responseDetail: ResponseDetail = ResponseDetail(CDFPayClaimsFound = false, None)
 
-      protected val response: GetReimbursementClaimsResponse = GetReimbursementClaimsResponse(
+      protected val response = domain.tpi01.Response(GetReimbursementClaimsResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(responseDetail))
+        Some(responseDetail)))
 
       when(mockTPIClaimsService.getClaims(any))
         .thenReturn(Future.successful(response))
@@ -91,8 +92,8 @@ class TPIClaimsControllerSpec extends SpecBase {
         Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(reimbursement))
       val responseDetail: domain.tpi02.ResponseDetail = domain.tpi02.ResponseDetail("MDTP", Some(cdfPayCase))
 
-      protected val specificClaimResponse: GetSpecificClaimResponse = GetSpecificClaimResponse(
-        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None), Some(responseDetail))
+      protected val specificClaimResponse = domain.tpi02.Response(GetSpecificClaimResponse(
+        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None), Some(responseDetail)))
 
       when(mockTPIClaimsService.getSpecificClaim(any, any))
         .thenReturn(Future.successful(specificClaimResponse))
@@ -106,8 +107,8 @@ class TPIClaimsControllerSpec extends SpecBase {
 
     "return 204 status when no claims found" in new Setup {
 
-      protected val specificClaimResponse: GetSpecificClaimResponse = GetSpecificClaimResponse(
-        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, Some("1682aaa9-d212-46ba-852e-43c2d01faf21"), Some("Invalid CDFPayCaseNumber"),  Some(List(ReturnParameter("POSITION", "FAIL")))), None)
+      protected val specificClaimResponse = domain.tpi02.Response(GetSpecificClaimResponse(
+        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, Some("1682aaa9-d212-46ba-852e-43c2d01faf21"), Some("Invalid CDFPayCaseNumber"),  Some(List(ReturnParameter("POSITION", "FAIL")))), None))
 
       when(mockTPIClaimsService.getSpecificClaim(any, any))
         .thenReturn(Future.successful(specificClaimResponse))

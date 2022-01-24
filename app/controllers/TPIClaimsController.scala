@@ -25,6 +25,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.TPIClaimsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -36,9 +37,9 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
     def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
     service.getClaims(request.body.eori)
       .map {
-        case response if response.mdtpError => InternalServerError
-        case GetReimbursementClaimsResponse(_, Some(responseDetail))
-          if responseDetail.cdfPayClaimsFound => Ok(Json.toJson(responseDetail))
+        case response if response.getReimbursementClaimsResponse.mdtpError => InternalServerError
+        case domain.tpi01.Response(GetReimbursementClaimsResponse(_, Some(responseDetail)))
+          if responseDetail.CDFPayClaimsFound => Ok(Json.toJson(responseDetail))
         case _ => NoContent
       }
       .recover {
@@ -54,8 +55,8 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
   def getSpecificClaim: Action[SpecificClaimRequest] = Action.async(parse.json[SpecificClaimRequest]) { implicit request =>
       service.getSpecificClaim(request.body.cdfPayService, request.body.cdfPayCaseNumber)
         .map {
-          case GetSpecificClaimResponse(_, Some(responseDetail)) => Ok(Json.toJson(responseDetail))
-          case GetSpecificClaimResponse(_, None) => NoContent
+          case domain.tpi02.Response(GetSpecificClaimResponse(_, Some(responseDetail))) => Ok(Json.toJson(responseDetail))
+          case domain.tpi02.Response(GetSpecificClaimResponse(_, None)) => NoContent
           case _ => InternalServerError
         }
         .recover {

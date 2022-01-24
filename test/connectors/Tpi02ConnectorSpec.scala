@@ -33,7 +33,7 @@ class Tpi02ConnectorSpec extends SpecBase {
 
   "retrieveSpecificClaim" should {
     "return specific claim on a successful response" in new Setup {
-      when[Future[GetSpecificClaimResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+      when[Future[Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(response))
 
       running(app) {
@@ -67,9 +67,9 @@ class Tpi02ConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
-    val response: GetSpecificClaimResponse = GetSpecificClaimResponse(
+    val response: Response = Response(GetSpecificClaimResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(ResponseDetail("MDTP", Some(cdfPayCase)))
+        Some(ResponseDetail("MDTP", Some(cdfPayCase))))
     )
 
     val cdfPayCase: CDFPayCase = CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",

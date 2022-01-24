@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package domain.tpi01
+package domain.tpi02
 
 import play.api.libs.json._
 
+case class Response(getSpecificClaimResponse: GetSpecificClaimResponse)
 
-case class GetReimbursementClaimsResponse(responseCommon: ResponseCommon,
-                                          responseDetail: Option[ResponseDetail]){
+object Response {
+  implicit val format: OFormat[Response] = Json.format[Response]
+}
+
+case class GetSpecificClaimResponse(responseCommon: ResponseCommon,
+                                    responseDetail: Option[ResponseDetail]){
   val mdtpError: Boolean = responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
 }
 
-object GetReimbursementClaimsResponse {
-  implicit val format: OFormat[GetReimbursementClaimsResponse] = Json.format[GetReimbursementClaimsResponse]
+object GetSpecificClaimResponse {
+  implicit val format: OFormat[GetSpecificClaimResponse] = Json.format[GetSpecificClaimResponse]
 }
 
 case class ReturnParameter(paramName: String, paramValue: String)
@@ -45,26 +50,38 @@ object ResponseCommon {
   implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 }
 
-case class ResponseDetail(cdfPayClaimsFound: Boolean,
-                          cdfPayCases: Option[Array[CDFPayCase]])
+case class ResponseDetail(CDFPayService: String,
+                          CDFPayCases: Option[CDFPayCase])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
 
-case class CDFPayCase(cdfPayCaseNumber: String,
-                      cdfPayService: String,
-                      caseStatus: String,
+case class CDFPayCase(caseStatus: String,
+                      CDFPayCaseNumber: String,
                       declarantEORI: String,
                       importerEORI: String,
                       claimantEORI: Option[String],
-                      claimAmountTotal: Option[String],
-                      totalCaseReimburseAmnt: Option[String])
+                      totalCustomsClaimAmount: Option[String],
+                      totalVATClaimAmount: Option[String],
+                      totalExciseClaimAmount: Option[String],
+                      totalCustomsReimbursementAmount: String,
+                      totalVATReimbursementAmount: String,
+                      totalExciseReimbursmentAmount: Option[String],
+                      reimbursement: Option[Reimbursement])
 
 object CDFPayCase {
   implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
 }
 
+case class Reimbursement(reimbursementDate: String,
+                         reimbursementAmount: String,
+                         reimbursementMethod: String)
+
+object Reimbursement {
+  implicit val format: OFormat[Reimbursement] = Json.format[Reimbursement]
+
+}
 
 case class ErrorResponse(errorDetail: ErrorDetail)
 
@@ -88,3 +105,5 @@ case class SourceFaultDetail(detail: Array[String])
 object SourceFaultDetail {
   implicit val format: OFormat[SourceFaultDetail] = Json.format[SourceFaultDetail]
 }
+
+

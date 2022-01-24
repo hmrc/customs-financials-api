@@ -33,7 +33,7 @@ class Tpi01ConnectorSpec extends SpecBase {
 
   "getReimbursementClaims" should {
     "return reimbursement claims on a successful response" in new Setup {
-      when[Future[GetReimbursementClaimsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+      when[Future[Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(response))
 
       running(app) {
@@ -67,9 +67,27 @@ class Tpi01ConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
-    val response: GetReimbursementClaimsResponse = GetReimbursementClaimsResponse(
+    val response1: String = {
+      s"""
+         |{
+         |	"getReimbursementClaims": {
+         |		"requestCommon": {
+         |			"originatingSystem": "MDTP",
+         |			"receiptDate": "2021-04-20T12:07:54Z",
+         |			"acknowledgementReference": "1234567890123456789012345678901"
+         |		},
+         |		"requestDetail": {
+         |			"EORI": "GB000000001"
+         |		}
+         |	}
+         |}
+         |
+         |""".stripMargin
+    }
+
+    val response: Response = Response(GetReimbursementClaimsResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(ResponseDetail(cdfPayClaimsFound = true, Some(Array(cdfPayCase))))
+        Some(ResponseDetail(CDFPayClaimsFound = true, Some(Array(cdfPayCase)))))
     )
 
     val cdfPayCase: CDFPayCase = CDFPayCase("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",

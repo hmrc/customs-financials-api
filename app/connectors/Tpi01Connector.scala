@@ -18,10 +18,9 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, GetReimbursementClaimsResponse}
+import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, Response}
 import javax.inject.Inject
 import models.EORI
-import play.api.libs.json.Json
 import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -32,7 +31,7 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def retrieveReimbursementClaims(eori: EORI): Future[GetReimbursementClaimsResponse] = {
+  def retrieveReimbursementClaims(eori: EORI): Future[Response] = {
 
     val commonRequest = tpi01.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -45,7 +44,7 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
         tpi01.RequestDetail(eori)
     ))
 
-    httpClient.POST[GetReimbursementClaimsRequest, GetReimbursementClaimsResponse](
+    httpClient.POST[GetReimbursementClaimsRequest, Response](
       appConfig.tpi01GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi01BearerToken, appConfig.tpi01HostHeader)

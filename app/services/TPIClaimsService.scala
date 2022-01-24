@@ -18,8 +18,8 @@ package services
 
 import connectors.{Tpi01Connector, Tpi02Connector}
 import domain._
-import domain.tpi01.GetReimbursementClaimsResponse
-import domain.tpi02.GetSpecificClaimResponse
+import domain.tpi01.Response
+import domain.tpi02.Response
 import javax.inject.{Inject, Singleton}
 import models.EORI
 
@@ -29,11 +29,11 @@ import scala.concurrent.Future
 class TPIClaimsService @Inject()(tpi01Connector: Tpi01Connector,
                                  tpi02Connector: Tpi02Connector) {
 
-  def getClaims(eori: EORI): Future[GetReimbursementClaimsResponse] = {
+  def getClaims(eori: EORI): Future[tpi01.Response] = {
     tpi01Connector.retrieveReimbursementClaims(eori)
   }
 
-  def getSpecificClaim(cdfPayService: String, cdfPayCaseNumber: String): Future[GetSpecificClaimResponse] = {
+  def getSpecificClaim(cdfPayService: String, cdfPayCaseNumber: String): Future[tpi02.Response] = {
     tpi02Connector.retrieveSpecificClaim(cdfPayService, cdfPayCaseNumber)
   }
 }
