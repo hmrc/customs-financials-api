@@ -18,9 +18,10 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.tpi01.{GetReimbursementClaimsRequest, GetReimbursementClaimsResponse}
+import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, GetReimbursementClaimsResponse}
 import javax.inject.Inject
 import models.EORI
+import play.api.libs.json.Json
 import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -39,10 +40,10 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
       originatingSystem = "Digital"
     )
 
-    val request = GetReimbursementClaimsRequest(
+    val request = GetReimbursementClaimsRequest(GetReimbursementClaims(
         commonRequest,
         tpi01.RequestDetail(eori)
-    )
+    ))
 
     httpClient.POST[GetReimbursementClaimsRequest, GetReimbursementClaimsResponse](
       appConfig.tpi01GetReimbursementClaimsEndpoint,

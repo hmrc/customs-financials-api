@@ -24,7 +24,6 @@ import play.api.{Logger, LoggerLike}
 import play.api.mvc.{Action, ControllerComponents}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 

@@ -25,7 +25,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.TPIClaimsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -38,8 +37,9 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
     service.getClaims(request.body.eori)
       .map {
         case response if response.mdtpError => InternalServerError
-        case GetReimbursementClaimsResponse(_, Some(responseDetail)) => Ok(Json.toJson(responseDetail))
-        case GetReimbursementClaimsResponse(_, None) => NoContent
+        case GetReimbursementClaimsResponse(_, Some(responseDetail))
+          if responseDetail.cdfPayClaimsFound => Ok(Json.toJson(responseDetail))
+        case _ => NoContent
       }
       .recover {
         case ex if ex.getMessage.contains("JSON validation") =>
@@ -54,9 +54,9 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
   def getSpecificClaim: Action[SpecificClaimRequest] = Action.async(parse.json[SpecificClaimRequest]) { implicit request =>
       service.getSpecificClaim(request.body.cdfPayService, request.body.cdfPayCaseNumber)
         .map {
-          case response if response.mdtpError => InternalServerError
           case GetSpecificClaimResponse(_, Some(responseDetail)) => Ok(Json.toJson(responseDetail))
           case GetSpecificClaimResponse(_, None) => NoContent
+          case _ => InternalServerError
         }
         .recover {
           case ex if ex.getMessage.contains("JSON validation") =>

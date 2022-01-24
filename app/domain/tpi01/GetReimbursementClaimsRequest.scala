@@ -19,11 +19,17 @@ package domain.tpi01
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
-case class GetReimbursementClaimsRequest(requestCommon: RequestCommon,
-                                         requestDetail: RequestDetail)
+case class GetReimbursementClaimsRequest(getReimbursementClaims: GetReimbursementClaims)
 
 object GetReimbursementClaimsRequest {
   implicit val format: OFormat[GetReimbursementClaimsRequest] = Json.format[GetReimbursementClaimsRequest]
+}
+
+case class GetReimbursementClaims(requestCommon: RequestCommon,
+                                  requestDetail: RequestDetail)
+
+object GetReimbursementClaims {
+  implicit val format: OFormat[GetReimbursementClaims] = Json.format[GetReimbursementClaims]
 }
 
 case class RequestCommon(originatingSystem: String,
@@ -34,7 +40,7 @@ object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
 }
 
-case class RequestDetail(eori: EORI)
+case class RequestDetail(EORI: EORI)
 
 object RequestDetail {
   implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]
