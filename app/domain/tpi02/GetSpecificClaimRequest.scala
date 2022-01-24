@@ -18,6 +18,11 @@ package domain.tpi02
 
 import play.api.libs.json.{Json, OFormat}
 
+case class GetSpecificClaimRequestWrapper(getSpecificClaimRequest: GetSpecificClaimRequest)
+
+object GetSpecificClaimRequestWrapper {
+  implicit val format: OFormat[GetSpecificClaimRequestWrapper] = Json.format[GetSpecificClaimRequestWrapper]
+}
 
 case class GetSpecificClaimRequest(requestCommon: RequestCommon,
                                    requestDetail: RequestDetail)
@@ -34,8 +39,8 @@ object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
 }
 
-case class RequestDetail(cdfPayService: String,
-                         cdfPayCaseNumber: String)
+case class RequestDetail(CDFPayService: String,
+                         CDFPayCaseNumber: String)
 
 object RequestDetail {
   implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]

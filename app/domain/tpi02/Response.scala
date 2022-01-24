@@ -41,7 +41,7 @@ object ReturnParameter {
 }
 
 case class ResponseCommon(status: String,
-                          processingDate: String,
+                          processingDateTime: String,
                           correlationId: Option[String],
                           errorMessage: Option[String],
                           returnParameters: Option[List[ReturnParameter]])
@@ -51,7 +51,7 @@ object ResponseCommon {
 }
 
 case class ResponseDetail(CDFPayService: String,
-                          CDFPayCases: Option[CDFPayCase])
+                          CDFPayCase: Option[CDFPayCase])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]

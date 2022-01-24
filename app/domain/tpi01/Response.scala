@@ -51,13 +51,20 @@ object ResponseCommon {
 }
 
 case class ResponseDetail(CDFPayClaimsFound: Boolean,
-                          CDFPayCases: Option[Array[CDFPayCase]])
+                          CDFPayCases: Option[List[CDFPayCase]])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
 
-case class CDFPayCase(CDFPayCaseNumber: String,
+case class CDFPayCase(CDFPayCase: CDFPayCaseDetail)
+
+object CDFPayCase {
+  implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
+}
+
+
+case class CDFPayCaseDetail(CDFPayCaseNumber: String,
                       CDFPayService: String,
                       caseStatus: String,
                       declarantEORI: String,
@@ -66,8 +73,8 @@ case class CDFPayCase(CDFPayCaseNumber: String,
                       claimAmountTotal: Option[String],
                       totalCaseReimburseAmnt: Option[String])
 
-object CDFPayCase {
-  implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
+object CDFPayCaseDetail {
+  implicit val format: OFormat[CDFPayCaseDetail] = Json.format[CDFPayCaseDetail]
 }
 
 

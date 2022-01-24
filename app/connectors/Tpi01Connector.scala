@@ -19,10 +19,12 @@ package connectors
 import config.AppConfig
 import domain._
 import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, Response}
+
 import javax.inject.Inject
 import models.EORI
+import play.api.libs.json.Json
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,10 +46,13 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
         tpi01.RequestDetail(eori)
     ))
 
-    httpClient.POST[GetReimbursementClaimsRequest, Response](
+    httpClient.POST[GetReimbursementClaimsRequest, HttpResponse](
       appConfig.tpi01GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi01BearerToken, appConfig.tpi01HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    )(implicitly, implicitly, HeaderCarrier(), implicitly).map { value =>
+      println(value.body)
+      Json.parse(value.body).as[Response]
+    }
   }
 }
