@@ -66,6 +66,16 @@ class TPIClaimsControllerSpec extends SpecBase {
       }
     }
 
+    "return 500 for no response" in new Setup {
+      when(mockTPIClaimsService.getClaims(any))
+        .thenReturn(Future.successful(None))
+
+      running(app) {
+        val result = route(app, request).value
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
     "return 503 for any error" in new Setup {
       when(mockTPIClaimsService.getClaims(any))
         .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
