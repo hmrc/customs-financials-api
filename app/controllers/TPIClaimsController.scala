@@ -16,8 +16,9 @@
 
 package controllers
 
-import domain.tpi01.GetReimbursementClaimsResponse
-import domain.tpi02.GetSpecificClaimResponse
+import domain.tpi01.{GetReimbursementClaimsResponse, ResponseDetail}
+import domain.tpi02.{CDFPayCase, GetSpecificClaimResponse}
+
 import javax.inject.Inject
 import models.requests.{ReimbursementClaimsRequest, SpecificClaimRequest}
 import play.api.Logger
@@ -34,38 +35,33 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
 
   val log: Logger = Logger(this.getClass)
 
-    def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
-    service.getClaims(request.body.eori)
-      .map {
-        case response if response.getReimbursementClaimsResponse.mdtpError => InternalServerError
-        case domain.tpi01.Response(GetReimbursementClaimsResponse(_, Some(responseDetail)))
-          if responseDetail.CDFPayClaimsFound => Ok(Json.toJson(responseDetail))
-        case _ => NoContent
-      }
-      .recover {
-        case ex if ex.getMessage.contains("JSON validation") =>
-          log.error(s"getReimbursementClaims failed: ${ex.getMessage}")
-          InternalServerError("JSON Validation Error")
-        case NonFatal(error) =>
-          log.error(s"getReimbursementClaims failed: ${error.getMessage}")
-          ServiceUnavailable
-      }
+  def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
+    service.getClaims(request.body.eori).map {
+      case Some(value) => Ok(Json.obj("claims" -> value))
+      case None => InternalServerError
+    }.recover {
+      case ex if ex.getMessage.contains("JSON validation") =>
+        log.error(s"getReimbursementClaims failed: ${ex.getMessage}")
+        InternalServerError("JSON Validation Error")
+      case NonFatal(error) =>
+        log.error(s"getReimbursementClaims failed: ${error.getMessage}")
+        ServiceUnavailable
+    }
   }
 
   def getSpecificClaim: Action[SpecificClaimRequest] = Action.async(parse.json[SpecificClaimRequest]) { implicit request =>
-      service.getSpecificClaim(request.body.cdfPayService, request.body.cdfPayCaseNumber)
-        .map {
-          case domain.tpi02.Response(GetSpecificClaimResponse(_, Some(responseDetail))) => Ok(Json.toJson(responseDetail))
-          case domain.tpi02.Response(GetSpecificClaimResponse(_, None)) => NoContent
-          case _ => InternalServerError
-        }
-        .recover {
-          case ex if ex.getMessage.contains("JSON validation") =>
-            log.error(s"getSpecificClaim failed: ${ex.getMessage}")
-            InternalServerError("JSON Validation Error")
-          case NonFatal(error) =>
-            log.error(s"getSpecificClaim failed: ${error.getMessage}")
-            ServiceUnavailable
-        }
-    }
+    service.getSpecificClaim(request.body.cdfPayService, request.body.cdfPayCaseNumber)
+      .map {
+        case Some(value) => Ok(Json.toJson(value))
+        case None => NoContent
+      }
+      .recover {
+        case ex if ex.getMessage.contains("JSON validation") =>
+          log.error(s"getSpecificClaim failed: ${ex.getMessage}")
+          InternalServerError("JSON Validation Error")
+        case NonFatal(error) =>
+          log.error(s"getSpecificClaim failed: ${error.getMessage}")
+          ServiceUnavailable
+      }
+  }
 }
