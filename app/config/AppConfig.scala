@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,4 +75,13 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val sub09HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc37.host-header")
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
+
+  lazy val tpi01GetReimbursementClaimsEndpoint: String = baseUrl("tpi01") + getConfString("tpi01.context-base", "/") + "/tpi/getreimbursementclaims/v1"
+  lazy val tpi01HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi01.host-header")
+  lazy val tpi01BearerToken: String = getConfString("tpi01.bearer-token", "test")
+
+  lazy val tpi02GetReimbursementClaimsEndpoint: String = baseUrl("tpi02") + getConfString("tpi02.context-base", "/") + "/tpi/getspecificclaim/v1"
+  lazy val tpi02HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi02.host-header")
+  lazy val tpi02BearerToken: String = getConfString("tpi02.bearer-token", "test")
+
 }

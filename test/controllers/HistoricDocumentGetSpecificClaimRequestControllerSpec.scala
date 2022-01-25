@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import java.time.LocalDate
 import scala.concurrent.Future
 
 
-class HistoricDocumentRequestControllerSpec extends SpecBase {
+class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
   "HistoricDocumentRequestController.makeRequest" should {
     "delegate to the service and return 204 (no content)" when {
       "successfully sent the request for C79Certificate" in new Setup {
