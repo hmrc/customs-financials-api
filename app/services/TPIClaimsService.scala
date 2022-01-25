@@ -18,18 +18,15 @@ package services
 
 import connectors.{Tpi01Connector, Tpi02Connector}
 import domain._
-import domain.tpi02.CDFPayCase
-
 import javax.inject.{Inject, Singleton}
 import models.EORI
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TPIClaimsService @Inject()(tpi01Connector: Tpi01Connector,
                                  tpi02Connector: Tpi02Connector)(implicit executionContext: ExecutionContext) {
 
-  def getClaims(eori: EORI): Future[Option[Seq[domain.tpi01.CDFPayCaseDetail]]] = {
+  def getClaims(eori: EORI): Future[Option[Seq[tpi01.CDFPayCaseDetail]]] = {
     tpi01Connector.retrieveReimbursementClaims(eori).map{ response =>
       response.getReimbursementClaimsResponse.responseDetail.map { detail =>
         detail.CDFPayCases.getOrElse(Seq.empty).map(_.CDFPayCase.toCDSPayCaseDetail)

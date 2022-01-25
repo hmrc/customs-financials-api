@@ -15,8 +15,6 @@
  */
 
 package domain.tpi02
-
-import domain.tpi01.CDFPayCaseDetail
 import play.api.libs.json._
 
 case class Response(getSpecificClaimResponse: GetSpecificClaimResponse)

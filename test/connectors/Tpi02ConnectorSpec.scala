@@ -19,7 +19,6 @@ package connectors
 import java.time.LocalDate
 
 import domain.tpi02._
-import models.EORI
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -41,26 +40,6 @@ class Tpi02ConnectorSpec extends SpecBase {
         result mustBe response
       }
     }
-
-//    "return NoAssociatedData error response when responded with no associated data" in new Setup {
-//      when[Future[Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-//        .thenReturn(Future.successful(noDataResponse))
-//
-//      running(app) {
-//        val result = await(connector.retrieveGuaranteeTransactions(request))
-//        result mustBe Left(NoAssociatedDataException)
-//      }
-//    }
-//
-//    "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
-//      when[Future[GuaranteeTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-//        .thenReturn(Future.successful(tooMuchDataRequestedResponse))
-//
-//      running(app) {
-//        val result = await(connector.retrieveGuaranteeTransactions(request))
-//        result mustBe Left(ExceededThresholdErrorException)
-//      }
-//    }
   }
 
   trait Setup {

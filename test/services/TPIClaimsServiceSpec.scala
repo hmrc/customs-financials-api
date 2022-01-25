@@ -17,17 +17,16 @@
 package services
 
 import java.time.LocalDate
-
 import connectors.{Tpi01Connector, Tpi02Connector}
-import domain.tpi01.{CDFPayCase, CDFPayCaseDetail, GetReimbursementClaimsResponse, Response, ResponseCommon, ResponseDetail}
-import domain.tpi02.{GetSpecificClaimResponse, Reimbursement, Response}
+import domain._
+import domain.tpi01._
+import domain.tpi02.{GetSpecificClaimResponse, Reimbursement}
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class TPIClaimsServiceSpec extends SpecBase {
@@ -35,26 +34,38 @@ class TPIClaimsServiceSpec extends SpecBase {
   "TPIClaimsService" when {
 
     "calling get Claims" should {
-      "successfully returns GetReimbursementClaimsResponse" in new Setup {
+      "successfully returns CDFPayCaseDetail" in new Setup {
+        val cdfPayCaseDetail: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Open", "GB138153003838312", "GB138153003838312",
+          Some("GB138153003838312"), Some("10.00"), Some("10.00"))
+
+        val getClaimsResponse: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "In Progress", "GB138153003838312", "GB138153003838312",
+          Some("GB138153003838312"), Some("10.00"), Some("10.00"))
+
+        val response: tpi01.Response = tpi01.Response(GetReimbursementClaimsResponse(
+          ResponseCommon("OK", LocalDate.now().toString, None, None, None),
+          Some(ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCaseDetail)))))))
 
         when(mockTpi01Connector.retrieveReimbursementClaims(any))
           .thenReturn(Future.successful(response))
 
         running(app) {
           val result = await(service.getClaims(EORI("Trader EORI")))
-          result mustBe response
+          result mustBe Some(Seq(getClaimsResponse))
         }
       }
     }
 
     "calling get Specific Claims" should {
-      "successfully returns GetSpecificClaimResponse" in new Setup {
-        val cdfPayCase: domain.tpi02.CDFPayCase = domain.tpi02.CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",
+      "successfully returns CDFPayCase" in new Setup {
+        val cdfPayCase: tpi02.CDFPayCase = tpi02.CDFPayCase("Open", "4374422408", "GB138153003838312", "GB138153003838312",
           Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(Reimbursement("date", "10.00", "10.00")))
 
-        protected val responseSpecificClaim: domain.tpi02.Response = domain.tpi02.Response(GetSpecificClaimResponse(
-          domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-          Some(domain.tpi02.ResponseDetail("MDTP", Some(cdfPayCase)))
+        val getSpecificClaimResponse: tpi02.CDFPayCase = tpi02.CDFPayCase("In Progress", "4374422408", "GB138153003838312", "GB138153003838312",
+          Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(Reimbursement("date", "10.00", "10.00")))
+
+        val responseSpecificClaim: tpi02.Response = tpi02.Response(GetSpecificClaimResponse(
+          tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None),
+          Some(tpi02.ResponseDetail("MDTP", Some(cdfPayCase)))
         ))
 
         when(mockTpi02Connector.retrieveSpecificClaim(any, any))
@@ -62,7 +73,7 @@ class TPIClaimsServiceSpec extends SpecBase {
 
         running(app) {
           val result = await(service.getSpecificClaim("CDFPayService", "CDFPayCaseNumber"))
-          result mustBe responseSpecificClaim
+          result mustBe Some(getSpecificClaimResponse)
         }
       }
     }
@@ -86,11 +97,5 @@ class TPIClaimsServiceSpec extends SpecBase {
     ).build()
 
     val service: TPIClaimsService = app.injector.instanceOf[TPIClaimsService]
-
-    val cdfPayCaseDetails: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
-      Some("GB138153003838312"), Some("10.00"), Some("10.00"))
-    val response: domain.tpi01.Response = domain.tpi01.Response(GetReimbursementClaimsResponse(
-      ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-      Some(ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCaseDetails)))))))
   }
 }

@@ -16,9 +16,6 @@
 
 package controllers
 
-import domain.tpi01.{GetReimbursementClaimsResponse, ResponseDetail}
-import domain.tpi02.{CDFPayCase, GetSpecificClaimResponse}
-
 import javax.inject.Inject
 import models.requests.{ReimbursementClaimsRequest, SpecificClaimRequest}
 import play.api.Logger
@@ -26,7 +23,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.TPIClaimsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 

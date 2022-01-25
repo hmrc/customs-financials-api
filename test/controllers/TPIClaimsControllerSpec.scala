@@ -17,10 +17,9 @@
 package controllers
 
 import java.time.LocalDate
-
-import domain.tpi01.{CDFPayCase, CDFPayCaseDetail, GetReimbursementClaimsResponse, Response, ResponseCommon, ResponseDetail}
-import domain.tpi02
-import domain.tpi02.{GetSpecificClaimResponse, Reimbursement, Response, ReturnParameter}
+import domain._
+import domain.tpi01._
+import domain.tpi02.Reimbursement
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -31,7 +30,6 @@ import play.api.{Application, inject}
 import services.TPIClaimsService
 import uk.gov.hmrc.http.NotFoundException
 import utils.SpecBase
-
 import scala.concurrent.Future
 
 class TPIClaimsControllerSpec extends SpecBase {
@@ -42,34 +40,29 @@ class TPIClaimsControllerSpec extends SpecBase {
         Some("GB138153003838312"), Some("10.00"), Some("10.00"))
       val responseDetail: ResponseDetail = ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCases))))
 
-      protected val response = domain.tpi01.Response(GetReimbursementClaimsResponse(
+      protected val response = tpi01.Response(GetReimbursementClaimsResponse(
         ResponseCommon("OK", LocalDate.now().toString, None, None, None),
         Some(responseDetail)))
 
       when(mockTPIClaimsService.getClaims(any))
-        .thenReturn(Future.successful(response))
+        .thenReturn(Future.successful(Some(Seq(cdfPayCases))))
 
       running(app) {
         val result = route(app, request).value
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(responseDetail)
+        contentAsJson(result) mustBe Json.obj("claims" -> List(cdfPayCases))
 
       }
     }
 
-    "return 204 status for no claims found" in new Setup {
-      val responseDetail: ResponseDetail = ResponseDetail(CDFPayClaimsFound = false, None)
-
-      protected val response = domain.tpi01.Response(GetReimbursementClaimsResponse(
-        ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(responseDetail)))
-
+    "return 200 with empty claims Json for no claims found" in new Setup {
       when(mockTPIClaimsService.getClaims(any))
-        .thenReturn(Future.successful(response))
+        .thenReturn(Future.successful(Some(Seq.empty[CDFPayCaseDetail])))
 
       running(app) {
         val result = route(app, request).value
-        status(result) mustBe 204
+        status(result) mustBe 200
+        contentAsJson(result) mustBe Json.obj("claims" -> Seq.empty[CDFPayCaseDetail])
       }
     }
 
@@ -85,33 +78,24 @@ class TPIClaimsControllerSpec extends SpecBase {
   }
 
   "getSpecificClaim" should {
-    "return 200 status" in new Setup {
-
+    "return 200 with cdfPayCase when claim found " in new Setup {
       val reimbursement: Reimbursement = Reimbursement("date", "10.00", "10.00")
-      val cdfPayCase: domain.tpi02.CDFPayCase = domain.tpi02.CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",
+      val cdfPayCase: tpi02.CDFPayCase = tpi02.CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",
         Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(reimbursement))
-      val responseDetail: domain.tpi02.ResponseDetail = domain.tpi02.ResponseDetail("MDTP", Some(cdfPayCase))
-
-      protected val specificClaimResponse = domain.tpi02.Response(GetSpecificClaimResponse(
-        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None), Some(responseDetail)))
 
       when(mockTPIClaimsService.getSpecificClaim(any, any))
-        .thenReturn(Future.successful(specificClaimResponse))
+        .thenReturn(Future.successful(Some(cdfPayCase)))
 
       running(app) {
         val result = route(app, requestSpecificClaim).value
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(responseDetail)
+        contentAsJson(result) mustBe Json.toJson(cdfPayCase)
       }
     }
 
     "return 204 status when no claims found" in new Setup {
-
-      protected val specificClaimResponse = domain.tpi02.Response(GetSpecificClaimResponse(
-        domain.tpi02.ResponseCommon("OK", LocalDate.now().toString, Some("1682aaa9-d212-46ba-852e-43c2d01faf21"), Some("Invalid CDFPayCaseNumber"),  Some(List(ReturnParameter("POSITION", "FAIL")))), None))
-
       when(mockTPIClaimsService.getSpecificClaim(any, any))
-        .thenReturn(Future.successful(specificClaimResponse))
+        .thenReturn(Future.successful(None))
 
       running(app) {
         val result = route(app, requestSpecificClaim).value
@@ -131,7 +115,6 @@ class TPIClaimsControllerSpec extends SpecBase {
   }
 
   trait Setup {
-
     val traderEORI: EORI = EORI("testEORI")
     val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST", controllers.routes.TPIClaimsController.getReimbursementClaims().url)
       .withJsonBody(Json.parse("""{"eori":"some eori"}"""))

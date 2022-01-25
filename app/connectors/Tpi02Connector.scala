@@ -23,6 +23,7 @@ import javax.inject.Inject
 import services.DateTimeService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 class Tpi02Connector @Inject()(httpClient: HttpClient,
                                appConfig: AppConfig,

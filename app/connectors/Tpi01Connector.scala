@@ -19,13 +19,11 @@ package connectors
 import config.AppConfig
 import domain._
 import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, Response}
-
 import javax.inject.Inject
 import models.EORI
-import play.api.libs.json.Json
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class Tpi01Connector @Inject()(httpClient: HttpClient,
