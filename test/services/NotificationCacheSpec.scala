@@ -189,7 +189,7 @@ class NotificationCacheSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val cache: DefaultNotificationCache = app.injector.instanceOf[DefaultNotificationCache]
+    val cache: CcsCache = app.injector.instanceOf[CcsCache]
     await(cache.collection.drop().toFuture())
 
   }

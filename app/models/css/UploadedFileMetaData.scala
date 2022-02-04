@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package models.css
 
-sealed trait ErrorResponse extends Throwable
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
 
-case object ExceededThresholdErrorException extends ErrorResponse
+case class UploadedFileMetaData(nonce: String, uploadedFiles: Array[UploadedFile])
 
-case object NoAssociatedDataException extends ErrorResponse
-
-case object UnknownException extends ErrorResponse
+object UploadedFileMetaData {
+  implicit val uploadFileMetaDataFormat: ElementEncoder[UploadedFileMetaData] = deriveElementEncoder[UploadedFileMetaData]
+}

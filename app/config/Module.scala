@@ -17,11 +17,11 @@
 package config
 
 import com.google.inject.AbstractModule
-import services.{DefaultNotificationCache, NotificationCache}
+import services.{CcsCache, NotificationCache}
 
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
+    bind(classOf[NotificationCache]).to(classOf[CcsCache]).asEagerSingleton()
   }
 }

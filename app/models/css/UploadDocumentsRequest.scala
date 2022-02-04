@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package models.css
 
-sealed trait ErrorResponse extends Throwable
+import java.util.UUID
+import models.EORI
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
 
-case object ExceededThresholdErrorException extends ErrorResponse
+case class UploadDocumentsRequest(id: UUID,
+                                  eori: EORI,
+                                  caseNumber: String,
+                                  properties: UploadedFileMetaData)
 
-case object NoAssociatedDataException extends ErrorResponse
 
-case object UnknownException extends ErrorResponse
+object UploadDocumentsRequest {
+implicit val uploadDocumentsFormat: ElementEncoder[UploadDocumentsRequest] = deriveElementEncoder[UploadDocumentsRequest]
+}

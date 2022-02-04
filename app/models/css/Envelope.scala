@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package models.css
 
-sealed trait ErrorResponse extends Throwable
+import models.css.Namespaces.soap
+import ru.tinkoff.phobos.derivation.semiauto.deriveXmlEncoder
+import ru.tinkoff.phobos.encoding.XmlEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-case object ExceededThresholdErrorException extends ErrorResponse
+case class Envelope(@xmlns(soap) Body: Body)
 
-case object NoAssociatedDataException extends ErrorResponse
-
-case object UnknownException extends ErrorResponse
+object Envelope {
+  implicit val envelopeEncoder: XmlEncoder[Envelope] = deriveXmlEncoder("Envelope", Namespaces.soap)
+}

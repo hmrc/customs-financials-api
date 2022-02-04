@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package models
+package models.css
 
-sealed trait ErrorResponse extends Throwable
-
-case object ExceededThresholdErrorException extends ErrorResponse
-
-case object NoAssociatedDataException extends ErrorResponse
-
-case object UnknownException extends ErrorResponse
+case class CcsSubmissionPayload(dec64Body: String, headers: Seq[(String, String)])
