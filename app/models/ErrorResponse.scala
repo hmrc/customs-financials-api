@@ -21,5 +21,3 @@ sealed trait ErrorResponse extends Throwable
 case object ExceededThresholdErrorException extends ErrorResponse
 
 case object NoAssociatedDataException extends ErrorResponse
-
-case object UnknownException extends ErrorResponse

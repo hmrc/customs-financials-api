@@ -19,14 +19,15 @@ package controllers
 import javax.inject.Inject
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
-import services.CcsService
+import services.{CcsService, FileUploadCache}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.ExecutionContext
 
 class SubmitUploadedDocumentsController @Inject()(cc: ControllerComponents,
                                                   authorisedRequest: AuthorisedRequest,
-                                                  ccsService: CcsService
+                                                  ccsService: CcsService,
+                                                  fileUploadCache: FileUploadCache
                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 

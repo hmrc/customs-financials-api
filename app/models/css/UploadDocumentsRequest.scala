@@ -17,16 +17,15 @@
 package models.css
 
 import java.util.UUID
+
 import models.EORI
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
+import play.api.libs.json.{Format, Json}
 
 case class UploadDocumentsRequest(id: UUID,
                                   eori: EORI,
                                   caseNumber: String,
                                   properties: UploadedFileMetaData)
 
-
 object UploadDocumentsRequest {
-implicit val uploadDocumentsFormat: ElementEncoder[UploadDocumentsRequest] = deriveElementEncoder[UploadDocumentsRequest]
+  implicit val format: Format[UploadDocumentsRequest] = Json.format[UploadDocumentsRequest]
 }

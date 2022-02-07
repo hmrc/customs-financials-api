@@ -16,11 +16,10 @@
 
 package models.css
 
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
+import play.api.libs.json.{Json, Format}
 
-case class UploadedFileMetaData(nonce: String, uploadedFiles: Array[UploadedFile])
+case class UploadedFileMetaData(nonce: String, uploadedFiles: Seq[UploadedFiles])
 
 object UploadedFileMetaData {
-  implicit val uploadFileMetaDataFormat: ElementEncoder[UploadedFileMetaData] = deriveElementEncoder[UploadedFileMetaData]
+  implicit val format: Format[UploadedFileMetaData] = Json.format[UploadedFileMetaData]
 }

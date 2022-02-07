@@ -16,18 +16,17 @@
 
 package models.css
 
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
+import play.api.libs.json.{Json, Format}
 
-case class UploadedFile(upscanReference: String,
-                        downloadUrl: String,
-                        uploadTimeStamp: String,
-                        checkSum: String,
-                        fileName: String,
-                        fileMimeType: String,
-                        fileSize: String,
-                        previousUrl: String)
+case class UploadedFiles(upscanReference: String,
+                         downloadUrl: String,
+                         uploadTimeStamp: String,
+                         checkSum: String,
+                         fileName: String,
+                         fileMimeType: String,
+                         fileSize: String,
+                         previousUrl: String)
 
-object UploadedFile {
-  implicit val uploadFileFormat: ElementEncoder[UploadedFile] = deriveElementEncoder[UploadedFile]
+object UploadedFiles {
+  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
 }

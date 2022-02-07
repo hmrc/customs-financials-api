@@ -16,4 +16,10 @@
 
 package models.css
 
+import play.api.libs.json.{Json, OFormat}
+
 case class CcsSubmissionPayload(dec64Body: String, headers: Seq[(String, String)])
+
+object CcsSubmissionPayload {
+  implicit val format: OFormat[CcsSubmissionPayload] = Json.format[CcsSubmissionPayload]
+}

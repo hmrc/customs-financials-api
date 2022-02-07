@@ -17,31 +17,30 @@
 package services
 
 import connectors.CcsConnector
+import domain.FileUploadMongo
 import javax.inject.{Inject, Singleton}
 import models.css._
+import org.joda.time.DateTime
 import ru.tinkoff.phobos.encoding.XmlEncoder
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpResponse}
 import scala.concurrent.Future
 
 @Singleton
 class CcsService @Inject()(cssConnector: CcsConnector,
-                           cssCache: CcsCache,
-                           requestToDec64Payload: RequestToDec64Payload)(implicit hc: HeaderCarrier) {
+                           fileUploadCache: FileUploadCache,
+                           requestToDec64Payload: RequestToDec64Payload) {
 
 
-  def submitFileToCcs(ccsSubmissionPayload: CcsSubmissionPayload): Future[HttpResponse] = {
-    cssConnector.postCcsSubmissionPayload(
-      CcsSubmissionPayload(ccsSubmissionPayload.dec64Body, getHeaders(hc))
-    )
+  def submitFileToCcs(request: UploadDocumentsRequest)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+
+    val ccsSubmissionsPayload = requestToDec64Payload.map(request).map(data =>
+      CcsSubmissionPayload(XmlEncoder[Envelope].encode(data), getHeaders(hc))).head
+
+    cssConnector.postCcsSubmissionPayload(ccsSubmissionsPayload)
   }
 
   def insertFileToUploadQueue(request: UploadDocumentsRequest)(implicit hc: HeaderCarrier) = {
-
-    val queueCcsSubmissions = requestToDec64Payload.map(request).map(data =>
-      CcsSubmissionPayload(XmlEncoder[Envelope].encode(data), getHeaders(hc)))
-
-    queueCcsSubmissions.map(data => cssCache.set(data))
-
+    fileUploadCache.set(FileUploadMongo(request, DateTime.now))
   }
 
   def getHeaders(headerCarrier: HeaderCarrier): Seq[(String, String)] =

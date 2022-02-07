@@ -29,6 +29,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   private def getConfString(path: String, default: String) = servicesConfig.getConfString(path, default)
   private def baseUrl(path: String) = servicesConfig.baseUrl(path)
   lazy val notificationCacheCollectionName = "notificationStore"
+  lazy val fileUploadCacheCollectionName = "fileUploadStore"
 
   lazy val hodsEndpoint: String = baseUrl("acc27") + getConfString("acc27.context-base", "/") + getConfString("acc27.endpoint", "/")
 
