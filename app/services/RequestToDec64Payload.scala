@@ -18,11 +18,11 @@ package services
 
 import java.util.UUID
 
-import models.css.{BatchFileInterfaceMetadata, Body, Envelope, PropertiesType, PropertyType, UploadDocumentsRequest}
+import models.css.{BatchFileInterfaceMetadata, Body, Envelope, PropertiesType, PropertyType, UploadedFilesRequest}
 
 class RequestToDec64Payload {
 
-  def map(request: UploadDocumentsRequest): List[Envelope] =
+  def map(request: UploadedFilesRequest): List[Envelope] =
     request.properties.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
       Envelope(
         Body(

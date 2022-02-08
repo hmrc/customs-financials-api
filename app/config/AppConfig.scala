@@ -31,6 +31,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val notificationCacheCollectionName = "notificationStore"
   lazy val fileUploadCacheCollectionName = "fileUploadStore"
 
+  lazy val fileUploadPerInstancePerSecond: Double = configuration.get[Double]("fileUploadPerInstancePerSecond")
+  lazy val housekeepingHours: Int = configuration.get[Int]("housekeepingHours")
+  lazy val fileUploadMaxAgeMins: Int = configuration.get[Int]("fileUploadMaxAgeMins")
+
   lazy val hodsEndpoint: String = baseUrl("acc27") + getConfString("acc27.context-base", "/") + getConfString("acc27.endpoint", "/")
 
   lazy val onlyOpenItems: Boolean = configuration.get[Boolean]("features.onlyOpenItems")
@@ -84,5 +88,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val tpi02GetReimbursementClaimsEndpoint: String = baseUrl("tpi02") + getConfString("tpi02.context-base", "/") + "/tpi/getspecificclaim/v1"
   lazy val tpi02HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi02.host-header")
   lazy val tpi02BearerToken: String = getConfString("tpi02.bearer-token", "test")
+
+  lazy val ccsFileUploadEndpoint: String = baseUrl("ccs") + getConfString("ccs.context-base", "/") + "/ccs/cds/documents"
 
 }

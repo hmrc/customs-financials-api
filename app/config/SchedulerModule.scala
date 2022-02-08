@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package models.css
+package config
 
-import java.util.UUID
+import play.api.inject._
+import services.Scheduler
 
-import models.EORI
-import play.api.libs.json.{Format, Json}
-
-case class UploadDocumentsRequest(id: UUID,
-                                  eori: EORI,
-                                  caseNumber: String,
-                                  properties: UploadedFileMetaData)
-
-object UploadDocumentsRequest {
-  implicit val format: Format[UploadDocumentsRequest] = Json.format[UploadDocumentsRequest]
-}
+class SchedulerModule extends SimpleModule(bind[Scheduler].toSelf.eagerly())

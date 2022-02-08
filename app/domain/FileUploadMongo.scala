@@ -16,15 +16,15 @@
 
 package domain
 
-import models.css.{CcsSubmissionPayload, UploadDocumentsRequest}
-import org.joda.time.DateTime
+import java.time.LocalDateTime
+import models.css.{CcsSubmissionPayload, UploadedFilesRequest}
 import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-case class FileUploadMongo(uploadDocumentsRequest: UploadDocumentsRequest, receivedAt: DateTime = DateTime.now())
+case class FileUploadMongo(_id: String, uploadDocumentsRequest: UploadedFilesRequest, processing: Boolean, receivedAt: LocalDateTime)
 
 object FileUploadMongo {
-  implicit val timeFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+  implicit val timeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
   implicit val format: OFormat[FileUploadMongo] = Json.format[FileUploadMongo]
   implicit val documentFormat: OFormat[CcsSubmissionPayload] = Json.format[CcsSubmissionPayload]
 }

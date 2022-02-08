@@ -16,18 +16,33 @@
 
 package connectors
 
+import config.AppConfig
 import javax.inject.Inject
 import models.css.CcsSubmissionPayload
+import play.api.{Logger, LoggerLike}
+import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class CcsConnector @Inject()(httpClient: HttpClient)(implicit executionContext: ExecutionContext) {
+class CcsConnector @Inject()(httpClient: HttpClient,
+                             config: AppConfig)(implicit executionContext: ExecutionContext) {
 
-  private val ccsSubmissionUrl: String = ""
+  val log: LoggerLike = Logger(this.getClass)
 
-
-  def postCcsSubmissionPayload(cssSubmissionPayload: CcsSubmissionPayload)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    httpClient.POSTString[HttpResponse](ccsSubmissionUrl, cssSubmissionPayload.dec64Body,
-      cssSubmissionPayload.headers)(HttpReads[HttpResponse], hc, executionContext)
+  def submitFileUpload(payload: CcsSubmissionPayload)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    httpClient.POSTString[HttpResponse](config.ccsFileUploadEndpoint, payload.dec64Body,
+      payload.headers)(HttpReads[HttpResponse], hc, executionContext).collect {
+      case response if response.status == Status.NO_CONTENT =>
+        log.info(s"[submitFileUpload] Successful request to CCS ")
+        true
+      case response =>
+        log.error(s"[submitFileUpload] Failed with status - ${response.status} error - ${response.body}")
+        false
+    }.recover {
+      case ex: Throwable =>
+        log.error(s"[submitFileUpload] Received an exception with message - ${ex.getMessage}")
+        false
+    }
   }
 }

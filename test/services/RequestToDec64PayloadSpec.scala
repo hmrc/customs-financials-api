@@ -21,7 +21,7 @@ import java.util.UUID
 import connectors.{CcsConnector, Sub09Connector}
 import domain.sub09._
 import models.EORI
-import models.css.{UploadDocumentsRequest, UploadedFileMetaData, UploadedFiles}
+import models.css.{UploadedFilesRequest, UploadedFileMetaData, UploadedFiles}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
@@ -55,7 +55,7 @@ class RequestToDec64PayloadSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val uploadDocumentsRequest = UploadDocumentsRequest(UUID.randomUUID(), EORI("eori"), "casenumber",
+    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "12", "preiousUrl"))))
 

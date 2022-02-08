@@ -16,11 +16,10 @@
 
 package services
 
-import java.util.UUID
+import java.time.LocalDateTime
 import domain.FileUploadMongo
 import models.EORI
 import models.css._
-import org.joda.time.DateTime
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
@@ -31,14 +30,16 @@ class FileUploadCacheSpec extends SpecBase {
 
   "FileUploadCache" should {
 
-    "set file upload to mongo db" in new Setup {
+    "enqueue file upload to mongo db returns true" in new Setup {
       running(app) {
-        val result = for {
-          setResponse <- cache.set(FileUploadMongo(UploadDocumentsRequest(UUID.randomUUID(), EORI("eori"), "casenumber",
-            UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-              "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), DateTime.now))
-        } yield setResponse
-        await(result) mustBe true
+        await(for {
+          enqueueJob <- cache.enqueueFileUploadJob(uploadDocumentsRequest)
+          nextJob <- cache.nextJob
+        } yield {
+          enqueueJob mustBe true
+          nextJob mustBe Some(uploadDocumentsRequest)
+          }
+        )
       }
     }
   }
@@ -54,25 +55,12 @@ class FileUploadCacheSpec extends SpecBase {
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
 
-    val fileUploadMongo = FileUploadMongo(UploadDocumentsRequest(UUID.randomUUID(), EORI("eori"), "casenumber",
+    val fileUploadMongo = FileUploadMongo("id", UploadedFilesRequest("id", EORI("eori"), "casenumber",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), DateTime.now)
+        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), false, LocalDateTime.now)
 
-//    val receivedAt: DateTime = DateTime.now(DateTimeZone.UTC)
-//
-//    val uploadDocumentsRequest = UploadDocumentsRequest(UUID.randomUUID(), EORI("eori"), "casenumber",
-//      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-//        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
-//
-//    val uploadedFile = UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-//      "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")
-
-
-    val mapResponse = List(Envelope(Body(BatchFileInterfaceMetadata("TPI","AWS","DEC64", "1.0.0", "5f6c71d4-68de-4a40-816d-20766c291f6d", "casenumber" ,1,1,"checkSum","SHA-256", 12, false,
-      PropertiesType(List(PropertyType("CaseReference", "casenumber"), PropertyType("Eori","eori"), PropertyType("DeclarationId", "TODO"),
-        PropertyType("DeclarationType", "MRN"), PropertyType("ApplicationName", "NDRC"), PropertyType("DocumentType", "TODO"), PropertyType("DocumentReceivedDate", "uploadTimeStamp"))),
-      "downloadUrl", "fileName", "fileMimeType"))))
-
-
+    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
+      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
+        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
   }
 }
