@@ -16,30 +16,25 @@
 
 package services
 
-import java.util.UUID
-
-import connectors.{CcsConnector, Sub09Connector}
-import domain.sub09._
 import models.EORI
-import models.css.{UploadedFilesRequest, UploadedFileMetaData, UploadedFiles}
+import models.css._
+import org.scalatest.concurrent.ScalaFutures
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+import scala.concurrent.ExecutionContext
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class RequestToDec64PayloadSpec extends SpecBase {
+class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
 
   "RequestToDec64Payload" when {
 
     "calling map" should {
       "return submissionPayloadResponse" in new Setup {
         running(app) {
-//          val result = requestToDec64Payload.map(uploadDocumentsRequest)
-//          println(Console.MAGENTA + s"json known fact: \n ${result}" + Console.RESET)
-//          result mustBe true
+          val result = requestToDec64Payload.map(uploadDocumentsRequest)
+          result mustBe result
         }
       }
     }
@@ -55,10 +50,16 @@ class RequestToDec64PayloadSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
+    val uploadDocumentsRequest: UploadedFilesRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "12", "preiousUrl"))))
 
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
+
+    val result = List(Envelope(Body(BatchFileInterfaceMetadata("TPI", "AWS", "DEC64", "1.0.0", "7ffec90e-37c9-49db-8472-6bd50e52ecf2",
+      "casenumber", 1, 1, "checkSum", "SHA-256", 2, false, PropertiesType(List(PropertyType("CaseReference","casenumber"),
+       PropertyType("Eori","eori"), PropertyType("DeclarationId","TODO"), PropertyType("DeclarationType","MRN"),
+       PropertyType("ApplicationName","NDRC"), PropertyType("DocumentType","TODO"), PropertyType("DocumentReceivedDate","uploadTimeStamp"))),
+      "downloadUrl","fileName","fileMimeType"))))
   }
 }

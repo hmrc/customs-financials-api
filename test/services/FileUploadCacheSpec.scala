@@ -34,12 +34,30 @@ class FileUploadCacheSpec extends SpecBase {
       running(app) {
         await(for {
           enqueueJob <- cache.enqueueFileUploadJob(uploadDocumentsRequest)
+        } yield {
+          enqueueJob mustBe true
+        })
+      }
+    }
+    "enqueue file upload & return next file upload job" in new Setup {
+      running(app) {
+        await(for {
+          enqueueJob <- cache.enqueueFileUploadJob(uploadDocumentsRequest)
           nextJob <- cache.nextJob
         } yield {
           enqueueJob mustBe true
           nextJob mustBe Some(uploadDocumentsRequest)
-          }
-        )
+        })
+      }
+    }
+
+    "delete file upload from cache should return true" in new Setup {
+      running(app) {
+        await(for {
+          deleteJob <- cache.deleteJob("id")
+        } yield {
+          deleteJob mustBe true
+        })
       }
     }
   }
@@ -63,4 +81,5 @@ class FileUploadCacheSpec extends SpecBase {
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
   }
+
 }
