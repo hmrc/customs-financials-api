@@ -38,8 +38,8 @@ case class BatchFileInterfaceMetadata(
                                        @xmlns(mdg) properties: PropertiesType,
                                        @xmlns(mdg) sourceLocation: String,
                                        @xmlns(mdg) sourceFileName: String,
-                                       @xmlns(mdg) sourceFileMimeType: String
-//                                       @xmlns(mdg) destinations: Destinations = Destinations(List(Destination(Dec64.CDFPay)))
+                                       @xmlns(mdg) sourceFileMimeType: String,
+                                       @xmlns(mdg) destinations: Destinations = Destinations(List(Destination(Dec64.CDFPay)))
                                      )
 
 object BatchFileInterfaceMetadata {

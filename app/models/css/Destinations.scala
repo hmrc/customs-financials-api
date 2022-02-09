@@ -16,16 +16,14 @@
 
 package models.css
 
-import models.EORI
-import play.api.libs.json.{Format, Json}
+import javax.print.attribute.standard.Destination
+import models.css.Namespaces.mdg
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-case class UploadedFilesRequest(id: String,
-                                eori: EORI,
-                                caseNumber: String,
-                                applicationName: String,
-                                documentType: String,
-                                properties: UploadedFileMetaData)
+case class Destinations(@xmlns(mdg) destination: List[Destination] = Nil)
 
-object UploadedFilesRequest {
-  implicit val format: Format[UploadedFilesRequest] = Json.format[UploadedFilesRequest]
+object Destinations {
+  implicit val destinationsTypeEnc: ElementEncoder[Destinations] = deriveElementEncoder[Destinations]
 }

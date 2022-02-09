@@ -21,13 +21,12 @@ import java.time.LocalDateTime
 import connectors.CcsConnector
 import domain.FileUploadMongo
 import models.EORI
-import models.css._
+import models.css.{UploadedFilesRequest, _}
 import org.mockito.ArgumentMatchers
 import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import utils.SpecBase
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,7 +37,7 @@ class CcsServiceSpec extends SpecBase {
     "submit uploaded files to ccs should return true when successful" in new Setup {
       running(app) {
         await(for {
-          response <- ccsService.submitFileToCcs(uploadDocumentsRequest)
+          response <- ccsService.submitFileToCcs(uploadedFilesRequest)
         } yield {
           response mustBe true
         })
@@ -62,19 +61,24 @@ class CcsServiceSpec extends SpecBase {
 
     val ccsService: CcsService = app.injector.instanceOf[CcsService]
 
-    val fileUploadMongo = FileUploadMongo("id", UploadedFilesRequest("id", EORI("eori"), "casenumber",
-      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), false, LocalDateTime.now)
+    val fileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
+      processing = false, receivedAt = LocalDateTime.now)
 
-    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
-      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "12", "preiousUrl"))))
+    val uploadedFilesRequest = UploadedFilesRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
 
-    val batchFileInterfaceMetadata = BatchFileInterfaceMetadata("", "", "", "", "", "", 75098112, 75098112, "", "", 75098112, true,
-      PropertiesType(List(PropertyType("CaseReference", ""), PropertyType("Eori", ""),
+    val uploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+
+    val uploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
+      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+
+    val batchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",
+      interfaceVersion = "", correlationID = "", batchID = "", batchSize = 75098112, batchCount = 75098112, checksum = "", checksumAlgorithm = "",
+      fileSize = 75098112, compressed = true, properties = PropertiesType(List(PropertyType("CaseReference", ""), PropertyType("Eori", ""),
         PropertyType("DeclarationId", "TODO"), PropertyType("DeclarationType", "MRN"),
         PropertyType("ApplicationName", "NDRC"), PropertyType("DocumentType", "TODO"),
-        PropertyType("DocumentReceivedDate", "timestamp"))), "", "", "")
+        PropertyType("DocumentReceivedDate", "timestamp"))), sourceLocation = "", sourceFileName = "",
+      sourceFileMimeType = "", destinations = Destinations(List(Destination(""))))
 
     when(mockCcsConnector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
     when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(List(Envelope(Body(batchFileInterfaceMetadata))))

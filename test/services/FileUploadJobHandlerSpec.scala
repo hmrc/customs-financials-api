@@ -36,7 +36,7 @@ import utils.SpecBase
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UploadFilesJobHandlerSpec extends SpecBase {
+class FileUploadJobHandlerSpec extends SpecBase {
 
   "FileUploadJobHandlerSpec" should {
 
@@ -68,7 +68,7 @@ class UploadFilesJobHandlerSpec extends SpecBase {
       "housekeeping " in {
         val mockCcsService: CcsService = mock[CcsService]
         val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-        val service = new UploadFilesJobHandler(mockDefaultFileUploadCache, mockCcsService)
+        val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
         service.houseKeeping()
 
@@ -120,15 +120,15 @@ class UploadFilesJobHandlerSpec extends SpecBase {
 
     val mockCcsService: CcsService = mock[CcsService]
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-    val service = new UploadFilesJobHandler(mockDefaultFileUploadCache, mockCcsService)
+    val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
-    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
+    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
 
     val fileUploadMongo: FileUploadMongo = FileUploadMongo(
       UUID.randomUUID().toString,
-      UploadedFilesRequest("id", EORI("eori"), "casenumber",
+      UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
         UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
           "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))),
       processing = true,

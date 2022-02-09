@@ -27,14 +27,16 @@ import scala.language.postfixOps
 
 @Singleton
 class Scheduler @Inject()(appConfig: AppConfig,
-                          uploadFilesJobHandler: UploadFilesJobHandler,
+                          fileUploadJobHandler: FileUploadJobHandler,
                           actorSystem: ActorSystem)(implicit executionContext: ExecutionContext) {
 
+  val log: LoggerLike = Logger(this.getClass)
+
   actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0 seconds, delay = 1 / appConfig.fileUploadPerInstancePerSecond second) {
-    () => uploadFilesJobHandler.processJob()
+    () => fileUploadJobHandler.processJob()
   }
 
   actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 10 minutes, delay = appConfig.housekeepingHours hours) {
-    () => uploadFilesJobHandler.houseKeeping()
+    () => fileUploadJobHandler.houseKeeping()
   }
 }

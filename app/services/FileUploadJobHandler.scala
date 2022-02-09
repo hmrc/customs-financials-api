@@ -21,14 +21,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class UploadFilesJobHandler @Inject()(fileUploadCache: FileUploadCache,
-                                      ccsService: CcsService)(implicit ec: ExecutionContext) {
+class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
+                                     ccsService: CcsService)(implicit ec: ExecutionContext) {
 
   def processJob(): Future[Unit] = {
     for {
       fileUploadJob <- fileUploadCache.nextJob if fileUploadJob.isDefined
-      emailRequest = fileUploadJob.get
-      _ <- ccsService.submitFileToCcs(emailRequest)
+      uploadedFileRequest = fileUploadJob.get
+      _ <- ccsService.submitFileToCcs(uploadedFileRequest)
       id = fileUploadJob.get.id
       _ <- fileUploadCache.deleteJob(id)
     } yield ()

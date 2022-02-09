@@ -22,7 +22,6 @@ import models.css.CcsSubmissionPayload
 import play.api.{Logger, LoggerLike}
 import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class CcsConnector @Inject()(httpClient: HttpClient,

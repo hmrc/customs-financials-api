@@ -73,11 +73,11 @@ class FileUploadCacheSpec extends SpecBase {
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
 
-    val fileUploadMongo = FileUploadMongo("id", UploadedFilesRequest("id", EORI("eori"), "casenumber",
+    val fileUploadMongo = FileUploadMongo("id", UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), false, LocalDateTime.now)
 
-    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber",
+    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
   }

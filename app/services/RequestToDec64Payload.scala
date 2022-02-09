@@ -40,7 +40,7 @@ class RequestToDec64Payload {
               List(
                 PropertyType("CaseReference", request.caseNumber),
                 PropertyType("Eori", request.eori.value),
-                PropertyType("DeclarationId", "TODO"),
+                PropertyType("DeclarationId", "MrnNUmber"),
                 PropertyType("DeclarationType", "MRN"),
                 PropertyType("ApplicationName", "NDRC"),
                 PropertyType("DocumentType", "TODO"),

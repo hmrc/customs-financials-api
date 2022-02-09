@@ -88,6 +88,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val tpi02HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi02.host-header")
   lazy val tpi02BearerToken: String = getConfString("tpi02.bearer-token", "test")
 
-  lazy val ccsFileUploadEndpoint: String = baseUrl("ccs") + getConfString("ccs.context-base", "/") + "/ccs/cds/documents"
+  lazy val ccsFileUploadEndpoint: String = baseUrl("ccs") + getConfString("ccs.context-base", "/") + "/filetransfer/init/v1"
 
 }
