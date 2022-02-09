@@ -18,11 +18,11 @@ package services
 
 import java.util.UUID
 
-import models.css.{BatchFileInterfaceMetadata, Body, Envelope, PropertiesType, PropertyType, UploadedFilesRequest}
+import models.css.{BatchFileInterfaceMetadata, Body, Envelope, PropertiesType, PropertyType, FileUploadRequest}
 
 class RequestToDec64Payload {
 
-  def map(request: UploadedFilesRequest): List[Envelope] =
+  def map(request: FileUploadRequest): List[Envelope] =
     request.properties.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
       Envelope(
         Body(
@@ -40,10 +40,10 @@ class RequestToDec64Payload {
               List(
                 PropertyType("CaseReference", request.caseNumber),
                 PropertyType("Eori", request.eori.value),
-                PropertyType("DeclarationId", "MrnNUmber"),
+                PropertyType("DeclarationId", "MRNNumer"),
                 PropertyType("DeclarationType", "MRN"),
-                PropertyType("ApplicationName", "NDRC"),
-                PropertyType("DocumentType", "TODO"),
+                PropertyType("ApplicationName", request.applicationName),
+                PropertyType("DocumentType", request.documentType),
                 PropertyType("DocumentReceivedDate", uploadedFile.uploadTimeStamp)
               )
             )

@@ -17,11 +17,10 @@
 package services
 
 import java.time.LocalDateTime
-
 import connectors.CcsConnector
 import domain.FileUploadMongo
 import models.EORI
-import models.css.{UploadedFilesRequest, _}
+import models.css.{FileUploadRequest, _}
 import org.mockito.ArgumentMatchers
 import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -64,7 +63,7 @@ class CcsServiceSpec extends SpecBase {
     val fileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
       processing = false, receivedAt = LocalDateTime.now)
 
-    val uploadedFilesRequest = UploadedFilesRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+    val uploadedFilesRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
 
     val uploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))

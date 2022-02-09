@@ -23,7 +23,7 @@ import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
 import javax.inject.Inject
-import models.css.UploadedFilesRequest
+import models.css.FileUploadRequest
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
@@ -48,21 +48,21 @@ class DefaultFileUploadCache @Inject()(
       )
     )) with FileUploadCache  {
 
-  override def enqueueFileUploadJob(uploadDocumentsRequest: UploadedFilesRequest): Future[Boolean] = {
+  override def enqueueFileUploadJob(uploadDocumentsRequest: FileUploadRequest): Future[Boolean] = {
     val timeStamp = LocalDateTime.now
     val id = UUID.randomUUID().toString
     val record = FileUploadMongo(id, uploadDocumentsRequest, processing = false, timeStamp)
     val result: Future[Boolean] = collection.insertOne(record).toFuture().map(_.wasAcknowledged())
     result.onComplete {
       case Failure(error) =>
-        logger.error(s"Could not enqueue FileUploadMongo: ${error.getMessage}")
+        logger.error(s"Could not enqueue FileUploadMongo record: ${error.getMessage}")
       case Success(_) =>
-        logger.info(s"Successfully enqueued FileUploadMongo:  $timeStamp : $uploadDocumentsRequest")
+        logger.info(s"Successfully enqueued FileUploadMongo record:  $timeStamp : $uploadDocumentsRequest")
     }
     result
   }
 
-  override def nextJob: Future[Option[UploadedFilesRequest]] = {
+  override def nextJob: Future[Option[FileUploadRequest]] = {
     collection.findOneAndUpdate(
       equal("processing", false),
       Updates.set("processing", true)
@@ -107,8 +107,8 @@ class DefaultFileUploadCache @Inject()(
 }
 
 trait FileUploadCache {
-    def enqueueFileUploadJob(payload: UploadedFilesRequest): Future[Boolean]
-    def nextJob: Future[Option[UploadedFilesRequest]]
+    def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
+    def nextJob: Future[Option[FileUploadRequest]]
     def deleteJob(id: String): Future[Boolean]
     def resetProcessing: Future[Unit]
 }

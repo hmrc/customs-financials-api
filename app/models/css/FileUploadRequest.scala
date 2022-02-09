@@ -19,13 +19,13 @@ package models.css
 import models.EORI
 import play.api.libs.json.{Format, Json}
 
-case class UploadedFilesRequest(id: String,
-                                eori: EORI,
-                                caseNumber: String,
-                                applicationName: String,
-                                documentType: String,
-                                properties: UploadedFileMetaData)
+case class FileUploadRequest(id: String,
+                             eori: EORI,
+                             caseNumber: String,
+                             applicationName: String,
+                             documentType: String,
+                             properties: UploadedFileMetaData)
 
-object UploadedFilesRequest {
-  implicit val format: Format[UploadedFilesRequest] = Json.format[UploadedFilesRequest]
+object FileUploadRequest {
+  implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]
 }

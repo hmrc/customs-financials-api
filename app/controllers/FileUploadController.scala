@@ -17,7 +17,7 @@
 package controllers
 
 import javax.inject.Inject
-import models.css.UploadedFilesRequest
+import models.css.FileUploadRequest
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.FileUploadCache
@@ -30,8 +30,8 @@ class FileUploadController @Inject()(cc: ControllerComponents,
                                     )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
-  def enqueueUploadedFiles(): Action[UploadedFilesRequest] = Action.async(parse.json[UploadedFilesRequest]) { implicit request =>
-    logger.info(s"enqueueEmail: send email request enqueued")
+  def enqueueUploadedFiles(): Action[FileUploadRequest] = Action.async(parse.json[FileUploadRequest]) { implicit request =>
+    logger.info(s"enqueueUploadedFiles: file upload request enqueued")
     fileUploadCache.enqueueFileUploadJob(request.body)
     Future.successful(Accepted(Json.obj("Status" -> "Ok", "message" -> "Uploaded files successfully queued")))
   }

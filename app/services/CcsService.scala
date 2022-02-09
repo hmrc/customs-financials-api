@@ -29,7 +29,7 @@ class CcsService @Inject()(cssConnector: CcsConnector,
                            requestToDec64Payload: RequestToDec64Payload) {
 
 
-  def submitFileToCcs(request: UploadedFilesRequest): Future[Boolean] = {
+  def submitFileToCcs(request: FileUploadRequest): Future[Boolean] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val ccsSubmissionsPayload = requestToDec64Payload.map(request).map(data =>
       CcsSubmissionPayload(XmlEncoder[Envelope].encode(data), getHeaders(hc))).head

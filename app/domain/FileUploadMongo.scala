@@ -17,11 +17,11 @@
 package domain
 
 import java.time.LocalDateTime
-import models.css.{CcsSubmissionPayload, UploadedFilesRequest}
+import models.css.{CcsSubmissionPayload, FileUploadRequest}
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-case class FileUploadMongo(_id: String, uploadDocumentsRequest: UploadedFilesRequest, processing: Boolean, receivedAt: LocalDateTime)
+case class FileUploadMongo(_id: String, uploadDocumentsRequest: FileUploadRequest, processing: Boolean, receivedAt: LocalDateTime)
 
 object FileUploadMongo {
   implicit val timeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat

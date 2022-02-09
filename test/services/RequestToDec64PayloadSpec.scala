@@ -50,7 +50,7 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
       "auditing.enabled" -> false
     ).build()
 
-    val uploadDocumentsRequest: UploadedFilesRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
+    val uploadDocumentsRequest: FileUploadRequest = FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "12", "preiousUrl"))))
 

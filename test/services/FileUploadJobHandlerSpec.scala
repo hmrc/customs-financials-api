@@ -23,7 +23,7 @@ import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import config.AppConfig
 import domain.FileUploadMongo
 import models.EORI
-import models.css.{UploadedFileMetaData, UploadedFiles, UploadedFilesRequest}
+import models.css.{UploadedFileMetaData, UploadedFiles, FileUploadRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{mock, verify, when}
@@ -74,39 +74,6 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
         verify(mockDefaultFileUploadCache).resetProcessing
       }
-
-//        "integration" in new Setup {
-//          val mockConfiguration = mock[Configuration]
-//          val mockApplicationLifeCycle = mock[ApplicationLifecycle]
-////          when(mockConfiguration.get(ArgumentMatchers.eq("mongodb.uri"))(any)).thenReturn("mongodb://127.0.0.1:27017/test-customs-email-throttler")
-//
-//          val reactiveMongoComponent: PlayMongoComponent = new PlayMongoComponent(mockConfiguration, lifecycle = mockApplicationLifeCycle)
-//
-//          val metricsReporter = mock[MetricsReporterService]
-//          val mockDateTimeService = mock[DateTimeService]
-////          val defaultFileUploadCache = new DefaultFileUploadCache(reactiveMongoComponent, appConfig)
-//
-//          val fileUploadRequests = Seq(
-//            UploadedFilesRequest("id_1", EORI("eori"), "casenumber",
-//              UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-//                "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))),
-//            UploadedFilesRequest("id_2", EORI("eori"), "casenumber",
-//              UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-//                "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))),
-//            UploadedFilesRequest("id_3", EORI("eori"), "casenumber",
-//              UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-//                "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
-//          )
-//          fileUploadRequests.foreach(request => await(mockDefaultFileUploadCache.enqueueFileUploadJob(request)))
-//
-//          when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-//          override val service = new UploadFilesJobHandler(mockDefaultFileUploadCache, mockCcsService)
-//
-//          await(service.processJob())
-//          await(service.processJob())
-//
-//          reactiveMongoComponent.client.close()
-//        }
     }
   }
 
@@ -122,13 +89,13 @@ class FileUploadJobHandlerSpec extends SpecBase {
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
     val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
-    val uploadDocumentsRequest = UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
+    val uploadDocumentsRequest = FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
       UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
         "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
 
     val fileUploadMongo: FileUploadMongo = FileUploadMongo(
       UUID.randomUUID().toString,
-      UploadedFilesRequest("id", EORI("eori"), "casenumber", "", "",
+      FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
         UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
           "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))),
       processing = true,
