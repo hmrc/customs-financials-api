@@ -21,10 +21,11 @@ import java.time.LocalDateTime
 import domain.FileUploadMongo
 import models.EORI
 import models.css._
+import org.mongodb.scala.model.Filters
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import uk.gov.hmrc.mongo.MongoComponent
+import services.ccs.DefaultFileUploadCache
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,6 +43,7 @@ class FileUploadCacheSpec extends SpecBase {
         })
       }
     }
+
     "enqueue file upload & return next file upload job" in new Setup {
       running(app) {
         await(for {
@@ -63,10 +65,33 @@ class FileUploadCacheSpec extends SpecBase {
         })
       }
     }
+
+    "send all file uploads with processing set to false" in new Setup {
+
+      val fileUploadCache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
+      val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id_1", uploadDocumentsRequest = uploadedFilesRequest,
+        processing = false, receivedAt = LocalDateTime.now)
+      val fileUploadMongo2: FileUploadMongo = FileUploadMongo(_id = "id_2", uploadDocumentsRequest = uploadedFilesRequest,
+        processing = false, receivedAt = LocalDateTime.now)
+
+
+      running(app) {
+        await(for {
+          _ <- fileUploadCache.collection.insertMany(Seq(fileUploadMongo, fileUploadMongo2)).toFuture()
+          result1 <- fileUploadCache.nextJob
+          result2 <- fileUploadCache.nextJob
+          result3 <- fileUploadCache.nextJob
+          _ <- fileUploadCache.collection.drop().toFuture()
+        } yield {
+          result1.nonEmpty mustBe true
+          result2.nonEmpty mustBe true
+          result3.nonEmpty mustBe false
+        })
+      }
+    }
   }
 
   trait Setup {
-
     val app: Application = GuiceApplicationBuilder().overrides().configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,
@@ -75,12 +100,12 @@ class FileUploadCacheSpec extends SpecBase {
 
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
-    val mockMongo = mock[MongoComponent]
 
     val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
-      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
 
-    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce1", uploadedFiles = Seq(uploadedFiles))
+    val uploadedFileMetaData2: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce2", uploadedFiles = Seq(uploadedFiles))
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)

@@ -18,12 +18,12 @@ package connectors
 
 import config.AppConfig
 import models.css.CcsSubmissionPayload
-import org.mockito.ArgumentMatchers
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.JsResult.Exception
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
 import utils.SpecBase
 
 import scala.concurrent.Future
@@ -46,6 +46,16 @@ class CcsConnectorSpec extends SpecBase {
     "return false when fails file upload ccs POST" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POSTString(any, any, any)(any, any, any))
         .thenReturn(Future.successful(HttpResponse(BAD_REQUEST)))
+
+      running(app) {
+        val result = await(connector.submitFileUpload(CcsSubmissionPayload("", Seq())))
+        result mustBe false
+      }
+    }
+
+    "return false when exception thrown for file upload ccs POST" in new Setup {
+      when[Future[HttpResponse]](mockHttpClient.POSTString(any, any, any)(any, any, any))
+        .thenReturn(Future.failed(new InternalServerException("boom")))
 
       running(app) {
         val result = await(connector.submitFileUpload(CcsSubmissionPayload("", Seq())))

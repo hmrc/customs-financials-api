@@ -16,7 +16,6 @@
 
 package models.css
 
-import javax.print.attribute.standard.Destination
 import models.css.Namespaces.mdg
 import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
 import ru.tinkoff.phobos.encoding.ElementEncoder

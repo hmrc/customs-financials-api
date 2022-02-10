@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services
+package services.ccs
 
 import akka.actor.ActorSystem
 import config.AppConfig

@@ -20,9 +20,10 @@ import javax.inject.Inject
 import models.css.FileUploadRequest
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import services.FileUploadCache
+import services.ccs.FileUploadCache
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
 import scala.concurrent.ExecutionContext
 
 class FileUploadController @Inject()(cc: ControllerComponents,

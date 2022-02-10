@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package services
+package services.ccs
 
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 

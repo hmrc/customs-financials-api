@@ -17,6 +17,6 @@
 package config
 
 import play.api.inject._
-import services.Scheduler
+import services.ccs.Scheduler
 
 class SchedulerModule extends SimpleModule(bind[Scheduler].toSelf.eagerly())

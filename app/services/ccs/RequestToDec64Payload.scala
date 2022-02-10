@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package services
+package services.ccs
 
-import java.util.UUID
+import com.google.inject.Inject
+import models.css._
+import utils.RandomUUIDGenerator
 
-import models.css.{BatchFileInterfaceMetadata, Body, Envelope, PropertiesType, PropertyType, FileUploadRequest}
-
-class RequestToDec64Payload {
+class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
 
   def map(request: FileUploadRequest): List[Envelope] =
     request.properties.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
       Envelope(
         Body(
           BatchFileInterfaceMetadata(
-            correlationID = UUID.randomUUID().toString,
+            correlationID = uuidGenerator.generateUuid,
             batchID = request.caseNumber,
             batchCount = index.toLong + 1,
             batchSize = request.properties.uploadedFiles.length,

@@ -18,7 +18,9 @@ package services
 
 import akka.actor.ActorSystem
 import config.AppConfig
+import services.ccs.{FileUploadJobHandler, Scheduler}
 import utils.SpecBase
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration

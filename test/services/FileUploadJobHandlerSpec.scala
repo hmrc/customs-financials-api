@@ -17,6 +17,7 @@
 package services
 
 import java.time.LocalDateTime
+
 import domain.FileUploadMongo
 import models.EORI
 import models.css.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
@@ -24,7 +25,9 @@ import org.mockito.ArgumentMatchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
+import services.ccs.{CcsService, DefaultFileUploadCache, FileUploadJobHandler}
 import utils.SpecBase
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -23,10 +23,10 @@ import domain.FileUploadMongo
 import models.EORI
 import models.css.{FileUploadRequest, _}
 import org.mockito.ArgumentMatchers
-import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.test.Helpers.running
+import play.api.{Application, inject}
+import services.ccs.{CcsService, RequestToDec64Payload}
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,7 +48,6 @@ class CcsServiceSpec extends SpecBase {
   }
 
   trait Setup {
-
     val mockCcsConnector: CcsConnector = mock[CcsConnector]
     val mockRequestToDec64Payload: RequestToDec64Payload = mock[RequestToDec64Payload]
 

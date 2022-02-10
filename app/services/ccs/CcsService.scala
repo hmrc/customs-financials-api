@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services
+package services.ccs
 
 import connectors.CcsConnector
 import javax.inject.{Inject, Singleton}
@@ -26,31 +26,15 @@ import scala.concurrent.Future
 
 @Singleton
 class CcsService @Inject()(cssConnector: CcsConnector,
+                           ccsHeaders: CcsHeaders,
                            requestToDec64Payload: RequestToDec64Payload) {
-
 
   def submitFileToCcs(request: FileUploadRequest): Future[Boolean] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val ccsSubmissionsPayload = requestToDec64Payload.map(request).map(data =>
-      CcsSubmissionPayload(XmlEncoder[Envelope].encode(data), getHeaders(hc))).head
+      CcsSubmissionPayload(XmlEncoder[Envelope].encode(data), ccsHeaders.getHeaders(hc))).head
     cssConnector.submitFileUpload(ccsSubmissionsPayload)
   }
-
-  def getHeaders(headerCarrier: HeaderCarrier): Seq[(String, String)] =
-    List(
-      headerCarrier.requestId.map(rid => headerCarrier.names.xRequestId -> rid.value),
-      headerCarrier.sessionId.map(sid => headerCarrier.names.xSessionId -> sid.value),
-      headerCarrier.forwarded.map(f => headerCarrier.names.xForwardedFor -> f.value),
-      Some(headerCarrier.names.xRequestChain -> headerCarrier.requestChain.value),
-      headerCarrier.authorization.map(auth => headerCarrier.names.authorisation -> auth.value),
-      headerCarrier.trueClientIp.map(HeaderNames.trueClientIp -> _),
-      headerCarrier.trueClientPort.map(HeaderNames.trueClientPort -> _),
-      headerCarrier.gaToken.map(HeaderNames.googleAnalyticTokenId -> _),
-      headerCarrier.gaUserId.map(HeaderNames.googleAnalyticUserId -> _),
-      headerCarrier.deviceID.map(HeaderNames.deviceID -> _),
-      headerCarrier.akamaiReputation.map(HeaderNames.akamaiReputation -> _.value)
-    ).flatten ++ headerCarrier.extraHeaders ++ headerCarrier.otherHeaders
-
 }
 
 

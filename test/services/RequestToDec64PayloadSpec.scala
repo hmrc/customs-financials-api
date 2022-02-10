@@ -19,11 +19,13 @@ package services
 import models.EORI
 import models.css._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
+import play.api.{Application, inject}
+import services.ccs.RequestToDec64Payload
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.SpecBase
+import utils.{RandomUUIDGenerator, SpecBase}
+
 import scala.concurrent.ExecutionContext
 
 class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
@@ -33,8 +35,8 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
     "calling map" should {
       "return submissionPayloadResponse" in new Setup {
         running(app) {
-          val result = requestToDec64Payload.map(uploadDocumentsRequest)
-          result mustBe result
+          val result = requestToDec64Payload.map(uploadedFilesRequest)
+          result mustBe ccsSubmissionPayload
         }
       }
     }
@@ -43,23 +45,38 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    val mockUUID = mock[RandomUUIDGenerator]
 
-    val app: Application = GuiceApplicationBuilder().configure(
+    val app: Application = GuiceApplicationBuilder().overrides(
+      inject.bind[RandomUUIDGenerator].toInstance(mockUUID),
+    ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,
       "auditing.enabled" -> false
     ).build()
 
-    val uploadDocumentsRequest: FileUploadRequest = FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
-      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "12", "preiousUrl"))))
-
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
 
-    val result = List(Envelope(Body(BatchFileInterfaceMetadata("TPI", "AWS", "DEC64", "1.0.0", "7ffec90e-37c9-49db-8472-6bd50e52ecf2",
-      "casenumber", 1, 1, "checkSum", "SHA-256", 2, false, PropertiesType(List(PropertyType("CaseReference","casenumber"),
-       PropertyType("Eori","eori"), PropertyType("DeclarationId","TODO"), PropertyType("DeclarationType","MRN"),
-       PropertyType("ApplicationName","NDRC"), PropertyType("DocumentType","TODO"), PropertyType("DocumentReceivedDate","uploadTimeStamp"))),
-      "downloadUrl","fileName","fileMimeType"))))
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "timeStamp",
+      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+
+    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+
+    val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+
+    val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "AWS",
+      interfaceName = "DEC64", interfaceVersion = "1.0.0", correlationID = "correlationID", batchID = "casenumber",
+      batchSize = 1, batchCount = 1, checksum = "sum", checksumAlgorithm = "SHA-256", fileSize = 12, compressed = false,
+      properties = PropertiesType(List(PropertyType("CaseReference", "casenumber"),
+        PropertyType("Eori", "eori"), PropertyType("DeclarationId", "MRNNumer"), PropertyType("DeclarationType", "MRN"),
+        PropertyType("ApplicationName", "appName"), PropertyType("DocumentType", "docType"),
+        PropertyType("DocumentReceivedDate", "timeStamp"))), sourceLocation = "url", sourceFileName = "filename",
+      sourceFileMimeType = "mimeType", destinations = Destinations(List(Destination("CDFPay"))))
+
+    val ccsSubmissionPayload = List(Envelope(Body(batchFileInterfaceMetadata)))
+
+    when(mockUUID.generateUuid).thenReturn("correlationID")
+
   }
 }

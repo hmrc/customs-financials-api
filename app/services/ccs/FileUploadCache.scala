@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package services
+package services.ccs
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.ZoneOffset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+
 import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
@@ -27,14 +28,17 @@ import models.css.FileUploadRequest
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
+import services.DateTimeService
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class DefaultFileUploadCache @Inject()(
   mongoComponent: MongoComponent,
+  dateTimeService: DateTimeService,
   config: AppConfig)(implicit executionContext: ExecutionContext)
   extends PlayMongoRepository[FileUploadMongo](
     collectionName = config.fileUploadCacheCollectionName,
@@ -49,7 +53,7 @@ class DefaultFileUploadCache @Inject()(
     )) with FileUploadCache  {
 
   override def enqueueFileUploadJob(uploadDocumentsRequest: FileUploadRequest): Future[Boolean] = {
-    val timeStamp = LocalDateTime.now
+    val timeStamp = dateTimeService.now()
     val id = UUID.randomUUID().toString
     val record = FileUploadMongo(id, uploadDocumentsRequest, processing = false, timeStamp)
     val result: Future[Boolean] = collection.insertOne(record).toFuture().map(_.wasAcknowledged())
@@ -92,7 +96,7 @@ class DefaultFileUploadCache @Inject()(
   }
 
   override def resetProcessing: Future[Unit] = {
-    val maxAge = getLocalDateTime.minusMinutes(config.fileUploadMaxAgeMins)
+    val maxAge = dateTimeService.now().minusMinutes(config.fileUploadMaxAgeMins)
     val updates = Updates.set("processing", false)
     collection.updateMany(
       filter = Filters.and(
@@ -102,8 +106,6 @@ class DefaultFileUploadCache @Inject()(
       updates
     ).toFuture().map(_ => ())
   }
-
-  def getLocalDateTime: LocalDateTime = LocalDateTime.now
 }
 
 trait FileUploadCache {

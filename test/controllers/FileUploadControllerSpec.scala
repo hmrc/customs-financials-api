@@ -16,16 +16,15 @@
 
 package controllers
 
-import models.EORI
-import models.css.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
+import models.css.FileUploadRequest
+import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, Result}
-import play.api.test.{FakeHeaders, FakeRequest, Helpers}
+import play.api.mvc.Result
 import play.api.test.Helpers._
-import play.api.{Application, inject}
-import services.{FileUploadCache, FileUploadJobHandler}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
+import services.ccs.FileUploadCache
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -90,5 +89,4 @@ class FileUploadControllerSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
   }
-
 }
