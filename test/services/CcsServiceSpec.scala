@@ -17,6 +17,7 @@
 package services
 
 import java.time.LocalDateTime
+
 import connectors.CcsConnector
 import domain.FileUploadMongo
 import models.EORI
@@ -24,8 +25,10 @@ import models.css.{FileUploadRequest, _}
 import org.mockito.ArgumentMatchers
 import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import utils.SpecBase
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -60,18 +63,18 @@ class CcsServiceSpec extends SpecBase {
 
     val ccsService: CcsService = app.injector.instanceOf[CcsService]
 
-    val fileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
-      processing = false, receivedAt = LocalDateTime.now)
-
-    val uploadedFilesRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
-
-    val uploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
-
-    val uploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
       checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
 
-    val batchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",
+    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+
+    val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+
+    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
+      processing = false, receivedAt = LocalDateTime.now)
+
+    val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",
       interfaceVersion = "", correlationID = "", batchID = "", batchSize = 75098112, batchCount = 75098112, checksum = "", checksumAlgorithm = "",
       fileSize = 75098112, compressed = true, properties = PropertiesType(List(PropertyType("CaseReference", ""), PropertyType("Eori", ""),
         PropertyType("DeclarationId", "TODO"), PropertyType("DeclarationType", "MRN"),

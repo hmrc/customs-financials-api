@@ -23,7 +23,7 @@ import play.api.mvc.{Action, ControllerComponents}
 import services.FileUploadCache
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class FileUploadController @Inject()(cc: ControllerComponents,
                                      fileUploadCache: FileUploadCache
@@ -32,7 +32,11 @@ class FileUploadController @Inject()(cc: ControllerComponents,
 
   def enqueueUploadedFiles(): Action[FileUploadRequest] = Action.async(parse.json[FileUploadRequest]) { implicit request =>
     logger.info(s"enqueueUploadedFiles: file upload request enqueued")
-    fileUploadCache.enqueueFileUploadJob(request.body)
-    Future.successful(Accepted(Json.obj("Status" -> "Ok", "message" -> "Uploaded files successfully queued")))
+    fileUploadCache.enqueueFileUploadJob(request.body).map {
+      case true =>
+        Accepted(Json.obj("Status" -> "Ok", "message" -> "Uploaded files successfully queued"))
+      case false =>
+        BadRequest
+    }
   }
 }

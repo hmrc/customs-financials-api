@@ -97,7 +97,7 @@ class DefaultFileUploadCache @Inject()(
     collection.updateMany(
       filter = Filters.and(
         Filters.equal("processing", true),
-        Filters.lt("lastUpdated", maxAge.toInstant(ZoneOffset.UTC))
+        Filters.lt("receivedAt", maxAge.toInstant(ZoneOffset.UTC))
       ),
       updates
     ).toFuture().map(_ => ())

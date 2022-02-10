@@ -17,13 +17,16 @@
 package services
 
 import java.time.LocalDateTime
+
 import domain.FileUploadMongo
 import models.EORI
 import models.css._
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
+import uk.gov.hmrc.mongo.MongoComponent
 import utils.SpecBase
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileUploadCacheSpec extends SpecBase {
@@ -33,7 +36,7 @@ class FileUploadCacheSpec extends SpecBase {
     "enqueue file upload to mongo db returns true" in new Setup {
       running(app) {
         await(for {
-          enqueueJob <- cache.enqueueFileUploadJob(uploadDocumentsRequest)
+          enqueueJob <- cache.enqueueFileUploadJob(uploadedFilesRequest)
         } yield {
           enqueueJob mustBe true
         })
@@ -42,11 +45,11 @@ class FileUploadCacheSpec extends SpecBase {
     "enqueue file upload & return next file upload job" in new Setup {
       running(app) {
         await(for {
-          enqueueJob <- cache.enqueueFileUploadJob(uploadDocumentsRequest)
+          enqueueJob <- cache.enqueueFileUploadJob(uploadedFilesRequest)
           nextJob <- cache.nextJob
         } yield {
           enqueueJob mustBe true
-          nextJob mustBe Some(uploadDocumentsRequest)
+          nextJob mustBe Some(uploadedFilesRequest)
         })
       }
     }
@@ -72,14 +75,15 @@ class FileUploadCacheSpec extends SpecBase {
 
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
+    val mockMongo = mock[MongoComponent]
 
-    val fileUploadMongo = FileUploadMongo("id", FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
-      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl")))), false, LocalDateTime.now)
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
+      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
 
-    val uploadDocumentsRequest = FileUploadRequest("id", EORI("eori"), "casenumber", "", "",
-      UploadedFileMetaData("nonce", Seq(UploadedFiles("upscanRef", "downloadUrl", "uploadTimeStamp",
-        "checkSum", "fileName", "fileMimeType", "fileSize", "preiousUrl"))))
+    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+
+    val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
   }
 
 }

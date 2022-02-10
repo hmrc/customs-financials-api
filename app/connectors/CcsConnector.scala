@@ -16,22 +16,33 @@
 
 package connectors
 
+import java.util.UUID
+
 import config.AppConfig
 import javax.inject.Inject
-import models.css.CcsSubmissionPayload
+import models.css.{CcsSubmissionPayload, RFC7231DateTime}
 import play.api.{Logger, LoggerLike}
-import play.api.http.Status
+import play.api.http.{ContentTypes, HeaderNames, MimeTypes, Status}
+import play.api.mvc.Codec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CcsConnector @Inject()(httpClient: HttpClient,
                              config: AppConfig)(implicit executionContext: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
+  val xmlHeaders =  Seq(
+    HeaderNames.DATE                   -> RFC7231DateTime.now,
+    "X-Correlation-ID"                 -> UUID.randomUUID().toString,
+    HeaderNames.X_FORWARDED_HOST       -> "MDTP",
+    HeaderNames.CONTENT_TYPE           -> ContentTypes.withCharset(MimeTypes.XML)(Codec.utf_8),
+    HeaderNames.ACCEPT                 -> MimeTypes.XML
+  )
 
   def submitFileUpload(payload: CcsSubmissionPayload)(implicit hc: HeaderCarrier): Future[Boolean] = {
     httpClient.POSTString[HttpResponse](config.ccsFileUploadEndpoint, payload.dec64Body,
-      payload.headers)(HttpReads[HttpResponse], hc, executionContext).collect {
+      payload.headers ++ xmlHeaders)(HttpReads[HttpResponse], hc, executionContext).collect {
       case response if response.status == Status.NO_CONTENT =>
         log.info(s"[submitFileUpload] Successful request to CCS ")
         true
