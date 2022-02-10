@@ -20,8 +20,7 @@ import connectors.CcsConnector
 import javax.inject.{Inject, Singleton}
 import models.css._
 import ru.tinkoff.phobos.encoding.XmlEncoder
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
-
+import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 @Singleton
