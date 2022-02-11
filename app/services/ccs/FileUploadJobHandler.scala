@@ -17,6 +17,7 @@
 package services.ccs
 
 import javax.inject.{Inject, Singleton}
+import play.api.{Logger, LoggerLike}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,14 +26,23 @@ import scala.concurrent.{ExecutionContext, Future}
 class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
                                      ccsService: CcsService)(implicit ec: ExecutionContext) {
 
+  val log: LoggerLike = Logger(this.getClass)
+
   def processJob(): Future[Unit] = {
     for {
       fileUploadJob <- fileUploadCache.nextJob if fileUploadJob.isDefined
       uploadedFileRequest = fileUploadJob.get
-      _ <- ccsService.submitFileToCcs(uploadedFileRequest)
+      fileSubmitted <- ccsService.submitFileToCcs(uploadedFileRequest)
       id = fileUploadJob.get.id
-      _ <- fileUploadCache.deleteJob(id)
-    } yield ()
+    } yield {
+      fileSubmitted match {
+        case true =>
+          log.info(s"File Submission to CSS was successful delete job starting")
+          fileUploadCache.deleteJob(id)
+        case _ =>
+          log.info(s"File Submission to CSS failed delete job not ran")
+      }
+    }
   }
 
   def houseKeeping(): Unit = fileUploadCache.resetProcessing

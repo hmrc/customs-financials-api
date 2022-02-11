@@ -22,10 +22,10 @@ import domain.FileUploadMongo
 import models.EORI
 import models.css.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
 import org.mockito.ArgumentMatchers
-import play.api.Application
+import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import services.ccs.{CcsService, DefaultFileUploadCache, FileUploadJobHandler}
+import services.ccs.{CcsService, DefaultFileUploadCache, FileUploadCache, FileUploadJobHandler}
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,13 +57,51 @@ class FileUploadJobHandlerSpec extends SpecBase {
         }
       }
 
-      "delete completed job" in new Setup {
+      "delete completed job if submission was successful" in new Setup {
         running(app) {
 
           await(handler.processJob())
 
           verify(mockDefaultFileUploadCache).deleteJob(ArgumentMatchers.any())
         }
+      }
+
+      "delete not completed job when submission to ccs was unsuccessful" in  {
+
+        val app: Application = GuiceApplicationBuilder().overrides().configure(
+          "microservice.metrics.enabled" -> false,
+          "metrics.enabled" -> false,
+          "auditing.enabled" -> false
+        ).build()
+
+        val mockCcsService: CcsService = mock[CcsService]
+        val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
+        val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
+
+        val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
+          checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+
+        val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
+
+        val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+          applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+
+        val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
+          processing = false, receivedAt = LocalDateTime.now)
+
+        when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
+
+        when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(false))
+
+        running(app) {
+
+          await(handler.processJob())
+
+          verify(mockCcsService).submitFileToCcs(ArgumentMatchers.any())
+
+          verifyZeroInteractions(mockDefaultFileUploadCache)
+        }
+
       }
 
       "housekeeping " in {
