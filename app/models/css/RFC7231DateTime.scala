@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package models.css
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneOffset, ZonedDateTime}
 
-class Module extends AbstractModule {
+object RFC7231DateTime {
 
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
+  private val rfc7231DateTimeFormat: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
+
+  def now: String = rfc7231DateTimeFormat.format(ZonedDateTime.now(ZoneOffset.UTC))
 }

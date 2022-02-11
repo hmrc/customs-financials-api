@@ -175,15 +175,8 @@ class NotificationCacheSpec extends SpecBase {
     val requestedAndNonRequestedNotifications = Seq(c79CertNotification1, c79StatementRequest1)
 
     val lastUpdated: Option[DateTime] = Some(DateTime.now(DateTimeZone.UTC))
-    val mockAppConfig: AppConfig = mock[AppConfig]
-    when(mockAppConfig.dbTimeToLiveInSeconds).thenReturn(10)
-    when(mockAppConfig.notificationCacheCollectionName).thenReturn("notificationStore-test")
-    when(mockAppConfig.authUrl).thenReturn("/")
 
-
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[AppConfig].toInstance(mockAppConfig)
-    ).configure(
+    val app: Application = GuiceApplicationBuilder().configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,
       "auditing.enabled" -> false

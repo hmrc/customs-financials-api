@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package models.css
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import models.css.Namespaces.soap
+import ru.tinkoff.phobos.derivation.semiauto.deriveXmlEncoder
+import ru.tinkoff.phobos.encoding.XmlEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-class Module extends AbstractModule {
+case class Envelope(@xmlns(soap) Body: Body)
 
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
+object Envelope {
+  implicit val envelopeEncoder: XmlEncoder[Envelope] = deriveXmlEncoder("Envelope", Namespaces.soap)
 }

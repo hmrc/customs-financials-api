@@ -26,13 +26,12 @@ import org.mongodb.scala.model._
 import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DefaultNotificationCache @Inject()()(
+class DefaultNotificationCache @Inject()(
   mongoComponent: MongoComponent,
   appConfig: AppConfig
 )(implicit executionContext: ExecutionContext)

@@ -16,14 +16,7 @@
 
 package config
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import play.api.inject._
+import services.ccs.Scheduler
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
-}
+class SchedulerModule extends SimpleModule(bind[Scheduler].toSelf.eagerly())

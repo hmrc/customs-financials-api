@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package config
+package utils
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import java.util.UUID
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
+class RandomUUIDGenerator {
+  def generateUuid: String = UUID.randomUUID().toString
 }

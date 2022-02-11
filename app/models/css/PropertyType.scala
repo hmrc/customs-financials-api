@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package models.css
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import models.css.Namespaces.mdg
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-class Module extends AbstractModule {
+case class PropertyType(@xmlns(mdg) name: String,
+                        @xmlns(mdg) value: String)
 
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
+object PropertyType {
+  implicit val propertyTypeEnc: ElementEncoder[PropertyType] = deriveElementEncoder[PropertyType]
 }

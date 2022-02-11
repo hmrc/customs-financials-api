@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models.css
 
-import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
-import services.{DefaultNotificationCache, NotificationCache}
+import play.api.libs.json.{Json, Format}
 
-class Module extends AbstractModule {
+case class UploadedFileMetaData(nonce: String, uploadedFiles: Seq[UploadedFiles])
 
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
-  }
+object UploadedFileMetaData {
+  implicit val format: Format[UploadedFileMetaData] = Json.format[UploadedFileMetaData]
 }
