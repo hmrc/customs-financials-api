@@ -89,5 +89,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val tpi02BearerToken: String = getConfString("tpi02.bearer-token", "test")
 
   lazy val ccsFileUploadEndpoint: String = baseUrl("dec64") + getConfString("dec64.context-base", "/") + "/filetransfer/init/v1"
+  lazy val cssBearerToken: String = configuration.get[String]("microservice.services.dec64.bearer-token")
 
 }
