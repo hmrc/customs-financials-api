@@ -16,6 +16,7 @@
 
 package services
 
+import config.MetaConfig.Dec64
 import models.EORI
 import models.css._
 import org.scalatest.concurrent.ScalaFutures
@@ -35,8 +36,9 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
     "calling map" should {
       "return submissionPayloadResponse" in new Setup {
         running(app) {
+          val expectedResult = responseXmlString.toString
           val result = requestToDec64Payload.map(uploadedFilesRequest)
-          result mustBe ccsSubmissionPayload
+          result contains expectedResult
         }
       }
     }
@@ -58,7 +60,7 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
 
     val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "timeStamp",
-      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
 
     val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
 
@@ -74,9 +76,69 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
         PropertyType("DocumentReceivedDate", "timeStamp"))), sourceLocation = "url", sourceFileName = "filename",
       sourceFileMimeType = "mimeType", destinations = Destinations(List(Destination("CDFPay"))))
 
-    val ccsSubmissionPayload = List(Envelope(Body(batchFileInterfaceMetadata)))
+    val ccsSubmissionPayload = List(batchFileInterfaceMetadata.toString)
 
     when(mockUUID.generateUuid).thenReturn("correlationID")
 
+    val responseXmlString =
+      <mdg:BatchFileInterfaceMetadata
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mdg="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema"
+      xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema BatchFileInterfaceMetadata-1.0.7.xsd">
+        <mdg:sourceSystem>TPI</mdg:sourceSystem>
+        <mdg:sourceSystemType>AWS</mdg:sourceSystemType>
+        <mdg:interfaceName>DEC64</mdg:interfaceName>
+        <mdg:interfaceVersion>1.0.0</mdg:interfaceVersion>
+        <mdg:correlationID>correlationID</mdg:correlationID>
+        <mdg:batchID>casenumber</mdg:batchID>
+        <mdg:batchSize>1</mdg:batchSize>
+        <mdg:batchCount>1</mdg:batchCount>
+        <mdg:extractEndDateTime>timeStamp</mdg:extractEndDateTime>
+        <mdg:checksum>sum</mdg:checksum>
+        <mdg:checksumAlgorithm>SHA-256</mdg:checksumAlgorithm>
+        <mdg:fileSize>12</mdg:fileSize>
+        <mdg:compressed>false</mdg:compressed>
+        <mdg:encrypted>false</mdg:encrypted>
+        <mdg:properties>
+          <mdg:property>
+            <mdg:name>EORI</mdg:name>
+            <mdg:value>eori</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>ApplicationName</mdg:name>
+            <mdg:value>appName</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>CaseReference</mdg:name>
+            <mdg:value>casenumber</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>DocumentReceivedDate</mdg:name>
+            <mdg:value>timeStamp</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>DeclarationId</mdg:name>
+            <mdg:value>MRNNumber</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>DeclarationType</mdg:name>
+            <mdg:value>MRN</mdg:value>
+          </mdg:property>
+          <mdg:property>
+            <mdg:name>DocumentType</mdg:name>
+            <mdg:value>docType</mdg:value>
+          </mdg:property>
+        </mdg:properties>
+        <mdg:sourceLocation>url</mdg:sourceLocation>
+        <mdg:sourceFileName>filename</mdg:sourceFileName>
+        <mdg:sourceFileMimeType>mimeType</mdg:sourceFileMimeType>
+        <mdg:destinations>
+          <mdg:destination>
+            <mdg:destinationSystem>CDFPay</mdg:destinationSystem>
+          </mdg:destination>
+        </mdg:destinations>
+      </mdg:BatchFileInterfaceMetadata>
+
   }
+
 }

@@ -82,7 +82,7 @@ class CcsServiceSpec extends SpecBase {
       sourceFileMimeType = "", destinations = Destinations(List(Destination(""))))
 
     when(mockCcsConnector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(List(Envelope(Body(batchFileInterfaceMetadata))))
+    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(List(batchFileInterfaceMetadata.toString))
 
   }
 }
