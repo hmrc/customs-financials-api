@@ -35,12 +35,11 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
       fileSubmitted <- ccsService.submitFileToCcs(uploadedFileRequest)
       id = fileUploadJob.get.id
     } yield {
-      fileSubmitted match {
-        case true =>
-          log.info(s"File Submission to CSS was successful delete job starting")
-          fileUploadCache.deleteJob(id)
-        case _ =>
-          log.info(s"File Submission to CSS failed delete job not ran")
+      if (fileSubmitted) {
+        log.info(s"File Submission to CSS was successful delete job starting")
+        fileUploadCache.deleteJob(id)
+      } else {
+        log.info(s"File Submission to CSS failed delete job not ran")
       }
     }
   }

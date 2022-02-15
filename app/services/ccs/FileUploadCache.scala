@@ -19,15 +19,15 @@ package services.ccs
 import java.time.ZoneOffset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
-import com.mongodb.client.model.Updates
+import com.mongodb.client.model.{ReplaceOptions, Updates}
 import config.AppConfig
 import domain.FileUploadMongo
+
 import javax.inject.Inject
 import models.css.FileUploadRequest
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
 import services.DateTimeService
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
@@ -37,9 +37,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class DefaultFileUploadCache @Inject()(
-  mongoComponent: MongoComponent,
-  dateTimeService: DateTimeService,
-  config: AppConfig)(implicit executionContext: ExecutionContext)
+                                        mongoComponent: MongoComponent,
+                                        dateTimeService: DateTimeService,
+                                        config: AppConfig)(implicit executionContext: ExecutionContext)
   extends PlayMongoRepository[FileUploadMongo](
     collectionName = config.fileUploadCacheCollectionName,
     mongoComponent = mongoComponent,
@@ -49,8 +49,12 @@ class DefaultFileUploadCache @Inject()(
         ascending("receivedAt"),
         IndexOptions().name("file-upload-cache-received-at-index")
           .expireAfter(config.dbTimeToLiveInSeconds, TimeUnit.SECONDS)
+      ),
+      IndexModel(
+        ascending("uploadDocumentsRequest.id"),
+        IndexOptions().name("document-id-index")
       )
-    )) with FileUploadCache  {
+    )) with FileUploadCache {
 
   override def enqueueFileUploadJob(uploadDocumentsRequest: FileUploadRequest): Future[Boolean] = {
     val timeStamp = dateTimeService.now()
@@ -85,7 +89,7 @@ class DefaultFileUploadCache @Inject()(
   }
 
   override def deleteJob(id: String): Future[Boolean] = {
-    val result = collection.deleteOne(equal("_id", id)).toFuture().map(_.wasAcknowledged())
+    val result = collection.deleteOne(equal("uploadDocumentsRequest.id", id)).toFuture().map(_.wasAcknowledged())
     result.onComplete {
       case Success(_) =>
         logger.info(s"Successfully deleted FileUploadMongo job: $id")
@@ -109,10 +113,13 @@ class DefaultFileUploadCache @Inject()(
 }
 
 trait FileUploadCache {
-    def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
-    def nextJob: Future[Option[FileUploadRequest]]
-    def deleteJob(id: String): Future[Boolean]
-    def resetProcessing: Future[Unit]
+  def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
+
+  def nextJob: Future[Option[FileUploadRequest]]
+
+  def deleteJob(id: String): Future[Boolean]
+
+  def resetProcessing: Future[Unit]
 }
 
 
