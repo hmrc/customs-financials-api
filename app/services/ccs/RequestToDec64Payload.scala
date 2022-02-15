@@ -17,38 +17,77 @@
 package services.ccs
 
 import com.google.inject.Inject
+import config.MetaConfig.Dec64
+import models.css.Namespaces.mdg
 import models.css._
+import org.joda.time.DateTime
+import ru.tinkoff.phobos.syntax.xmlns
 import utils.RandomUUIDGenerator
 
 class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
 
-  def map(request: FileUploadRequest): List[Envelope] =
+  def map(request: FileUploadRequest): Seq[String] =
     request.properties.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
-      Envelope(
-        Body(
-          BatchFileInterfaceMetadata(
-            correlationID = uuidGenerator.generateUuid,
-            batchID = request.caseNumber,
-            batchCount = index.toLong + 1,
-            batchSize = request.properties.uploadedFiles.length,
-            checksum = uploadedFile.checkSum,
-            sourceLocation = uploadedFile.downloadUrl,
-            sourceFileName = uploadedFile.fileName,
-            sourceFileMimeType = uploadedFile.fileMimeType,
-            fileSize = uploadedFile.fileSize.toLong,
-            properties = PropertiesType(
-              List(
-                PropertyType("CaseReference", request.caseNumber),
-                PropertyType("Eori", request.eori.value),
-                PropertyType("DeclarationId", "MRNNumer"),
-                PropertyType("DeclarationType", "MRN"),
-                PropertyType("ApplicationName", request.applicationName),
-                PropertyType("DocumentType", request.documentType),
-                PropertyType("DocumentReceivedDate", uploadedFile.uploadTimeStamp)
-              )
-            )
-          )
-        )
-      )
-    }.toList
+
+      val xml =
+        <mdg:BatchFileInterfaceMetadata
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mdg="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema"
+        xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema BatchFileInterfaceMetadata-1.0.7.xsd">
+          <mdg:sourceSystem>{Dec64.SOURCE_SYSTEM}</mdg:sourceSystem>
+          <mdg:sourceSystemType>{Dec64.SOURCE_SYSTEM_TYPE}</mdg:sourceSystemType>
+          <mdg:interfaceName>{Dec64.INTERFACE_NAME}</mdg:interfaceName>
+          <mdg:interfaceVersion>{Dec64.INTERFACE_VERSION}</mdg:interfaceVersion>
+          <mdg:correlationID>{uuidGenerator.generateUuid}</mdg:correlationID>
+          <mdg:batchID>{request.caseNumber}</mdg:batchID>
+          <mdg:batchSize>{request.properties.uploadedFiles.length}</mdg:batchSize>
+          <mdg:batchCount>{index.toLong + 1}</mdg:batchCount>
+          <mdg:extractEndDateTime>{uploadedFile.uploadTimeStamp}</mdg:extractEndDateTime>
+          <mdg:checksum>{uploadedFile.checkSum}</mdg:checksum>
+          <mdg:checksumAlgorithm>{Dec64.UPSCAN_CHECKSUM_ALGORITHM}</mdg:checksumAlgorithm>
+          <mdg:fileSize>{uploadedFile.fileSize.toLong}</mdg:fileSize>
+          <mdg:compressed>false</mdg:compressed>
+          <mdg:encrypted>false</mdg:encrypted>
+          <mdg:properties>
+            <mdg:property>
+              <mdg:name>EORI</mdg:name>
+              <mdg:value>{request.eori.value}</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>ApplicationName</mdg:name>
+              <mdg:value>{request.applicationName}</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>CaseReference</mdg:name>
+              <mdg:value>{request.caseNumber}</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>DocumentReceivedDate</mdg:name>
+              <mdg:value>{uploadedFile.uploadTimeStamp}</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>DeclarationId</mdg:name>
+              <mdg:value>MRNNumber</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>DeclarationType</mdg:name>
+              <mdg:value>MRN</mdg:value>
+            </mdg:property>
+            <mdg:property>
+              <mdg:name>DocumentType</mdg:name>
+              <mdg:value>{request.documentType}</mdg:value>
+            </mdg:property>
+          </mdg:properties>
+          <mdg:sourceLocation>{uploadedFile.downloadUrl}</mdg:sourceLocation>
+          <mdg:sourceFileName>{uploadedFile.fileName}</mdg:sourceFileName>
+          <mdg:sourceFileMimeType>{uploadedFile.fileMimeType}</mdg:sourceFileMimeType>
+          <mdg:destinations>
+            <mdg:destination>
+              <mdg:destinationSystem>{Dec64.CDFPay}</mdg:destinationSystem>
+            </mdg:destination>
+          </mdg:destinations>
+        </mdg:BatchFileInterfaceMetadata>
+
+      xml.toString()
+    }
 }
