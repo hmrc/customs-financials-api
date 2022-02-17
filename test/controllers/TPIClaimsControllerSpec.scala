@@ -63,7 +63,7 @@ class TPIClaimsControllerSpec extends SpecBase {
       }
     }
 
-    "return 200 with empty CDFPayCase Json for no cases found" in new Setup {
+    "return 200 with no associated data found" in new Setup {
 
       val responseDetail: ResponseDetail = ResponseDetail(NDRCCasesFound = false, SCTYCasesFound= false, CDFPayCase = None)
 
