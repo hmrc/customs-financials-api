@@ -32,7 +32,7 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
   val log: Logger = Logger(this.getClass)
 
   def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
-    service.getClaims(request.body.eori).map {
+    service.getClaims(request.body.eori, request.body.appType).map {
       case Some(value) => Ok(Json.obj("claims" -> value))
       case None => InternalServerError
     }.recover {

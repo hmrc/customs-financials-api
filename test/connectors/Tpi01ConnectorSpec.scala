@@ -17,7 +17,6 @@
 package connectors
 
 import java.time.LocalDate
-
 import domain.tpi01._
 import models.EORI
 import play.api.Application
@@ -30,13 +29,13 @@ import scala.concurrent.Future
 
 class Tpi01ConnectorSpec extends SpecBase {
 
-  "getReimbursementClaims" should {
-    "return reimbursement claims on a successful response" in new Setup {
+  "retrievePostClearanceCases" should {
+    "return cases on a successful response" in new Setup {
       when[Future[Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.retrieveReimbursementClaims(EORI("GB138153003838312")))
+        val result = await(connector.retrievePostClearanceCases(EORI("GB138153003838312"), "A"))
         result mustBe response
       }
     }
@@ -45,32 +44,6 @@ class Tpi01ConnectorSpec extends SpecBase {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
-
-    val response1: String = {
-      s"""
-         |{
-         |	"getReimbursementClaims": {
-         |		"requestCommon": {
-         |			"originatingSystem": "MDTP",
-         |			"receiptDate": "2021-04-20T12:07:54Z",
-         |			"acknowledgementReference": "1234567890123456789012345678901"
-         |		},
-         |		"requestDetail": {
-         |			"EORI": "GB000000001"
-         |		}
-         |	}
-         |}
-         |
-         |""".stripMargin
-    }
-
-    val response: Response = Response(GetReimbursementClaimsResponse(
-        ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCase))))))
-    )
-
-    val cdfPayCase: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
-      Some("GB138153003838312"), Some("10.00"), Some("10.00"))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
@@ -81,5 +54,23 @@ class Tpi01ConnectorSpec extends SpecBase {
     ).build()
 
     val connector: Tpi01Connector = app.injector.instanceOf[Tpi01Connector]
+
+    val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
+      claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+      importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
+      totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
+      basisOfClaim = Some("Duplicate Entry"))
+
+    val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
+      claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+      declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
+      totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
+
+    val response: Response = Response(GetReimbursementClaimsResponse(
+        ResponseCommon("OK", LocalDate.now().toString, None, None, None),
+        Some(ResponseDetail(NDRCCasesFound = true, SCTYCasesFound= true,
+          Some(CDFPayCase(NDRCCaseTotal = Some("1"), NDRCCases = Some(Seq(ndrcCaseDetails)),
+            SCTYCaseTotal = Some("1"), SCTYCases = Some(Seq(sctyCaseDetails))))))
+    ))
   }
 }

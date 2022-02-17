@@ -19,7 +19,7 @@ package models.requests
 import models.EORI
 import play.api.libs.json.{Format, Json}
 
-case class ReimbursementClaimsRequest(eori: EORI)
+case class ReimbursementClaimsRequest(eori: EORI, appType: String)
 
 object ReimbursementClaimsRequest {
   implicit val format: Format[ReimbursementClaimsRequest] = Json.format[ReimbursementClaimsRequest]

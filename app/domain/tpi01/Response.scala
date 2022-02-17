@@ -18,7 +18,7 @@ package domain.tpi01
 
 import play.api.libs.json._
 
-case class Response(getReimbursementClaimsResponse: GetReimbursementClaimsResponse)
+case class Response(getPostClearanceCasesResponse: GetReimbursementClaimsResponse)
 
 object Response {
   implicit val format: OFormat[Response] = Json.format[Response]
@@ -41,7 +41,7 @@ object ReturnParameter {
 }
 
 case class ResponseCommon(status: String,
-                          processingDateTime: String,
+                          processingDate: String,
                           correlationId: Option[String],
                           errorMessage: Option[String],
                           returnParameters: Option[List[ReturnParameter]])
@@ -50,14 +50,18 @@ object ResponseCommon {
   implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 }
 
-case class ResponseDetail(CDFPayClaimsFound: Boolean,
-                          CDFPayCases: Option[List[CDFPayCase]])
+case class ResponseDetail(NDRCCasesFound: Boolean,
+                          SCTYCasesFound: Boolean,
+                          CDFPayCase: Option[CDFPayCase])
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
 
-case class CDFPayCase(CDFPayCase: CDFPayCaseDetail)
+case class CDFPayCase(NDRCCaseTotal: Option[String],
+                      NDRCCases: Option[Seq[NDRCCaseDetails]],
+                      SCTYCaseTotal: Option[String],
+                      SCTYCases: Option[Seq[SCTYCaseDetails]])
 
 object CDFPayCase {
   implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
