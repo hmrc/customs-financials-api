@@ -25,7 +25,7 @@ object Response {
 }
 
 case class GetReimbursementClaimsResponse(responseCommon: ResponseCommon,
-                                          responseDetail: Option[ResponseDetail]){
+                                          responseDetail: Option[ResponseDetail]) {
   val mdtpError: Boolean = responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
 }
@@ -55,8 +55,8 @@ case class ResponseDetail(NDRCCasesFound: Boolean,
                           CDFPayCase: Option[CDFPayCase]) {
 
   def generateClaimsResponse: JsObject = {
-    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty)
-    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty)
+    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty).map(_.toSCTYCaseDetails)
+    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty).map(_.toNDRCCaseDetails)
 
     Json.obj("claims" ->
       Json.obj("sctyClaims" -> scty,
