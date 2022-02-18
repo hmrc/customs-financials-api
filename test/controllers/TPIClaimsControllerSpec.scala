@@ -16,7 +16,6 @@
 
 package controllers
 
-import java.time.LocalDate
 import domain._
 import domain.tpi01._
 import domain.tpi02.Reimbursement
@@ -58,7 +57,7 @@ class TPIClaimsControllerSpec extends SpecBase {
       running(app) {
         val result = route(app, request).value
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.obj("claims" -> responseDetail)
+        contentAsJson(result) mustBe Json.obj("claims" -> Json.obj("sctyClaims" -> Seq(sctyCaseDetails), "ndrcClaims" -> Seq(ndrcCaseDetails)))
 
       }
     }
@@ -73,7 +72,7 @@ class TPIClaimsControllerSpec extends SpecBase {
       running(app) {
         val result = route(app, request).value
         status(result) mustBe 200
-        contentAsJson(result) mustBe Json.obj("claims" -> responseDetail)
+        contentAsJson(result) mustBe Json.obj("claims" -> Json.obj("sctyClaims" -> Seq.empty[SCTYCaseDetails], "ndrcClaims" -> Seq.empty[NDRCCaseDetails]))
       }
     }
 

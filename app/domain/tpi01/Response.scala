@@ -52,7 +52,17 @@ object ResponseCommon {
 
 case class ResponseDetail(NDRCCasesFound: Boolean,
                           SCTYCasesFound: Boolean,
-                          CDFPayCase: Option[CDFPayCase])
+                          CDFPayCase: Option[CDFPayCase]) {
+
+  def generateClaimsResponse: JsObject = {
+    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty)
+    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty)
+
+    Json.obj("claims" ->
+      Json.obj("sctyClaims" -> scty,
+        "ndrcClaims" -> ndrc))
+  }
+}
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
@@ -66,51 +76,6 @@ case class CDFPayCase(NDRCCaseTotal: Option[String],
 object CDFPayCase {
   implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
 }
-
-
-case class CDFPayCaseDetail(CDFPayCaseNumber: String,
-                      CDFPayService: String,
-                      caseStatus: String,
-                      declarantEORI: String,
-                      importerEORI: String,
-                      claimantEORI: Option[String],
-                      claimAmountTotal: Option[String],
-                      totalCaseReimburseAmnt: Option[String]) {
-
-  private def transformedCaseStatus: String =
-    caseStatus match {
-      case "Open" => "In Progress"
-      case "Open-Analysis" => "In Progress"
-      case "Pending-Approval" =>  "Pending"
-      case "Pending-Queried" => "Pending"
-      case "Resolved-Withdrawn" => "Closed"
-      case "Rejected-Failed Validation" => "Closed"
-      case "Resolved-Rejected" => "Closed"
-      case "Open-Rework" => "In Progress"
-      case "Paused" => "In Progress"
-      case "Resolved-No Reply" => "Closed"
-      case "RTBH-Sent" => "Closed"
-      case "Resolved-Refused" => "Closed"
-      case "Pending Payment Confirmation" => "Pending"
-      case "Resolved-Approved" => "Closed"
-      case "Resolved-Partial Refused" => "Closed"
-      case "Pending Decision Letter" => "Pending"
-      case "Approved" => "Closed"
-      case "Analysis-Rework" => "In Progress"
-      case "Rework-Payment Details" => "In Progress"
-      case "Reply To RTBH" => "Pending"
-      case "Pending-Compliance Recommendation" => "Pending"
-      case "Pending-Compliance Check Query" => "Pending"
-      case "Pending-Compliance Check" => "Pending"
-    }
-
-  def toCDSPayCaseDetail: CDFPayCaseDetail = this.copy(caseStatus = transformedCaseStatus)
-}
-
-object CDFPayCaseDetail {
-  implicit val format: OFormat[CDFPayCaseDetail] = Json.format[CDFPayCaseDetail]
-}
-
 
 case class ErrorResponse(errorDetail: ErrorDetail)
 

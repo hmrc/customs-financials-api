@@ -22,8 +22,9 @@ import domain.tpi01.{GetPostClearanceCasesRequest, Request, Response}
 import javax.inject.Inject
 import models.EORI
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class Tpi01Connector @Inject()(httpClient: HttpClient,

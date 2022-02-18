@@ -54,9 +54,6 @@ case class NDRCCaseDetails(CDFPayCaseNumber: String,
       case "Analysis-Rework" => "In Progress"
       case "Rework-Payment Details" => "In Progress"
       case "Reply To RTBH" => "Pending"
-      case "Pending-Compliance Recommendation" => "Pending"
-      case "Pending-Compliance Check Query" => "Pending"
-      case "Pending-Compliance Check" => "Pending"
     }
 
   def toNDRCCaseDetails: NDRCCaseDetails = this.copy(caseStatus = transformedCaseStatus)

@@ -33,7 +33,7 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
 
   def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
     service.getClaims(request.body.eori, request.body.appType).map {
-      case Some(value) => Ok(Json.obj("claims" -> value))
+      case Some(response) => Ok(response.generateClaimsResponse)
       case None => InternalServerError
     }.recover {
       case ex if ex.getMessage.contains("JSON validation") =>
