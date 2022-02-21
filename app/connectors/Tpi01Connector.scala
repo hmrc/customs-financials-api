@@ -18,12 +18,13 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.tpi01.{GetReimbursementClaims, GetReimbursementClaimsRequest, Response}
+import domain.tpi01.{GetPostClearanceCasesRequest, Request, Response}
 import javax.inject.Inject
 import models.EORI
 import services.DateTimeService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class Tpi01Connector @Inject()(httpClient: HttpClient,
@@ -31,7 +32,7 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def retrieveReimbursementClaims(eori: EORI): Future[Response] = {
+  def retrievePostClearanceCases(eori: EORI, appType: String): Future[Response] = {
 
     val commonRequest = tpi01.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -39,12 +40,12 @@ class Tpi01Connector @Inject()(httpClient: HttpClient,
       originatingSystem = "MDTP"
     )
 
-    val request = GetReimbursementClaimsRequest(GetReimbursementClaims(
-        commonRequest,
-        tpi01.RequestDetail(eori)
+    val request = Request(GetPostClearanceCasesRequest(
+      commonRequest,
+      tpi01.RequestDetail(eori, appType)
     ))
 
-    httpClient.POST[GetReimbursementClaimsRequest, Response](
+    httpClient.POST[Request, Response](
       appConfig.tpi01GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi01BearerToken, appConfig.tpi01HostHeader)

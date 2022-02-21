@@ -18,14 +18,14 @@ package domain.tpi01
 
 import play.api.libs.json._
 
-case class Response(getReimbursementClaimsResponse: GetReimbursementClaimsResponse)
+case class Response(getPostClearanceCasesResponse: GetReimbursementClaimsResponse)
 
 object Response {
   implicit val format: OFormat[Response] = Json.format[Response]
 }
 
 case class GetReimbursementClaimsResponse(responseCommon: ResponseCommon,
-                                          responseDetail: Option[ResponseDetail]){
+                                          responseDetail: Option[ResponseDetail]) {
   val mdtpError: Boolean = responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
 }
@@ -41,7 +41,7 @@ object ReturnParameter {
 }
 
 case class ResponseCommon(status: String,
-                          processingDateTime: String,
+                          processingDate: String,
                           correlationId: Option[String],
                           errorMessage: Option[String],
                           returnParameters: Option[List[ReturnParameter]])
@@ -50,63 +50,32 @@ object ResponseCommon {
   implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 }
 
-case class ResponseDetail(CDFPayClaimsFound: Boolean,
-                          CDFPayCases: Option[List[CDFPayCase]])
+case class ResponseDetail(NDRCCasesFound: Boolean,
+                          SCTYCasesFound: Boolean,
+                          CDFPayCase: Option[CDFPayCase]) {
+
+  def generateClaimsResponse: JsObject = {
+    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty).map(_.toSCTYCaseDetails).filter(_.declarationID.isDefined)
+    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty).map(_.toNDRCCaseDetails).filter(_.declarationID.isDefined)
+
+    Json.obj("claims" ->
+      Json.obj("sctyClaims" -> scty,
+        "ndrcClaims" -> ndrc))
+  }
+}
 
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
 
-case class CDFPayCase(CDFPayCase: CDFPayCaseDetail)
+case class CDFPayCase(NDRCCaseTotal: Option[String],
+                      NDRCCases: Option[Seq[NDRCCaseDetails]],
+                      SCTYCaseTotal: Option[String],
+                      SCTYCases: Option[Seq[SCTYCaseDetails]])
 
 object CDFPayCase {
   implicit val format: OFormat[CDFPayCase] = Json.format[CDFPayCase]
 }
-
-
-case class CDFPayCaseDetail(CDFPayCaseNumber: String,
-                      CDFPayService: String,
-                      caseStatus: String,
-                      declarantEORI: String,
-                      importerEORI: String,
-                      claimantEORI: Option[String],
-                      claimAmountTotal: Option[String],
-                      totalCaseReimburseAmnt: Option[String]) {
-
-  private def transformedCaseStatus: String =
-    caseStatus match {
-      case "Open" => "In Progress"
-      case "Open-Analysis" => "In Progress"
-      case "Pending-Approval" =>  "Pending"
-      case "Pending-Queried" => "Pending"
-      case "Resolved-Withdrawn" => "Closed"
-      case "Rejected-Failed Validation" => "Closed"
-      case "Resolved-Rejected" => "Closed"
-      case "Open-Rework" => "In Progress"
-      case "Paused" => "In Progress"
-      case "Resolved-No Reply" => "Closed"
-      case "RTBH-Sent" => "Closed"
-      case "Resolved-Refused" => "Closed"
-      case "Pending Payment Confirmation" => "Pending"
-      case "Resolved-Approved" => "Closed"
-      case "Resolved-Partial Refused" => "Closed"
-      case "Pending Decision Letter" => "Pending"
-      case "Approved" => "Closed"
-      case "Analysis-Rework" => "In Progress"
-      case "Rework-Payment Details" => "In Progress"
-      case "Reply To RTBH" => "Pending"
-      case "Pending-Compliance Recommendation" => "Pending"
-      case "Pending-Compliance Check Query" => "Pending"
-      case "Pending-Compliance Check" => "Pending"
-    }
-
-  def toCDSPayCaseDetail: CDFPayCaseDetail = this.copy(caseStatus = transformedCaseStatus)
-}
-
-object CDFPayCaseDetail {
-  implicit val format: OFormat[CDFPayCaseDetail] = Json.format[CDFPayCaseDetail]
-}
-
 
 case class ErrorResponse(errorDetail: ErrorDetail)
 

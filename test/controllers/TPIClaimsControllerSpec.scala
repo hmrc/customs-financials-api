@@ -16,7 +16,6 @@
 
 package controllers
 
-import java.time.LocalDate
 import domain._
 import domain.tpi01._
 import domain.tpi02.Reimbursement
@@ -36,38 +35,77 @@ class TPIClaimsControllerSpec extends SpecBase {
 
   "getReimbursementClaims" should {
     "return 200 status" in new Setup {
-      val cdfPayCases: CDFPayCaseDetail = CDFPayCaseDetail("4374422408", "NDRC", "Resolved-Completed", "GB138153003838312", "GB138153003838312",
-        Some("GB138153003838312"), Some("10.00"), Some("10.00"))
-      val responseDetail: ResponseDetail = ResponseDetail(CDFPayClaimsFound = true, Some(List(CDFPayCase(cdfPayCases))))
+      val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
+        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+        importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
+        totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
+        basisOfClaim = Some("Duplicate Entry"))
 
-      protected val response = tpi01.Response(GetReimbursementClaimsResponse(
-        ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(responseDetail)))
+      val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
+        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+        declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
+        totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
 
-      when(mockTPIClaimsService.getClaims(any))
-        .thenReturn(Future.successful(Some(Seq(cdfPayCases))))
+      val responseDetail: ResponseDetail = ResponseDetail(NDRCCasesFound = true, SCTYCasesFound= true,
+        Some(CDFPayCase(NDRCCaseTotal = Some("1"), NDRCCases = Some(Seq(ndrcCaseDetails)),
+          SCTYCaseTotal = Some("1"), SCTYCases = Some(Seq(sctyCaseDetails)))))
+
+
+      when(mockTPIClaimsService.getClaims(any, any))
+        .thenReturn(Future.successful(Some(responseDetail)))
 
       running(app) {
         val result = route(app, request).value
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.obj("claims" -> List(cdfPayCases))
+        contentAsJson(result) mustBe Json.obj("claims" -> Json.obj("sctyClaims" -> Seq(sctyResponse), "ndrcClaims" -> Seq(ndrcResponse)))
 
       }
     }
 
-    "return 200 with empty claims Json for no claims found" in new Setup {
-      when(mockTPIClaimsService.getClaims(any))
-        .thenReturn(Future.successful(Some(Seq.empty[CDFPayCaseDetail])))
+    "return 200 status where NDRCCase with no declarationId is omitted from response body" in new Setup {
+      val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = None,
+        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+        importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
+        totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
+        basisOfClaim = Some("Duplicate Entry"))
+
+      val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
+        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+        declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
+        totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
+
+      val responseDetail: ResponseDetail = ResponseDetail(NDRCCasesFound = true, SCTYCasesFound= true,
+        Some(CDFPayCase(NDRCCaseTotal = Some("1"), NDRCCases = Some(Seq(ndrcCaseDetails)),
+          SCTYCaseTotal = Some("1"), SCTYCases = Some(Seq(sctyCaseDetails)))))
+
+
+      when(mockTPIClaimsService.getClaims(any, any))
+        .thenReturn(Future.successful(Some(responseDetail)))
+
+      running(app) {
+        val result = route(app, request).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("claims" -> Json.obj("sctyClaims" -> Seq(sctyResponse), "ndrcClaims" -> Seq.empty[NDRCCaseDetails]))
+
+      }
+    }
+
+    "return 200 with no associated data found" in new Setup {
+
+      val responseDetail: ResponseDetail = ResponseDetail(NDRCCasesFound = false, SCTYCasesFound= false, CDFPayCase = None)
+
+      when(mockTPIClaimsService.getClaims(any, any))
+        .thenReturn(Future.successful(Some(responseDetail)))
 
       running(app) {
         val result = route(app, request).value
         status(result) mustBe 200
-        contentAsJson(result) mustBe Json.obj("claims" -> Seq.empty[CDFPayCaseDetail])
+        contentAsJson(result) mustBe Json.obj("claims" -> Json.obj("sctyClaims" -> Seq.empty[SCTYCaseDetails], "ndrcClaims" -> Seq.empty[NDRCCaseDetails]))
       }
     }
 
     "return 500 for no response" in new Setup {
-      when(mockTPIClaimsService.getClaims(any))
+      when(mockTPIClaimsService.getClaims(any, any))
         .thenReturn(Future.successful(None))
 
       running(app) {
@@ -77,7 +115,7 @@ class TPIClaimsControllerSpec extends SpecBase {
     }
 
     "return 503 for any error" in new Setup {
-      when(mockTPIClaimsService.getClaims(any))
+      when(mockTPIClaimsService.getClaims(any, any))
         .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
 
       running(app) {
@@ -125,9 +163,9 @@ class TPIClaimsControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val traderEORI: EORI = EORI("testEORI")
+    val eori: EORI = EORI("testEORI")
     val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST", controllers.routes.TPIClaimsController.getReimbursementClaims().url)
-      .withJsonBody(Json.parse("""{"eori":"some eori"}"""))
+      .withJsonBody(Json.parse("""{"eori":"some eori", "appType":"A"}"""))
 
     val requestSpecificClaim: FakeRequest[AnyContentAsJson] = FakeRequest("POST", controllers.routes.TPIClaimsController.getSpecificClaim().url)
       .withJsonBody(Json.parse("""{"cdfPayService":"mtdp", "cdfPayCaseNumber":"abc"}"""))
@@ -141,5 +179,16 @@ class TPIClaimsControllerSpec extends SpecBase {
       "metrics.enabled" -> false,
       "auditing.enabled" -> false
     ).build()
+
+    val ndrcResponse: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
+      claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "In Progress", declarantEORI = "GB744638982000",
+      importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
+      totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
+      basisOfClaim = Some("Duplicate Entry"))
+
+    val sctyResponse: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
+      claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "In Progress",
+      declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
+      totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
   }
 }
