@@ -55,8 +55,8 @@ case class ResponseDetail(NDRCCasesFound: Boolean,
                           CDFPayCase: Option[CDFPayCase]) {
 
   def generateClaimsResponse: JsObject = {
-    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty).map(_.toSCTYCaseDetails)
-    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty).map(_.toNDRCCaseDetails)
+    val scty = CDFPayCase.flatMap(_.SCTYCases).getOrElse(Seq.empty).map(_.toSCTYCaseDetails).filter(_.declarationID.isDefined)
+    val ndrc = CDFPayCase.flatMap(_.NDRCCases).getOrElse(Seq.empty).map(_.toNDRCCaseDetails).filter(_.declarationID.isDefined)
 
     Json.obj("claims" ->
       Json.obj("sctyClaims" -> scty,
