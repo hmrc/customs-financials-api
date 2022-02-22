@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
 import javax.inject.{Inject, Singleton}
 import play.api.{Logger, LoggerLike}
@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
-                                     ccsService: CcsService)(implicit ec: ExecutionContext) {
+                                     ccsService: FileUploadService)(implicit ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -32,7 +32,7 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
     for {
       fileUploadJob <- fileUploadCache.nextJob if fileUploadJob.isDefined
       uploadedFileRequest = fileUploadJob.get
-      fileSubmitted <- ccsService.submitFileToCcs(uploadedFileRequest)
+      fileSubmitted <- ccsService.submitFileToDec64(uploadedFileRequest)
       id = fileUploadJob.get.id
     } yield {
       if (fileSubmitted) {

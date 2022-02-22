@@ -23,7 +23,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import services.ccs.RequestToDec64Payload
+import services.dec64.RequestToDec64Payload
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{RandomUUIDGenerator, SpecBase}
 

@@ -18,19 +18,19 @@ package services
 
 import domain.StandingAuthority
 import models._
+import models.css.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
 import org.scalatest.matchers.should.Matchers._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.SpecBase
-
 import scala.concurrent._
 
 class AuditingServiceSpec extends SpecBase {
@@ -292,6 +292,55 @@ class AuditingServiceSpec extends SpecBase {
         result.auditType mustBe "RequestHistoricStatement"
         result.auditSource mustBe "customs-financials-api"
         result.tags.get("transactionName") mustBe Some("Request historic statements")
+      }
+    }
+
+    "audit file upload request to Dec64" in new Setup {
+      val auditRequest: JsValue = Json.parse(
+        """{
+          |   "detail":{
+          |      "id":"id",
+          |      "eori":"eori",
+          |      "caseNumber":"casenumber",
+          |      "applicationName":"appName",
+          |      "documentType":"docType",
+          |      "properties":{
+          |         "uploadedFiles":[
+          |            {
+          |               "upscanReference":"upscanRef",
+          |               "downloadUrl":"url",
+          |               "uploadTimeStamp":"String",
+          |               "checkSum":"sum",
+          |               "fileName":"filename",
+          |               "fileMimeType":"mimeType",
+          |               "fileSize":"12",
+          |               "previousUrl":"url"
+          |            }
+          |         ]
+          |      }
+          |   }
+          |}""".stripMargin)
+
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
+        checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
+
+      val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce1", uploadedFiles = Seq(uploadedFiles))
+
+      val fileUploadRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+        applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+
+      running(app) {
+        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+          .thenReturn(Future.successful(AuditResult.Success))
+
+        service.auditFileUploadRequest(fileUploadRequest)
+        val result = extendedDataEventCaptor.getValue
+        result.detail mustBe auditRequest
+        result.auditType mustBe "ViewAmendFileUpload"
+        result.auditSource mustBe "customs-financials-api"
+        result.tags.get("transactionName") mustBe Some("View and amend file upload")
       }
     }
 

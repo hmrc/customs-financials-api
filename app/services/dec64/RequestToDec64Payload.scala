@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
 import com.google.inject.Inject
 import config.MetaConfig.Dec64

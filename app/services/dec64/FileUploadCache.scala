@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
 import java.time.ZoneOffset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import com.mongodb.client.model.{ReplaceOptions, Updates}
+import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
-
 import javax.inject.Inject
 import models.css.FileUploadRequest
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import services.DateTimeService
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 

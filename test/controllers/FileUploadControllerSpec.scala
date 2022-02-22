@@ -24,9 +24,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Helpers}
-import services.ccs.FileUploadCache
+import services.dec64.FileUploadCache
 import utils.SpecBase
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

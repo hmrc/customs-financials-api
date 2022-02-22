@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers
 import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import services.ccs.{CcsService, DefaultFileUploadCache, FileUploadCache, FileUploadJobHandler}
+import services.dec64.{FileUploadService, DefaultFileUploadCache, FileUploadCache, FileUploadJobHandler}
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,7 +53,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
           await(handler.processJob())
 
-          verify(mockCcsService).submitFileToCcs(ArgumentMatchers.any())
+          verify(mockCcsService).submitFileToDec64(ArgumentMatchers.any())
         }
       }
 
@@ -74,7 +74,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
           "auditing.enabled" -> false
         ).build()
 
-        val mockCcsService: CcsService = mock[CcsService]
+        val mockCcsService: FileUploadService = mock[FileUploadService]
         val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
         val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
@@ -91,13 +91,13 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
         when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
 
-        when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(false))
+        when(mockCcsService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(false))
 
         running(app) {
 
           await(handler.processJob())
 
-          verify(mockCcsService).submitFileToCcs(ArgumentMatchers.any())
+          verify(mockCcsService).submitFileToDec64(ArgumentMatchers.any())
 
           verifyZeroInteractions(mockDefaultFileUploadCache)
         }
@@ -113,7 +113,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
         running(app) {
 
-          val mockCcsService: CcsService = mock[CcsService]
+          val mockCcsService: FileUploadService = mock[FileUploadService]
           val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
           val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
@@ -133,7 +133,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val mockCcsService: CcsService = mock[CcsService]
+    val mockCcsService: FileUploadService = mock[FileUploadService]
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
     val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
 
@@ -150,7 +150,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
     when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
     when(mockDefaultFileUploadCache.deleteJob(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-    when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(true))
+    when(mockCcsService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(true))
 
   }
 }

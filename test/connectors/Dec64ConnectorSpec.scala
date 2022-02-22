@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServer
 import utils.SpecBase
 import scala.concurrent.Future
 
-class CcsConnectorSpec extends SpecBase {
+class Dec64ConnectorSpec extends SpecBase {
 
   "submitFileUpload" should {
     "return true on a successful file upload ccs POST" in new Setup {
@@ -74,6 +74,6 @@ class CcsConnectorSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val connector: CcsConnector = app.injector.instanceOf[CcsConnector]
+    val connector: Dec64Connector = app.injector.instanceOf[Dec64Connector]
   }
 }

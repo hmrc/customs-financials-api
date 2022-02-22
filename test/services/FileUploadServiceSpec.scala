@@ -18,7 +18,7 @@ package services
 
 import java.time.LocalDateTime
 
-import connectors.CcsConnector
+import connectors.Dec64Connector
 import domain.FileUploadMongo
 import models.EORI
 import models.css.{FileUploadRequest, _}
@@ -26,20 +26,20 @@ import org.mockito.ArgumentMatchers
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import services.ccs.{CcsService, RequestToDec64Payload}
+import services.dec64.{FileUploadService, RequestToDec64Payload}
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CcsServiceSpec extends SpecBase {
+class FileUploadServiceSpec extends SpecBase {
 
   "CcsService" should {
 
     "submit uploaded files to ccs should return true when successful" in new Setup {
       running(app) {
         await(for {
-          response <- ccsService.submitFileToCcs(uploadedFilesRequest)
+          response <- ccsService.submitFileToDec64(uploadedFilesRequest)
         } yield {
           response mustBe true
         })
@@ -48,11 +48,11 @@ class CcsServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    val mockCcsConnector: CcsConnector = mock[CcsConnector]
+    val mockCcsConnector: Dec64Connector = mock[Dec64Connector]
     val mockRequestToDec64Payload: RequestToDec64Payload = mock[RequestToDec64Payload]
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CcsConnector].toInstance(mockCcsConnector),
+      inject.bind[Dec64Connector].toInstance(mockCcsConnector),
       inject.bind[RequestToDec64Payload].toInstance(mockRequestToDec64Payload)
     ).configure(
       "microservice.metrics.enabled" -> false,
@@ -60,7 +60,7 @@ class CcsServiceSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val ccsService: CcsService = app.injector.instanceOf[CcsService]
+    val ccsService: FileUploadService = app.injector.instanceOf[FileUploadService]
 
     val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
       checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")

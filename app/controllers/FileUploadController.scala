@@ -20,7 +20,7 @@ import javax.inject.Inject
 import models.css.FileUploadRequest
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import services.ccs.FileUploadCache
+import services.dec64.FileUploadCache
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
