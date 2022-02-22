@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package domain.tpi02
-import play.api.libs.json._
+package domain.tpi02.ndrc
 
-case class Response(getSpecificCaseResponse: GetSpecificCaseResponse)
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+
+case class NDRCCase(
+                     NDRCDetail: NDRCDetail,
+                     NDRCAmounts: NDRCAmounts
+                   )
+
+object NDRCCase {
+  implicit val reads: Reads[NDRCCase] = {
+    (JsPath.read[NDRCDetail] and JsPath.read[NDRCAmounts])(NDRCCase.apply _)
+  }
+
+  implicit val writes: Writes[NDRCCase] = {
+    (JsPath.write[NDRCDetail] and JsPath.write[NDRCAmounts])(unlift(NDRCCase.unapply))
+  }
 }

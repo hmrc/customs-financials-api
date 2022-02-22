@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package domain.tpi02
-import play.api.libs.json._
+package domain.tpi02.ndrc
 
-case class Response(getSpecificCaseResponse: GetSpecificCaseResponse)
+import play.api.libs.json.{Json, OFormat}
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+case class EntryDetail(entryNumber: String, mainDeclarationReference: Boolean)
+
+object EntryDetail {
+  implicit val format: OFormat[EntryDetail] = Json.format[EntryDetail]
 }

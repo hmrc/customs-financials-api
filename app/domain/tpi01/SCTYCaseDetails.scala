@@ -45,7 +45,6 @@ case class SCTYCaseDetails(CDFPayCaseNumber: String,
       case "RTBH Letter Initiated" => "Pending"
       case "Awaiting RTBH Letter Response" => "Pending"
       case "Reminder Letter Initiated" => "Pending"
-      case "Reminder Letter Initiated" => "Pending"
       case "Awaiting Reminder Letter Response" => "Pending"
       case "Decision Letter Initiated" => "Pending"
       case "Partial BTA" => "Pending"

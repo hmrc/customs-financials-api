@@ -39,14 +39,14 @@ class Tpi02Connector @Inject()(httpClient: HttpClient,
       originatingSystem = "MDTP"
     )
 
-    val request = GetSpecificClaimRequestWrapper(
-      GetSpecificClaimRequest(
+    val request = GetSpecificCaseRequestWrapper(
+      GetSpecificCaseRequest(
         commonRequest,
         tpi02.RequestDetail(cdfPayService, cdfPayCaseNumber)
       )
     )
 
-    httpClient.POST[GetSpecificClaimRequestWrapper, Response](
+    httpClient.POST[GetSpecificCaseRequestWrapper, Response](
       appConfig.tpi02GetReimbursementClaimsEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.tpi02BearerToken, appConfig.tpi02HostHeader)

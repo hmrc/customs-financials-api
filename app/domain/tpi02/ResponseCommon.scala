@@ -15,10 +15,15 @@
  */
 
 package domain.tpi02
-import play.api.libs.json._
 
-case class Response(getSpecificCaseResponse: GetSpecificCaseResponse)
+import play.api.libs.json.{Json, OFormat}
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+case class ResponseCommon(status: String,
+                          processingDate: String,
+                          correlationId: Option[String],
+                          errorMessage: Option[String],
+                          returnParameters: Option[List[ReturnParameter]])
+
+object ResponseCommon {
+  implicit val format: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 }

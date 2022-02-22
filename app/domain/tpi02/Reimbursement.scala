@@ -15,10 +15,15 @@
  */
 
 package domain.tpi02
-import play.api.libs.json._
 
-case class Response(getSpecificCaseResponse: GetSpecificCaseResponse)
+import play.api.libs.json.{Json, OFormat}
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+case class Reimbursement(reimbursementDate: String,
+                         reimbursementAmount: String,
+                         taxType: String,
+                         reimbursementMethod: String)
+
+object Reimbursement {
+  implicit val format: OFormat[Reimbursement] = Json.format[Reimbursement]
+
 }
