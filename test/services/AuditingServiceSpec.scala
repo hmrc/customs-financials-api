@@ -18,7 +18,7 @@ package services
 
 import domain.StandingAuthority
 import models._
-import models.css.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
+import models.dec64.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor

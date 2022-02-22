@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.mdg
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
-import ru.tinkoff.phobos.syntax.xmlns
+import models.EORI
+import play.api.libs.json.{Format, Json}
 
-case class PropertyType(@xmlns(mdg) name: String,
-                        @xmlns(mdg) value: String)
+case class FileUploadRequest(id: String,
+                             eori: EORI,
+                             caseNumber: String,
+                             applicationName: String,
+                             documentType: String,
+                             properties: UploadedFileMetaData)
 
-object PropertyType {
-  implicit val propertyTypeEnc: ElementEncoder[PropertyType] = deriveElementEncoder[PropertyType]
+object FileUploadRequest {
+  implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]
 }

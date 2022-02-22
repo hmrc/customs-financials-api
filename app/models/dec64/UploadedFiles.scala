@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import java.time.format.DateTimeFormatter
-import java.time.{ZoneOffset, ZonedDateTime}
+import play.api.libs.json.{Json, Format}
 
-object RFC7231DateTime {
+case class UploadedFiles(upscanReference: String,
+                         downloadUrl: String,
+                         uploadTimeStamp: String,
+                         checkSum: String,
+                         fileName: String,
+                         fileMimeType: String,
+                         fileSize: String,
+                         previousUrl: String)
 
-  private val rfc7231DateTimeFormat: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
-
-  def now: String = rfc7231DateTimeFormat.format(ZonedDateTime.now(ZoneOffset.UTC))
+object UploadedFiles {
+  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
 }

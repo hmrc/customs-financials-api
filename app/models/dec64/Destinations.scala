@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import play.api.libs.json.{Json, Format}
+import models.dec64.Namespaces.mdg
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-case class UploadedFiles(upscanReference: String,
-                         downloadUrl: String,
-                         uploadTimeStamp: String,
-                         checkSum: String,
-                         fileName: String,
-                         fileMimeType: String,
-                         fileSize: String,
-                         previousUrl: String)
+case class Destinations(@xmlns(mdg) destination: List[Destination] = Nil)
 
-object UploadedFiles {
-  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
+object Destinations {
+  implicit val destinationsTypeEnc: ElementEncoder[Destinations] = deriveElementEncoder[Destinations]
 }

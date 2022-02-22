@@ -16,7 +16,7 @@
 
 package domain
 
-import models.css.UploadedFiles
+import models.dec64.UploadedFiles
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
 

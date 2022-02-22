@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.soap
-import ru.tinkoff.phobos.derivation.semiauto.deriveXmlEncoder
-import ru.tinkoff.phobos.encoding.XmlEncoder
+import models.dec64.Namespaces.mdg
+import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
+import ru.tinkoff.phobos.encoding.ElementEncoder
 import ru.tinkoff.phobos.syntax.xmlns
 
-case class Envelope(@xmlns(soap) Body: Body)
+case class Body(@xmlns(mdg) BatchFileInterfaceMetadata: BatchFileInterfaceMetadata)
 
-object Envelope {
-  implicit val envelopeEncoder: XmlEncoder[Envelope] = deriveXmlEncoder("Envelope", Namespaces.soap)
+object Body {
+  implicit val batchFileInterfaceMetadataEncoder: ElementEncoder[Body] = deriveElementEncoder[Body]
 }

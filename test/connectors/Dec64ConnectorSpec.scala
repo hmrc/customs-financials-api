@@ -17,7 +17,7 @@
 package connectors
 
 import config.AppConfig
-import models.css.CcsSubmissionPayload
+import models.dec64.Dec64SubmissionPayload
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -29,33 +29,33 @@ import scala.concurrent.Future
 class Dec64ConnectorSpec extends SpecBase {
 
   "submitFileUpload" should {
-    "return true on a successful file upload ccs POST" in new Setup {
+    "return true on a successful file upload DEC64 POST" in new Setup {
 
       when[Future[HttpResponse]](mockHttpClient.POSTString(any, any, any)(any, any, any))
         .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
       running(app) {
-        val result = await(connector.submitFileUpload(CcsSubmissionPayload("", Seq())))
+        val result = await(connector.submitFileUpload(Dec64SubmissionPayload("", Seq())))
         result mustBe true
       }
     }
 
-    "return false when fails file upload ccs POST" in new Setup {
+    "return false when fails file upload DEC64 POST" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POSTString(any, any, any)(any, any, any))
         .thenReturn(Future.successful(HttpResponse(BAD_REQUEST)))
 
       running(app) {
-        val result = await(connector.submitFileUpload(CcsSubmissionPayload("", Seq())))
+        val result = await(connector.submitFileUpload(Dec64SubmissionPayload("", Seq())))
         result mustBe false
       }
     }
 
-    "return false when exception thrown for file upload ccs POST" in new Setup {
+    "return false when exception thrown for file upload DEC64 POST" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POSTString(any, any, any)(any, any, any))
         .thenReturn(Future.failed(new InternalServerException("boom")))
 
       running(app) {
-        val result = await(connector.submitFileUpload(CcsSubmissionPayload("", Seq())))
+        val result = await(connector.submitFileUpload(Dec64SubmissionPayload("", Seq())))
         result mustBe false
       }
     }

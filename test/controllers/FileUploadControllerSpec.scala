@@ -16,7 +16,7 @@
 
 package controllers
 
-import models.css.FileUploadRequest
+import models.dec64.FileUploadRequest
 import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder

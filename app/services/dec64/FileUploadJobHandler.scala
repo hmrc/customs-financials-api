@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
-                                     ccsService: FileUploadService)(implicit ec: ExecutionContext) {
+                                     fileUploadService: FileUploadService)(implicit ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -32,7 +32,7 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
     for {
       fileUploadJob <- fileUploadCache.nextJob if fileUploadJob.isDefined
       uploadedFileRequest = fileUploadJob.get
-      fileSubmitted <- ccsService.submitFileToDec64(uploadedFileRequest)
+      fileSubmitted <- fileUploadService.submitFileToDec64(uploadedFileRequest)
       id = fileUploadJob.get.id
     } yield {
       if (fileSubmitted) {

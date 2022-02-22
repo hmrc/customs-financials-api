@@ -16,7 +16,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     ScoverageKeys.coverageExcludedPackages := List("<empty>"
       , ".*Reverse.*"
-      , ".*services.ccs.CcsHeaders.*"
+      , ".*services.dec64.Dec64Headers.*"
       , ".*(BuildInfo|Routes|testOnly).*").mkString(";"),
     ScoverageKeys.coverageMinimum := 90,
     ScoverageKeys.coverageFailOnMinimum := true,

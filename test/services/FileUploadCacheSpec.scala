@@ -19,7 +19,7 @@ package services
 import java.time.LocalDateTime
 import domain.FileUploadMongo
 import models.EORI
-import models.css._
+import models.dec64._
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running

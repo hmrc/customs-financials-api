@@ -23,7 +23,7 @@ import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
 import javax.inject.Inject
-import models.css.FileUploadRequest
+import models.dec64.FileUploadRequest
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
