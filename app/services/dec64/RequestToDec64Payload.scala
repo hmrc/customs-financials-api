@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
 import com.google.inject.Inject
 import config.MetaConfig.Dec64
-import models.css.Namespaces.mdg
-import models.css._
+import models.dec64.Namespaces.mdg
+import models.dec64._
 import org.joda.time.DateTime
 import ru.tinkoff.phobos.syntax.xmlns
 import utils.RandomUUIDGenerator

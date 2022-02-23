@@ -18,19 +18,16 @@ package connectors
 
 import java.util.UUID
 import config.AppConfig
-
 import javax.inject.Inject
-import models.css.{CcsSubmissionPayload, RFC7231DateTime}
-import play.api.{Logger, LoggerLike}
+import models.dec64.{Dec64SubmissionPayload, RFC7231DateTime}
 import play.api.http.{ContentTypes, HeaderNames, MimeTypes, Status}
 import play.api.mvc.Codec
-import play.mvc.Http
+import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
-
 import scala.concurrent.{ExecutionContext, Future}
 
-class CcsConnector @Inject()(httpClient: HttpClient,
-                             config: AppConfig)(implicit executionContext: ExecutionContext) {
+class Dec64Connector @Inject()(httpClient: HttpClient,
+                               config: AppConfig)(implicit executionContext: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
   val xmlHeaders = Seq(
@@ -39,14 +36,14 @@ class CcsConnector @Inject()(httpClient: HttpClient,
     HeaderNames.X_FORWARDED_HOST -> "MDTP",
     HeaderNames.CONTENT_TYPE -> ContentTypes.withCharset(MimeTypes.XML)(Codec.utf_8),
     HeaderNames.ACCEPT -> MimeTypes.XML,
-    HeaderNames.AUTHORIZATION -> config.cssBearerToken
+    HeaderNames.AUTHORIZATION -> config.dec64BearerToken
   )
 
-  def submitFileUpload(payload: CcsSubmissionPayload)(implicit hc: HeaderCarrier): Future[Boolean] = {
-    httpClient.POSTString[HttpResponse](config.ccsFileUploadEndpoint, payload.dec64Body,
+  def submitFileUpload(payload: Dec64SubmissionPayload)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    httpClient.POSTString[HttpResponse](config.dec64FileUploadEndpoint, payload.dec64Body,
       payload.headers ++ xmlHeaders)(HttpReads[HttpResponse], hc, executionContext).collect {
       case response if response.status == Status.NO_CONTENT =>
-        log.info(s"[submitFileUpload] Successful request to CCS ")
+        log.info(s"[submitFileUpload] Successful request to DEC64 ")
         true
       case response =>
         log.error(s"[submitFileUpload] Failed with status - ${response.status} error - ${response.body}")

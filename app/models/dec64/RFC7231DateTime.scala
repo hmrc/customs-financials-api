@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.mdg
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
-import ru.tinkoff.phobos.syntax.xmlns
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneOffset, ZonedDateTime}
 
-case class PropertiesType(@xmlns(mdg) property: Seq[PropertyType] = Nil)
+object RFC7231DateTime {
 
-object PropertiesType {
-  implicit val propertiesTypeEnc: ElementEncoder[PropertiesType] = deriveElementEncoder[PropertiesType]
+  private val rfc7231DateTimeFormat: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
+
+  def now: String = rfc7231DateTimeFormat.format(ZonedDateTime.now(ZoneOffset.UTC))
 }

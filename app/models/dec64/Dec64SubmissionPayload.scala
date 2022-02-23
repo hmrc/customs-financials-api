@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.EORI
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, OFormat}
 
-case class FileUploadRequest(id: String,
-                             eori: EORI,
-                             caseNumber: String,
-                             applicationName: String,
-                             documentType: String,
-                             properties: UploadedFileMetaData)
+case class Dec64SubmissionPayload(dec64Body: String, headers: Seq[(String, String)])
 
-object FileUploadRequest {
-  implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]
+object Dec64SubmissionPayload {
+  implicit val format: OFormat[Dec64SubmissionPayload] = Json.format[Dec64SubmissionPayload]
 }

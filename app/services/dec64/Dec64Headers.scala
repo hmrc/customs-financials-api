@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 
-class CcsHeaders {
+class Dec64Headers {
   def getHeaders(headerCarrier: HeaderCarrier): Seq[(String, String)] =
     List(
       headerCarrier.requestId.map(rid => headerCarrier.names.xRequestId -> rid.value),

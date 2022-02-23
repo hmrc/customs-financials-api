@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
 import play.api.libs.json.{Json, Format}
 

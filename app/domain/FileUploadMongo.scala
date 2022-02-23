@@ -17,7 +17,7 @@
 package domain
 
 import java.time.LocalDateTime
-import models.css.{CcsSubmissionPayload, FileUploadRequest}
+import models.dec64.{Dec64SubmissionPayload, FileUploadRequest}
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
@@ -26,5 +26,5 @@ case class FileUploadMongo(_id: String, uploadDocumentsRequest: FileUploadReques
 object FileUploadMongo {
   implicit val timeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
   implicit val format: OFormat[FileUploadMongo] = Json.format[FileUploadMongo]
-  implicit val documentFormat: OFormat[CcsSubmissionPayload] = Json.format[CcsSubmissionPayload]
+  implicit val documentFormat: OFormat[Dec64SubmissionPayload] = Json.format[Dec64SubmissionPayload]
 }

@@ -16,6 +16,7 @@
 
 package domain
 
+import models.dec64.UploadedFiles
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
 
@@ -67,14 +68,37 @@ object RevokeAuthorityRequestAuditDetail {
   implicit val RevokeAuthorityRequestAuditDetailWrites: OWrites[RevokeAuthorityRequestAuditDetail] = Json.writes[RevokeAuthorityRequestAuditDetail]
 }
 
-case class HistoricDocumentRequestAuditDetail(eori : EORI,
-                                              documentType : FileRole,
-                                              accountNumber : AccountNumber,
-                                              periodStartYear : String,
-                                              periodStartMonth :String,
-                                              periodEndYear : String,
-                                              periodEndMonth : String)
+case class HistoricDocumentRequestAuditDetail(eori: EORI,
+                                              documentType: FileRole,
+                                              accountNumber: AccountNumber,
+                                              periodStartYear: String,
+                                              periodStartMonth: String,
+                                              periodEndYear: String,
+                                              periodEndMonth: String)
 
 object HistoricDocumentRequestAuditDetail {
   implicit val historicDocumentRequestAuditDetailWrites: OWrites[HistoricDocumentRequestAuditDetail] = Json.writes[HistoricDocumentRequestAuditDetail]
+}
+
+case class AuditDetailsWrapper(detail: FileUploadRequestAuditDetail)
+
+object AuditDetailsWrapper {
+  implicit val auditDetailsWrapperFormat: OWrites[AuditDetailsWrapper] = Json.writes[AuditDetailsWrapper]
+}
+
+case class FileUploadRequestAuditDetail(id: String,
+                                        eori: String,
+                                        caseNumber: String,
+                                        applicationName: String,
+                                        documentType: String,
+                                        properties: Properties)
+
+object FileUploadRequestAuditDetail {
+  implicit val fileUploadRequestAuditDetailWrites: OWrites[FileUploadRequestAuditDetail] = Json.writes[FileUploadRequestAuditDetail]
+}
+
+case class Properties(uploadedFiles: Seq[UploadedFiles])
+
+object Properties {
+  implicit val PropertiesWrites: OWrites[Properties] = Json.writes[Properties]
 }

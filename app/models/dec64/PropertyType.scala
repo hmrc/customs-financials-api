@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.mdg
+import models.dec64.Namespaces.mdg
 import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
 import ru.tinkoff.phobos.encoding.ElementEncoder
 import ru.tinkoff.phobos.syntax.xmlns
 
-case class Destinations(@xmlns(mdg) destination: List[Destination] = Nil)
+case class PropertyType(@xmlns(mdg) name: String,
+                        @xmlns(mdg) value: String)
 
-object Destinations {
-  implicit val destinationsTypeEnc: ElementEncoder[Destinations] = deriveElementEncoder[Destinations]
+object PropertyType {
+  implicit val propertyTypeEnc: ElementEncoder[PropertyType] = deriveElementEncoder[PropertyType]
 }

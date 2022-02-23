@@ -29,8 +29,8 @@ import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
-
 import javax.inject.{Inject, Singleton}
+import models.dec64.FileUploadRequest
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -46,6 +46,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val REVOKE_AUTHORITY_ACTION = "Revoke Authority"
   val HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE = "RequestHistoricStatement"
   val HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME = "Request historic statements"
+  val FILE_UPLOAD_REQUEST_TRANSACTION_NAME = "View and amend file upload"
+  val FILE_UPLOAD_REQUEST_AUDIT_TYPE = "ViewAmendFileUpload"
 
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
@@ -110,7 +112,17 @@ class AuditingService @Inject()(appConfig: AppConfig,
     audit(AuditModel(HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME, auditJson, HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE))
   }
 
+  def auditFileUploadRequest(fileUploadRequest: FileUploadRequest)(implicit hc: HeaderCarrier): Future[AuditResult] = {
+    val auditJson = Json.toJson(AuditDetailsWrapper(FileUploadRequestAuditDetail(
+      fileUploadRequest.id,
+      fileUploadRequest.eori.value,
+      fileUploadRequest.caseNumber,
+      fileUploadRequest.applicationName,
+      fileUploadRequest.documentType,
+      Properties(fileUploadRequest.properties.uploadedFiles))))
 
+    audit(AuditModel(FILE_UPLOAD_REQUEST_TRANSACTION_NAME, auditJson, FILE_UPLOAD_REQUEST_AUDIT_TYPE))
+  }
 
   private def audit(auditModel: AuditModel)(implicit hc: HeaderCarrier): Future[AuditResult] = {
     val dataEvent = ExtendedDataEvent(
