@@ -113,13 +113,13 @@ class AuditingService @Inject()(appConfig: AppConfig,
   }
 
   def auditFileUploadRequest(fileUploadRequest: FileUploadRequest)(implicit hc: HeaderCarrier): Future[AuditResult] = {
-    val auditJson = Json.toJson(AuditDetailsWrapper(FileUploadRequestAuditDetail(
+    val auditJson = Json.toJson(FileUploadRequestAuditDetail(
       fileUploadRequest.id,
       fileUploadRequest.eori.value,
       fileUploadRequest.caseNumber,
       fileUploadRequest.applicationName,
       fileUploadRequest.documentType,
-      Properties(fileUploadRequest.properties.uploadedFiles))))
+      Properties(fileUploadRequest.properties.uploadedFiles)))
 
     audit(AuditModel(FILE_UPLOAD_REQUEST_TRANSACTION_NAME, auditJson, FILE_UPLOAD_REQUEST_AUDIT_TYPE))
   }

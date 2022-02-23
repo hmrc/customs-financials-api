@@ -298,26 +298,24 @@ class AuditingServiceSpec extends SpecBase {
     "audit file upload request to Dec64" in new Setup {
       val auditRequest: JsValue = Json.parse(
         """{
-          |   "detail":{
-          |      "id":"id",
-          |      "eori":"eori",
-          |      "caseNumber":"casenumber",
-          |      "applicationName":"appName",
-          |      "documentType":"docType",
-          |      "properties":{
-          |         "uploadedFiles":[
-          |            {
-          |               "upscanReference":"upscanRef",
-          |               "downloadUrl":"url",
-          |               "uploadTimeStamp":"String",
-          |               "checkSum":"sum",
-          |               "fileName":"filename",
-          |               "fileMimeType":"mimeType",
-          |               "fileSize":"12",
-          |               "previousUrl":"url"
-          |            }
-          |         ]
-          |      }
+          |   "id":"id",
+          |   "eori":"eori",
+          |   "caseNumber":"casenumber",
+          |   "applicationName":"appName",
+          |   "documentType":"docType",
+          |   "properties":{
+          |      "uploadedFiles":[
+          |         {
+          |            "upscanReference":"upscanRef",
+          |            "downloadUrl":"url",
+          |            "uploadTimeStamp":"String",
+          |            "checkSum":"sum",
+          |            "fileName":"filename",
+          |            "fileMimeType":"mimeType",
+          |            "fileSize":"12",
+          |            "previousUrl":"url"
+          |         }
+          |      ]
           |   }
           |}""".stripMargin)
 
@@ -379,4 +377,5 @@ class AuditingServiceSpec extends SpecBase {
 
     val service: AuditingService = app.injector.instanceOf[AuditingService]
   }
+
 }
