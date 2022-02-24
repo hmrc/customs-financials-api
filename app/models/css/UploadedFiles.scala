@@ -16,16 +16,18 @@
 
 package models.css
 
-import play.api.libs.json.{Json, Format}
+import play.api.libs.json.{Format, Json}
 
-case class UploadedFiles(upscanReference: String,
-                         downloadUrl: String,
-                         uploadTimeStamp: String,
-                         checkSum: String,
-                         fileName: String,
-                         fileMimeType: String,
-                         fileSize: String,
-                         previousUrl: String)
+case class UploadedFiles(
+                          upscanReference: String,
+                          downloadUrl: String,
+                          uploadTimestamp: String,
+                          checksum: String,
+                          fileName: String,
+                          fileMimeType: String,
+                          fileSize: Int,
+                          description: String
+                        )
 
 object UploadedFiles {
   implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]

@@ -27,7 +27,7 @@ import utils.RandomUUIDGenerator
 class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
 
   def map(request: FileUploadRequest): Seq[String] =
-    request.properties.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
+    request.uploadedFiles.zipWithIndex.map { case (uploadedFile, index) =>
 
       val xml =
         <mdg:BatchFileInterfaceMetadata
@@ -40,10 +40,10 @@ class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
           <mdg:interfaceVersion>{Dec64.INTERFACE_VERSION}</mdg:interfaceVersion>
           <mdg:correlationID>{uuidGenerator.generateUuid}</mdg:correlationID>
           <mdg:batchID>{request.caseNumber}</mdg:batchID>
-          <mdg:batchSize>{request.properties.uploadedFiles.length}</mdg:batchSize>
+          <mdg:batchSize>{request.uploadedFiles.length}</mdg:batchSize>
           <mdg:batchCount>{index.toLong + 1}</mdg:batchCount>
-          <mdg:extractEndDateTime>{uploadedFile.uploadTimeStamp}</mdg:extractEndDateTime>
-          <mdg:checksum>{uploadedFile.checkSum}</mdg:checksum>
+          <mdg:extractEndDateTime>{uploadedFile.uploadTimestamp}</mdg:extractEndDateTime>
+          <mdg:checksum>{uploadedFile.checksum}</mdg:checksum>
           <mdg:checksumAlgorithm>{Dec64.UPSCAN_CHECKSUM_ALGORITHM}</mdg:checksumAlgorithm>
           <mdg:fileSize>{uploadedFile.fileSize.toLong}</mdg:fileSize>
           <mdg:compressed>false</mdg:compressed>
@@ -63,7 +63,7 @@ class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
             </mdg:property>
             <mdg:property>
               <mdg:name>DocumentReceivedDate</mdg:name>
-              <mdg:value>{uploadedFile.uploadTimeStamp}</mdg:value>
+              <mdg:value>{uploadedFile.uploadTimestamp}</mdg:value>
             </mdg:property>
             <mdg:property>
               <mdg:name>DeclarationId</mdg:name>
@@ -75,7 +75,7 @@ class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
             </mdg:property>
             <mdg:property>
               <mdg:name>DocumentType</mdg:name>
-              <mdg:value>{request.documentType}</mdg:value>
+              <mdg:value>{"documentType NEEDED"}</mdg:value>
             </mdg:property>
           </mdg:properties>
           <mdg:sourceLocation>{uploadedFile.downloadUrl}</mdg:sourceLocation>

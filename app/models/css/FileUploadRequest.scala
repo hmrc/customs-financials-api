@@ -23,8 +23,7 @@ case class FileUploadRequest(id: String,
                              eori: EORI,
                              caseNumber: String,
                              applicationName: String,
-                             documentType: String,
-                             properties: UploadedFileMetaData)
+                             uploadedFiles: Seq[UploadedFiles])
 
 object FileUploadRequest {
   implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]

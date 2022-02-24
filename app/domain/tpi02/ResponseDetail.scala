@@ -25,6 +25,10 @@ case class ResponseDetail(CDFPayService: String,
                           NDRCCase: Option[NDRCCase],
                           SCTYCase: Option[SCTYCase]) {
 
+  def declarationIdDefined: Boolean =
+    NDRCCase.flatMap(_.NDRCDetail.declarationID).isDefined ||
+      SCTYCase.flatMap(_.declarationID).isDefined
+
   private def transformedCaseStatus(caseStatus: String): String =
     caseStatus match {
       case "Open" => "In Progress"

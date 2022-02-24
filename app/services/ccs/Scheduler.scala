@@ -32,11 +32,11 @@ class Scheduler @Inject()(appConfig: AppConfig,
 
   val log: LoggerLike = Logger(this.getClass)
 
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0 seconds, delay = 1 / appConfig.fileUploadPerInstancePerSecond second) {
-    () => fileUploadJobHandler.processJob()
-  }
-
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 10 minutes, delay = appConfig.housekeepingHours hours) {
-    () => fileUploadJobHandler.houseKeeping()
-  }
+//  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0 seconds, delay = 1 / appConfig.fileUploadPerInstancePerSecond second) {
+//    () => fileUploadJobHandler.processJob()
+//  }
+//
+//  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 10 minutes, delay = appConfig.housekeepingHours hours) {
+//    () => fileUploadJobHandler.houseKeeping()
+//  }
 }

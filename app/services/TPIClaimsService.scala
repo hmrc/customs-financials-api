@@ -36,8 +36,12 @@ class TPIClaimsService @Inject()(tpi01Connector: Tpi01Connector,
 
   def getSpecificClaim(cdfPayService: String, cdfPayCaseNumber: String): Future[Option[tpi02.ResponseDetail]] = {
     tpi02Connector.retrieveSpecificClaim(cdfPayService, cdfPayCaseNumber).map { response =>
-      response.getSpecificCaseResponse.responseDetail.map { detail =>
-        detail.toCDSResponseDetail
+      response.getSpecificCaseResponse.responseDetail.flatMap { detail =>
+        if(detail.declarationIdDefined) {
+          Some(detail.toCDSResponseDetail)
+        } else {
+          None
+        }
       }
     }
   }

@@ -18,7 +18,7 @@ package controllers
 
 import javax.inject.Inject
 import models.css.FileUploadRequest
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import services.ccs.FileUploadCache
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
@@ -31,9 +31,9 @@ class FileUploadController @Inject()(cc: ControllerComponents,
                                     )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
-  def enqueueUploadedFiles(): Action[FileUploadRequest] = Action.async(parse.json[FileUploadRequest]) { implicit request =>
+  def enqueueUploadedFiles(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     logger.info(s"enqueueUploadedFiles: file upload request enqueued")
-    fileUploadCache.enqueueFileUploadJob(request.body).map {
+    fileUploadCache.enqueueFileUploadJob(request.body.as[FileUploadRequest]).map {
       case true =>
         Accepted(Json.obj("Status" -> "Ok", "message" -> "Uploaded files successfully queued"))
       case false =>
