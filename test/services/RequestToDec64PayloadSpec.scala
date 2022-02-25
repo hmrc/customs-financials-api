@@ -17,12 +17,12 @@
 package services
 
 import models.EORI
-import models.css._
+import models.dec64._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import services.ccs.RequestToDec64Payload
+import services.dec64.RequestToDec64Payload
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{RandomUUIDGenerator, SpecBase}
 
@@ -74,7 +74,7 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
         PropertyType("DocumentReceivedDate", "timeStamp"))), sourceLocation = "url", sourceFileName = "filename",
       sourceFileMimeType = "mimeType", destinations = Destinations(List(Destination("CDFPay"))))
 
-    val ccsSubmissionPayload = List(batchFileInterfaceMetadata.toString)
+    val dec64SubmissionPayload = List(batchFileInterfaceMetadata.toString)
 
     when(mockUUID.generateUuid).thenReturn("correlationID")
 

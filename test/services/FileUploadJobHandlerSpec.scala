@@ -18,12 +18,12 @@ package services
 
 import domain.FileUploadMongo
 import models.EORI
-import models.css.{FileUploadRequest, UploadedFiles}
+import models.dec64.{FileUploadRequest, UploadedFiles}
 import org.mockito.ArgumentMatchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import services.ccs.{CcsService, DefaultFileUploadCache, FileUploadJobHandler}
+import services.dec64.{DefaultFileUploadCache, FileUploadJobHandler, FileUploadService}
 import utils.SpecBase
 
 import java.time.LocalDateTime
@@ -47,12 +47,12 @@ class FileUploadJobHandlerSpec extends SpecBase {
         }
       }
 
-      "submit file upload to CCS" in new Setup {
+      "submit file upload to DEC64" in new Setup {
         running(app) {
 
           await(handler.processJob())
 
-          verify(mockCcsService).submitFileToCcs(ArgumentMatchers.any())
+          verify(mockFileUploadService).submitFileToDec64(ArgumentMatchers.any())
         }
       }
 
@@ -65,7 +65,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
         }
       }
 
-      "delete not completed job when submission to ccs was unsuccessful" in  {
+      "delete not completed job when submission to DEC64 was unsuccessful" in  {
 
         val app: Application = GuiceApplicationBuilder().overrides().configure(
           "microservice.metrics.enabled" -> false,
@@ -73,9 +73,9 @@ class FileUploadJobHandlerSpec extends SpecBase {
           "auditing.enabled" -> false
         ).build()
 
-        val mockCcsService: CcsService = mock[CcsService]
+        val mockFileUploadService: FileUploadService = mock[FileUploadService]
         val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-        val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
+        val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
 
         val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
           checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
@@ -89,13 +89,13 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
         when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
 
-        when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(false))
+        when(mockFileUploadService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(false))
 
         running(app) {
 
           await(handler.processJob())
 
-          verify(mockCcsService).submitFileToCcs(ArgumentMatchers.any())
+          verify(mockFileUploadService).submitFileToDec64(ArgumentMatchers.any())
 
           verifyZeroInteractions(mockDefaultFileUploadCache)
         }
@@ -111,9 +111,9 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
         running(app) {
 
-          val mockCcsService: CcsService = mock[CcsService]
+          val mockFileUploadService: FileUploadService = mock[FileUploadService]
           val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-          val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
+          val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
 
           service.houseKeeping()
 
@@ -131,9 +131,9 @@ class FileUploadJobHandlerSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val mockCcsService: CcsService = mock[CcsService]
+    val mockFileUploadService: FileUploadService = mock[FileUploadService]
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-    val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockCcsService)
+    val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
 
     val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
@@ -147,7 +147,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
     when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
     when(mockDefaultFileUploadCache.deleteJob(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-    when(mockCcsService.submitFileToCcs(ArgumentMatchers.any())).thenReturn(Future.successful(true))
+    when(mockFileUploadService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(true))
 
   }
 }

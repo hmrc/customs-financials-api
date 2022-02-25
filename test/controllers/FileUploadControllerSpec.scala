@@ -16,7 +16,7 @@
 
 package controllers
 
-import models.css.FileUploadRequest
+import models.dec64.FileUploadRequest
 import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -24,7 +24,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Helpers}
-import services.ccs.FileUploadCache
+import services.dec64.FileUploadCache
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global

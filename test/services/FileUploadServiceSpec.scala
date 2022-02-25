@@ -16,29 +16,29 @@
 
 package services
 
-import connectors.CcsConnector
+import connectors.Dec64Connector
 import domain.FileUploadMongo
 import models.EORI
-import models.css._
+import models.dec64._
 import org.mockito.ArgumentMatchers
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import services.ccs.{CcsService, RequestToDec64Payload}
+import services.dec64.{FileUploadService, RequestToDec64Payload}
 import utils.SpecBase
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CcsServiceSpec extends SpecBase {
+class FileUploadServiceSpec extends SpecBase {
 
-  "CcsService" should {
+  "FileUploadService" should {
 
-    "submit uploaded files to ccs should return true when successful" in new Setup {
+    "submit uploaded files to dec64 should return true when successful" in new Setup {
       running(app) {
         await(for {
-          response <- ccsService.submitFileToCcs(uploadedFilesRequest)
+          response <- fileUploadService.submitFileToDec64(uploadedFilesRequest)
         } yield {
           response mustBe true
         })
@@ -47,11 +47,11 @@ class CcsServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    val mockCcsConnector: CcsConnector = mock[CcsConnector]
+    val mockDec64Connector: Dec64Connector = mock[Dec64Connector]
     val mockRequestToDec64Payload: RequestToDec64Payload = mock[RequestToDec64Payload]
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CcsConnector].toInstance(mockCcsConnector),
+      inject.bind[Dec64Connector].toInstance(mockDec64Connector),
       inject.bind[RequestToDec64Payload].toInstance(mockRequestToDec64Payload)
     ).configure(
       "microservice.metrics.enabled" -> false,
@@ -59,7 +59,7 @@ class CcsServiceSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val ccsService: CcsService = app.injector.instanceOf[CcsService]
+    val fileUploadService: FileUploadService = app.injector.instanceOf[FileUploadService]
 
     val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
@@ -78,7 +78,7 @@ class CcsServiceSpec extends SpecBase {
         PropertyType("DocumentReceivedDate", "timestamp"))), sourceLocation = "", sourceFileName = "",
       sourceFileMimeType = "", destinations = Destinations(List(Destination(""))))
 
-    when(mockCcsConnector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
+    when(mockDec64Connector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
     when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(List(batchFileInterfaceMetadata.toString))
 
   }

@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.mdg
-import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
-import ru.tinkoff.phobos.encoding.ElementEncoder
-import ru.tinkoff.phobos.syntax.xmlns
+import play.api.libs.json.{Json, OFormat}
 
-case class Destinations(@xmlns(mdg) destination: List[Destination] = Nil)
+case class Dec64SubmissionPayload(dec64Body: String, headers: Seq[(String, String)])
 
-object Destinations {
-  implicit val destinationsTypeEnc: ElementEncoder[Destinations] = deriveElementEncoder[Destinations]
+object Dec64SubmissionPayload {
+  implicit val format: OFormat[Dec64SubmissionPayload] = Json.format[Dec64SubmissionPayload]
 }

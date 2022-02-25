@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.AbstractModule
-import services.ccs.{DefaultFileUploadCache, FileUploadCache}
+import services.dec64.{DefaultFileUploadCache, FileUploadCache}
 import services.{DefaultNotificationCache, NotificationCache}
 
 class Module extends AbstractModule {

@@ -18,11 +18,11 @@ package services
 
 import domain.FileUploadMongo
 import models.EORI
-import models.css._
+import models.dec64._
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import services.ccs.DefaultFileUploadCache
+import services.dec64.DefaultFileUploadCache
 import utils.SpecBase
 
 import java.time.LocalDateTime

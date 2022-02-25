@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-package services.ccs
+package services.dec64
 
-import connectors.CcsConnector
+import connectors.Dec64Connector
 import javax.inject.{Inject, Singleton}
-import models.css._
-import ru.tinkoff.phobos.encoding.XmlEncoder
+import models.dec64._
+import services.AuditingService
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 @Singleton
-class CcsService @Inject()(cssConnector: CcsConnector,
-                           ccsHeaders: CcsHeaders,
-                           requestToDec64Payload: RequestToDec64Payload) {
+class FileUploadService @Inject()(dec64Connector: Dec64Connector,
+                                  dec64Headers: Dec64Headers,
+                                  requestToDec64Payload: RequestToDec64Payload,
+                                  auditingService: AuditingService) {
 
-  def submitFileToCcs(request: FileUploadRequest): Future[Boolean] = {
+  def submitFileToDec64(request: FileUploadRequest): Future[Boolean] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val ccsSubmissionsPayload = requestToDec64Payload.map(request).map(data =>
-      CcsSubmissionPayload(data, ccsHeaders.getHeaders(hc))).head
-    cssConnector.submitFileUpload(ccsSubmissionsPayload)
+    auditingService.auditFileUploadRequest(request)
+    val dec64SubmissionsPayload = requestToDec64Payload.map(request).map(data =>
+      Dec64SubmissionPayload(data, dec64Headers.getHeaders(hc))).head
+    dec64Connector.submitFileUpload(dec64SubmissionsPayload)
   }
 }
 

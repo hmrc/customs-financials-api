@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
 import ru.tinkoff.phobos
 

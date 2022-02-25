@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import play.api.libs.json.{Json, OFormat}
+import models.dec64.Namespaces.soap
+import ru.tinkoff.phobos.derivation.semiauto.deriveXmlEncoder
+import ru.tinkoff.phobos.encoding.XmlEncoder
+import ru.tinkoff.phobos.syntax.xmlns
 
-case class CcsSubmissionPayload(dec64Body: String, headers: Seq[(String, String)])
+case class Envelope(@xmlns(soap) Body: Body)
 
-object CcsSubmissionPayload {
-  implicit val format: OFormat[CcsSubmissionPayload] = Json.format[CcsSubmissionPayload]
+object Envelope {
+  implicit val envelopeEncoder: XmlEncoder[Envelope] = deriveXmlEncoder("Envelope", Namespaces.soap)
 }

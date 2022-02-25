@@ -18,13 +18,14 @@ package services
 
 import domain.StandingAuthority
 import models._
+import models.dec64.{FileUploadRequest, UploadedFiles}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
 import org.scalatest.matchers.should.Matchers._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
@@ -295,6 +296,50 @@ class AuditingServiceSpec extends SpecBase {
       }
     }
 
+    "audit file upload request to Dec64" in new Setup {
+      val auditRequest: JsValue = Json.parse(
+        """{
+          |   "id":"id",
+          |   "eori":"eori",
+          |   "caseNumber":"casenumber",
+          |   "applicationName":"appName",
+          |   "properties":{
+          |      "uploadedFiles":[
+          |         {
+          |            "upscanReference":"upscanRef",
+          |            "downloadUrl":"url",
+          |            "uploadTimestamp":"String",
+          |            "checksum":"sum",
+          |            "fileName":"filename",
+          |            "fileMimeType":"mimeType",
+          |            "fileSize":12,
+          |            "description":"file type"
+          |         }
+          |      ]
+          |   }
+          |}""".stripMargin)
+
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+        checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "file type")
+
+      val fileUploadRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
+        applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
+
+      running(app) {
+        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+          .thenReturn(Future.successful(AuditResult.Success))
+
+        service.auditFileUploadRequest(fileUploadRequest)
+        val result = extendedDataEventCaptor.getValue
+        result.detail mustBe auditRequest
+        result.auditType mustBe "ViewAmendFileUpload"
+        result.auditSource mustBe "customs-financials-api"
+        result.tags.get("transactionName") mustBe Some("View and amend file upload")
+      }
+    }
+
     "not throw an exception when failing to audit the events" in new Setup {
       val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
 
@@ -330,4 +375,5 @@ class AuditingServiceSpec extends SpecBase {
 
     val service: AuditingService = app.injector.instanceOf[AuditingService]
   }
+
 }

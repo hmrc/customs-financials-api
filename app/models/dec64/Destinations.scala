@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.css.Namespaces.mdg
+import models.dec64.Namespaces.mdg
 import ru.tinkoff.phobos.derivation.semiauto.deriveElementEncoder
 import ru.tinkoff.phobos.encoding.ElementEncoder
 import ru.tinkoff.phobos.syntax.xmlns
 
-case class Destination(@xmlns(mdg) destinationSystem: String)
+case class Destinations(@xmlns(mdg) destination: List[Destination] = Nil)
 
-object Destination {
-  implicit val destinationTypeEnc: ElementEncoder[Destination] = deriveElementEncoder[Destination]
+object Destinations {
+  implicit val destinationsTypeEnc: ElementEncoder[Destinations] = deriveElementEncoder[Destinations]
 }

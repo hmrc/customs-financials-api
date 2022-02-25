@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package models.css
+package models.dec64
 
-import models.EORI
 import play.api.libs.json.{Format, Json}
 
-case class FileUploadRequest(id: String,
-                             eori: EORI,
-                             caseNumber: String,
-                             declarationId: String,
-                             entryNumber: Boolean,
-                             applicationName: String,
-                             uploadedFiles: Seq[UploadedFiles]) {
+case class UploadedFiles(
+                          upscanReference: String,
+                          downloadUrl: String,
+                          uploadTimestamp: String,
+                          checksum: String,
+                          fileName: String,
+                          fileMimeType: String,
+                          fileSize: Int,
+                          description: String
+                        )
 
-  def declarationType: String = {
-    if (entryNumber) "Entry" else "MRN"
-  }
-
-
-}
-
-object FileUploadRequest {
-  implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]
+object UploadedFiles {
+  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
 }
