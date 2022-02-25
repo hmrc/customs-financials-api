@@ -18,7 +18,6 @@ package controllers
 
 import domain._
 import domain.tpi01._
-import domain.tpi02.Reimbursement
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -29,6 +28,7 @@ import play.api.{Application, inject}
 import services.TPIClaimsService
 import uk.gov.hmrc.http.NotFoundException
 import utils.SpecBase
+
 import scala.concurrent.Future
 
 class TPIClaimsControllerSpec extends SpecBase {
@@ -127,17 +127,17 @@ class TPIClaimsControllerSpec extends SpecBase {
 
   "getSpecificClaim" should {
     "return 200 with cdfPayCase when claim found " in new Setup {
-      val reimbursement: Reimbursement = Reimbursement("date", "10.00", "10.00")
-      val cdfPayCase: tpi02.CDFPayCase = tpi02.CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",
-        Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(reimbursement))
+
+      val response =
+        tpi02.ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase), None)
 
       when(mockTPIClaimsService.getSpecificClaim(any, any))
-        .thenReturn(Future.successful(Some(cdfPayCase)))
+        .thenReturn(Future.successful(Some(response)))
 
       running(app) {
         val result = route(app, requestSpecificClaim).value
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(cdfPayCase)
+        contentAsJson(result) mustBe Json.toJson(response)
       }
     }
 

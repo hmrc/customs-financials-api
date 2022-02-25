@@ -22,8 +22,17 @@ import play.api.libs.json.{Format, Json}
 case class FileUploadRequest(id: String,
                              eori: EORI,
                              caseNumber: String,
+                             declarationId: String,
+                             entryNumber: Boolean,
                              applicationName: String,
-                             uploadedFiles: Seq[UploadedFiles])
+                             uploadedFiles: Seq[UploadedFiles]) {
+
+  def declarationType: String = {
+    if (entryNumber) "Entry" else "MRN"
+  }
+
+
+}
 
 object FileUploadRequest {
   implicit val format: Format[FileUploadRequest] = Json.format[FileUploadRequest]

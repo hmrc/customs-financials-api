@@ -57,23 +57,22 @@ class FileUploadControllerSpec extends SpecBase {
         |   "id":"id",
         |   "eori":"eori",
         |   "caseNumber":"casenumber",
+        |   "declarationId":"MRN",
+        |   "entryNumber": false,
         |   "applicationName":"appName",
         |   "documentType":"docType",
-        |   "properties":{
-        |      "nonce":"nonce",
-        |      "uploadedFiles":[
-        |         {
-        |            "upscanReference":"upscanRef",
-        |            "downloadUrl":"url",
-        |            "uploadTimeStamp":"String",
-        |            "checkSum":"sum",
-        |            "fileName":"filename",
-        |            "fileMimeType":"mimeType",
-        |            "fileSize":"12",
-        |            "previousUrl":"url"
-        |         }
-        |      ]
+        |   "uploadedFiles":[
+        |   {
+        |      "upscanReference":"upscanRef",
+        |      "downloadUrl":"url",
+        |      "uploadTimestamp":"String",
+        |      "checksum":"sum",
+        |      "fileName":"filename",
+        |      "fileMimeType":"mimeType",
+        |      "fileSize":12,
+        |      "description":"Additional Documents"
         |   }
+        |]
         |}""".stripMargin)
 
 

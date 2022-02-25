@@ -18,10 +18,7 @@ package services.ccs
 
 import com.google.inject.Inject
 import config.MetaConfig.Dec64
-import models.css.Namespaces.mdg
 import models.css._
-import org.joda.time.DateTime
-import ru.tinkoff.phobos.syntax.xmlns
 import utils.RandomUUIDGenerator
 
 class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
@@ -67,15 +64,15 @@ class RequestToDec64Payload @Inject()(uuidGenerator: RandomUUIDGenerator) {
             </mdg:property>
             <mdg:property>
               <mdg:name>DeclarationId</mdg:name>
-              <mdg:value>MRNNumber</mdg:value>
+              <mdg:value>{request.declarationId}</mdg:value>
             </mdg:property>
             <mdg:property>
               <mdg:name>DeclarationType</mdg:name>
-              <mdg:value>MRN</mdg:value>
+              <mdg:value>{request.declarationType}</mdg:value>
             </mdg:property>
             <mdg:property>
               <mdg:name>DocumentType</mdg:name>
-              <mdg:value>{"documentType NEEDED"}</mdg:value>
+              <mdg:value>{uploadedFile.description}</mdg:value>
             </mdg:property>
           </mdg:properties>
           <mdg:sourceLocation>{uploadedFile.downloadUrl}</mdg:sourceLocation>

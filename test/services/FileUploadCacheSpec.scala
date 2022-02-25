@@ -16,18 +16,16 @@
 
 package services
 
-import java.time.LocalDateTime
-
 import domain.FileUploadMongo
 import models.EORI
 import models.css._
-import org.mongodb.scala.model.Filters
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import services.ccs.DefaultFileUploadCache
 import utils.SpecBase
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileUploadCacheSpec extends SpecBase {
@@ -101,14 +99,11 @@ class FileUploadCacheSpec extends SpecBase {
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
-      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
-
-    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce1", uploadedFiles = Seq(uploadedFiles))
-    val uploadedFileMetaData2: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce2", uploadedFiles = Seq(uploadedFiles))
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+      checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "Additional documents")
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+      applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
   }
 
 }

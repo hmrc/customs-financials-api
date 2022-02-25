@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
 import utils.SpecBase
+
 import scala.concurrent.Future
 
 class CcsConnectorSpec extends SpecBase {

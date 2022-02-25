@@ -16,13 +16,12 @@
 
 package services
 
-import config.AppConfig
 import domain.{Notification, NotificationsForEori}
 import models.{EORI, FileRole}
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import play.api.{Application, inject}
 import utils.SpecBase
 
 import java.time.LocalDate
