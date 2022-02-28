@@ -112,11 +112,8 @@ class DefaultFileUploadCache @Inject()(
 
 trait FileUploadCache {
   def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
-
   def nextJob: Future[Option[FileUploadRequest]]
-
   def deleteJob(id: String): Future[Boolean]
-
   def resetProcessing: Future[Unit]
 }
 

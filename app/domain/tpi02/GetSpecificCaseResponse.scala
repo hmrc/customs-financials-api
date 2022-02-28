@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package models.dec64
+package domain.tpi02
 
-import play.api.libs.json.{Json, Format}
+import play.api.libs.json.{Json, OFormat}
 
-case class UploadedFileMetaData(nonce: String, uploadedFiles: Seq[UploadedFiles])
+case class GetSpecificCaseResponse(responseCommon: ResponseCommon,
+                                   responseDetail: Option[ResponseDetail]){
+  val mdtpError: Boolean = responseCommon
+    .returnParameters.exists(_.exists(_.paramName == "POSITION"))
+}
 
-object UploadedFileMetaData {
-  implicit val format: Format[UploadedFileMetaData] = Json.format[UploadedFileMetaData]
+object GetSpecificCaseResponse {
+  implicit val format: OFormat[GetSpecificCaseResponse] = Json.format[GetSpecificCaseResponse]
 }

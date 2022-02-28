@@ -25,6 +25,7 @@ import play.api.{Application, inject}
 import services.dec64.RequestToDec64Payload
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{RandomUUIDGenerator, SpecBase}
+
 import scala.concurrent.ExecutionContext
 
 class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
@@ -57,13 +58,12 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
 
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "timeStamp",
-      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "timeStamp",
+      checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
-    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+      applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
     val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "AWS",
       interfaceName = "DEC64", interfaceVersion = "1.0.0", correlationID = "correlationID", batchID = "casenumber",

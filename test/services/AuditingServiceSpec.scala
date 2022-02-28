@@ -18,7 +18,7 @@ package services
 
 import domain.StandingAuthority
 import models._
-import models.dec64.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
+import models.dec64.{FileUploadRequest, UploadedFiles}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.SpecBase
+
 import scala.concurrent._
 
 class AuditingServiceSpec extends SpecBase {
@@ -302,18 +303,17 @@ class AuditingServiceSpec extends SpecBase {
           |   "eori":"eori",
           |   "caseNumber":"casenumber",
           |   "applicationName":"appName",
-          |   "documentType":"docType",
           |   "properties":{
           |      "uploadedFiles":[
           |         {
           |            "upscanReference":"upscanRef",
           |            "downloadUrl":"url",
-          |            "uploadTimeStamp":"String",
-          |            "checkSum":"sum",
+          |            "uploadTimestamp":"String",
+          |            "checksum":"sum",
           |            "fileName":"filename",
           |            "fileMimeType":"mimeType",
-          |            "fileSize":"12",
-          |            "previousUrl":"url"
+          |            "fileSize":12,
+          |            "description":"file type"
           |         }
           |      ]
           |   }
@@ -321,13 +321,11 @@ class AuditingServiceSpec extends SpecBase {
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
-        checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12", previousUrl = "url")
-
-      val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce1", uploadedFiles = Seq(uploadedFiles))
+      val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+        checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "file type")
 
       val fileUploadRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-        applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+        applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))

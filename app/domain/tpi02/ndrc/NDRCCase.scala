@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package models.dec64
+package domain.tpi02.ndrc
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class UploadedFiles(
-                          upscanReference: String,
-                          downloadUrl: String,
-                          uploadTimestamp: String,
-                          checksum: String,
-                          fileName: String,
-                          fileMimeType: String,
-                          fileSize: Int,
-                          description: String
-                        )
 
-object UploadedFiles {
-  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
+case class NDRCCase(
+                     NDRCDetail: NDRCDetail,
+                     NDRCAmounts: NDRCAmounts
+                   )
+
+object NDRCCase {
+  implicit val reads: Reads[NDRCCase] = {
+    (JsPath.read[NDRCDetail] and JsPath.read[NDRCAmounts])(NDRCCase.apply _)
+  }
+
+  implicit val writes: Writes[NDRCCase] = {
+    (JsPath.write[NDRCDetail] and JsPath.write[NDRCAmounts])(unlift(NDRCCase.unapply))
+  }
 }

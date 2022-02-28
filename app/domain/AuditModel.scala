@@ -84,7 +84,6 @@ case class FileUploadRequestAuditDetail(id: String,
                                         eori: String,
                                         caseNumber: String,
                                         applicationName: String,
-                                        documentType: String,
                                         properties: Properties)
 
 object FileUploadRequestAuditDetail {

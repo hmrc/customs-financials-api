@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package models.dec64
+package domain.tpi02.ndrc
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, OFormat}
 
-case class UploadedFiles(
-                          upscanReference: String,
-                          downloadUrl: String,
-                          uploadTimestamp: String,
-                          checksum: String,
-                          fileName: String,
-                          fileMimeType: String,
-                          fileSize: Int,
-                          description: String
-                        )
+case class EntryDetail(entryNumber: String, mainDeclarationReference: Boolean)
 
-object UploadedFiles {
-  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
+object EntryDetail {
+  implicit val format: OFormat[EntryDetail] = Json.format[EntryDetail]
 }

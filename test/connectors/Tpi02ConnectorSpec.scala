@@ -16,8 +16,6 @@
 
 package connectors
 
-import java.time.LocalDate
-
 import domain.tpi02._
 import play.api.Application
 import play.api.inject.bind
@@ -26,6 +24,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class Tpi02ConnectorSpec extends SpecBase {
@@ -46,15 +45,10 @@ class Tpi02ConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
-    val response: Response = Response(GetSpecificClaimResponse(
-        ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-        Some(ResponseDetail("MDTP", Some(cdfPayCase))))
+    val response: Response = Response(GetSpecificCaseResponse(
+      ResponseCommon("OK", LocalDate.now().toString, None, None, None),
+      Some(ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase), Some(sctyCase))))
     )
-
-    val cdfPayCase: CDFPayCase = CDFPayCase("Resolved-Completed", "4374422408", "GB138153003838312", "GB138153003838312",
-      Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(reimbursement))
-
-    val reimbursement: Reimbursement = Reimbursement("date", "10.00", "10.00")
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)

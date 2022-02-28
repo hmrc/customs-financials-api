@@ -16,7 +16,6 @@
 
 package connectors
 
-import java.time.LocalDate
 import domain.tpi01._
 import models.EORI
 import play.api.Application
@@ -25,6 +24,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class Tpi01ConnectorSpec extends SpecBase {

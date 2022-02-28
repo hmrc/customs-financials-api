@@ -118,8 +118,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
       fileUploadRequest.eori.value,
       fileUploadRequest.caseNumber,
       fileUploadRequest.applicationName,
-      fileUploadRequest.documentType,
-      Properties(fileUploadRequest.properties.uploadedFiles)))
+      Properties(fileUploadRequest.uploadedFiles)))
 
     audit(AuditModel(FILE_UPLOAD_REQUEST_TRANSACTION_NAME, auditJson, FILE_UPLOAD_REQUEST_AUDIT_TYPE))
   }

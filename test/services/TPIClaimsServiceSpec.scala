@@ -16,17 +16,18 @@
 
 package services
 
-import java.time.LocalDate
 import connectors.{Tpi01Connector, Tpi02Connector}
 import domain._
 import domain.tpi01._
-import domain.tpi02.{GetSpecificClaimResponse, Reimbursement}
+import domain.tpi02.GetSpecificCaseResponse
 import models.EORI
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class TPIClaimsServiceSpec extends SpecBase {
@@ -66,15 +67,9 @@ class TPIClaimsServiceSpec extends SpecBase {
 
     "calling get Specific Claims" should {
       "successfully returns CDFPayCase" in new Setup {
-        val cdfPayCase: tpi02.CDFPayCase = tpi02.CDFPayCase("Open", "4374422408", "GB138153003838312", "GB138153003838312",
-          Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(Reimbursement("date", "10.00", "10.00")))
-
-        val getSpecificClaimResponse: tpi02.CDFPayCase = tpi02.CDFPayCase("In Progress", "4374422408", "GB138153003838312", "GB138153003838312",
-          Some("GB138153003838312"), Some("10.00"), Some("10.00"), Some("10.00"), "10.00", "10.00", Some("10.00"), Some(Reimbursement("date", "10.00", "10.00")))
-
-        val responseSpecificClaim: tpi02.Response = tpi02.Response(GetSpecificClaimResponse(
+        val responseSpecificClaim: tpi02.Response = tpi02.Response(GetSpecificCaseResponse(
           tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None),
-          Some(tpi02.ResponseDetail("MDTP", Some(cdfPayCase)))
+          Some(tpi02.ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase), None))
         ))
 
         when(mockTpi02Connector.retrieveSpecificClaim(any, any))
@@ -82,7 +77,22 @@ class TPIClaimsServiceSpec extends SpecBase {
 
         running(app) {
           val result = await(service.getSpecificClaim("CDFPayService", "CDFPayCaseNumber"))
-          result mustBe Some(getSpecificClaimResponse)
+          result mustBe Some(tpi02.ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase.copy(ndrcCase.NDRCDetail.copy(caseStatus = "Closed"), ndrcCase.NDRCAmounts)), None))
+        }
+      }
+
+      "return None if no declarationId present" in new Setup {
+        val responseSpecificClaim: tpi02.Response = tpi02.Response(GetSpecificCaseResponse(
+          tpi02.ResponseCommon("OK", LocalDate.now().toString, None, None, None),
+          Some(tpi02.ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase.copy(ndrcCase.NDRCDetail.copy(declarationID = None), ndrcCase.NDRCAmounts)), None))
+        ))
+
+        when(mockTpi02Connector.retrieveSpecificClaim(any, any))
+          .thenReturn(Future.successful(responseSpecificClaim))
+
+        running(app) {
+          val result = await(service.getSpecificClaim("CDFPayService", "CDFPayCaseNumber"))
+          result mustBe None
         }
       }
     }

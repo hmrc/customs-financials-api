@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package models.dec64
+package domain.tpi02
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, OFormat}
 
-case class UploadedFiles(
-                          upscanReference: String,
-                          downloadUrl: String,
-                          uploadTimestamp: String,
-                          checksum: String,
-                          fileName: String,
-                          fileMimeType: String,
-                          fileSize: Int,
-                          description: String
-                        )
+case class ReturnParameter(paramName: String, paramValue: String)
 
-object UploadedFiles {
-  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
+object ReturnParameter {
+  implicit val format: OFormat[ReturnParameter] = Json.format[ReturnParameter]
 }

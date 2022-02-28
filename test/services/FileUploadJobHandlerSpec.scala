@@ -16,18 +16,17 @@
 
 package services
 
-import java.time.LocalDateTime
-
 import domain.FileUploadMongo
 import models.EORI
-import models.dec64.{FileUploadRequest, UploadedFileMetaData, UploadedFiles}
+import models.dec64.{FileUploadRequest, UploadedFiles}
 import org.mockito.ArgumentMatchers
-import play.api.{Application, inject}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
-import services.dec64.{FileUploadService, DefaultFileUploadCache, FileUploadCache, FileUploadJobHandler}
+import services.dec64.{DefaultFileUploadCache, FileUploadJobHandler, FileUploadService}
 import utils.SpecBase
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -78,13 +77,12 @@ class FileUploadJobHandlerSpec extends SpecBase {
         val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
         val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
 
-        val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
-          checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+        val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+          checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
-        val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
 
         val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-          applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+          applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
         val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
           processing = false, receivedAt = LocalDateTime.now)
@@ -137,13 +135,12 @@ class FileUploadJobHandlerSpec extends SpecBase {
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
     val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimeStamp = "String",
-      checkSum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = "12" , previousUrl = "url")
+    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+      checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
-    val uploadedFileMetaData: UploadedFileMetaData = UploadedFileMetaData(nonce = "nonce", uploadedFiles = Seq(uploadedFiles))
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-      applicationName = "appName", documentType = "docType", properties = uploadedFileMetaData)
+      applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
     val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
       processing = false, receivedAt = LocalDateTime.now)
