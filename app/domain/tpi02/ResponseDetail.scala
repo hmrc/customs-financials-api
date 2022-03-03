@@ -51,6 +51,7 @@ case class ResponseDetail(CDFPayService: String,
       case "Analysis-Rework" => "In Progress"
       case "Rework-Payment Details" => "In Progress"
       case "Reply To RTBH" => "Pending"
+      case "Closed-C18 Raised" => "Closed"
       case "Pending-Compliance Recommendation" => "Pending"
       case "Pending-Compliance Check Query" => "Pending"
       case "Pending-Compliance Check" => "Pending"
