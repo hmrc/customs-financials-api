@@ -18,7 +18,7 @@ package services
 
 import domain.StandingAuthority
 import models._
-import models.dec64.{FileUploadRequest, UploadedFiles}
+import models.dec64.{FileUploadRequest, UploadedFile}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
@@ -321,7 +321,7 @@ class AuditingServiceSpec extends SpecBase {
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+      val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
         checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "file type")
 
       val fileUploadRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",

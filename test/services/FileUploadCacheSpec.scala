@@ -67,9 +67,9 @@ class FileUploadCacheSpec extends SpecBase {
     "send all file uploads with processing set to false" in new Setup {
 
       val fileUploadCache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
-      val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id_1", uploadDocumentsRequest = uploadedFilesRequest,
+      val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id_1", uploadDocumentsDetail = uploadedFilesRequest,
         processing = false, receivedAt = LocalDateTime.now)
-      val fileUploadMongo2: FileUploadMongo = FileUploadMongo(_id = "id_2", uploadDocumentsRequest = uploadedFilesRequest,
+      val fileUploadMongo2: FileUploadMongo = FileUploadMongo(_id = "id_2", uploadDocumentsDetail = uploadedFilesRequest,
         processing = false, receivedAt = LocalDateTime.now)
 
 
@@ -99,7 +99,7 @@ class FileUploadCacheSpec extends SpecBase {
     val cache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
     await(cache.collection.drop().toFuture())
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+    val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "Additional documents")
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",

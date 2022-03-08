@@ -25,13 +25,24 @@ case class FileUploadRequest(id: String,
                              declarationId: String,
                              entryNumber: Boolean,
                              applicationName: String,
-                             uploadedFiles: Seq[UploadedFiles]) {
+                             uploadedFiles: Seq[UploadedFile]) {
 
   def declarationType: String = {
     if (entryNumber) "Entry" else "MRN"
   }
 
-
+  def toFileUploadDetail(file: UploadedFile, index: Int): FileUploadDetail = {
+    FileUploadDetail(id = id,
+      eori = eori,
+      caseNumber = caseNumber,
+      declarationId = declarationId,
+      entryNumber = entryNumber,
+      applicationName = applicationName,
+      declarationType = declarationType,
+      fileCount = uploadedFiles.length,
+      file = file,
+      index = index)
+  }
 }
 
 object FileUploadRequest {

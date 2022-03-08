@@ -58,7 +58,7 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
 
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "timeStamp",
+    val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "timeStamp",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
 

@@ -16,7 +16,7 @@
 
 package domain
 
-import models.dec64.UploadedFiles
+import models.dec64.UploadedFile
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
 
@@ -90,7 +90,7 @@ object FileUploadRequestAuditDetail {
   implicit val fileUploadRequestAuditDetailWrites: OWrites[FileUploadRequestAuditDetail] = Json.writes[FileUploadRequestAuditDetail]
 }
 
-case class Properties(uploadedFiles: Seq[UploadedFiles])
+case class Properties(uploadedFiles: Seq[UploadedFile])
 
 object Properties {
   implicit val PropertiesWrites: OWrites[Properties] = Json.writes[Properties]

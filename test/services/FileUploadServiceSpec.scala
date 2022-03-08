@@ -61,13 +61,13 @@ class FileUploadServiceSpec extends SpecBase {
 
     val fileUploadService: FileUploadService = app.injector.instanceOf[FileUploadService]
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+    val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
-    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
+    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsDetail = uploadedFilesRequest,
       processing = false, receivedAt = LocalDateTime.now)
 
     val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",

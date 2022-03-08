@@ -16,19 +16,21 @@
 
 package models.dec64
 
+import models.EORI
 import play.api.libs.json.{Format, Json}
 
-case class UploadedFiles(
-                          upscanReference: String,
-                          downloadUrl: String,
-                          uploadTimestamp: String,
-                          checksum: String,
-                          fileName: String,
-                          fileMimeType: String,
-                          fileSize: Int,
-                          description: String
-                        )
+case class FileUploadDetail(id: String,
+                            eori: EORI,
+                            caseNumber: String,
+                            declarationId: String,
+                            entryNumber: Boolean,
+                            applicationName: String,
+                            declarationType: String,
+                            fileCount: Int,
+                            file: UploadedFile,
+                            index: Int,
+                           )
 
-object UploadedFiles {
-  implicit val format: Format[UploadedFiles] = Json.format[UploadedFiles]
+object FileUploadDetail {
+  implicit val format: Format[FileUploadDetail] = Json.format[FileUploadDetail]
 }

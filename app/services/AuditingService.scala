@@ -30,7 +30,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Suc
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import javax.inject.{Inject, Singleton}
-import models.dec64.FileUploadRequest
+import models.dec64.{FileUploadDetail, FileUploadRequest}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

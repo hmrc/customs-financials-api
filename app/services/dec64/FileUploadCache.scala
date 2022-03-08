@@ -19,11 +19,12 @@ package services.dec64
 import java.time.ZoneOffset
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+
 import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
 import javax.inject.Inject
-import models.dec64.FileUploadRequest
+import models.dec64.{FileUploadDetail, FileUploadRequest, UploadedFile}
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
@@ -31,6 +32,7 @@ import services.DateTimeService
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -54,16 +56,45 @@ class DefaultFileUploadCache @Inject()(
       )
     )) with FileUploadCache {
 
-  override def enqueueFileUploadJob(uploadDocumentsRequest: FileUploadRequest): Future[Boolean] = {
-    val timeStamp = dateTimeService.now()
+  override def enqueueFileUploadJob(request: FileUploadRequest): Future[Boolean] = {
+    val files = request.uploadedFiles.zipWithIndex
+    files.length match {
+      case 1 =>
+        enqueueOneFile(mongoRec(request.uploadedFiles.head, 1, request))
+      case _ =>
+        val seqFileUploadDocuments: Seq[FileUploadMongo] =
+          for (file <- files) yield
+            mongoRec(file._1, file._2, request)
+
+        println(Console.MAGENTA + s"mongo records Seq: \n $seqFileUploadDocuments}" + Console.RESET)
+        enqueueMultipleFiles(seqFileUploadDocuments)
+    }
+  }
+
+  private def mongoRec(uploadedFile: UploadedFile, index: Int, uploadDocumentsRequest: FileUploadRequest): FileUploadMongo = {
     val id = UUID.randomUUID().toString
-    val record = FileUploadMongo(id, uploadDocumentsRequest, processing = false, timeStamp)
-    val result: Future[Boolean] = collection.insertOne(record).toFuture().map(_.wasAcknowledged())
+    val timeStamp = dateTimeService.now()
+    FileUploadMongo(id, uploadDocumentsRequest, processing = false, timeStamp, uploadedFile)
+  }
+
+  override def enqueueOneFile(fileUploadMongo: FileUploadMongo): Future[Boolean] = {
+    val result: Future[Boolean] = collection.insertOne(fileUploadMongo).toFuture().map(_.wasAcknowledged())
     result.onComplete {
       case Failure(error) =>
         logger.error(s"Could not enqueue FileUploadMongo record: ${error.getMessage}")
       case Success(_) =>
-        logger.info(s"Successfully enqueued FileUploadMongo record:  $timeStamp : $uploadDocumentsRequest")
+        logger.info(s"Successfully enqueued FileUploadMongo record:  ${fileUploadMongo.receivedAt} : $fileUploadMongo")
+    }
+    result
+  }
+
+  override def enqueueMultipleFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean] = {
+    val result: Future[Boolean] = collection.insertMany(fileUploadMongo).toFuture().map(_.wasAcknowledged())
+    result.onComplete {
+      case Failure(error) =>
+        logger.error(s"Could not enqueue FileUploadMongo record: ${error.getMessage}")
+      case Success(_) =>
+        logger.info(s"Successfully enqueued FileUploadMongo record: : $fileUploadMongo")
     }
     result
   }
@@ -112,8 +143,15 @@ class DefaultFileUploadCache @Inject()(
 
 trait FileUploadCache {
   def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
+
+  def enqueueOneFile(fileUploadMongo: FileUploadMongo): Future[Boolean]
+
+  def enqueueMultipleFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean]
+
   def nextJob: Future[Option[FileUploadRequest]]
+
   def deleteJob(id: String): Future[Boolean]
+
   def resetProcessing: Future[Unit]
 }
 
