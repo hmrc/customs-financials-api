@@ -299,7 +299,6 @@ class AuditingServiceSpec extends SpecBase {
     "audit file upload request to Dec64" in new Setup {
       val auditRequest: JsValue = Json.parse(
         """{
-          |   "id":"id",
           |   "eori":"eori",
           |   "caseNumber":"casenumber",
           |   "applicationName":"appName",
