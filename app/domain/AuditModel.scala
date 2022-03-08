@@ -80,8 +80,7 @@ object HistoricDocumentRequestAuditDetail {
   implicit val historicDocumentRequestAuditDetailWrites: OWrites[HistoricDocumentRequestAuditDetail] = Json.writes[HistoricDocumentRequestAuditDetail]
 }
 
-case class FileUploadRequestAuditDetail(id: String,
-                                        eori: String,
+case class FileUploadRequestAuditDetail(eori: String,
                                         caseNumber: String,
                                         applicationName: String,
                                         properties: Properties)
