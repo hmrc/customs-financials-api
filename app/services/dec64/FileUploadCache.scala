@@ -17,14 +17,12 @@
 package services.dec64
 
 import java.time.ZoneOffset
-import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
 import javax.inject.Inject
-import models.dec64.{FileUploadDetail, FileUploadRequest, UploadedFile}
+import models.dec64.{FileUploadRequest, UploadedFile}
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
@@ -33,7 +31,6 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import utils.RandomUUIDGenerator
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 

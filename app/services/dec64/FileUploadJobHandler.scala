@@ -19,7 +19,6 @@ package services.dec64
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.{Logger, LoggerLike}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 
