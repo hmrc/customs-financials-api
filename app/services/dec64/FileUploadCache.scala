@@ -32,6 +32,7 @@ import services.DateTimeService
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.logger
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import utils.RandomUUIDGenerator
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -39,6 +40,7 @@ import scala.util.{Failure, Success}
 class DefaultFileUploadCache @Inject()(
                                         mongoComponent: MongoComponent,
                                         dateTimeService: DateTimeService,
+                                        randomUUIDGenerator: RandomUUIDGenerator,
                                         config: AppConfig)(implicit executionContext: ExecutionContext)
   extends PlayMongoRepository[FileUploadMongo](
     collectionName = config.fileUploadCacheCollectionName,
@@ -57,38 +59,21 @@ class DefaultFileUploadCache @Inject()(
     )) with FileUploadCache {
 
   override def enqueueFileUploadJob(request: FileUploadRequest): Future[Boolean] = {
-    val files = request.uploadedFiles.zipWithIndex
-    files.length match {
-      case 1 =>
-        enqueueOneFile(mongoRec(request.uploadedFiles.head, 1, request))
-      case _ =>
-        val seqFileUploadDocuments: Seq[FileUploadMongo] =
-          for (file <- files) yield
-            mongoRec(file._1, file._2, request)
-
-        println(Console.MAGENTA + s"mongo records Seq: \n $seqFileUploadDocuments}" + Console.RESET)
-        enqueueMultipleFiles(seqFileUploadDocuments)
-    }
+   Future.sequence(
+   request.uploadedFiles.zipWithIndex.map { case (file: UploadedFile, index: Int) =>
+      enqueueFiles(Seq(mongoRecord(file, index, request)))
+   }).map { v => !v.contains(false)
+   }
   }
 
-  private def mongoRec(uploadedFile: UploadedFile, index: Int, uploadDocumentsRequest: FileUploadRequest): FileUploadMongo = {
-    val id = UUID.randomUUID().toString
+  private def mongoRecord(uploadedFile: UploadedFile, index: Int, uploadDocumentsRequest: FileUploadRequest): FileUploadMongo = {
+    val id = randomUUIDGenerator.generateUuid
     val timeStamp = dateTimeService.now()
-    FileUploadMongo(id, uploadDocumentsRequest, processing = false, timeStamp, uploadedFile)
+    val fileUploadDetail = uploadDocumentsRequest.toFileUploadDetail(uploadedFile, index)
+    FileUploadMongo(id, processing = false, timeStamp, fileUploadDetail)
   }
 
-  override def enqueueOneFile(fileUploadMongo: FileUploadMongo): Future[Boolean] = {
-    val result: Future[Boolean] = collection.insertOne(fileUploadMongo).toFuture().map(_.wasAcknowledged())
-    result.onComplete {
-      case Failure(error) =>
-        logger.error(s"Could not enqueue FileUploadMongo record: ${error.getMessage}")
-      case Success(_) =>
-        logger.info(s"Successfully enqueued FileUploadMongo record:  ${fileUploadMongo.receivedAt} : $fileUploadMongo")
-    }
-    result
-  }
-
-  override def enqueueMultipleFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean] = {
+  override def enqueueFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean] = {
     val result: Future[Boolean] = collection.insertMany(fileUploadMongo).toFuture().map(_.wasAcknowledged())
     result.onComplete {
       case Failure(error) =>
@@ -99,26 +84,15 @@ class DefaultFileUploadCache @Inject()(
     result
   }
 
-  override def nextJob: Future[Option[FileUploadRequest]] = {
+  override def nextJob: Future[Option[FileUploadMongo]] = {
     collection.findOneAndUpdate(
       equal("processing", false),
       Updates.set("processing", true)
-    ).toFutureOption().map {
-      case fileUploadMongo@Some(value) =>
-        logger.info(s"Successfully marked latest FileUploadMongo for processing: ${value}")
-        fileUploadMongo.map(_.uploadDocumentsRequest)
-      case None =>
-        logger.debug(s"FileUploadMongo queue is empty")
-        None
-    }.recover {
-      case e =>
-        logger.error(s"Marking FileUploadMongo for processing failed. Unexpected MongoDB error: $e")
-        throw e
-    }
+    ).toFutureOption()
   }
 
   override def deleteJob(id: String): Future[Boolean] = {
-    val result = collection.deleteOne(equal("uploadDocumentsRequest.id", id)).toFuture().map(_.wasAcknowledged())
+    val result = collection.deleteOne(equal("_id", id)).toFuture().map(_.wasAcknowledged())
     result.onComplete {
       case Success(_) =>
         logger.info(s"Successfully deleted FileUploadMongo job: $id")
@@ -139,20 +113,29 @@ class DefaultFileUploadCache @Inject()(
       updates
     ).toFuture().map(_ => ())
   }
+
+  override def resetProcessingFailedUpload(id: String): Future[Boolean] = {
+    collection.updateOne(equal("_id", id),
+      Updates.combine(
+        Updates.inc("failedSubmission", 1),
+        Updates.set("processing", false)
+      )
+    ).toFuture().map(_.wasAcknowledged())
+  }
 }
 
 trait FileUploadCache {
   def enqueueFileUploadJob(payload: FileUploadRequest): Future[Boolean]
 
-  def enqueueOneFile(fileUploadMongo: FileUploadMongo): Future[Boolean]
+  def enqueueFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean]
 
-  def enqueueMultipleFiles(fileUploadMongo: Seq[FileUploadMongo]): Future[Boolean]
-
-  def nextJob: Future[Option[FileUploadRequest]]
+  def nextJob: Future[Option[FileUploadMongo]]
 
   def deleteJob(id: String): Future[Boolean]
 
   def resetProcessing: Future[Unit]
+
+  def resetProcessingFailedUpload(id: String): Future[Boolean]
 }
 
 

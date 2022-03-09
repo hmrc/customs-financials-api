@@ -16,6 +16,7 @@
 
 package services.dec64
 
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.{Logger, LoggerLike}
 
@@ -24,7 +25,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
-                                     fileUploadService: FileUploadService)(implicit ec: ExecutionContext) {
+                                     fileUploadService: FileUploadService,
+                                     appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -32,14 +34,20 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
     for {
       fileUploadJob <- fileUploadCache.nextJob if fileUploadJob.isDefined
       uploadedFileRequest = fileUploadJob.get
-      fileSubmitted <- fileUploadService.submitFileToDec64(uploadedFileRequest)
-      id = fileUploadJob.get.id
+      fileSubmitted <- fileUploadService.submitFileToDec64(uploadedFileRequest.fileUploadDetail)
+      id = fileUploadJob.get._id
     } yield {
-      if (fileSubmitted) {
-        log.info(s"File Submission to CSS was successful delete job starting")
-        fileUploadCache.deleteJob(id)
-      } else {
-        log.info(s"File Submission to CSS failed delete job not ran")
+      val failCount = uploadedFileRequest.failedSubmission
+      fileSubmitted match {
+        case true =>
+          log.info(s"File Submission to CSS was successful delete job starting")
+          fileUploadCache.deleteJob(id)
+        case false if failCount >= appConfig.fileUploadFailCount =>
+          log.info(s"File Submission to CSS failed 5 times deleting job")
+          fileUploadCache.deleteJob(id)
+        case _ =>
+          log.info(s"File Submission to CCS failed count number: $failCount")
+          fileUploadCache.resetProcessingFailedUpload(id)
       }
     }
   }

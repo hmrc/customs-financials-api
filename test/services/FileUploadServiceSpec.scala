@@ -16,6 +16,8 @@
 
 package services
 
+import java.time.LocalDateTime
+
 import connectors.Dec64Connector
 import domain.FileUploadMongo
 import models.EORI
@@ -27,7 +29,6 @@ import play.api.{Application, inject}
 import services.dec64.{FileUploadService, RequestToDec64Payload}
 import utils.SpecBase
 
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,7 +39,7 @@ class FileUploadServiceSpec extends SpecBase {
     "submit uploaded files to dec64 should return true when successful" in new Setup {
       running(app) {
         await(for {
-          response <- fileUploadService.submitFileToDec64(uploadedFilesRequest)
+          response <- fileUploadService.submitFileToDec64(fileUploadDetail)
         } yield {
           response mustBe true
         })
@@ -67,8 +68,11 @@ class FileUploadServiceSpec extends SpecBase {
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
-    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsDetail = uploadedFilesRequest,
-      processing = false, receivedAt = LocalDateTime.now)
+    val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
+      entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 0, file = uploadedFiles, index = 0)
+
+    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", processing = false, receivedAt = LocalDateTime.now,
+      fileUploadDetail)
 
     val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",
       interfaceVersion = "", correlationID = "", batchID = "", batchSize = 75098112, batchCount = 75098112, checksum = "", checksumAlgorithm = "",
@@ -79,7 +83,7 @@ class FileUploadServiceSpec extends SpecBase {
       sourceFileMimeType = "", destinations = Destinations(List(Destination(""))))
 
     when(mockDec64Connector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(List(batchFileInterfaceMetadata.toString))
+    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(batchFileInterfaceMetadata.toString)
 
   }
 }

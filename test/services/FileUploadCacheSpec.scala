@@ -19,13 +19,13 @@ package services
 import domain.FileUploadMongo
 import models.EORI
 import models.dec64._
-import play.api.Application
+import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import services.dec64.DefaultFileUploadCache
-import utils.SpecBase
-
+import utils.{RandomUUIDGenerator, SpecBase}
 import java.time.LocalDateTime
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileUploadCacheSpec extends SpecBase {
@@ -49,7 +49,7 @@ class FileUploadCacheSpec extends SpecBase {
           nextJob <- cache.nextJob
         } yield {
           enqueueJob mustBe true
-          nextJob mustBe Some(uploadedFilesRequest)
+          nextJob.get.fileUploadDetail mustBe fileUploadDetail
         })
       }
     }
@@ -67,10 +67,10 @@ class FileUploadCacheSpec extends SpecBase {
     "send all file uploads with processing set to false" in new Setup {
 
       val fileUploadCache: DefaultFileUploadCache = app.injector.instanceOf[DefaultFileUploadCache]
-      val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id_1", uploadDocumentsDetail = uploadedFilesRequest,
-        processing = false, receivedAt = LocalDateTime.now)
-      val fileUploadMongo2: FileUploadMongo = FileUploadMongo(_id = "id_2", uploadDocumentsDetail = uploadedFilesRequest,
-        processing = false, receivedAt = LocalDateTime.now)
+      val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id_1",
+        processing = false, receivedAt = LocalDateTime.now, fileUploadDetail = fileUploadDetail)
+      val fileUploadMongo2: FileUploadMongo = FileUploadMongo(_id = "id_2",
+        processing = false, receivedAt = LocalDateTime.now, fileUploadDetail)
 
 
       running(app) {
@@ -104,6 +104,11 @@ class FileUploadCacheSpec extends SpecBase {
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
+
+    val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
+      entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 1, file = uploadedFiles, index = 0)
+
+    val fileUploadMongoRecord: FileUploadMongo = FileUploadMongo(_id = "id", processing = false, receivedAt = LocalDateTime.now(), fileUploadDetail = fileUploadDetail)
   }
 
 }
