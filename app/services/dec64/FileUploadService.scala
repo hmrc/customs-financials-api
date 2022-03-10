@@ -29,12 +29,11 @@ class FileUploadService @Inject()(dec64Connector: Dec64Connector,
                                   requestToDec64Payload: RequestToDec64Payload,
                                   auditingService: AuditingService) {
 
-  def submitFileToDec64(request: FileUploadRequest): Future[Boolean] = {
+  def submitFileToDec64(request: FileUploadDetail): Future[Boolean] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    auditingService.auditFileUploadRequest(request)
-    val dec64SubmissionsPayload = requestToDec64Payload.map(request).map(data =>
-      Dec64SubmissionPayload(data, dec64Headers.getHeaders(hc))).head
-    dec64Connector.submitFileUpload(dec64SubmissionsPayload)
+    auditingService.auditFileUploadDetail(request)
+    val dec64xml = requestToDec64Payload.map(request)
+    dec64Connector.submitFileUpload(Dec64SubmissionPayload(dec64xml, dec64Headers.getHeaders(hc)))
   }
 }
 

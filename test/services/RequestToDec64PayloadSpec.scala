@@ -36,7 +36,7 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
       "return submissionPayloadResponse" in new Setup {
         running(app) {
           val expectedResult = responseXmlString.toString
-          val result = requestToDec64Payload.map(uploadedFilesRequest)
+          val result = requestToDec64Payload.map(fileUploadDetail)
           result contains expectedResult
         }
       }
@@ -58,9 +58,11 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
 
     val requestToDec64Payload: RequestToDec64Payload = app.injector.instanceOf[RequestToDec64Payload]
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "timeStamp",
+    val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "timeStamp",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
+    val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
+      entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 0, file = uploadedFiles, index = 0)
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))

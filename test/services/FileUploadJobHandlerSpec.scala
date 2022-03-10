@@ -16,17 +16,18 @@
 
 package services
 
+import java.time.LocalDateTime
+
+import config.AppConfig
 import domain.FileUploadMongo
 import models.EORI
-import models.dec64.{FileUploadRequest, UploadedFiles}
+import models.dec64.{FileUploadDetail, FileUploadRequest, UploadedFile}
 import org.mockito.ArgumentMatchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import services.dec64.{DefaultFileUploadCache, FileUploadJobHandler, FileUploadService}
 import utils.SpecBase
-
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,8 +39,6 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
       "fetch job from FileUploadJob" in new Setup {
         running(app) {
-
-          when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
 
           await(handler.processJob())
 
@@ -65,7 +64,7 @@ class FileUploadJobHandlerSpec extends SpecBase {
         }
       }
 
-      "delete not completed job when submission to DEC64 was unsuccessful" in  {
+      "deleteJob not completed when fail count threshold not exceeded" in  {
 
         val app: Application = GuiceApplicationBuilder().overrides().configure(
           "microservice.metrics.enabled" -> false,
@@ -73,23 +72,26 @@ class FileUploadJobHandlerSpec extends SpecBase {
           "auditing.enabled" -> false
         ).build()
 
+        val mockAppConfig: AppConfig = mock[AppConfig]
         val mockFileUploadService: FileUploadService = mock[FileUploadService]
         val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-        val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
+        val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService, mockAppConfig)
 
-        val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+        val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
           checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
+        val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
+          entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 1, file = uploadedFiles, index = 0)
 
-        val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
-          applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
+        val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id",
+          processing = false, receivedAt = LocalDateTime.now, fileUploadDetail)
 
-        val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
-          processing = false, receivedAt = LocalDateTime.now)
-
-        when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
+        when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo)))
 
         when(mockFileUploadService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(false))
+
+        when(mockAppConfig.fileUploadFailCount).thenReturn(5)
+        when(mockDefaultFileUploadCache.resetProcessingFailedUpload(ArgumentMatchers.any())).thenReturn(Future.successful(true))
 
         running(app) {
 
@@ -97,9 +99,9 @@ class FileUploadJobHandlerSpec extends SpecBase {
 
           verify(mockFileUploadService).submitFileToDec64(ArgumentMatchers.any())
 
-          verifyZeroInteractions(mockDefaultFileUploadCache)
-        }
+          verify(mockDefaultFileUploadCache).nextJob
 
+        }
       }
 
       "housekeeping " in {
@@ -110,10 +112,10 @@ class FileUploadJobHandlerSpec extends SpecBase {
         ).build()
 
         running(app) {
-
+          val mockAppConfig: AppConfig = mock[AppConfig]
           val mockFileUploadService: FileUploadService = mock[FileUploadService]
           val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-          val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
+          val service = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService, mockAppConfig)
 
           service.houseKeeping()
 
@@ -132,20 +134,23 @@ class FileUploadJobHandlerSpec extends SpecBase {
     ).build()
 
     val mockFileUploadService: FileUploadService = mock[FileUploadService]
+    val mockAppConfig: AppConfig = mock[AppConfig]
     val mockDefaultFileUploadCache: DefaultFileUploadCache = mock[DefaultFileUploadCache]
-    val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService)
+    val handler = new FileUploadJobHandler(mockDefaultFileUploadCache, mockFileUploadService, mockAppConfig)
 
-    val uploadedFiles: UploadedFiles = UploadedFiles(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
+    val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
       checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, description = "Additional documents")
 
 
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
-    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", uploadDocumentsRequest = uploadedFilesRequest,
-      processing = false, receivedAt = LocalDateTime.now)
+    val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
+      entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 1, file = uploadedFiles, index = 0)
 
-    when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo.uploadDocumentsRequest)))
+    val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", processing = false, receivedAt = LocalDateTime.now, fileUploadDetail)
+
+    when(mockDefaultFileUploadCache.nextJob).thenReturn(Future.successful(Some(fileUploadMongo)))
     when(mockDefaultFileUploadCache.deleteJob(ArgumentMatchers.any())).thenReturn(Future.successful(true))
     when(mockFileUploadService.submitFileToDec64(ArgumentMatchers.any())).thenReturn(Future.successful(true))
 

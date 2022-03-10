@@ -33,6 +33,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val fileUploadPerInstancePerSecond: Double = configuration.get[Double]("fileUploadPerInstancePerSecond")
   lazy val housekeepingHours: Int = configuration.get[Int]("housekeepingHours")
   lazy val fileUploadMaxAgeMins: Int = configuration.get[Int]("fileUploadMaxAgeMins")
+  lazy val fileUploadFailCount: Int = configuration.get[Int]("fileUploadFailCount")
 
   lazy val hodsEndpoint: String = baseUrl("acc27") + getConfString("acc27.context-base", "/") + getConfString("acc27.endpoint", "/")
 
