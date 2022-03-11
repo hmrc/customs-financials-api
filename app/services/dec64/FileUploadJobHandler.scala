@@ -36,10 +36,10 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
       id = fileUploadJob.get.id
     } yield {
       if (fileSubmitted) {
-        log.info(s"File Submission to CSS was successful delete job starting")
+        log.info(s"File Submission to DEC64 was successful delete job starting")
         fileUploadCache.deleteJob(id)
       } else {
-        log.info(s"File Submission to CSS failed delete job not ran")
+        log.info(s"File Submission to DEC64 failed delete job not ran")
       }
     }
   }

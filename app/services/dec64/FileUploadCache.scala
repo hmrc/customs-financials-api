@@ -74,7 +74,7 @@ class DefaultFileUploadCache @Inject()(
       Updates.set("processing", true)
     ).toFutureOption().map {
       case fileUploadMongo@Some(value) =>
-        logger.info(s"Successfully marked latest FileUploadMongo for processing: ${value}")
+        logger.info(s"Successfully marked latest FileUploadMongo job: ${value._id} for processing")
         fileUploadMongo.map(_.uploadDocumentsRequest)
       case None =>
         logger.debug(s"FileUploadMongo queue is empty")
