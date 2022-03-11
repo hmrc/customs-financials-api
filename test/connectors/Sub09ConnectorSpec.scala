@@ -48,7 +48,7 @@ class Sub09ConnectorSpec extends SpecBase {
     val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
     val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
       cdsEstablishmentAddress, None, None, None,
-      None, None, None, None, None, None, None, ETMP_Master_Indicator = true)
+      None, None, None, None, None, ETMP_Master_Indicator = true, None)
     val response: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
     val app: Application = GuiceApplicationBuilder().overrides(

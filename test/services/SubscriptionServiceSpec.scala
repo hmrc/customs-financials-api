@@ -36,8 +36,8 @@ class SubscriptionServiceSpec extends SpecBase {
         val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
         val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("1 street", "Southampton", Some("SO1 1AA"), "GB")
         val responseDetail: ResponseDetail = ResponseDetail(Some(eori), None, None, "CDSFullName",
-          cdsEstablishmentAddress, None, None, None,
-          None, None, None, None, None, None, None, ETMP_Master_Indicator = true)
+          cdsEstablishmentAddress, None,
+          None, None, None, None, None, None, None, ETMP_Master_Indicator = true, None)
         val subscriptionResponse: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
         when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"))).thenReturn(Future.successful(subscriptionResponse))
 
