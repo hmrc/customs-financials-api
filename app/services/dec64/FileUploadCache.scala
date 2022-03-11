@@ -76,7 +76,7 @@ class DefaultFileUploadCache @Inject()(
       case Failure(error) =>
         logger.error(s"Could not enqueue FileUploadMongo record: ${error.getMessage}")
       case Success(_) =>
-        logger.info(s"Successfully enqueued FileUploadMongo record: : $fileUploadMongo")
+        logger.info(s"Successfully enqueued FileUploadMongo record.")
     }
     result
   }
