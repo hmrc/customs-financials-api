@@ -39,13 +39,13 @@ class FileUploadJobHandler @Inject()(fileUploadCache: FileUploadCache,
       val failCount = uploadedFileRequest.failedSubmission
       fileSubmitted match {
         case true =>
-          log.info(s"File Submission to CSS was successful delete job starting")
+          log.info(s"File Submission to DEC64 was successful delete job starting")
           fileUploadCache.deleteJob(id)
         case false if failCount >= appConfig.fileUploadFailCount =>
-          log.info(s"File Submission to CSS failed 5 times deleting job")
+          log.info(s"File Submission to DEC64 failed 5 times deleting job")
           fileUploadCache.deleteJob(id)
         case _ =>
-          log.info(s"File Submission to CCS failed count number: $failCount")
+          log.info(s"File Submission to DEC64 failed count number: $failCount")
           fileUploadCache.resetProcessingFailedUpload(id)
       }
     }
