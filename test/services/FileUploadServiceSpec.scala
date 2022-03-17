@@ -74,16 +74,10 @@ class FileUploadServiceSpec extends SpecBase {
     val fileUploadMongo: FileUploadMongo = FileUploadMongo(_id = "id", processing = false, receivedAt = LocalDateTime.now,
       fileUploadDetail)
 
-    val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "sourceSystemType", interfaceName = "",
-      interfaceVersion = "", correlationID = "", batchID = "", batchSize = 75098112, batchCount = 75098112, checksum = "", checksumAlgorithm = "",
-      fileSize = 75098112, compressed = true, properties = PropertiesType(List(PropertyType("CaseReference", ""), PropertyType("Eori", ""),
-        PropertyType("DeclarationId", "TODO"), PropertyType("DeclarationType", "MRN"),
-        PropertyType("ApplicationName", "NDRC"), PropertyType("DocumentType", "TODO"),
-        PropertyType("DocumentReceivedDate", "timestamp"))), sourceLocation = "", sourceFileName = "",
-      sourceFileMimeType = "", destinations = Destinations(List(Destination(""))))
+
 
     when(mockDec64Connector.submitFileUpload(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(true))
-    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn(batchFileInterfaceMetadata.toString)
+    when(mockRequestToDec64Payload.map(ArgumentMatchers.any())).thenReturn("")
 
   }
 }

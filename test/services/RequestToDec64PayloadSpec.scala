@@ -67,17 +67,6 @@ class RequestToDec64PayloadSpec extends SpecBase with ScalaFutures {
     val uploadedFilesRequest: FileUploadRequest = FileUploadRequest(id = "id", eori = EORI("eori"), caseNumber = "casenumber",
       applicationName = "appName", declarationId = "MRN", entryNumber = false, uploadedFiles = Seq(uploadedFiles))
 
-    val batchFileInterfaceMetadata: BatchFileInterfaceMetadata = BatchFileInterfaceMetadata(sourceSystem = "TPI", sourceSystemType = "AWS",
-      interfaceName = "DEC64", interfaceVersion = "1.0.0", correlationID = "correlationID", batchID = "casenumber",
-      batchSize = 1, batchCount = 1, checksum = "sum", checksumAlgorithm = "SHA-256", fileSize = 12, compressed = false,
-      properties = PropertiesType(List(PropertyType("CaseReference", "casenumber"),
-        PropertyType("Eori", "eori"), PropertyType("DeclarationId", "MRNNumer"), PropertyType("DeclarationType", "MRN"),
-        PropertyType("ApplicationName", "appName"), PropertyType("DocumentType", "docType"),
-        PropertyType("DocumentReceivedDate", "timeStamp"))), sourceLocation = "url", sourceFileName = "filename",
-      sourceFileMimeType = "mimeType", destinations = Destinations(List(Destination("CDFPay"))))
-
-    val dec64SubmissionPayload = List(batchFileInterfaceMetadata.toString)
-
     when(mockUUID.generateUuid).thenReturn("correlationID")
 
     val responseXmlString =
