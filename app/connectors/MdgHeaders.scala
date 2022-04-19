@@ -55,11 +55,8 @@ class MdgHeaders @Inject()(dateTimeService: DateTimeService) {
       "X-Correlation-ID" -> mdgCompliantCorrelationId
     )
 
-    log.info(s"Mandatory MDG headers: $mandatoryHeaders")
-
     maybeHostHeader match {
       case Some(hostHeader) => {
-        log.info(s"Adding optional MDG host header: $hostHeader")
         mandatoryHeaders :+ ("Host" -> hostHeader)
       }
       case _ => mandatoryHeaders
