@@ -69,6 +69,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val acc38HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc38.host-header")
   lazy val acc38BearerToken: String = getConfString("acc38.bearer-token", "test")
 
+  lazy val acc40SearchAuthoritiesEndpoint: String = baseUrl("acc40") + getConfString("acc40.context-base", "/") + "/bolt/agent/search-authorities"
+  lazy val acc40HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc40.host-header")
+  lazy val acc40BearerToken: String = getConfString("acc40.bearer-token", "test")
+
   lazy val acc37UpdateAccountContactDetailsEndpoint: String = baseUrl("acc37") + getConfString("acc37.context-base", "/") + "/accounts/amendcorrespondenceaddress/v1"
   lazy val acc37HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc37.host-header")
   lazy val acc37BearerToken: String = getConfString("acc37.bearer-token", "test")

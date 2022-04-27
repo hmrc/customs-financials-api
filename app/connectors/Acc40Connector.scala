@@ -1,0 +1,71 @@
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package connectors
+
+import config.AppConfig
+import domain.acc40.{Response, ResponseDetail}
+import domain._
+import models.EORI
+import services.{DateTimeService, MetricsReporterService}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+class Acc40Connector @Inject()(httpClient: HttpClient,
+                               appConfig: AppConfig,
+                               dateTimeService: DateTimeService,
+                               metricsReporterService: MetricsReporterService,
+                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+
+  def searchAuthorities(requestingEORI: EORI, searchID: EORI): Future[Either[Acc40Response, AuthoritiesFound]] = {
+
+    val commonRequest = acc40.RequestCommon(
+      receiptDate = dateTimeService.currentDateTimeAsIso8601,
+      acknowledgementReference = mdgHeaders.acknowledgementReference,
+      originatingSystem = "MDTP",
+      regime = "CDS"
+    )
+
+    val requestDetail = acc40.RequestDetail(
+      requestingEORI = requestingEORI,
+      searchType = "1",
+      searchID = searchID
+    )
+
+    val request = acc40.Request(
+      commonRequest,
+      requestDetail
+    )
+
+    val result: Future[Response] = httpClient.POST[acc40.Request, acc40.Response](
+      appConfig.acc40SearchAuthoritiesEndpoint,
+      request,
+      headers = mdgHeaders.headers(appConfig.acc40BearerToken, appConfig.acc40HostHeader)
+    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+
+    result.map {
+      response => response.responseDetail match {
+        case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
+        case ResponseDetail(None, Some(0), _, _, _) => Left(NoAuthoritiesFound)
+        case v@ResponseDetail(_, _, _, _, _) => Right(v.toAuthoritiesFound)
+      }
+    }.recover {
+      case _ => Left(ErrorResponse)
+    }
+  }
+}
