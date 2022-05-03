@@ -36,7 +36,7 @@ case class NDRCCaseDetails(CDFPayCaseNumber: String,
     caseStatus match {
       case "Open" => "In Progress"
       case "Open-Analysis" => "In Progress"
-      case "Pending-Approval" =>  "Pending"
+      case "Pending-Approval" => "In Progress"
       case "Pending-Queried" => "Pending"
       case "Resolved-Withdrawn" => "Closed"
       case "Rejected-Failed Validation" => "Closed"
@@ -44,16 +44,20 @@ case class NDRCCaseDetails(CDFPayCaseNumber: String,
       case "Open-Rework" => "In Progress"
       case "Paused" => "In Progress"
       case "Resolved-No Reply" => "Closed"
-      case "RTBH-Sent" => "Closed"
       case "Resolved-Refused" => "Closed"
-      case "Pending Payment Confirmation" => "Pending"
+      case "Pending Payment Confirmation" => "In Progress"
       case "Resolved-Approved" => "Closed"
       case "Resolved-Partial Refused" => "Closed"
-      case "Pending Decision Letter" => "Pending"
-      case "Approved" => "Closed"
+      case "Pending Decision Letter" => "In Progress"
+      case "Approved" => "In Progress"
       case "Analysis-Rework" => "In Progress"
       case "Rework-Payment Details" => "In Progress"
+      case "Pending-RTBH" => "In Progress"
+      case "RTBH Sent" => "Pending"
       case "Reply To RTBH" => "Pending"
+      case "Pending-Compliance Recommendation" => "In Progress"
+      case "Pending-Compliance Check Query" => "Pending"
+      case "Pending-Compliance Check" => "In Progress"
     }
 
   def toNDRCCaseDetails: NDRCCaseDetails = this.copy(caseStatus = transformedCaseStatus)
