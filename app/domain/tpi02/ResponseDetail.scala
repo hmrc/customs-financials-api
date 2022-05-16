@@ -57,6 +57,29 @@ case class ResponseDetail(CDFPayService: String,
       case "Pending-Compliance Check" => "In Progress"
     }
 
+  private def transformedCaseStatusScty(caseStatus: String): String =
+    caseStatus match {
+      case "Open" => "In Progress"
+      case "Pending-Approval" =>  "Pending"
+      case "Pending-Payment" =>  "Pending"
+      case "Partial Refund" =>  "Pending"
+      case "Resolved-Refund" =>  "Closed"
+      case "Pending-Query" => "Pending"
+      case "Resolved-Manual BTA" => "Closed"
+      case "Pending-C18" => "Pending"
+      case "Closed-C18 Raised" => "Closed"
+      case "RTBH Letter Initiated" => "Pending"
+      case "Awaiting RTBH Letter Response" => "Pending"
+      case "Reminder Letter Initiated" => "Pending"
+      case "Awaiting Reminder Letter Response" => "Pending"
+      case "Decision Letter Initiated" => "Pending"
+      case "Partial BTA" => "Pending"
+      case "Partial BTA/Refund" => "Pending"
+      case "Resolved-Auto BTA" => "Closed"
+      case "Resolved-Manual BTA/Refund" => "Closed"
+      case "Open-Extension Granted" => "In Progress" //Check these
+    }
+
   def toCDSResponseDetail: ResponseDetail = {
     val transformedNDRCCase = NDRCCase.map{ ndrcCase =>
       val detail = ndrcCase.NDRCDetail
@@ -66,7 +89,7 @@ case class ResponseDetail(CDFPayService: String,
 
     val transformedSCTYCase = SCTYCase.map { sctyCase =>
       val originalStatus = sctyCase.caseStatus
-      sctyCase.copy(caseStatus = transformedCaseStatus(originalStatus))
+      sctyCase.copy(caseStatus = transformedCaseStatusScty(originalStatus))
     }
 
     ResponseDetail(CDFPayService, CDFPayCaseFound, transformedNDRCCase, transformedSCTYCase)
