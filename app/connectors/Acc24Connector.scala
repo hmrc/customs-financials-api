@@ -18,6 +18,7 @@ package connectors
 
 import config.AppConfig
 import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
+import play.api.{Logger, LoggerLike}
 import play.api.http.Status
 import services.MetricsReporterService
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -32,6 +33,8 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
+  val log: LoggerLike = Logger(this.getClass)
+
   def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] = {
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
       httpClient.POST[HistoricStatementRequest, HttpResponse](
@@ -39,6 +42,7 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
         HistoricStatementRequest.from(historicDocumentRequest, UUID.randomUUID()),
         mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
+        log.info(s"HistoricDocumentResponse :  $response")
         response.status match {
           case Status.NO_CONTENT => true
           case _ => false
