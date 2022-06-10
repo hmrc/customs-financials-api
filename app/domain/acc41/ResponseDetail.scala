@@ -16,15 +16,15 @@
 
 package domain.acc41
 
-import domain.AuthoritiesCsvGeneration
+import domain.AuthoritiesCsvGenerationResponse
 import play.api.libs.json.{Json, OFormat}
 
 //Could potentially have custom reads for optional values
 case class ResponseDetail(errorMessage: Option[String],
                           requestAcceptedDate: Option[String])
 {
-  def toAuthoritiesCsvGeneration: AuthoritiesCsvGeneration =
-    AuthoritiesCsvGeneration(requestAcceptedDate)
+  def toAuthoritiesCsvGeneration: AuthoritiesCsvGenerationResponse =
+    AuthoritiesCsvGenerationResponse(requestAcceptedDate)
 }
 
 object ResponseDetail {

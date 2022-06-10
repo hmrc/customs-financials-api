@@ -25,7 +25,8 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AuthoritiesCsvGenerationController @Inject()(acc41Connector: Acc41Connector,
+class AuthoritiesCsvGenerationController @Inject()(
+                                         acc41Connector: Acc41Connector,
                                          cc: ControllerComponents)
                                          (implicit ec: ExecutionContext) extends BackendController(cc) {
 

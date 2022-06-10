@@ -20,10 +20,10 @@ import play.api.libs.json.{Json, OFormat}
 
 sealed trait Acc41Response
 
-case class AuthoritiesCsvGeneration(requestAcceptedDate: Option[String]) extends Acc41Response
+case class AuthoritiesCsvGenerationResponse(requestAcceptedDate: Option[String]) extends Acc41Response
 
-object AuthoritiesCsvGeneration {
-  implicit val format: OFormat[AuthoritiesCsvGeneration] = Json.format[AuthoritiesCsvGeneration]
+object AuthoritiesCsvGenerationResponse {
+  implicit val format: OFormat[AuthoritiesCsvGenerationResponse] = Json.format[AuthoritiesCsvGenerationResponse]
 }
 
 case object Acc41ErrorResponse extends Acc41Response
