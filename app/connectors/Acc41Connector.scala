@@ -32,7 +32,7 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def createAuthoritiesCSV(requestingEori: EORI): Future[Either[Acc41Response, AuthoritiesCsvGeneration]] = {
+  def initiateAuthoritiesCSV(requestingEori: EORI): Future[Either[Acc41Response, AuthoritiesCsvGeneration]] = {
 
     val commonRequest = acc41.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,

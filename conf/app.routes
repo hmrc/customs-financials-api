@@ -21,6 +21,8 @@ GET           /customs-financials-api/eori/:eori/validate                       
 
 POST          /customs-financials-api/search-authorities                                  controllers.SearchAuthoritiesController.searchAuthorities()
 
+POST          /customs-financials-api/standing-authorities-file                           controllers.AuthoritiesCsvGenerationController.initiateAuthoritiesCsvGeneration()
+
 GET           /customs-financials-api/eori/:eori/notifications                            controllers.SDESNotificationsController.getNotifications(eori: models.EORI)
 DELETE        /customs-financials-api/eori/:eori/notifications/:fileRole                  controllers.SDESNotificationsController.deleteNonRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
 DELETE        /customs-financials-api/eori/:eori/requested-notifications/:fileRole        controllers.SDESNotificationsController.deleteRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
