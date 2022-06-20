@@ -19,6 +19,12 @@ package domain.acc41
 
 import play.api.libs.json.{Json, OFormat}
 
+case class StandingAuthoritiesForEORIRequest(standingAuthoritiesForEORIRequest: Request)
+
+object StandingAuthoritiesForEORIRequest {
+  implicit val format: OFormat[StandingAuthoritiesForEORIRequest] = Json.format[StandingAuthoritiesForEORIRequest]
+}
+
 case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)
 
 object Request {

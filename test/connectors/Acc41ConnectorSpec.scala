@@ -32,8 +32,8 @@ class Acc41ConnectorSpec extends SpecBase {
 
   "initiateAuthoritiesCSV" should {
     "return Left Acc41ErrorResponse when request returns error message" in new Setup {
-      when[Future[domain.acc41.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(Some("Request failed"), None)))
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori")))
@@ -42,8 +42,8 @@ class Acc41ConnectorSpec extends SpecBase {
     }
 
     "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
-      when[Future[domain.acc41.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(None, Some("020-06-09T21:59:56Z"))))
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori")))
