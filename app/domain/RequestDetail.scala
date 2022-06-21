@@ -19,8 +19,8 @@ package domain
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
-case class SearchAuthoritiesRequest(searchID: EORI, requestingEORI: EORI)
+case class RequestDetail(searchID: EORI, requestingEORI: EORI)
 
-object SearchAuthoritiesRequest {
-  implicit val format: OFormat[SearchAuthoritiesRequest] = Json.format[SearchAuthoritiesRequest]
+object RequestDetail {
+  implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]
 }

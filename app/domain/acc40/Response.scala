@@ -18,6 +18,12 @@ package domain.acc40
 
 import play.api.libs.json.{Json, OFormat}
 
+case class SearchAuthoritiesResponse(searchAuthoritiesResponse: Response)
+
+object SearchAuthoritiesResponse {
+  implicit val format: OFormat[SearchAuthoritiesResponse] = Json.format[SearchAuthoritiesResponse]
+}
+
 case class Response(requestCommon: RequestCommon, requestDetail: RequestDetail, responseDetail: ResponseDetail)
 
 object Response {

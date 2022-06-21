@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.Acc40Connector
-import domain.{ErrorResponse, NoAuthoritiesFound, SearchAuthoritiesRequest}
+import domain.{ErrorResponse, NoAuthoritiesFound, RequestDetail}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -29,7 +29,7 @@ class SearchAuthoritiesController @Inject()(
                                              acc40Connector: Acc40Connector,
                                              cc: ControllerComponents
                                            )(implicit ec: ExecutionContext) extends BackendController(cc) {
-  def searchAuthorities(): Action[SearchAuthoritiesRequest] = Action.async(parse.json[SearchAuthoritiesRequest]) {
+  def searchAuthorities(): Action[RequestDetail] = Action.async(parse.json[RequestDetail]) {
     implicit request =>
       acc40Connector.searchAuthorities(request.body.requestingEORI, request.body.searchID).map {
         case Left(NoAuthoritiesFound) => NoContent

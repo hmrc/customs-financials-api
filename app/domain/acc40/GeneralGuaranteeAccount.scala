@@ -18,7 +18,7 @@ package domain.acc40
 
 import play.api.libs.json.{Json, OFormat}
 
-case class GeneralGuaranteeAccount(account: Account, availableGuaranteeBalance: Option[Double])
+case class GeneralGuaranteeAccount(account: Account, availableGuaranteeBalance: Option[String])
 
 object GeneralGuaranteeAccount {
   implicit val format: OFormat[GeneralGuaranteeAccount] = Json.format[GeneralGuaranteeAccount]

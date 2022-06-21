@@ -16,25 +16,23 @@
 
 package connectors
 
+import domain.acc40._
 import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
-import domain.acc38.GetCorrespondenceAddressResponse
-import domain.acc40.{Account, CashAccount, DutyDefermentAccount, GeneralGuaranteeAccount, RequestCommon, RequestDetail, ResponseDetail}
-import models.{AccountNumber, EORI}
+import models.EORI
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
-
 import scala.concurrent.Future
 
 class Acc40ConnectorSpec extends SpecBase {
 
   "searchAuthorities" should {
     "return Left no authorities when no authorities returned in the response" in new Setup {
-      when[Future[domain.acc40.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(None, Some(0), None, None, None)))
+      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
@@ -43,8 +41,8 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "return Left with error response if the error message present in the response" in new Setup {
-      when[Future[domain.acc40.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(Some("error message"), Some(0), None, None, None)))
+      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
@@ -53,12 +51,12 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "return Right if a valid response with authorities returned" in new Setup {
-      when[Future[domain.acc40.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(None, Some(1), Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some(10.0)))), None, None)))
+      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(response(None, Some("1"), Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))), None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
-        result mustBe Right(AuthoritiesFound(Some(1), None, None, Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some(10.0))))))
+        result mustBe Right(AuthoritiesFound(Some("1"), None, None, Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0"))))))
       }
     }
   }
@@ -69,11 +67,11 @@ class Acc40ConnectorSpec extends SpecBase {
     val mockHttpClient: HttpClient = mock[HttpClient]
 
     def response(error: Option[String],
-                 numberOfAuthorities: Option[Int],
+                 numberOfAuthorities: Option[String],
                  cashAccount: Option[Seq[CashAccount]],
                  dutyDefermentAccount: Option[Seq[DutyDefermentAccount]],
                  generalGuaranteeAccount: Option[Seq[GeneralGuaranteeAccount]]
-                ): domain.acc40.Response = domain.acc40.Response(
+                ): SearchAuthoritiesResponse = SearchAuthoritiesResponse(domain.acc40.Response(
       RequestCommon("date", "MDTP", "reference", "CDS"),
       RequestDetail(EORI("someEORI"), "1", EORI("someOtherEORI")),
       ResponseDetail(
@@ -83,6 +81,7 @@ class Acc40ConnectorSpec extends SpecBase {
         generalGuaranteeAccounts = generalGuaranteeAccount,
         cdsCashAccounts = cashAccount
       )
+    )
     )
 
 

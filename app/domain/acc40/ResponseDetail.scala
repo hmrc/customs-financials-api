@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, OFormat}
 //Could potentially have custom reads for optional values
 case class ResponseDetail(
                            errorMessage: Option[String],
-                           numberOfAuthorities: Option[Int],
+                           numberOfAuthorities: Option[String],
                            dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
                            generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
                            cdsCashAccounts: Option[Seq[CashAccount]]

@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 sealed trait Acc40Response
 
-case class AuthoritiesFound(numberOfAuthorities: Option[Int],
+case class AuthoritiesFound(numberOfAuthorities: Option[String],
                             dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
                             generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
                             cdsCashAccounts: Option[Seq[CashAccount]]

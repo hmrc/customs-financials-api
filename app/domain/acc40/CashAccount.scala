@@ -18,7 +18,7 @@ package domain.acc40
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CashAccount(account: Account, availableAccountBalance: Option[Double])
+case class CashAccount(account: Account, availableAccountBalance: Option[String])
 
 object CashAccount {
   implicit val format: OFormat[CashAccount] = Json.format[CashAccount]

@@ -17,8 +17,8 @@
 package connectors
 
 import config.AppConfig
-import domain.acc40.{Response, ResponseDetail}
 import domain._
+import domain.acc40.{ResponseDetail, SearchAuthoritiesRequest, SearchAuthoritiesResponse}
 import models.EORI
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -47,21 +47,21 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
       searchID = searchID
     )
 
-    val request = acc40.Request(
+    val request = SearchAuthoritiesRequest(acc40.Request(
       commonRequest,
       requestDetail
-    )
+    ))
 
-    val result: Future[Response] = httpClient.POST[acc40.Request, acc40.Response](
+    val result: Future[SearchAuthoritiesResponse] = httpClient.POST[SearchAuthoritiesRequest, SearchAuthoritiesResponse](
       appConfig.acc40SearchAuthoritiesEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.acc40BearerToken, appConfig.acc40HostHeader)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
 
     result.map {
-      response => response.responseDetail match {
+      res => res.searchAuthoritiesResponse.responseDetail match {
         case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
-        case ResponseDetail(None, Some(0), _, _, _) => Left(NoAuthoritiesFound)
+        case ResponseDetail(None, Some("0"), _, _, _) => Left(NoAuthoritiesFound)
         case v@ResponseDetail(_, _, _, _, _) => Right(v.toAuthoritiesFound)
       }
     }.recover {
