@@ -18,7 +18,7 @@ package connectors
 
 import config.AppConfig
 import domain._
-import domain.acc41.{Response, ResponseDetail}
+import domain.acc41.{ResponseDetail, StandingAuthoritiesForEORIResponse}
 import models.EORI
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -42,22 +42,22 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     )
 
     val requestDetail = acc41.RequestDetail(
-      requestingEori = requestingEori
+      requestingEORI = requestingEori
     )
 
-    val request = acc41.Request(
+    val request = acc41.StandingAuthoritiesForEORIRequest(acc41.Request(
       commonRequest,
       requestDetail
-    )
+    ))
 
-    val result: Future[Response] = httpClient.POST[acc41.Request, acc41.Response](
+    val result: Future[StandingAuthoritiesForEORIResponse] = httpClient.POST[acc41.StandingAuthoritiesForEORIRequest, acc41.StandingAuthoritiesForEORIResponse](
       appConfig.acc41AuthoritiesCsvGenerationEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
 
     result.map {
-      response => response.response match {
+      res => res.standingAuthoritiesForEORIResponse.responseDetail match {
         case ResponseDetail(Some(_), None) => Left(Acc41ErrorResponse)
         case v@ResponseDetail(None, Some(_)) => Right(v.toAuthoritiesCsvGeneration)
       }

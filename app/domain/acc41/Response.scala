@@ -18,7 +18,13 @@ package domain.acc41
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Response(requestCommon: RequestCommon, requestDetail: RequestDetail, response: ResponseDetail)
+case class StandingAuthoritiesForEORIResponse(standingAuthoritiesForEORIResponse: Response)
+
+object StandingAuthoritiesForEORIResponse {
+  implicit val format: OFormat[StandingAuthoritiesForEORIResponse] = Json.format[StandingAuthoritiesForEORIResponse]
+}
+
+case class Response(requestCommon: RequestCommon, requestDetail: RequestDetail, responseDetail: ResponseDetail)
 
 object Response {
   implicit val format: OFormat[Response] = Json.format[Response]
