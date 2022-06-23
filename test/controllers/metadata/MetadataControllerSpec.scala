@@ -133,6 +133,41 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+    "send email when requested Standing Authority is available" in new Setup {
+      val newFileNotificationFromSDES: JsValue = Json.parse(
+        """
+          |[
+          |    {
+          |        "eori":"testEORI-23456",
+          |		     "fileName": "whatever.pdf",
+          |        "fileSize": 999,
+          |        "metadata": [
+          |            {"metadata": "FileRole", "value": "StandingAuthority"},
+          |            {"metadata": "Other", "value": "Stuff"},
+          |            {"metadata": "statementRequestID", "value": "1abcdeff2-a2b1-abcd-abcd-0123456789"}
+          |        ]
+          |    }
+          |]
+        """.stripMargin)
+
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockDataStore.getVerifiedEmail(any)(any))
+        .thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(is(EORI("testEORI")))(any))
+        .thenReturn(Future.successful(Some(EmailAddress("foo@bar.com"))))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url).withJsonBody(newFileNotificationFromSDES)
+        val result = route(app, req).value
+        status(result) mustBe OK
+        val expectedEmailRequest = EmailRequest(
+          List(EmailAddress("foo@bar.com")), "customs_financials_requested_for_authorities", Map.empty, force = false, Some("testEORI"), None, None)
+        verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
+      }
+    }
+
     "send email when supplementary duty deferment statement is available" in new Setup {
       val dd4emailRequest: JsValue = Json.parse(
         """
