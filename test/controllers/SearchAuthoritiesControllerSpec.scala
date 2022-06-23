@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.Acc40Connector
-import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound, SearchAuthoritiesRequest}
+import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound, RequestDetail}
 import models.EORI
 import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -66,9 +66,9 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
   trait Setup {
     val mockConnector: Acc40Connector = mock[Acc40Connector]
 
-    val authorities: AuthoritiesFound = AuthoritiesFound(Some(1), Some(Seq.empty), None, None)
+    val authorities: AuthoritiesFound = AuthoritiesFound(Some("1"), Some(Seq.empty), None, None)
 
-    val frontendRequest: SearchAuthoritiesRequest = SearchAuthoritiesRequest(EORI("someEori"), EORI("otherEori"))
+    val frontendRequest: RequestDetail = RequestDetail(EORI("someEori"), EORI("otherEori"))
 
     val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST", routes.SearchAuthoritiesController.searchAuthorities().url)
       .withJsonBody(Json.toJson(frontendRequest))
