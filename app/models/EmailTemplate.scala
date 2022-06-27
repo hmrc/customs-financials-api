@@ -44,6 +44,7 @@ object EmailTemplate {
       case "SecurityStatement" => Some(SecurityStatementEmail(emailAddress, notification.eori.value))
       case "PostponedVATStatement" if isHistoricStatement => Some(HistoricPostponedVATStatementEmail(emailAddress, notification.eori.value))
       case "PostponedVATStatement" => Some(PostponedVatEmail(emailAddress, notification.eori.value))
+      case "StandingAuthority" => Some(AuthoritiesStatementEmail(emailAddress, notification.eori.value))
       case _ => Some(Unknown(emailAddress, notification.eori.value))
     }
   }
@@ -121,3 +122,8 @@ case class Unknown(email: EmailAddress, eori: String) extends EmailTemplate {
   override val templateId: String = "customs_financials_new_statement_notification"
   override val params: Map[String, String] = Map("Name" -> "test")
 }
+
+case class AuthoritiesStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+  override val templateId: String = "customs_financials_requested_for_standing_authorities"
+}
+
