@@ -123,7 +123,6 @@ case class Unknown(email: EmailAddress, eori: String) extends EmailTemplate {
   override val params: Map[String, String] = Map("Name" -> "test")
 }
 
-//We need to create this template for CSV notification to the user
 case class AuthoritiesStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_for_standing_authorities"
 }
