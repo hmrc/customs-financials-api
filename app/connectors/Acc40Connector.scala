@@ -43,7 +43,7 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
 
     val requestDetail = acc40.RequestDetail(
       requestingEORI = requestingEORI,
-      searchType = "1",
+      searchType = searchType(searchID),
       searchID = searchID
     )
 
@@ -66,6 +66,13 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
       }
     }.recover {
       case _ => Left(ErrorResponse)
+    }
+  }
+
+  def searchType(searchID: EORI) = {
+    searchID.value match {
+      case x if x.startsWith("GB") => "0"
+      case _ => "1"
     }
   }
 }
