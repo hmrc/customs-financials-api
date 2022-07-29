@@ -17,11 +17,10 @@
 package services
 
 import config.AppConfig
-import connectors.DataStoreConnector
 import domain._
-import domain.acc40.{ResponseDetail, SearchAuthoritiesResponse}
+import domain.acc40.ResponseDetail
 import models.requests.HistoricDocumentRequest
-import models.requests.manageAuthorities.{Accounts, GrantAuthorityRequest, RevokeAccountType, RevokeAuthorityRequest}
+import models.requests.manageAuthorities._
 import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Writes}
@@ -32,13 +31,11 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Suc
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import javax.inject.{Inject, Singleton}
-import models.dec64.{FileUploadDetail, FileUploadRequest}
-
+import models.dec64.FileUploadDetail
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditingService @Inject()(appConfig: AppConfig,
-                                dataStoreService: DataStoreConnector,
                                 auditConnector: AuditConnector)(implicit executionContext: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
@@ -58,9 +55,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
   val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
   val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
-
-
-
+  
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
 
@@ -106,13 +101,14 @@ class AuditingService @Inject()(appConfig: AppConfig,
     audit(AuditModel(REVOKE_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditRequestAuthCSVStatementRequest(v: acc41.ResponseDetail, request: domain.acc41.RequestDetail)
+  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail, request: domain.acc41.RequestDetail)
     (implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestAuthCSVAuditDetail(
       request.requestingEORI.toString,
-      v.requestAcceptedDate.toString
+      response.requestAcceptedDate.toString
     ))
+
     audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
   }
 
@@ -126,6 +122,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
       fileRole = notification.fileRole.toString,
       fileType = fileType.toString
     ))
+
     audit(AuditModel(DISPLAY_STANDING_AUTHORITIES_NAME, auditJson, DISPLAY_STANDING_AUTHORITIES_TYPE))
   }
 
