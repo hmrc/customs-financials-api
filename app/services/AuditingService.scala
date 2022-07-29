@@ -55,7 +55,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
   val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
   val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
-  
+
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
 
@@ -134,7 +134,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
        request.searchType,
        request.searchID.toString,
        response.numberOfAuthorities,
-       "", //request.companyName Company name is missing!
+       "Company Name", //request.companyName Company name is missing!
        response.dutyDefermentAccounts,
        response.generalGuaranteeAccounts,
        response.cdsCashAccounts

@@ -20,7 +20,7 @@ import config.AppConfig
 import domain._
 import domain.acc41.{ResponseDetail, StandingAuthoritiesForEORIResponse}
 import models.EORI
-import services.{AuditingService, DateTimeService, MetricsReporterService}
+import services.{AuditingService, DateTimeService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 
@@ -30,10 +30,10 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
                                auditingService: AuditingService,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
-                               metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def initiateAuthoritiesCSV(requestingEori: EORI): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
+  def initiateAuthoritiesCSV(requestingEori: EORI)
+    (implicit hc: HeaderCarrier): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
 
     val commonRequest = acc41.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,

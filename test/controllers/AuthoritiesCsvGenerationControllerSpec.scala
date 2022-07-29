@@ -25,14 +25,16 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, inject}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+
 import scala.concurrent.Future
 
 class AuthoritiesCsvGenerationControllerSpec extends SpecBase {
 
   "initiateAuthoritiesCsvGeneration" should {
     "return INTERNAL_SERVER_ERROR when request returned error response" in new Setup {
-      when(mockConnector.initiateAuthoritiesCSV(any))
+      when(mockConnector.initiateAuthoritiesCSV(any)(any))
         .thenReturn(Future.successful(Left(Acc41ErrorResponse)))
 
       running(app) {
@@ -42,7 +44,7 @@ class AuthoritiesCsvGenerationControllerSpec extends SpecBase {
     }
 
     "return 200 with requestAcceptedDate request successful" in new Setup {
-      when(mockConnector.initiateAuthoritiesCSV(any))
+      when(mockConnector.initiateAuthoritiesCSV(any)(any))
         .thenReturn(Future.successful(Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))))
 
       running(app) {
