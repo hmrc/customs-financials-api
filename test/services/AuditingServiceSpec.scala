@@ -16,9 +16,9 @@
 
 package services
 
-import domain.StandingAuthority
+import domain.{StandingAuthority, acc41}
 import models._
-import models.dec64.{FileUploadDetail, FileUploadRequest, UploadedFile}
+import models.dec64.{FileUploadDetail, UploadedFile}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
@@ -45,7 +45,6 @@ class AuditingServiceSpec extends SpecBase {
         AuthorisedUser("John Smith", "Managing Director"),
         editRequest = false
       )
-
 
       val auditRequest =
         """{
@@ -77,6 +76,32 @@ class AuditingServiceSpec extends SpecBase {
         result.auditSource mustBe "customs-financials-api"
         result.tags.get("transactionName") mustBe Some("Grant Authority")
 
+      }
+    }
+
+    "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
+
+      val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(""), Some(""))
+      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"))
+
+      val auditRequest =
+        """{
+          "requestingEori":"EORI(GB123456789)",
+          "requestAcceptedDate":"Some()"
+        }"""
+
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      running(app) {
+        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+          .thenReturn(Future.successful(AuditResult.Success))
+
+        service.auditRequestAuthCSVStatementRequest(response, request)
+        val result = extendedDataEventCaptor.getValue
+        result.detail mustBe Json.parse(auditRequest)
+        result.auditType mustBe "RequestAuthoritiesCSV"
+        result.auditSource mustBe "customs-financials-api"
+        result.tags.get("Request authorities")
       }
     }
 

@@ -55,6 +55,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
   val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
   val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
+  val DOWNLOAD_STANDING_AUTHORITIES_NAME = "Download Standing Authorities CSV"
+  val DOWNLOAD_STANDING_AUTHORITIES_TYPE = "DownloadStandingAuthoritiesCSV"
 
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
@@ -112,7 +114,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
     audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
   }
 
-  def auditRequestAuthCSVStatementRequest(notification: Notification, fileType: FileType)
+  def auditDisplayAuthCSVStatementRequest(notification: Notification, fileType: FileType)
     (implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestDisplayStandingAuthCSVAuditDetail(
