@@ -16,7 +16,8 @@
 
 package services
 
-import domain.{StandingAuthority, acc41}
+import java.time.LocalDate
+import domain.{Notification, StandingAuthority, acc41}
 import models._
 import models.dec64.{FileUploadDetail, UploadedFile}
 import models.requests.HistoricDocumentRequest
@@ -76,32 +77,6 @@ class AuditingServiceSpec extends SpecBase {
         result.auditSource mustBe "customs-financials-api"
         result.tags.get("transactionName") mustBe Some("Grant Authority")
 
-      }
-    }
-
-    "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
-
-      val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(""), Some(""))
-      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"))
-
-      val auditRequest =
-        """{
-          "requestingEori":"EORI(GB123456789)",
-          "requestAcceptedDate":"Some()"
-        }"""
-
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-
-      running(app) {
-        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
-          .thenReturn(Future.successful(AuditResult.Success))
-
-        service.auditRequestAuthCSVStatementRequest(response, request)
-        val result = extendedDataEventCaptor.getValue
-        result.detail mustBe Json.parse(auditRequest)
-        result.auditType mustBe "RequestAuthoritiesCSV"
-        result.auditSource mustBe "customs-financials-api"
-        result.tags.get("Request authorities")
       }
     }
 
@@ -385,6 +360,73 @@ class AuditingServiceSpec extends SpecBase {
         }
       }
     }
+
+
+    "Audit the ACC41 audit Display Auth CSV Statement Request" in new Setup {
+
+      val display = Map("Name" -> "DISPLAY_STANDING_AUTHORITIES_NAME",
+        "Type" -> "DISPLAY_STANDING_AUTHORITIES_TYPE")
+
+      val notification: Notification = Notification(
+        EORI("GB123456789"),
+        FileRole("fileRole"),
+        "file name",
+        12,
+        Some(LocalDate.now()),
+        display)
+
+      val fileType: FileType = FileType("CSV")
+
+      val auditRequest =
+        """{
+        "Eori":"EORI(GB123456789)",
+        "isHistoric":false,
+        "fileName":"file name",
+        "fileRole":"FileRole(fileRole)",
+        "fileType":"FileType(CSV)"
+      }"""
+
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent]
+      = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      running(app){
+        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+          .thenReturn(Future.successful(AuditResult.Success))
+
+        service.auditDisplayAuthCSVStatementRequest(notification, fileType)
+        val result = extendedDataEventCaptor.getValue
+        result.detail mustBe Json.parse(auditRequest)
+        result.auditType mustBe "DisplayStandingAuthoritiesCSV"
+        result.auditSource mustBe "customs-financials-api"
+        result.tags.get("transactionName") mustBe Some("Display Authorities CSV")
+      }
+    }
+
+    "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
+
+      val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(""), Some(""))
+      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"))
+
+      val auditRequest =
+        """{
+          "requestingEori":"EORI(GB123456789)",
+          "requestAcceptedDate":"Some()"
+        }"""
+
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      running(app) {
+        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+          .thenReturn(Future.successful(AuditResult.Success))
+
+        service.auditRequestAuthCSVStatementRequest(response, request)
+        val result = extendedDataEventCaptor.getValue
+        result.detail mustBe Json.parse(auditRequest)
+        result.auditType mustBe "RequestAuthoritiesCSV"
+        result.auditSource mustBe "customs-financials-api"
+        result.tags.get("transactionName") mustBe Some("Request Authorities CSV")
+      }
+    }
   }
 
   trait Setup {
@@ -399,5 +441,4 @@ class AuditingServiceSpec extends SpecBase {
 
     val service: AuditingService = app.injector.instanceOf[AuditingService]
   }
-
 }
