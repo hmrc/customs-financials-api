@@ -69,11 +69,11 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val acc38HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc38.host-header")
   lazy val acc38BearerToken: String = getConfString("acc38.bearer-token", "test")
 
-  lazy val acc40SearchAuthoritiesEndpoint: String = baseUrl("acc40") + getConfString("acc40.context-base", "/") + "/bolt/agent/search-authorities"
+  lazy val acc40SearchAuthoritiesEndpoint: String = baseUrl("acc40") + getConfString("acc40.context-base", "/") + "/accounts/searchauthorities/v1"
   lazy val acc40HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc40.host-header")
   lazy val acc40BearerToken: String = getConfString("acc40.bearer-token", "test")
 
-  lazy val acc41AuthoritiesCsvGenerationEndpoint: String = baseUrl("acc41") + getConfString("acc41.context-base", "/") + "/bolt/standing-authorities-file"
+  lazy val acc41AuthoritiesCsvGenerationEndpoint: String = baseUrl("acc41") + getConfString("acc41.context-base", "/") + "/accounts/requeststandingauthorities/v1"
   lazy val acc41HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc41.host-header")
   lazy val acc41BearerToken: String = getConfString("acc41.bearer-token", "test")
 
