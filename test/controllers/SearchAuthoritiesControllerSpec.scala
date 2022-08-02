@@ -33,7 +33,7 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
 
   "searchAuthorities" should {
     "return NO_CONTENT if no authorities returned" in new Setup {
-      when(mockConnector.searchAuthorities(any, any))
+      when(mockConnector.searchAuthorities(any, any)(any))
         .thenReturn(Future.successful(Left(NoAuthoritiesFound)))
 
       running(app) {
@@ -43,7 +43,7 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
     }
 
     "return INTERNAL_SERVER_ERROR if an error response returns from the connector" in new Setup {
-      when(mockConnector.searchAuthorities(any, any))
+      when(mockConnector.searchAuthorities(any, any)(any))
         .thenReturn(Future.successful(Left(ErrorResponse)))
 
       running(app) {
@@ -53,7 +53,7 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
     }
 
     "return OK with authorities if authorities returns from the connector" in new Setup {
-      when(mockConnector.searchAuthorities(any, any))
+      when(mockConnector.searchAuthorities(any, any)(any))
         .thenReturn(Future.successful(Right(authorities)))
 
       running(app) {

@@ -20,19 +20,19 @@ import config.AppConfig
 import domain._
 import domain.acc40.{ResponseDetail, SearchAuthoritiesRequest, SearchAuthoritiesResponse}
 import models.EORI
-import services.{DateTimeService, MetricsReporterService}
+import services.{AuditingService, DateTimeService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class Acc40Connector @Inject()(httpClient: HttpClient,
+                               auditingService: AuditingService,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
-                               metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def searchAuthorities(requestingEORI: EORI, searchID: EORI): Future[Either[Acc40Response, AuthoritiesFound]] = {
+  def searchAuthorities(requestingEORI: EORI, searchID: EORI)
+    (implicit hc: HeaderCarrier): Future[Either[Acc40Response, AuthoritiesFound]] = {
 
     val commonRequest = acc40.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -62,7 +62,11 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
       res => res.searchAuthoritiesResponse.responseDetail match {
         case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
         case ResponseDetail(None, Some("0"), _, _, _) => Left(NoAuthoritiesFound)
-        case v@ResponseDetail(_, _, _, _, _) => Right(v.toAuthoritiesFound)
+        case v@ResponseDetail(_, _, _, _, _) => {
+          auditingService.auditRequestAuthStatementRequest(v,
+            res.searchAuthoritiesResponse.requestDetail)
+          Right(v.toAuthoritiesFound)
+        }
       }
     }.recover {
       case _ => Left(ErrorResponse)

@@ -18,9 +18,10 @@ package services
 
 import config.AppConfig
 import domain._
+import domain.acc40.ResponseDetail
 import models.requests.HistoricDocumentRequest
-import models.requests.manageAuthorities.{Accounts, GrantAuthorityRequest, RevokeAccountType, RevokeAuthorityRequest}
-import models.{AccountNumber, AccountType, EORI, FileRole}
+import models.requests.manageAuthorities._
+import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.{Logger, LoggerLike}
@@ -30,8 +31,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Suc
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import javax.inject.{Inject, Singleton}
-import models.dec64.{FileUploadDetail, FileUploadRequest}
-
+import models.dec64.FileUploadDetail
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -49,6 +49,14 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME = "Request historic statements"
   val FILE_UPLOAD_REQUEST_TRANSACTION_NAME = "View and amend file upload"
   val FILE_UPLOAD_REQUEST_AUDIT_TYPE = "ViewAmendFileUpload"
+  val REQUEST_STANDING_AUTHORITIES_NAME = "Request Authorities CSV"
+  val REQUEST_STANDING_AUTHORITIES_TYPE = "RequestAuthoritiesCSV"
+  val REQUEST_AUTHORITIES_NAME = "Request Authorities"
+  val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
+  val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
+  val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
+  val DOWNLOAD_STANDING_AUTHORITIES_NAME = "Download Standing Authorities CSV"
+  val DOWNLOAD_STANDING_AUTHORITIES_TYPE = "DownloadStandingAuthoritiesCSV"
 
   implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
@@ -93,6 +101,47 @@ class AuditingService @Inject()(appConfig: AppConfig,
       revokeAuthorityRequest.authorisedUser.userRole))
 
     audit(AuditModel(REVOKE_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
+  }
+
+  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail, request: domain.acc41.RequestDetail)
+    (implicit hc: HeaderCarrier): Future[AuditResult] = {
+
+    val auditJson = Json.toJson(RequestAuthCSVAuditDetail(
+      request.requestingEORI.toString,
+      response.requestAcceptedDate.toString
+    ))
+
+    audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
+  }
+
+  def auditDisplayAuthCSVStatementRequest(notification: Notification, fileType: FileType)
+    (implicit hc: HeaderCarrier): Future[AuditResult] = {
+
+    val auditJson = Json.toJson(RequestDisplayStandingAuthCSVAuditDetail(
+      Eori = notification.eori.toString,
+      isHistoric = notification.metadata.contains("statementRequestID"),
+      fileName = notification.fileName,
+      fileRole = notification.fileRole.toString,
+      fileType = fileType.toString
+    ))
+
+    audit(AuditModel(DISPLAY_STANDING_AUTHORITIES_NAME, auditJson, DISPLAY_STANDING_AUTHORITIES_TYPE))
+  }
+
+  def auditRequestAuthStatementRequest(response: ResponseDetail,
+    request: domain.acc40.RequestDetail)(implicit hc: HeaderCarrier): Future[AuditResult] = {
+
+    val auditJson = Json.toJson(RequestAuthAuditDetail(
+       request.requestingEORI.toString,
+       request.searchType,
+       request.searchID.toString,
+       response.numberOfAuthorities,
+       "Company Name", //request.companyName Company name is missing!
+       response.dutyDefermentAccounts,
+       response.generalGuaranteeAccounts,
+       response.cdsCashAccounts
+    ))
+    audit(AuditModel(REQUEST_AUTHORITIES_NAME, auditJson, REQUEST_AUTHORITIES_TYPE))
   }
 
   def auditHistoricStatementRequest(historicDocumentRequest: HistoricDocumentRequest)(implicit hc: HeaderCarrier): Future[AuditResult] = {

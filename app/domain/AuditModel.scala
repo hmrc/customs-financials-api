@@ -16,6 +16,7 @@
 
 package domain
 
+import domain.acc40.{CashAccount, DutyDefermentAccount, GeneralGuaranteeAccount}
 import models.dec64.UploadedFile
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
@@ -87,6 +88,43 @@ case class FileUploadRequestAuditDetail(eori: String,
 
 object FileUploadRequestAuditDetail {
   implicit val fileUploadRequestAuditDetailWrites: OWrites[FileUploadRequestAuditDetail] = Json.writes[FileUploadRequestAuditDetail]
+}
+
+case class RequestAuthAuditDetail(requestingEori: String,
+                                  seachType: String,
+                                  searchID: String,
+                                  numberOfAuthorities: Option[String],
+                                  companyName: String,
+                                  dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
+                                  generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
+                                  cdsCashAccounts: Option[Seq[CashAccount]]
+)
+
+object RequestAuthAuditDetail {
+  implicit val requestAuthAuditDetailsWrites: OWrites[RequestAuthAuditDetail] = Json.writes[RequestAuthAuditDetail]
+}
+
+case class RequestAuthCSVAuditDetail(
+  requestingEori: String,
+  requestAcceptedDate: String
+)
+
+object RequestAuthCSVAuditDetail {
+  implicit val requestAuthCSVAuditDetailsWrites: OWrites[RequestAuthCSVAuditDetail] =
+    Json.writes[RequestAuthCSVAuditDetail]
+}
+
+case class RequestDisplayStandingAuthCSVAuditDetail(
+  Eori: String,
+  isHistoric: Boolean,
+  fileName: String,
+  fileRole: String,
+  fileType: String
+)
+
+object RequestDisplayStandingAuthCSVAuditDetail {
+  implicit val requestStandingAuthCSVAuditDetailsWrites: OWrites[RequestDisplayStandingAuthCSVAuditDetail] =
+    Json.writes[RequestDisplayStandingAuthCSVAuditDetail]
 }
 
 case class Properties(uploadedFiles: Seq[UploadedFile])
