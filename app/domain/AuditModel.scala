@@ -94,7 +94,6 @@ case class RequestAuthAuditDetail(requestingEori: String,
                                   seachType: String,
                                   searchID: String,
                                   numberOfAuthorities: Option[String],
-                                  companyName: String,
                                   dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
                                   generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
                                   cdsCashAccounts: Option[Seq[CashAccount]]

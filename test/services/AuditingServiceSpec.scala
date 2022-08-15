@@ -408,8 +408,8 @@ class AuditingServiceSpec extends SpecBase {
 
       val auditRequest =
         """{
-          "requestingEori":"EORI(GB123456789)",
-          "requestAcceptedDate":"Some()"
+          "requestingEori":"GB123456789",
+          "requestAcceptedDate":""
         }"""
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
