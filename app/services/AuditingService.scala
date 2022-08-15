@@ -107,8 +107,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
     (implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestAuthCSVAuditDetail(
-      request.requestingEORI.toString,
-      response.requestAcceptedDate.toString
+      request.requestingEORI.value,
+      response.requestAcceptedDate.get
     ))
 
     audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
@@ -132,11 +132,10 @@ class AuditingService @Inject()(appConfig: AppConfig,
     request: domain.acc40.RequestDetail)(implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestAuthAuditDetail(
-       request.requestingEORI.toString,
+       request.requestingEORI.value,
        request.searchType,
-       request.searchID.toString,
+       request.searchID.value,
        response.numberOfAuthorities,
-       "Company Name", //request.companyName Company name is missing!
        response.dutyDefermentAccounts,
        response.generalGuaranteeAccounts,
        response.cdsCashAccounts
