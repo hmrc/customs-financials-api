@@ -1,0 +1,64 @@
+2022.11.09 15:14:40 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/mathewmay/Documents/GitHub/customs-financials-api/.metals/lsp.trace.json or /Users/mathewmay/Library/Caches/org.scalameta.metals/lsp.trace.json
+2022.11.09 15:14:40 INFO  logging to file /Users/mathewmay/Documents/GitHub/customs-financials-api/.metals/metals.log
+2022.11.09 15:14:40 INFO  Started: Metals version 0.11.9 in workspace '/Users/mathewmay/Documents/GitHub/customs-financials-api' for client Visual Studio Code 1.73.0.
+2022.11.09 15:14:41 INFO  time: initialize in 0.75s
+2022.11.09 15:14:42 WARN  Build server is not auto-connectable.
+2022.11.09 15:14:42 WARN  no build target for: /Users/mathewmay/Documents/GitHub/customs-financials-api/build.sbt
+2022.11.09 15:14:43 INFO  no build target found for /Users/mathewmay/Documents/GitHub/customs-financials-api/build.sbt. Using presentation compiler with project's scala-library version: 3.2.0
+2022.11.09 15:14:44 INFO  time: code lens generation in 1.43s
+2022.11.09 15:14:58 INFO  running '/opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/bin/java -Djline.terminal=jline.UnsupportedTerminal -Dsbt.log.noformat=true -Dfile.encoding=UTF-8 -jar /var/folders/mf/ygq8d1ms3cz58srtwzz25rx80000gn/T/metals17784671762729343961/sbt-launch.jar -Dbloop.export-jar-classifiers=sources bloopInstall'
+2022.11.09 15:14:59 WARN  no build target for: /Users/mathewmay/Documents/GitHub/customs-financials-api/project/metals.sbt
+2022.11.09 15:14:59 WARN  no build target for: /Users/mathewmay/Documents/GitHub/customs-financials-api/project/project/metals.sbt
+2022.11.09 15:14:59 INFO  [info] welcome to sbt 1.7.0 (Homebrew Java 11.0.16.1)
+2022.11.09 15:14:59 INFO  [info] loading global plugins from /Users/mathewmay/.sbt/1.0/plugins
+2022.11.09 15:15:01 INFO  [info] loading settings for project customs-financials-api-build-build-build from metals.sbt ...
+2022.11.09 15:15:01 INFO  [info] loading project definition from /Users/mathewmay/Documents/GitHub/customs-financials-api/project/project/project
+2022.11.09 15:15:01 INFO  [info] loading settings for project customs-financials-api-build-build from metals.sbt ...
+2022.11.09 15:15:01 INFO  [info] loading project definition from /Users/mathewmay/Documents/GitHub/customs-financials-api/project/project
+2022.11.09 15:15:02 INFO  [success] Generated .bloop/customs-financials-api-build-build.json
+2022.11.09 15:15:02 INFO  [success] Total time: 1 s, completed 9 Nov 2022, 15:15:02
+2022.11.09 15:15:02 INFO  [info] loading settings for project customs-financials-api-build from metals.sbt,plugins.sbt ...
+2022.11.09 15:15:02 INFO  [info] loading project definition from /Users/mathewmay/Documents/GitHub/customs-financials-api/project
+2022.11.09 15:15:03 INFO  [success] Generated .bloop/customs-financials-api-build.json
+2022.11.09 15:15:03 INFO  [info] compiling 1 Scala source to /Users/mathewmay/Documents/GitHub/customs-financials-api/project/target/scala-2.12/sbt-1.0/classes ...
+2022.11.09 15:15:05 INFO  [info] done compiling
+2022.11.09 15:15:05 INFO  [success] Total time: 2 s, completed 9 Nov 2022, 15:15:05
+2022.11.09 15:15:05 ERROR /Users/mathewmay/Documents/GitHub/customs-financials-api/build.sbt:12: warning: method in in trait ScopingSetting is deprecated (since 1.5.0): `in` is deprecated; migrate to slash syntax - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html#slash
+2022.11.09 15:15:05 ERROR   .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
+2022.11.09 15:15:05 ERROR                                          ^
+2022.11.09 15:15:05 ERROR /Users/mathewmay/Documents/GitHub/customs-financials-api/build.sbt:21: warning: lazy value coverageMinimum in object ScoverageKeys is deprecated (since v1.8.0): Use coverageMinimumStmtTotal instead
+2022.11.09 15:15:05 ERROR     ScoverageKeys.coverageMinimum := 90,
+2022.11.09 15:15:05 ERROR                   ^
+2022.11.09 15:15:05 ERROR /Users/mathewmay/Documents/GitHub/customs-financials-api/build.sbt:28: warning: method in in trait ScopingSetting is deprecated (since 1.5.0): `in` is deprecated; migrate to slash syntax - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html#slash
+2022.11.09 15:15:05 ERROR   .settings(parallelExecution in Test := false)
+2022.11.09 15:15:05 ERROR                               ^
+2022.11.09 15:15:05 INFO  [info] SbtAutoBuildPlugin - adding build settings
+2022.11.09 15:15:05 INFO  [info] loading settings for project customs-financials-api from build.sbt ...
+2022.11.09 15:15:05 INFO  [error] fatal: No names found, cannot describe anything.
+2022.11.09 15:15:06 INFO  [info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+2022.11.09 15:15:06 INFO  [info] set current project to customs-financials-api (in build file:/Users/mathewmay/Documents/GitHub/customs-financials-api/)
+2022.11.09 15:15:07 INFO  [success] Generated .bloop/customs-financials-api.json
+2022.11.09 15:15:07 INFO  [success] Generated .bloop/customs-financials-api-it.json
+2022.11.09 15:15:07 INFO  [success] Generated .bloop/customs-financials-api-test.json
+2022.11.09 15:15:07 INFO  [success] Total time: 1 s, completed 9 Nov 2022, 15:15:08
+2022.11.09 15:15:08 INFO  time: ran 'sbt bloopInstall' in 9.36s
+2022.11.09 15:15:08 INFO  Attempting to connect to the build server...
+2022.11.09 15:15:08 INFO  Bloop uses /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1 defined at /Users/mathewmay/.bloop/bloop.json
+2022.11.09 15:15:08 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/mathewmay/Documents/GitHub/customs-financials-api/.metals/bsp.trace.json or /Users/mathewmay/Library/Caches/org.scalameta.metals/bsp.trace.json
+2022.11.09 15:15:08 INFO  Attempting to connect to the build server...
+2022.11.09 15:15:08 INFO  Bloop uses /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1 defined at /Users/mathewmay/.bloop/bloop.json
+2022.11.09 15:15:08 INFO  Attempting to connect to the build server...
+2022.11.09 15:15:08 INFO  Bloop uses /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1 defined at /Users/mathewmay/.bloop/bloop.json
+2022.11.09 15:15:08 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/mathewmay/Documents/GitHub/customs-financials-api/project/project/.metals/bsp.trace.json or /Users/mathewmay/Library/Caches/org.scalameta.metals/bsp.trace.json
+2022.11.09 15:15:08 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/mathewmay/Documents/GitHub/customs-financials-api/project/.metals/bsp.trace.json or /Users/mathewmay/Library/Caches/org.scalameta.metals/bsp.trace.json
+2022.11.09 15:15:08 INFO  time: Connected to build server in 0.19s
+2022.11.09 15:15:08 INFO  Connected to Build server: Bloop v1.5.4
+2022.11.09 15:15:10 WARN  Could not find java sources in /opt/homebrew/Cellar/openjdk@11/src.zip, /opt/homebrew/Cellar/openjdk@11/lib/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/lib/src.zip. Java symbols will not be available.
+2022.11.09 15:15:11 WARN  Could not find java sources in /opt/homebrew/Cellar/openjdk@11/src.zip, /opt/homebrew/Cellar/openjdk@11/lib/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/lib/src.zip. Java symbols will not be available.
+2022.11.09 15:15:11 WARN  Could not find java sources in /opt/homebrew/Cellar/openjdk@11/src.zip, /opt/homebrew/Cellar/openjdk@11/lib/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/src.zip, /opt/homebrew/Cellar/openjdk@11/11.0.16.1_1/lib/src.zip. Java symbols will not be available.
+2022.11.09 15:15:11 INFO  time: indexed workspace in 3.68s
+2022.11.09 15:15:12 INFO  compiling customs-financials-api-build (1 scala source)
+2022.11.09 15:15:13 INFO  time: compiled customs-financials-api-build in 1.03s
+2022.11.09 15:15:13 INFO  skipping build import with status 'Dismissed'
+Nov 09, 2022 3:16:18 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
