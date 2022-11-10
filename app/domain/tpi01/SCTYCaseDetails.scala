@@ -52,6 +52,7 @@ case class SCTYCaseDetails(CDFPayCaseNumber: String,
       case "Partial BTA/Refund" => "Pending"
       case "Resolved-Auto BTA" => "Closed"
       case "Resolved-Manual BTA/Refund" => "Closed"
+      case "Resolved-Withdrawn" => "Closed" 
       case "Open-Extension Granted" => "In Progress" //Check these
     }
 
