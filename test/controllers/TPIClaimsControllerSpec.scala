@@ -36,13 +36,13 @@ class TPIClaimsControllerSpec extends SpecBase {
   "getReimbursementClaims" should {
     "return 200 status" in new Setup {
       val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
-        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", caseSubStatus = Some("Open"), declarantEORI = "GB744638982000",
         importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
         totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
         basisOfClaim = Some("Duplicate Entry"))
 
       val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
-        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open", caseSubStatus = Some("Open"),
         declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
         totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
 
@@ -64,13 +64,13 @@ class TPIClaimsControllerSpec extends SpecBase {
 
     "return 200 status where NDRCCase with no declarationId is omitted from response body" in new Setup {
       val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = None,
-        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+        claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", caseSubStatus = Some("Open"), declarantEORI = "GB744638982000",
         importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
         totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
         basisOfClaim = Some("Duplicate Entry"))
 
       val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
-        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+        claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open", caseSubStatus =Some("Open"),
         declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
         totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
 
@@ -181,13 +181,13 @@ class TPIClaimsControllerSpec extends SpecBase {
     ).build()
 
     val ndrcResponse: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
-      claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "In Progress", declarantEORI = "GB744638982000",
+      claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "In Progress", caseSubStatus = Some("Open"), declarantEORI = "GB744638982000",
       importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
       totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
       basisOfClaim = Some("Duplicate Entry"))
 
     val sctyResponse: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
-      claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "In Progress",
+      claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "In Progress",  caseSubStatus = Some("Open"),
       declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
       totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
   }
