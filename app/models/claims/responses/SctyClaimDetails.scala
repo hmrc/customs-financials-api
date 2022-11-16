@@ -38,7 +38,7 @@ case class SctyClaimDetails(
     claimantName: Option[String],
     claimantEmailAddress: Option[String],
     closedDate: Option[String],
-    reimbursement: Option[Seq[Reimbursement]]
+    reimbursements: Option[Seq[Reimbursement]]
 )
 
 object SctyClaimDetails {
@@ -64,7 +64,7 @@ object SctyClaimDetails {
       claimantName = caseDetails.claimantName,
       claimantEmailAddress = caseDetails.claimantEmailAddress,
       closedDate = caseDetails.closedDate,
-      reimbursement = caseDetails.reimbursement.map(_.map(r => Reimbursement(
+      reimbursements = caseDetails.reimbursement.map(_.map(r => Reimbursement(
         r.reimbursementDate,
         r.reimbursementAmount,
         r.taxType,
@@ -74,7 +74,7 @@ object SctyClaimDetails {
   }
 
   def caseSubStatus(caseStatus: String): Option[String] = caseStatus match {
-    case "Resolved-Refund" => Some("Refund")
+    case "Resolved-Refund" => Some("Closed")
     case "Resolved-Manual BTA" => Some("Closed")
     case "Closed-C18 Raised" => Some("Closed")
     case "Resolved-Auto BTA" => Some("Closed")
@@ -102,6 +102,6 @@ object SctyClaimDetails {
       case "Partial BTA/Refund" => "Pending"
       case "Resolved-Auto BTA" => "Closed"
       case "Resolved-Manual BTA/Refund" => "Closed"
-      case "Open-Extension Granted" => "In Progress" //Check these
+      case "Open-Extension Granted" => "In Progress"
     }
 }

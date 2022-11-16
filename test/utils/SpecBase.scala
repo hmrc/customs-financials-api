@@ -19,8 +19,7 @@ package utils
 import domain.tpi02.Reimbursement
 import domain.tpi02.ndrc._
 import domain.tpi02.scty.{Goods, SCTYCase}
-import models.claims.responses.{NdrcClaimDetails, NdrcClaimItem}
-import models.claims.responses.{Reimbursement => ReimbursementResponse}
+import models.claims.responses.{NdrcClaimDetails, NdrcClaimItem, SctyClaimDetails, Reimbursement => ReimbursementResponse, Goods => GoodsResponse}
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -81,7 +80,7 @@ trait SpecBase extends AnyWordSpecLike
     Some("declarationId"),
     "Reason for security",
     "Procedure Code",
-    "Resolved-Completed",
+    "Resolved-Refund",
     Some(Seq(Goods("itemNumber", Some("description")))),
     "someEori",
     "someOtherEori",
@@ -115,5 +114,27 @@ trait SpecBase extends AnyWordSpecLike
     claimantEmailAddress = Some("email@email.com"),
     closedDate = Some("20221112"),
     reimbursements = Some(Seq(reimbursementResponse))
+  )
+
+  val sctyClaimDetails: SctyClaimDetails = SctyClaimDetails(
+    "caseNumber",
+    Some("declarationId"),
+    "Reason for security",
+    "Procedure Code",
+    "Closed",
+    Some("Closed"),
+    Some(Seq(GoodsResponse("itemNumber", Some("description")))),
+    "someEori",
+    "someOtherEori",
+    Some("claimaintEori"),
+    Some("600000"),
+    Some("600000"),
+    Some("600000"),
+    Some("600000"),
+    "20221210",
+    Some("name"),
+    Some("email@email.com"),
+    Some("20221012"),
+    Some(Seq(reimbursementResponse))
   )
 }
