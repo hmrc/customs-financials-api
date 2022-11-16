@@ -24,7 +24,6 @@ case class SCTYCaseDetails(CDFPayCaseNumber: String,
                            closedDate: Option[String],
                            reasonForSecurity: String,
                            caseStatus: String,
-                           caseSubStatus: Option[String],
                            declarantEORI: String,
                            importerEORI: String,
                            claimantEORI: Option[String],
@@ -55,8 +54,6 @@ case class SCTYCaseDetails(CDFPayCaseNumber: String,
       case "Resolved-Withdrawn" => "Closed" 
       case "Open-Extension Granted" => "In Progress" //Check these
     }
-
-  def toSCTYCaseDetails: SCTYCaseDetails = this.copy(caseSubStatus = Option(caseStatus), caseStatus = transformedCaseStatus)
 }
 
 object SCTYCaseDetails {

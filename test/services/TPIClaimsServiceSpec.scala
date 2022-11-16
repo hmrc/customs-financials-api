@@ -21,6 +21,7 @@ import domain._
 import domain.tpi01._
 import domain.tpi02.GetSpecificCaseResponse
 import models.EORI
+import models.claims.responses.{ClaimsResponse, NdrcClaimItem, SctyClaimItem, SpecificClaimResponse}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
@@ -38,13 +39,24 @@ class TPIClaimsServiceSpec extends SpecBase {
       "successfully returns CDFPayCaseDetail" in new Setup {
 
         val ndrcCaseDetails: NDRCCaseDetails = NDRCCaseDetails(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
-          claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", caseSubStatus = Some("Open"), declarantEORI = "GB744638982000",
+          claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "Open", declarantEORI = "GB744638982000",
+          importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
+          totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
+          basisOfClaim = Some("Duplicate Entry"))
+
+        val ndrcClaimItem: NdrcClaimItem = NdrcClaimItem(CDFPayCaseNumber = "NDRC-2109", declarationID = Some("21LLLLLLLLLLLLLLL9"),
+          claimStartDate = "20211120", closedDate = Some("00000000"), caseStatus = "In Progress", caseSubStatus = None, declarantEORI = "GB744638982000",
           importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"), totalCustomsClaimAmount = Some("3000.20"),
           totalVATClaimAmount = Some("784.66"), totalExciseClaimAmount = Some("1200.00"), declarantReferenceNumber = Some("KWMREF1"),
           basisOfClaim = Some("Duplicate Entry"))
 
         val sctyCaseDetails: SCTYCaseDetails = SCTYCaseDetails(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
-          claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open", caseSubStatus = Some("Open"),
+          claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "Open",
+          declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
+          totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
+
+        val sctyClaimItem: SctyClaimItem = SctyClaimItem(CDFPayCaseNumber = "SEC-2109", declarationID = Some("21LLLLLLLLLL12345"),
+          claimStartDate = "20210320", closedDate = Some("00000000"), reasonForSecurity = "ACS", caseStatus = "In Progress", caseSubStatus = None,
           declarantEORI = "GB744638982000", importerEORI = "GB744638982000", claimantEORI = Some("GB744638982000"),
           totalCustomsClaimAmount = Some("12000.56"), totalVATClaimAmount = Some("3412.01"), declarantReferenceNumber = Some("broomer007"))
 
@@ -60,7 +72,7 @@ class TPIClaimsServiceSpec extends SpecBase {
 
         running(app) {
           val result = await(service.getClaims(EORI("Trader EORI"), "A"))
-          result mustBe Some(responseDetail)
+          result mustBe Some(ClaimsResponse(Seq(sctyClaimItem), Seq(ndrcClaimItem)))
         }
       }
     }
@@ -77,7 +89,7 @@ class TPIClaimsServiceSpec extends SpecBase {
 
         running(app) {
           val result = await(service.getSpecificClaim("CDFPayService", "CDFPayCaseNumber"))
-          result mustBe Some(tpi02.ResponseDetail("NDRC", CDFPayCaseFound = true, Some(ndrcCase.copy(ndrcCase.NDRCDetail.copy(caseStatus = "Closed"), ndrcCase.NDRCAmounts)), None))
+          result mustBe Some(SpecificClaimResponse("NDRC", CDFPayCaseFound = true, Some(ndrcClaimDetails.copy(caseStatus = "Closed")), None))
         }
       }
 

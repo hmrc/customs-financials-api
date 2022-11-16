@@ -14,22 +14,65 @@
  * limitations under the License.
  */
 
-package domain.tpi02
+package models.claims.responses
 
-import domain.tpi02.ndrc.NDRCCase
-import domain.tpi02.scty.SCTYCase
+import domain.tpi01.NDRCCaseDetails
+import domain.tpi02.ndrc.NDRCDetail
 import play.api.libs.json.{Json, OFormat}
 
-case class ResponseDetail(CDFPayService: String,
-                          CDFPayCaseFound: Boolean,
-                          NDRCCase: Option[NDRCCase],
-                          SCTYCase: Option[SCTYCase]) {
+case class NdrcClaimDetails(
+  CDFPayCaseNumber: String,
+  declarationID: Option[String],
+  claimType: String, //C285 or C&E1179
+  caseType: String, //if (C285) Individual, Bulk, CMA, C18 || if (C&E1179) Individual, Bulk, CMA
+  caseStatus: String,
+  caseSubStatus: Option[String],
+  descOfGoods: Option[String],
+  descOfRejectedGoods: Option[String],
+  declarantEORI: String,
+  importerEORI: String,
+  claimantEORI: Option[String],
+  basisOfClaim: Option[String],
+  claimStartDate: String,
+  claimantName: Option[String],
+  claimantEmailAddress: Option[String],
+  closedDate: Option[String],
+//  mrnNumbers: Option[Seq[String]],
+//  entryNumbers: Option[Seq[String]],
+  reimbursements: Option[Seq[Reimbursement]]
+)
 
-  def declarationIdDefined: Boolean =
-    NDRCCase.flatMap(_.NDRCDetail.declarationID).isDefined ||
-      SCTYCase.flatMap(_.declarationID).isDefined
+object NdrcClaimDetails {
+  implicit val format: OFormat[NdrcClaimDetails] = Json.format[NdrcClaimDetails]
 
-  private def transformedCaseStatus(caseStatus: String): String =
+  def fromTpi02Response(caseDetails: NDRCDetail): NdrcClaimDetails = {
+    NdrcClaimDetails(
+      CDFPayCaseNumber = caseDetails.CDFPayCaseNumber,
+      declarationID = caseDetails.declarationID,
+      claimType = caseDetails.claimType,
+      caseType = caseDetails.caseType,
+      caseStatus = transformedCaseStatus(caseDetails.caseStatus),
+      caseSubStatus = caseSubStatus(caseDetails.caseStatus),
+      descOfGoods = caseDetails.descOfGoods,
+      descOfRejectedGoods = caseDetails.descOfRejectedGoods,
+      declarantEORI = caseDetails.declarantEORI,
+      importerEORI = caseDetails.importerEORI,
+      claimantEORI = caseDetails.claimantEORI,
+      basisOfClaim = caseDetails.basisOfClaim,
+      claimStartDate = caseDetails.claimStartDate,
+      claimantName = caseDetails.claimantName,
+      claimantEmailAddress = caseDetails.claimantEmailAddress,
+      closedDate = caseDetails.closedDate,
+      reimbursements = caseDetails.reimbursement.map(_.map(r => Reimbursement(
+        r.reimbursementDate,
+        r.reimbursementAmount,
+        r.taxType,
+        r.reimbursementMethod
+      )))
+    )
+  }
+
+  def transformedCaseStatus(caseStatus: String): String =
     caseStatus match {
       case "Open" => "In Progress"
       case "Open-Analysis" => "In Progress"
@@ -57,7 +100,7 @@ case class ResponseDetail(CDFPayService: String,
       case "Pending-Compliance Check" => "In Progress"
     }
 
-  private def caseSubStatus(caseStatus: String): Option[String] = caseStatus match {
+  def caseSubStatus(caseStatus: String): Option[String] = caseStatus match {
     case "Resolved-Withdrawn" => Some("Withdrawn")
     case "Rejected-Failed Validation" => Some("Failed Validation")
     case "Resolved-Rejected" => Some("Rejected")
@@ -67,40 +110,4 @@ case class ResponseDetail(CDFPayService: String,
     case "Resolved-Partial Refused" => Some("Partial Refused")
     case _ => None
   }
-
-  private def transformedCaseStatusScty(caseStatus: String): String =
-    caseStatus match {
-      case "Open" => "In Progress"
-      case "Pending-Approval" =>  "Pending"
-      case "Pending-Payment" =>  "Pending"
-      case "Partial Refund" =>  "Pending"
-      case "Resolved-Refund" =>  "Closed"
-      case "Pending-Query" => "Pending"
-      case "Resolved-Manual BTA" => "Closed"
-      case "Pending-C18" => "Pending"
-      case "Closed-C18 Raised" => "Closed"
-      case "RTBH Letter Initiated" => "Pending"
-      case "Awaiting RTBH Letter Response" => "Pending"
-      case "Reminder Letter Initiated" => "Pending"
-      case "Awaiting Reminder Letter Response" => "Pending"
-      case "Decision Letter Initiated" => "Pending"
-      case "Partial BTA" => "Pending"
-      case "Partial BTA/Refund" => "Pending"
-      case "Resolved-Auto BTA" => "Closed"
-      case "Resolved-Manual BTA/Refund" => "Closed"
-      case "Open-Extension Granted" => "In Progress" //Check these
-    }
-
-  private def caseSubStatusStcy(caseStatus: String): Option[String] = caseStatus match {
-    case "Resolved-Refund" =>  Some("Refund")
-    case "Resolved-Manual BTA" => Some("Closed")
-    case "Closed-C18 Raised" => Some("Closed")
-    case "Resolved-Auto BTA" => Some("Closed")
-    case "Resolved-Manual BTA/Refund" => Some("Closed")
-    case _ => None
-  }
-}
-
-object ResponseDetail {
-  implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }

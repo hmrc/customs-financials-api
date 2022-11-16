@@ -16,13 +16,17 @@
 
 package controllers
 
+import models.claims.responses.{ClaimsResponse, SpecificClaimResponse}
+
 import javax.inject.Inject
 import models.requests.{ReimbursementClaimsRequest, SpecificClaimRequest}
 import play.api.Logger
+import play.api.i18n.Lang.logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.TPIClaimsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -33,7 +37,7 @@ class TPIClaimsController @Inject()(service: TPIClaimsService,
 
   def getReimbursementClaims: Action[ReimbursementClaimsRequest] = Action.async(parse.json[ReimbursementClaimsRequest]) { implicit request =>
     service.getClaims(request.body.eori, request.body.appType).map {
-      case Some(response) => Ok(response.generateClaimsResponse)
+      case Some(response) => Ok(Json.obj("claims" -> Json.toJson(response)))
       case None => InternalServerError
     }.recover {
       case ex if ex.getMessage.contains("JSON validation") =>
