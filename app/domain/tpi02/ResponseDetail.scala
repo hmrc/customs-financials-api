@@ -57,17 +57,6 @@ case class ResponseDetail(CDFPayService: String,
       case "Pending-Compliance Check" => "In Progress"
     }
 
-  private def caseSubStatus(caseStatus: String): Option[String] = caseStatus match {
-    case "Resolved-Withdrawn" => Some("Withdrawn")
-    case "Rejected-Failed Validation" => Some("Failed Validation")
-    case "Resolved-Rejected" => Some("Rejected")
-    case "Resolved-No Reply" => Some("No Reply")
-    case "Resolved-Refused" => Some("Refused")
-    case "Resolved-Approved" => Some("Approved")
-    case "Resolved-Partial Refused" => Some("Partial Refused")
-    case _ => None
-  }
-
   private def transformedCaseStatusScty(caseStatus: String): String =
     caseStatus match {
       case "Open" => "In Progress"
@@ -90,15 +79,6 @@ case class ResponseDetail(CDFPayService: String,
       case "Resolved-Manual BTA/Refund" => "Closed"
       case "Open-Extension Granted" => "In Progress" //Check these
     }
-
-  private def caseSubStatusStcy(caseStatus: String): Option[String] = caseStatus match {
-    case "Resolved-Refund" =>  Some("Refund")
-    case "Resolved-Manual BTA" => Some("Closed")
-    case "Closed-C18 Raised" => Some("Closed")
-    case "Resolved-Auto BTA" => Some("Closed")
-    case "Resolved-Manual BTA/Refund" => Some("Closed")
-    case _ => None
-  }
 }
 
 object ResponseDetail {
