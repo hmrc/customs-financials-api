@@ -122,7 +122,7 @@ trait SpecBase extends AnyWordSpecLike
     "Reason for security",
     "Procedure Code",
     "Closed",
-    Some("Closed"),
+    Some("Resolved-Refund"),
     Some(Seq(GoodsResponse("itemNumber", Some("description")))),
     "someEori",
     "someOtherEori",

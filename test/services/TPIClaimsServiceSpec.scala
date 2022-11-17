@@ -38,11 +38,11 @@ class TPIClaimsServiceSpec extends SpecBase {
     ("Open-Analysis", "In Progress", None, "Pending-Approval", "Pending", None),
     ("Pending-Approval", "In Progress", None, "Pending-Payment", "Pending", None),
     ("Pending-Queried", "Pending", None, "Partial Refund", "Pending", None),
-    ("Resolved-Withdrawn", "Closed", Some("Withdrawn"), "Resolved-Refund", "Closed", Some("Closed")),
+    ("Resolved-Withdrawn", "Closed", Some("Withdrawn"), "Resolved-Refund", "Closed", Some("Resolved-Refund")),
     ("Rejected-Failed Validation", "Closed", Some("Failed Validation"), "Pending-Query", "Pending", None),
-    ("Resolved-Rejected", "Closed", Some("Rejected"), "Resolved-Manual BTA", "Closed", Some("Closed")),
+    ("Resolved-Rejected", "Closed", Some("Rejected"), "Resolved-Manual BTA", "Closed", Some("Resolved-Manual BTA")),
     ("Open-Rework", "In Progress", None, "Pending-C18", "Pending", None),
-    ("Paused", "In Progress", None, "Closed-C18 Raised", "Closed", Some("Closed")),
+    ("Paused", "In Progress", None, "Closed-C18 Raised", "Closed", Some("Closed-C18 Raised")),
     ("Resolved-No Reply", "Closed", Some("No Reply"), "RTBH Letter Initiated", "Pending", None),
     ("Resolved-Refused", "Closed", Some("Refused"), "Awaiting RTBH Letter Response", "Pending", None),
     ("Pending Payment Confirmation", "In Progress", None, "Reminder Letter Initiated", "Pending", None),
@@ -50,14 +50,14 @@ class TPIClaimsServiceSpec extends SpecBase {
     ("Resolved-Partial Refused", "Closed", Some("Partial Refused"), "Decision Letter Initiated", "Pending", None),
     ("Pending Decision Letter", "In Progress", None, "Partial BTA", "Pending", None),
     ("Approved", "In Progress", None, "Partial BTA/Refund", "Pending", None),
-    ("Analysis-Rework", "In Progress", None, "Resolved-Auto BTA", "Closed", Some("Closed")),
-    ("Rework-Payment Details", "In Progress", None, "Resolved-Manual BTA/Refund", "Closed", Some("Closed")),
+    ("Analysis-Rework", "In Progress", None, "Resolved-Auto BTA", "Closed", Some("Resolved-Auto BTA")),
+    ("Rework-Payment Details", "In Progress", None, "Resolved-Manual BTA/Refund", "Closed", Some("Resolved-Manual BTA/Refund")),
     ("Pending-RTBH", "In Progress", None, "Open-Extension Granted", "In Progress", None),
-    ("RTBH Sent", "Pending", None, "Open", "In Progress", None),
+    ("RTBH Sent", "Pending", None, "Resolved-Withdrawn", "Closed", Some("Resolved-Withdrawn")),
     ("Reply To RTBH", "Pending", None, "Pending-Approval", "Pending", None),
     ("Pending-Compliance Recommendation", "In Progress", None, "Pending-Payment", "Pending", None),
     ("Pending-Compliance Check Query", "Pending", None, "Partial Refund", "Pending", None),
-    ("Pending-Compliance Check", "In Progress", None, "Resolved-Refund", "Closed", Some("Closed"))
+    ("Pending-Compliance Check", "In Progress", None, "Resolved-Refund", "Closed", Some("Resolved-Refund"))
   )
 
   "TPIClaimsService" when {
