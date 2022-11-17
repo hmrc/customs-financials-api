@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package domain.tpi02
+package models.claims.responses
 
-import domain.tpi02.ndrc.NDRCCase
-import domain.tpi02.scty.SCTYCase
 import play.api.libs.json.{Json, OFormat}
 
-case class ResponseDetail(CDFPayService: String,
-                          CDFPayCaseFound: Boolean,
-                          NDRCCase: Option[NDRCCase],
-                          SCTYCase: Option[SCTYCase]) {
+case class Goods(itemNumber: String, goodsDescription: Option[String])
 
-  def declarationIdDefined: Boolean =
-    NDRCCase.flatMap(_.NDRCDetail.declarationID).isDefined ||
-      SCTYCase.flatMap(_.declarationID).isDefined
-
-}
-
-object ResponseDetail {
-  implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
+object Goods {
+  implicit val format: OFormat[Goods] = Json.format[Goods]
 }

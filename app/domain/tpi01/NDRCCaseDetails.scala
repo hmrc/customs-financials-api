@@ -23,7 +23,6 @@ case class NDRCCaseDetails(CDFPayCaseNumber: String,
                            claimStartDate: String,
                            closedDate: Option[String],
                            caseStatus: String,
-                           caseSubStatus: Option[String],
                            declarantEORI: String,
                            importerEORI: String,
                            claimantEORI: Option[String],
@@ -31,38 +30,7 @@ case class NDRCCaseDetails(CDFPayCaseNumber: String,
                            totalVATClaimAmount: Option[String],
                            totalExciseClaimAmount: Option[String],
                            declarantReferenceNumber: Option[String],
-                           basisOfClaim: Option[String]) {
-
-  private def transformedCaseStatus: String =
-    caseStatus match {
-      case "Open" => "In Progress"
-      case "Open-Analysis" => "In Progress"
-      case "Pending-Approval" => "In Progress"
-      case "Pending-Queried" => "Pending"
-      case "Resolved-Withdrawn" => "Closed"
-      case "Rejected-Failed Validation" => "Closed"
-      case "Resolved-Rejected" => "Closed"
-      case "Open-Rework" => "In Progress"
-      case "Paused" => "In Progress"
-      case "Resolved-No Reply" => "Closed"
-      case "Resolved-Refused" => "Closed"
-      case "Pending Payment Confirmation" => "In Progress"
-      case "Resolved-Approved" => "Closed"
-      case "Resolved-Partial Refused" => "Closed"
-      case "Pending Decision Letter" => "In Progress"
-      case "Approved" => "In Progress"
-      case "Analysis-Rework" => "In Progress"
-      case "Rework-Payment Details" => "In Progress"
-      case "Pending-RTBH" => "In Progress"
-      case "RTBH Sent" => "Pending"
-      case "Reply To RTBH" => "Pending"
-      case "Pending-Compliance Recommendation" => "In Progress"
-      case "Pending-Compliance Check Query" => "Pending"
-      case "Pending-Compliance Check" => "In Progress"
-    }
-
-  def toNDRCCaseDetails: NDRCCaseDetails = this.copy(caseSubStatus = Option(caseStatus),caseStatus = transformedCaseStatus)
-}
+                           basisOfClaim: Option[String])
 
 object NDRCCaseDetails {
   implicit val format: OFormat[NDRCCaseDetails] = Json.format[NDRCCaseDetails]

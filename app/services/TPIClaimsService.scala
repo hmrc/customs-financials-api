@@ -19,8 +19,10 @@ package services
 import connectors.{Tpi01Connector, Tpi02Connector}
 import domain._
 import domain.tpi01.ResponseDetail
+
 import javax.inject.{Inject, Singleton}
 import models.EORI
+import models.claims.responses.{ClaimsResponse, SpecificClaimResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,17 +30,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class TPIClaimsService @Inject()(tpi01Connector: Tpi01Connector,
                                  tpi02Connector: Tpi02Connector)(implicit executionContext: ExecutionContext) {
 
-  def getClaims(eori: EORI, appType: String): Future[Option[ResponseDetail]] = {
+  def getClaims(eori: EORI, appType: String): Future[Option[ClaimsResponse]] = {
     tpi01Connector.retrievePostClearanceCases(eori, appType).map{ response =>
-      response.getPostClearanceCasesResponse.responseDetail
+      response.getPostClearanceCasesResponse.responseDetail.map(ClaimsResponse.fromTpi01Response)
     }
   }
 
-  def getSpecificClaim(cdfPayService: String, cdfPayCaseNumber: String): Future[Option[tpi02.ResponseDetail]] = {
+  def getSpecificClaim(cdfPayService: String, cdfPayCaseNumber: String): Future[Option[SpecificClaimResponse]] = {
     tpi02Connector.retrieveSpecificClaim(cdfPayService, cdfPayCaseNumber).map { response =>
       response.getSpecificCaseResponse.responseDetail.flatMap { detail =>
         if(detail.declarationIdDefined) {
-          Some(detail.toCDSResponseDetail)
+          Some(SpecificClaimResponse.fromTpi02Response(detail))
         } else {
           None
         }
