@@ -37,8 +37,6 @@ case class NdrcClaimDetails(
   claimantName: Option[String],
   claimantEmailAddress: Option[String],
   closedDate: Option[String],
-//  mrnNumbers: Option[Seq[String]],
-//  entryNumbers: Option[Seq[String]],
   reimbursements: Option[Seq[Reimbursement]]
 )
 

@@ -57,6 +57,4 @@ object NdrcClaimItem {
       basisOfClaim = caseDetails.basisOfClaim,
     )
   }
-
-
 }
