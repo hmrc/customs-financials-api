@@ -105,6 +105,7 @@ trait SpecBase extends AnyWordSpecLike
     caseSubStatus = Some("Approved"),
     descOfGoods = Some("description of goods"),
     descOfRejectedGoods = Some("description of rejected goods"),
+    totalClaimAmount = Some("600000"),
     declarantEORI = "SomeEori",
     importerEORI = "SomeOtherEori",
     claimantEORI = Some("ClaimaintEori"),
