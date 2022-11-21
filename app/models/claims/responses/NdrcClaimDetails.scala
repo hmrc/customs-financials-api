@@ -17,7 +17,7 @@
 package models.claims.responses
 
 import domain.tpi01.NDRCCaseDetails
-import domain.tpi02.ndrc.NDRCDetail
+import domain.tpi02.ndrc.{NDRCCase, NDRCDetail}
 import play.api.libs.json.{Json, OFormat}
 
 case class NdrcClaimDetails(
@@ -29,6 +29,7 @@ case class NdrcClaimDetails(
   caseSubStatus: Option[String],
   descOfGoods: Option[String],
   descOfRejectedGoods: Option[String],
+  totalClaimAmount: Option[String],
   declarantEORI: String,
   importerEORI: String,
   claimantEORI: Option[String],
@@ -43,25 +44,26 @@ case class NdrcClaimDetails(
 object NdrcClaimDetails {
   implicit val format: OFormat[NdrcClaimDetails] = Json.format[NdrcClaimDetails]
 
-  def fromTpi02Response(caseDetails: NDRCDetail): NdrcClaimDetails = {
+  def fromTpi02Response(ndrcCase: NDRCCase): NdrcClaimDetails = {
     NdrcClaimDetails(
-      CDFPayCaseNumber = caseDetails.CDFPayCaseNumber,
-      declarationID = caseDetails.declarationID,
-      claimType = caseDetails.claimType,
-      caseType = caseDetails.caseType,
-      caseStatus = transformedCaseStatus(caseDetails.caseStatus),
-      caseSubStatus = caseSubStatus(caseDetails.caseStatus),
-      descOfGoods = caseDetails.descOfGoods,
-      descOfRejectedGoods = caseDetails.descOfRejectedGoods,
-      declarantEORI = caseDetails.declarantEORI,
-      importerEORI = caseDetails.importerEORI,
-      claimantEORI = caseDetails.claimantEORI,
-      basisOfClaim = caseDetails.basisOfClaim,
-      claimStartDate = caseDetails.claimStartDate,
-      claimantName = caseDetails.claimantName,
-      claimantEmailAddress = caseDetails.claimantEmailAddress,
-      closedDate = caseDetails.closedDate,
-      reimbursements = caseDetails.reimbursement.map(_.map(r => Reimbursement(
+      CDFPayCaseNumber = ndrcCase.NDRCDetail.CDFPayCaseNumber,
+      declarationID = ndrcCase.NDRCDetail.declarationID,
+      claimType = ndrcCase.NDRCDetail.claimType,
+      caseType = ndrcCase.NDRCDetail.caseType,
+      caseStatus = transformedCaseStatus(ndrcCase.NDRCDetail.caseStatus),
+      caseSubStatus = caseSubStatus(ndrcCase.NDRCDetail.caseStatus),
+      descOfGoods = ndrcCase.NDRCDetail.descOfGoods,
+      descOfRejectedGoods = ndrcCase.NDRCDetail.descOfRejectedGoods,
+      totalClaimAmount = ndrcCase.NDRCAmounts.totalClaimAmount,
+      declarantEORI = ndrcCase.NDRCDetail.declarantEORI,
+      importerEORI = ndrcCase.NDRCDetail.importerEORI,
+      claimantEORI = ndrcCase.NDRCDetail.claimantEORI,
+      basisOfClaim = ndrcCase.NDRCDetail.basisOfClaim,
+      claimStartDate = ndrcCase.NDRCDetail.claimStartDate,
+      claimantName = ndrcCase.NDRCDetail.claimantName,
+      claimantEmailAddress = ndrcCase.NDRCDetail.claimantEmailAddress,
+      closedDate = ndrcCase.NDRCDetail.closedDate,
+      reimbursements = ndrcCase.NDRCDetail.reimbursement.map(_.map(r => Reimbursement(
         r.reimbursementDate,
         r.reimbursementAmount,
         r.taxType,

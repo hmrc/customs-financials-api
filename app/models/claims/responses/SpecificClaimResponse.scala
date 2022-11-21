@@ -33,7 +33,7 @@ object SpecificClaimResponse {
       SpecificClaimResponse(
         responseDetail.CDFPayService,
         responseDetail.CDFPayCaseFound,
-        responseDetail.NDRCCase.map(x => NdrcClaimDetails.fromTpi02Response(x.NDRCDetail)),
+        responseDetail.NDRCCase.map(NdrcClaimDetails.fromTpi02Response),
         responseDetail.SCTYCase.map(SctyClaimDetails.fromTpi02Response)
       )
   }
