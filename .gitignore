@@ -10,6 +10,8 @@ dist
 /*.iml
 /*.ipr
 /out
+/.DS_Store
+/app/.DS_Store
 /.idea_modules
 /.classpath
 /.project
