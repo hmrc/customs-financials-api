@@ -9,6 +9,7 @@ dist
 /.idea
 /*.iml
 /*.ipr
+/sbt.json
 /out
 /.DS_Store
 /app/.DS_Store
