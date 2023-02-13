@@ -16,7 +16,7 @@
 
 package controllers
 
-import domain.sub09.EmailVerifiedResponse
+import domain.sub09.{EmailUnverifiedResponse, EmailVerifiedResponse}
 import models.EORI
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -46,6 +46,18 @@ class SubscriptionControllerSpec extends SpecBase {
       }
     }
 
+    "return 200 status code for unVerified email" in new Setup {
+      val subscriptionResponse: EmailUnverifiedResponse = EmailUnverifiedResponse(None)
+
+      when(mockSubscriptionService.getUnverifiedEmail(is(traderEORI)))
+        .thenReturn(Future.successful(subscriptionResponse))
+
+      running(app) {
+        val result = route(app, unVerifiedEmailRequest).value
+        status(result) mustBe OK
+      }
+    }
+
     "return 503 for any error" in new Setup {
       when(mockSubscriptionService.getVerifiedEmail(is(traderEORI)))
         .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
@@ -62,6 +74,7 @@ class SubscriptionControllerSpec extends SpecBase {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
+    val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]

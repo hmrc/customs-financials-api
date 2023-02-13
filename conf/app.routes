@@ -28,6 +28,7 @@ DELETE        /customs-financials-api/eori/:eori/notifications/:fileRole        
 DELETE        /customs-financials-api/eori/:eori/requested-notifications/:fileRole        controllers.SDESNotificationsController.deleteRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
 
 GET           /customs-financials-api/subscriptions/subscriptionsdisplay                  controllers.SubscriptionController.getVerifiedEmail()
+GET           /customs-financials-api/subscriptions/unverified-email-display              controllers.SubscriptionController.getUnverifiedEmail()
 GET           /api/conf/1.0/*file                                                         controllers.Assets.at(path="/public/api/conf/1.0", file)
 
 POST          /customs-financials-api/get-claims                                          controllers.TPIClaimsController.getReimbursementClaims()
