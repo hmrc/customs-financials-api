@@ -17,7 +17,7 @@
 package services
 
 import connectors.Sub09Connector
-import domain.sub09.EmailVerifiedResponse
+import domain.sub09.{EmailUnverifiedResponse, EmailVerifiedResponse}
 import models.EORI
 
 import javax.inject.{Inject, Singleton}
@@ -32,6 +32,16 @@ class SubscriptionService @Inject()(sub09Connector: Sub09Connector)(implicit ec:
         subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
           case Some(ci) if ci.emailVerificationTimestamp.isDefined => EmailVerifiedResponse(ci.emailAddress)
           case _ => EmailVerifiedResponse(None)
+        }
+      }
+  }
+
+  def getUnverifiedEmail(eori: EORI): Future[EmailUnverifiedResponse] = {
+    for (subscription <- sub09Connector.getSubscriptions(eori))
+      yield {
+        subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
+          case Some(ci) if ci.emailVerificationTimestamp.isEmpty => EmailUnverifiedResponse(ci.emailAddress)
+          case _ => EmailUnverifiedResponse(None)
         }
       }
   }

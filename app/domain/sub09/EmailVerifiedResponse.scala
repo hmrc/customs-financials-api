@@ -24,3 +24,9 @@ case class EmailVerifiedResponse(verifiedEmail: Option[EmailAddress])
 object EmailVerifiedResponse {
   implicit val format = Json.format[EmailVerifiedResponse]
 }
+
+case class EmailUnverifiedResponse(unVerifiedEmail: Option[EmailAddress])
+
+object EmailUnverifiedResponse {
+  implicit val format = Json.format[EmailUnverifiedResponse]
+}
