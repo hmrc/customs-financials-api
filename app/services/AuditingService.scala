@@ -58,7 +58,6 @@ class AuditingService @Inject()(appConfig: AppConfig,
   val DOWNLOAD_STANDING_AUTHORITIES_NAME = "Download Standing Authorities CSV"
   val DOWNLOAD_STANDING_AUTHORITIES_TYPE = "DownloadStandingAuthoritiesCSV"
 
-  implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
   val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold("-")(_._2)
 
   def auditEditAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit hc: HeaderCarrier): Future[AuditResult] = {
