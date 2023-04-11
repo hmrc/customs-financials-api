@@ -3,9 +3,12 @@ import play.sbt.PlayImport.ws
 import sbt._
 
 object AppDependencies {
+
+  val bootstrapVersion = "7.15.0"
+
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.15.0",
+    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "0.71.0"
   )
 
@@ -15,6 +18,7 @@ object AppDependencies {
     "org.pegdown" % "pegdown" % "1.6.0" % "test, it",
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
     "org.mockito" %% "mockito-scala-scalatest" % "1.16.37" % "test",
-    "com.vladsch.flexmark" % "flexmark-all" % "0.36.8"
+    "com.vladsch.flexmark" % "flexmark-all" % "0.36.8" % "test",
+    "uk.gov.hmrc" %% "bootstrap-test-play-28" % bootstrapVersion % "test"
   )
 }

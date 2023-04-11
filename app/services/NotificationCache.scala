@@ -28,9 +28,12 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+
+import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class DefaultNotificationCache @Inject()(
   mongoComponent: MongoComponent,
   appConfig: AppConfig
