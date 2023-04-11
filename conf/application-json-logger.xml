@@ -2,7 +2,6 @@
 <configuration>
 
     <logger name="uk.gov" level="WARN"/>
-
     <logger name="services" level="${logger.services:-INFO}"/>
     <logger name="controllers" level="${logger.controllers:-INFO}"/>
     
