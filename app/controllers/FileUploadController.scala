@@ -18,7 +18,7 @@ package controllers
 
 import javax.inject.Inject
 import models.dec64.FileUploadRequest
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.dec64.FileUploadCache
 import uk.gov.hmrc.mongo.play.json.Codecs.logger

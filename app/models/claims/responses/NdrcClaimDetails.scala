@@ -16,8 +16,7 @@
 
 package models.claims.responses
 
-import domain.tpi01.NDRCCaseDetails
-import domain.tpi02.ndrc.{NDRCCase, NDRCDetail}
+import domain.tpi02.ndrc.NDRCCase
 import play.api.libs.json.{Json, OFormat}
 
 case class NdrcClaimDetails(

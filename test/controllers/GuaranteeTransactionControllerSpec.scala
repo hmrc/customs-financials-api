@@ -45,13 +45,15 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   }
 
   "return an error when no gan found in request" in new Setup {
-    val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST", controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
+    val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST",
+      controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
+
       .withJsonBody(Json.parse("""{"invalid":"invalid"}"""))
 
     running(app) {
       val result = route(app, request).value
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),WrappedArray()))))"
+      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
@@ -142,7 +144,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
     running(app) {
       val result = route(app, request).value
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),WrappedArray()))))"
+      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 

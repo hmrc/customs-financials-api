@@ -17,8 +17,6 @@
 package services
 
 import connectors.{Tpi01Connector, Tpi02Connector}
-import domain._
-import domain.tpi01.ResponseDetail
 
 import javax.inject.{Inject, Singleton}
 import models.EORI

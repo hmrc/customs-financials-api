@@ -23,13 +23,13 @@ import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
 import play.api.http.HeaderNames
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import javax.inject.{Inject, Singleton}
 import models.dec64.FileUploadDetail
 import scala.concurrent.{ExecutionContext, Future}
