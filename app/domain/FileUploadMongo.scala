@@ -19,13 +19,11 @@ package domain
 import java.time.LocalDateTime
 
 import models.dec64.{Dec64SubmissionPayload, FileUploadDetail}
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.api.libs.json.{Json, OFormat}
 
 case class FileUploadMongo(_id: String, processing: Boolean, receivedAt: LocalDateTime, fileUploadDetail: FileUploadDetail, failedSubmission: Int = 0)
 
 object FileUploadMongo {
-  implicit val timeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
   implicit val format: OFormat[FileUploadMongo] = Json.format[FileUploadMongo]
   implicit val documentFormat: OFormat[Dec64SubmissionPayload] = Json.format[Dec64SubmissionPayload]
 }
