@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import com.mongodb.client.model.Updates
 import config.AppConfig
 import domain.FileUploadMongo
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.dec64.{FileUploadRequest, UploadedFile}
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
@@ -34,6 +34,7 @@ import utils.RandomUUIDGenerator
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
+@Singleton
 class DefaultFileUploadCache @Inject()(
                                         mongoComponent: MongoComponent,
                                         dateTimeService: DateTimeService,

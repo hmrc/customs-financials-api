@@ -16,12 +16,9 @@
 
 package controllers
 
-import models.claims.responses.{ClaimsResponse, SpecificClaimResponse}
-
 import javax.inject.Inject
 import models.requests.{ReimbursementClaimsRequest, SpecificClaimRequest}
 import play.api.Logger
-import play.api.i18n.Lang.logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.TPIClaimsService
