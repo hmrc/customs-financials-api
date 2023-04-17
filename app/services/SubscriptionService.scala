@@ -36,6 +36,16 @@ class SubscriptionService @Inject()(sub09Connector: Sub09Connector)(implicit ec:
       }
   }
 
+  def getEmailAddress(eori: EORI): Future[EmailVerifiedResponse] = {
+    for (subscription <- sub09Connector.getSubscriptions(eori))
+      yield {
+        subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
+          case Some(ci) if ci.emailAddress.isDefined => EmailVerifiedResponse(ci.emailAddress)
+          case _ => EmailVerifiedResponse(None)
+        }
+      }
+  }
+
   def getUnverifiedEmail(eori: EORI): Future[EmailUnverifiedResponse] = {
     for (subscription <- sub09Connector.getSubscriptions(eori))
       yield {

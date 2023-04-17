@@ -43,6 +43,17 @@ class SubscriptionController @Inject()(service: SubscriptionService,
       }
   }
 
+  def getEmail: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
+
+    service.getEmailAddress(request.eori)
+      .map(response => Ok(Json.toJson(response)))
+      .recover {
+        case NonFatal(error) =>
+          log.error(s"getSubscriptions failed: ${error.getMessage}")
+          ServiceUnavailable
+      }
+  }
+
   def getUnverifiedEmail: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
     service.getUnverifiedEmail(request.eori)
       .map(response => Ok(Json.toJson(response)))

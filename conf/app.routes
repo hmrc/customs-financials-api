@@ -29,6 +29,7 @@ DELETE        /customs-financials-api/eori/:eori/requested-notifications/:fileRo
 
 GET           /customs-financials-api/subscriptions/subscriptionsdisplay                  controllers.SubscriptionController.getVerifiedEmail()
 GET           /customs-financials-api/subscriptions/unverified-email-display              controllers.SubscriptionController.getUnverifiedEmail()
+GET           /customs-financials-api/subscriptions/email-display                         controllers.SubscriptionController.getEmail()
 GET           /api/conf/1.0/*file                                                         controllers.Assets.at(path="/public/api/conf/1.0", file)
 
 POST          /customs-financials-api/get-claims                                          controllers.TPIClaimsController.getReimbursementClaims()
