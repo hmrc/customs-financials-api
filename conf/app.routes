@@ -10,7 +10,7 @@ POST          /customs-financials-api/account/guarantee/open-transactions-detail
 POST          /customs-financials-api/account/cash/transactions                           controllers.CashTransactionsController.getSummary()
 POST          /customs-financials-api/account/cash/transactions-detail                    controllers.CashTransactionsController.getDetail()
 
-GET           /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.get()
+GET           /customs-financials-api/:eori/account-authorities                           controllers.AccountAuthoritiesController.get(eori: models.EORI)
 POST          /customs-financials-api/account-authorities/grant                           controllers.AccountAuthoritiesController.grant()
 POST          /customs-financials-api/account-authorities/revoke                          controllers.AccountAuthoritiesController.revoke()
 
