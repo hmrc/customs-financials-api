@@ -232,7 +232,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   trait Setup {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
-    val getRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get().url)
+    val getRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
 
     def grantRequest(request: GrantAuthorityRequest): FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant().url)
