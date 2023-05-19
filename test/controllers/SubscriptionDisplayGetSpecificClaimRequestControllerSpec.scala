@@ -33,7 +33,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
 
   "SubsciptopRequestController.get" should {
     "validate the EORI and return 200 status code" in new Setup {
-      val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+      val responseCommon: ResponseCommon = ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
       val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
       val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
         cdsEstablishmentAddress, None, None, None,
