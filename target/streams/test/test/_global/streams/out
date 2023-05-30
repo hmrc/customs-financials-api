@@ -1,0 +1,512 @@
+[0m[[0m[0mdebug[0m] [0m[0mjavaOptions: Vector()[0m
+[0m[[0m[0mdebug[0m] [0m[0mForking tests - parallelism = false[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreate a single-thread test executor[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunner for org.scalatest.tools.Framework produced 49 initial tasks for 49 tests.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.EORIHistoryGetSpecificClaimRequestControllerSpec, sbt.ForkMain$SubclassFingerscan@23f7d05d, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mEORIHistoryGetSpecificClaimRequestControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mEORIHistoryRequestController.get[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should validate the EORI and return 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 404 for invalid EORI[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.RequestToDec64PayloadSpec, sbt.ForkMain$SubclassFingerscan@1e730495, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mRequestToDec64PayloadSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mRequestToDec64Payload[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling map[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return submissionPayloadResponse[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.SDESNotificationsControllerSpec, sbt.ForkMain$SubclassFingerscan@7d3a22a9, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSDESNotificationsControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetNotifications[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return no notifications from a mongo when there isn't any[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return seq of notifications from a mongo when there are some[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an error when different EORINumber found in auth record[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mdeleteNonRequestedNotifications[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delete notifications successfully[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an error when different EORINumber found in auth record[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mdeleteRequestedNotifications[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delete notifications successfully[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an error when different EORINumber found in auth record[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 7 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.HistoricDocumentGetSpecificClaimRequestControllerSpec, sbt.ForkMain$SubclassFingerscan@1d082e88, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHistoricDocumentGetSpecificClaimRequestControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHistoricDocumentRequestController.makeRequest[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should delegate to the service and return 204 (no content)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when successfully sent the request for C79Certificate[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when successfully sent the multiple requests when historic eoris found[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when successfully sent the request for DutyDefermentStatement[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should return 503 (service unavailable)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when historic document request fails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when historic document request fails for one of the historic eoris[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.CustomsAccountsControllerSpec, sbt.ForkMain$SubclassFingerscan@60704c, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCustomsAccountsControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mget customs accounts[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return success response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should return bad request error[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when request bad request if EORINo not present[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.EmailThrottlerConnectorSpec, sbt.ForkMain$SubclassFingerscan@6b19b79, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mEmailThrottlerConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return true when the api responds with 202[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return false when the api responds with a successful response that isn't 204[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return false when the api fails[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.HistoricDocumentServiceSpec, sbt.ForkMain$SubclassFingerscan@2a32de6c, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHistoricDocumentServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mHistoricDocumentService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling ACC24 (request historic documents)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when true[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when false[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.SubscriptionServiceSpec, sbt.ForkMain$SubclassFingerscan@7692d9cc, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSubscriptionServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSubscriptionService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling Sub09 get subscriptions[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should get SubscriptionDisplayResponse[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.definition.DocumentationControllerSpec, sbt.ForkMain$SubclassFingerscan@75f32542, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDocumentationControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDocumentController[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return controllers.definition view[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc24ConnectorSpec, sbt.ForkMain$SubclassFingerscan@7f1302d6, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc24ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32msendHistoricDocumentRequest[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return true when a successful request has been made[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false if any other 2xx status code is returned[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false if an exception from Acc24 is returned[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.CashTransactionsServiceSpec, sbt.ForkMain$SubclassFingerscan@43ee72e6, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCashTransactionsServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveCashTransactionsSummary[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Left with an error if the api request failed[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Right with the Cash transactions on a successful response from the API[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveCashTransactionsDetail[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Left with an error if the api request failed[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Right with the Cash transactions on a successful response from the API[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 4 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.SchedulerSpec, sbt.ForkMain$SubclassFingerscan@23529fee, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSchedulerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mScheduler[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should schedule file upload submissions[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Tpi01ConnectorSpec, sbt.ForkMain$SubclassFingerscan@4fe767f3, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTpi01ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrievePostClearanceCases[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return cases on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.FileUploadServiceSpec, sbt.ForkMain$SubclassFingerscan@2805c96b, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should submit uploaded files to dec64 should return true when successful[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc29ConnectorSpec, sbt.ForkMain$SubclassFingerscan@184cf7cf, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc29ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetStandingAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a list of authorities on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Sub09ConnectorSpec, sbt.ForkMain$SubclassFingerscan@2fd6b6c7, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSub09ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetSubscriptions[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a json on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(domain.EmailGetSpecificClaimRequestSpec, sbt.ForkMain$SubclassFingerscan@5bfa9431, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mEmailGetSpecificClaimRequestSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mEmailTemplate.fromNotification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should construct an email request[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a week 4 duty deferment statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a supplementary duty deferment statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given an excise duty deferment statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a requested duty deferment statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a new C79 certificate notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a requested C79 certificate notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a new security statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a requested import adjustment notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a new postponed VAT statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when given a requested postponed VAT statement notification[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mcreateDutyDefermentDueDate[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should calculate the correct payment due date[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when statement type is Excise, due date is 29th of the current month[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when statement type is Excise, due date is 28th of the current month in February of a non-leap-year[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when statement type is not Excise, due date is 15th of the following month[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when statement type is not Excise, due date is 15th of January next year, when current month is December[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 14 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.TPIClaimsServiceSpec, sbt.ForkMain$SubclassFingerscan@5db250b4, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTPIClaimsServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTPIClaimsService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling get Claims[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Open and SCTY claim status Open[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Open-Analysis and SCTY claim status Pending-Approval[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-Approval and SCTY claim status Pending-Payment[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-Queried and SCTY claim status Partial Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-Withdrawn and SCTY claim status Resolved-Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Rejected-Failed Validation and SCTY claim status Pending-Query[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-Rejected and SCTY claim status Resolved-Manual BTA[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Open-Rework and SCTY claim status Pending-C18[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Paused and SCTY claim status Closed-C18 Raised[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-No Reply and SCTY claim status RTBH Letter Initiated[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-Refused and SCTY claim status Awaiting RTBH Letter Response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending Payment Confirmation and SCTY claim status Reminder Letter Initiated[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-Approved and SCTY claim status Awaiting Reminder Letter Response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Resolved-Partial Refused and SCTY claim status Decision Letter Initiated[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending Decision Letter and SCTY claim status Partial BTA[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Approved and SCTY claim status Partial BTA/Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Analysis-Rework and SCTY claim status Resolved-Auto BTA[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Rework-Payment Details and SCTY claim status Resolved-Manual BTA/Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-RTBH and SCTY claim status Open-Extension Granted[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status RTBH Sent and SCTY claim status Resolved-Withdrawn[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Reply To RTBH and SCTY claim status Pending-Approval[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-Compliance Recommendation and SCTY claim status Pending-Payment[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-Compliance Check Query and SCTY claim status Partial Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns CDFPayCaseDetail with NDRC claim status Pending-Compliance Check and SCTY claim status Resolved-Refund[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling get Specific Claims[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns NDRC CDFPayCase[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should successfully returns SCTY CDFPayCase[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return None if no declarationId present[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 27 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.metadata.MetadataControllerSpec, sbt.ForkMain$SubclassFingerscan@223f3642, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mMetadataControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32maddNotifications[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when 4th week duty deferment statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when requested duty deferment statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when requested Standing Authority is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when supplementary duty deferment statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when excise duty deferment statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when C79 Certificate is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when historic C79 Certificate is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when Security statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when requested Security statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when PVAT statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send email when a requested PVAT statement is available[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return BadRequest when request doesn't contain a seq of notifications json[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return BadRequest when request contains an invalid notification in the json[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 14 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.FileUploadJobHandlerSpec, sbt.ForkMain$SubclassFingerscan@38c5cc4c, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadJobHandlerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadJobHandlerSpec[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should process job[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should fetch job from FileUploadJob[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should submit file upload to DEC64[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should delete completed job if submission was successful[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should deleteJob not completed when fail count threshold not exceeded[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should housekeeping [0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc30ConnectorSpec, sbt.ForkMain$SubclassFingerscan@37918c79, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc30ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgrantAccountAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return true when the api responds with 204[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when the api responds with a successful response that isn't 204[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when the api fails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mrevokeAccountAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return true when the api responds with 204[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when the api responds with a successful response that isn't 204[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when the api fails[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 6 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.MetricsReporterServiceSpec, sbt.ForkMain$SubclassFingerscan@78e94dcf, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mMetricsReporterServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mMetricsReporterService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should withResponseTimeLogging[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log successful call metrics[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log default error during call metrics[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log not found call metrics[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log bad request error call metrics[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log 5xx error call metrics[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should log 4xx error call metrics[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 6 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.CashTransactionsControllerSpec, sbt.ForkMain$SubclassFingerscan@233fe9b6, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCashTransactionsControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCashTransactionControllerSpec.getSummary[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delegate to the service and return a list of cash daily statements with a 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return not found with no associated data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCashTransactionControllerSpec.getDetail[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delegate to the service and return a list of cash daily statements with a 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should retrieve cash transactions call fails with no associated data error[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should retrieve cash transactions call fails with exceeded threshold error[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc41ConnectorSpec, sbt.ForkMain$SubclassFingerscan@358ee631, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc41ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32minitiateAuthoritiesCSV[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Left Acc41ErrorResponse when request returns error message[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.GuaranteeTransactionsServiceSpec, sbt.ForkMain$SubclassFingerscan@ec756bd, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mGuaranteeTransactionsServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveGuaranteeTransactionsSummary[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return domain summary for a successful acc28 response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveGuaranteeTransactionsDetail[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return domain detail for a successful acc28 response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.AccountAuthoritiesControllerSpec, sbt.ForkMain$SubclassFingerscan@3c72f59f, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthoritiesControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthoritiesController.get[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delegate to the service and return a list of account authorities with a 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an error when no EORINumber found in auth record[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should return 503 (service unavailable)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when get account authorities call fails with BadRequestException (4xx) [0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when get account authorities call fails with InternalServerException (5xx) [0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should return 500 (InternalServerError)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when get account authorities call fails with InternalServerException (5xx) [0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthoritiesController.grant[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request is valid and API call is successful[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should delegate to the service and return a 204 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request is valid but API call fails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 500[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request JSON is invalid[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 400[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when no EORINumber found in auth record[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 403[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthoritiesController.revoke[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request is valid and API call is successful[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m    should delegate to the service and return a 204 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m    - when revoking for a cash account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m    - when revoking for a guarantee account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m    - when revoking for a deferment account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request is valid but API call fails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 500[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when request JSON is invalid[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 400[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when no EORINumber found in auth record[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 403[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 15 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(domain.NotificationSpec, sbt.ForkMain$SubclassFingerscan@60dcc9fe, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mNotificationSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mNotificationReads[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should parse message correctly[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should extract the EORI from a compound EORI-DAN style identifier[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.DataStoreConnectorSpec, sbt.ForkMain$SubclassFingerscan@222114ba, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDataStoreConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetVerifiedEmail[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the email from the data-store response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return None when an unknown exception happens from the data-store[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetEoriHistory[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return EORIHistory on a successful response from the data-store[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an empty sequence if an exception was thrown from the data-store[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 4 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.NotificationCacheSpec, sbt.ForkMain$SubclassFingerscan@16e7dcfd, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mNotificationCacheSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mNotificationCache[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should put and get notifications from mongo db[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should get statement request notifications which are not expired from mongo db[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delete non-requested C79Certificate by fileRole[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delete requested C79Certificate by fileRole[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 4 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.DutyDefermentContactDetailsSpec, sbt.ForkMain$SubclassFingerscan@3d121db3, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDutyDefermentContactDetailsSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDutyDefermentController.get[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delegate to the service and return contact details with a 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDutyDefermentController.updateContactDetails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw an exception when update account contact details fails with a fatal error[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should return 503[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when update account contact details fails with BadRequestException (4xx)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - when update account contact details fails with InternalServerException (5xx) [0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return success when update account contact details with a 200 status code[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.AccountAuthorityServiceSpec, sbt.ForkMain$SubclassFingerscan@3b07a0d6, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthorityServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountAuthorityService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling ACC29 (get account authorities)[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should get a list of accounts with authorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling ACC30 grantAccountAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when true[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when false[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  when calling ACC30 revokeAccountAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when true[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should propagate the connector's result when false[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.TPIClaimsControllerSpec, sbt.ForkMain$SubclassFingerscan@11a9e7c8, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTPIClaimsControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetReimbursementClaims[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 status[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 with no associated data found[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 500 for no response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 503 for any error[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetSpecificClaim[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 with cdfPayCase when claim found [0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 204 status when no claims found[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 503 for any error[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 7 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Tpi02ConnectorSpec, sbt.ForkMain$SubclassFingerscan@3901d134, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTpi02ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveSpecificClaim[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return specific claim on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.FileUploadCacheSpec, sbt.ForkMain$SubclassFingerscan@14d3bc22, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadCacheSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadCache[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should enqueue file upload to mongo db returns true[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should enqueue file upload & return next file upload job[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delete file upload from cache should return true[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should send all file uploads with processing set to false[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 4 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc38ConnectorSpec, sbt.ForkMain$SubclassFingerscan@12d4bf7e, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc38ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetAccountContactDetails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an acc37 response on a successful api call[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc40ConnectorSpec, sbt.ForkMain$SubclassFingerscan@4c1d9d4b, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc40ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32msearchAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Left no authorities when no authorities returned in the response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Left with error response if the error message present in the response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return Right if a valid response with authorities returned[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  should search type value[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 0 for EORI searchID[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m  - should return 1 for account number searchID[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 5 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc27ConnectorSpec, sbt.ForkMain$SubclassFingerscan@7b227d8d, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc27ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetAccounts[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a json on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.FileUploadControllerSpec, sbt.ForkMain$SubclassFingerscan@7219ec67, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mFileUploadControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32menqueueUploadedFiles[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 204 status when file upload successful[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 400 for bad request error[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.AccountContactDetailsServiceSpec, sbt.ForkMain$SubclassFingerscan@45018215, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAccountContactDetailsServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetAccountContactDetails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the response from the connector[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mupdateAccountContactDetails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the response from the connector[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc31ConnectorSpec, sbt.ForkMain$SubclassFingerscan@65d6b83b, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc31ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveCashTransactions[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a list of declarations on a successful response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return NoAssociatedData error response when responded with no associated data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return ExceededThreshold error response when responded with exceeded threshold[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.SubscriptionControllerSpec, sbt.ForkMain$SubclassFingerscan@d706f19, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSubscriptionControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSubscriptionController.get[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 status code for unVerified email[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 503 for any error[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc28ConnectorSpec, sbt.ForkMain$SubclassFingerscan@30b7c004, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc28ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mretrieveGuaranteeTransactions[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a list of declarations on a successful response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return NoAssociatedData error response when responded with no associated data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return ExceededThreshold error response when responded with exceeded threshold[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(services.AuditingServiceSpec, sbt.ForkMain$SubclassFingerscan@79efed2d, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAuditingServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAuditingService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit the ACC30 grant authority request data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit the ACC30 edit authority request data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit the ACC30 revoke authority request data cash account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit the ACC30 revoke authority request data duty deferment account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit the ACC30 revoke authority request data guarantee account[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit requested Duty Deferment statements[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit requested Security statements[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit requested C79 statements[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should audit file upload request to Dec64[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should not throw an exception when failing to audit the events[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw an exception when send fails to connect[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should Audit the ACC41 audit Display Auth CSV Statement Request[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should Audit the ACC41 audit Request Auth CSV Statement Request[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 13 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Dec64ConnectorSpec, sbt.ForkMain$SubclassFingerscan@2928854b, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDec64ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32msubmitFileUpload[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return true on a successful file upload DEC64 POST[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when fails file upload DEC64 POST[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return false when exception thrown for file upload DEC64 POST[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Sub21ConnectorSpec, sbt.ForkMain$SubclassFingerscan@27ae2fd0, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSub21ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mgetEoriHistory[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return a json on a successful response[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(connectors.Acc37ConnectorSpec, sbt.ForkMain$SubclassFingerscan@29176cc1, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAcc37ConnectorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mupdateAccountContactDetails[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return an acc37 response on a successful api call[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 1 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.GuaranteeTransactionControllerSpec, sbt.ForkMain$SubclassFingerscan@2f177a4b, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mGuaranteeTransactionControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mGuaranteeTransactionsController[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should delegate to the service and return a list of open guarantee transactions with a 200 status code[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return an error when no gan found in request[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mreturn 413[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- when the requested dates request too much data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mreturn NOT_FOUND[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- when the requested dates returns no content[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return a list of open guarantee transactions details[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return 413 when the date range selected requests too much data[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return NOT_FOUND when the date range selected returns no content[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- return an error from retrieveOpenGuaranteeTransactionsDetail when no gan found in request[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 8 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.SearchAuthoritiesControllerSpec, sbt.ForkMain$SubclassFingerscan@4278a03f, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mSearchAuthoritiesControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32msearchAuthorities[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return NO_CONTENT if no authorities returned[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return INTERNAL_SERVER_ERROR if an error response returns from the connector[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return OK with authorities if authorities returns from the connector[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 3 events.[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Running TaskDef(controllers.AuthoritiesCsvGenerationControllerSpec, sbt.ForkMain$SubclassFingerscan@147ed70f, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAuthoritiesCsvGenerationControllerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32minitiateAuthoritiesCsvGeneration[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return INTERNAL_SERVER_ERROR when request returned error response[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return 200 with requestAcceptedDate request successful[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Produced 0 nested tasks and 2 events.[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mRun completed in 39 seconds, 657 milliseconds.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTotal number of tests run: 215[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mSuites: completed 49, aborted 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTests: succeeded 215, failed 0, canceled 0, ignored 0, pending 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAll tests passed.[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.EORIHistoryGetSpecificClaimRequestControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.RequestToDec64PayloadSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.SDESNotificationsControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.HistoricDocumentGetSpecificClaimRequestControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.CustomsAccountsControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.EmailThrottlerConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.HistoricDocumentServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.SubscriptionServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.definition.DocumentationControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc24ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.CashTransactionsServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.SchedulerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Tpi01ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.FileUploadServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc29ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Sub09ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	domain.EmailGetSpecificClaimRequestSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.TPIClaimsServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.metadata.MetadataControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.FileUploadJobHandlerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc30ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.MetricsReporterServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.CashTransactionsControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc41ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.GuaranteeTransactionsServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.AccountAuthoritiesControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	domain.NotificationSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.DataStoreConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.NotificationCacheSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.DutyDefermentContactDetailsSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.AccountAuthorityServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.TPIClaimsControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Tpi02ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.FileUploadCacheSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc38ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc40ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc27ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.FileUploadControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.AccountContactDetailsServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc31ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.SubscriptionControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc28ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	services.AuditingServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Dec64ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Sub21ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	connectors.Acc37ConnectorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.GuaranteeTransactionControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.SearchAuthoritiesControllerSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	controllers.AuthoritiesCsvGenerationControllerSpec[0m

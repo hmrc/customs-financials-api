@@ -1,0 +1,38 @@
+# microservice specific routes
+
+POST          /customs-financials-api/eori/accounts                                       controllers.CustomsAccountsController.getCustomsAccountsDod09()
+
+POST          /customs-financials-api/historic-document-request                           controllers.HistoricDocumentRequestController.makeRequest()
+
+POST          /customs-financials-api/account/guarantee/open-transactions                 controllers.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary()
+POST          /customs-financials-api/account/guarantee/open-transactions-detail          controllers.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail()
+
+POST          /customs-financials-api/account/cash/transactions                           controllers.CashTransactionsController.getSummary()
+POST          /customs-financials-api/account/cash/transactions-detail                    controllers.CashTransactionsController.getDetail()
+
+GET           /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.get()
+POST          /customs-financials-api/:eori/account-authorities/grant                     controllers.AccountAuthoritiesController.grant(eori: models.EORI)
+POST          /customs-financials-api/:eori/account-authorities/revoke                    controllers.AccountAuthoritiesController.revoke(eori: models.EORI)
+
+POST          /customs-financials-api/duty-deferment/update-contact-details               controllers.DutyDefermentContactDetailsController.updateContactDetails()
+POST          /customs-financials-api/duty-deferment/contact-details                      controllers.DutyDefermentContactDetailsController.getContactDetails()
+
+GET           /customs-financials-api/eori/:eori/validate                                 controllers.EORIHistoryRequestController.validateEORI(eori: models.EORI)
+
+POST          /customs-financials-api/search-authorities                                  controllers.SearchAuthoritiesController.searchAuthorities()
+
+POST          /customs-financials-api/standing-authorities-file                           controllers.AuthoritiesCsvGenerationController.initiateAuthoritiesCsvGeneration()
+
+GET           /customs-financials-api/eori/:eori/notifications                            controllers.SDESNotificationsController.getNotifications(eori: models.EORI)
+DELETE        /customs-financials-api/eori/:eori/notifications/:fileRole                  controllers.SDESNotificationsController.deleteNonRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
+DELETE        /customs-financials-api/eori/:eori/requested-notifications/:fileRole        controllers.SDESNotificationsController.deleteRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
+
+GET           /customs-financials-api/subscriptions/subscriptionsdisplay                  controllers.SubscriptionController.getVerifiedEmail()
+GET           /customs-financials-api/subscriptions/unverified-email-display              controllers.SubscriptionController.getUnverifiedEmail()
+GET           /customs-financials-api/subscriptions/email-display                         controllers.SubscriptionController.getEmail()
+GET           /api/conf/1.0/*file                                                         controllers.Assets.at(path="/public/api/conf/1.0", file)
+
+POST          /customs-financials-api/get-claims                                          controllers.TPIClaimsController.getReimbursementClaims()
+POST          /customs-financials-api/get-specific-claim                                  controllers.TPIClaimsController.getSpecificClaim()
+
+POST          /customs-financials-api/submit-file-upload                                  controllers.FileUploadController.enqueueUploadedFiles()

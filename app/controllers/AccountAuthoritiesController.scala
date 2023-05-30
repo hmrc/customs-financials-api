@@ -18,6 +18,7 @@ package controllers
 
 
 import domain.AccountWithAuthorities
+import models.EORI
 import models.requests.manageAuthorities.{GrantAuthorityRequest, RevokeAuthorityRequest}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
@@ -25,8 +26,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.AccountAuthorityService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
-import models.EORI
-
+import scala.collection.Seq
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -36,8 +36,8 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
 
   val log: Logger = Logger(this.getClass)
 
-  def get: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
-    service.getAccountAuthorities(request.eori)
+  def get(eori: EORI): Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
+    service.getAccountAuthorities(eori)
       .map { accountWithAuthorities: Seq[AccountWithAuthorities] =>
         Ok(Json.toJson(accountWithAuthorities))
       }

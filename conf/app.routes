@@ -10,14 +10,14 @@ POST          /customs-financials-api/account/guarantee/open-transactions-detail
 POST          /customs-financials-api/account/cash/transactions                           controllers.CashTransactionsController.getSummary()
 POST          /customs-financials-api/account/cash/transactions-detail                    controllers.CashTransactionsController.getDetail()
 
-GET           /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.get()
+GET           /customs-financials-api/:eori/account-authorities                           controllers.AccountAuthoritiesController.get(eori: models.EORI)
 POST          /customs-financials-api/:eori/account-authorities/grant                     controllers.AccountAuthoritiesController.grant(eori: models.EORI)
 POST          /customs-financials-api/:eori/account-authorities/revoke                    controllers.AccountAuthoritiesController.revoke(eori: models.EORI)
 
 POST          /customs-financials-api/duty-deferment/update-contact-details               controllers.DutyDefermentContactDetailsController.updateContactDetails()
 POST          /customs-financials-api/duty-deferment/contact-details                      controllers.DutyDefermentContactDetailsController.getContactDetails()
 
-GET           /customs-financials-api/eori/:eori/validate                                 controllers.EORIHistoryRequestController.validateEORI(eori: models.EORI)
+GET           /customs-financials-api/eori/:eori/validate                                 controllers.SubscriptionDisplayRequestController.validateEORI(eori: models.EORI)
 
 POST          /customs-financials-api/search-authorities                                  controllers.SearchAuthoritiesController.searchAuthorities()
 

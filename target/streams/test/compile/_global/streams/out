@@ -1,0 +1,10 @@
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/connectors/Dec64ConnectorSpec.scala:46:39: method apply in object HttpResponse is deprecated (since 11.0.0): Use alternative HttpResponse.apply functions instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m        .thenReturn(Future.successful(HttpResponse(BAD_REQUEST)))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/connectors/Sub21ConnectorSpec.scala:49:95: method copyArrayToImmutableIndexedSeq in class LowPriorityImplicits2 is deprecated (since 2.13.0): Implicit conversions from Array to immutable.IndexedSeq are implemented by copying; Use the more efficient non-copying ArraySeq.unsafeWrapArray or an explicit toIndexedSeq call[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/controllers/EORIHistoryGetSpecificClaimRequestControllerSpec.scala:38:97: method copyArrayToImmutableIndexedSeq in class LowPriorityImplicits2 is deprecated (since 2.13.0): Implicit conversions from Array to immutable.IndexedSeq are implemented by copying; Use the more efficient non-copying ArraySeq.unsafeWrapArray or an explicit toIndexedSeq call[0m
+[0m[[0m[33mwarn[0m] [0m[0m      val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                                ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthree warnings found[0m

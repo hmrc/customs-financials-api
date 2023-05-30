@@ -49,7 +49,7 @@ class FileUploadCacheSpec extends SpecBase {
           nextJob <- cache.nextJob
         } yield {
           enqueueJob mustBe true
-          nextJob.get.fileUploadDetail mustBe fileUploadDetail
+          nextJob.getOrElse(fail("Expected nextJob to be Some, but it was None")).fileUploadDetail mustBe fileUploadDetail
         })
       }
     }
