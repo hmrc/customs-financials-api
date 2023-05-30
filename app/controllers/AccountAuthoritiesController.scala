@@ -16,7 +16,6 @@
 
 package controllers
 
-
 import domain.AccountWithAuthorities
 import models.EORI
 import models.requests.manageAuthorities.{GrantAuthorityRequest, RevokeAuthorityRequest}
@@ -52,18 +51,18 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
       }
   }
 
-  def grant: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-      service.grantAccountAuthorities(grantAuthorityRequest, request.eori).map {
+      service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
         case true => NoContent
         case false => InternalServerError
       }
     }
   }
 
-  def revoke: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-      service.revokeAccountAuthorities(revokeAuthorityRequest, request.eori).map {
+      service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
         case true => NoContent
         case false => InternalServerError
       }
