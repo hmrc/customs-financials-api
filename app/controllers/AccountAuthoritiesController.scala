@@ -24,8 +24,9 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.AccountAuthorityService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
 import javax.inject.Inject
+import models.EORI
+
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -50,22 +51,21 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
       }
   }
 
-  def grant: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-      service.grantAccountAuthorities(grantAuthorityRequest, request.eori).map {
+      service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
         case true => NoContent
         case false => InternalServerError
       }
     }
   }
 
-  def revoke: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-      service.revokeAccountAuthorities(revokeAuthorityRequest, request.eori).map {
+      service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
         case true => NoContent
         case false => InternalServerError
       }
     }
   }
-
 }

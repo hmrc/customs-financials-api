@@ -25,7 +25,6 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, inject}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
 
 import scala.concurrent.Future

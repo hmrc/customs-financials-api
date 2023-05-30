@@ -19,11 +19,11 @@ package services
 import domain.FileUploadMongo
 import models.EORI
 import models.dec64._
-import play.api.{Application, inject}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import services.dec64.DefaultFileUploadCache
-import utils.{RandomUUIDGenerator, SpecBase}
+import utils.SpecBase
 import java.time.LocalDateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global

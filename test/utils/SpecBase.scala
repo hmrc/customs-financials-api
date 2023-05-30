@@ -19,7 +19,7 @@ package utils
 import domain.tpi02.Reimbursement
 import domain.tpi02.ndrc._
 import domain.tpi02.scty.{Goods, SCTYCase}
-import models.claims.responses.{NdrcClaimDetails, NdrcClaimItem, SctyClaimDetails, Reimbursement => ReimbursementResponse, Goods => GoodsResponse}
+import models.claims.responses.{NdrcClaimDetails, SctyClaimDetails, Reimbursement => ReimbursementResponse, Goods => GoodsResponse}
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
