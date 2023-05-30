@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+      <head>
+        <title>ScalaTest Suite domain.EmailGetSpecificClaimRequestSpec Results</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="Expires" content="-1"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <link href="css/styles.css" rel="stylesheet"/>
+        
+        <script type="text/javascript">
+        //<![CDATA[
+            function toggleDetails(contentId, linkId) { 
+              var ele = document.getElementById(contentId); 
+              var text = document.getElementById(linkId); 
+              if(ele.style.display == "block") { 
+                ele.style.display = "none"; 
+                text.innerHTML = "(Show Details)"; 
+              } 
+              else { 
+                ele.style.display = "block"; 
+                text.innerHTML = "(Hide Details)";
+              }
+            } 
+            function hideOpenInNewTabIfRequired() { 
+              if (top === self) { document.getElementById('printlink').style.display = 'none'; } 
+            }
+        //]]>
+        </script>
+      </head>
+      <body class="specification">
+        <div id="suite_header_name">EmailGetSpecificClaimRequestSpec</div>
+        <div id="suite_header_statistic_passed">
+          Tests: total 14, succeeded 14, failed 0, canceled 0, ignored 0, pending 0
+        </div>
+        <div id="97f1f801-21f8-4265-a2d0-b929d227c8ee" class="scope" style="margin-left: 0px;">
+      EmailTemplate.fromNotification
+    </div><div id="8033c1b5-3ff2-49b9-8090-3060f73ce76b" class="scope" style="margin-left: 15px;">
+      should construct an email request
+    </div><div id="4988c731-305e-463c-bdde-f821a9660947" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a week 4 duty deferment statement notification</dt>
+      </dl>
+    </div><div id="866670e1-1bab-4444-bb12-00e7b1dd6887" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a supplementary duty deferment statement notification</dt>
+      </dl>
+    </div><div id="8adede5d-9424-44ec-83b7-505dfc9f07f8" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given an excise duty deferment statement notification</dt>
+      </dl>
+    </div><div id="8e8d1a5a-c972-4701-a3df-a1b41c0679b0" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a requested duty deferment statement notification</dt>
+      </dl>
+    </div><div id="0f1d34fd-500d-4357-86a6-b113b2984167" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a new C79 certificate notification</dt>
+      </dl>
+    </div><div id="d2847af6-e486-4d89-a628-f69f712db6b7" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a requested C79 certificate notification</dt>
+      </dl>
+    </div><div id="0df4f8a3-ea16-4302-b393-b1838a49d2ba" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a new security statement notification</dt>
+      </dl>
+    </div><div id="98266d52-2e2d-46c9-9e71-54918b00e086" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a requested import adjustment notification</dt>
+      </dl>
+    </div><div id="e150bcad-dbb1-423c-aa5e-137416b952e0" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a new postponed VAT statement notification</dt>
+      </dl>
+    </div><div id="613dd4fc-41a1-4df5-bbc6-36530b46c9e1" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when given a requested postponed VAT statement notification</dt>
+      </dl>
+    </div><div id="55d6169e-00ea-428f-964f-c6b15c12112e" class="scope" style="margin-left: 0px;">
+      createDutyDefermentDueDate
+    </div><div id="97d4afe7-6fdd-4141-8bd0-e5d222b37e28" class="scope" style="margin-left: 15px;">
+      should calculate the correct payment due date
+    </div><div id="1527e360-0db5-4101-850c-f321118b68bb" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when statement type is Excise, due date is 29th of the current month</dt>
+      </dl>
+    </div><div id="c86003af-159a-4bdd-9954-b95101dfa9e9" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when statement type is Excise, due date is 28th of the current month in February of a non-leap-year</dt>
+      </dl>
+    </div><div id="48157938-50e5-4b75-9edc-a33d91d6a65c" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when statement type is not Excise, due date is 15th of the following month</dt>
+      </dl>
+    </div><div id="2d0842a8-0f87-4291-897e-136652018ceb" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when statement type is not Excise, due date is 15th of January next year, when current month is December</dt>
+      </dl>
+    </div>
+        <table id="suite_footer">
+          <tr id="suite_footer_id">
+            <td id="suite_footer_id_label_passed">Suite ID</td>
+            <td id="suite_footer_id_value" colspan="5">domain.EmailGetSpecificClaimRequestSpec</td>
+          </tr>
+          <tr id="suite_footer_class">
+            <td id="suite_footer_class_label_passed">Class name</td>
+            <td id="suite_footer_class_value" colspan="5">domain.EmailGetSpecificClaimRequestSpec</td>
+          </tr>
+          <tr id="suite_footer_duration">
+            <td id="suite_footer_duration_label_passed">Total duration</td>
+            <td id="suite_footer_duration_value" colspan="2">
+              38 milliseconds
+              </td>
+          </tr>
+        </table>
+           <div id="printlink">(<a href="domain.EmailGetSpecificClaimRequestSpec.html" target="_blank">Open EmailGetSpecificClaimRequestSpec in new tab</a>)</div>
+      </body>
+      <script type="text/javascript">
+        //<![CDATA[
+          hideOpenInNewTabIfRequired();
+        //]]>
+      </script>
+    </html>

@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <title>ScalaTest Results</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="Expires" content="-1"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <link href="css/styles.css" rel="stylesheet"/>
+        
+        <script type="text/javascript" src="js/d3.v2.min.js"></script>
+        <script type="text/javascript" src="js/sorttable.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+            var tagMap = {};     
+            var SUCCEEDED_BIT = 1; 
+            var FAILED_BIT = 2; 
+            var IGNORED_BIT = 4; 
+            var PENDING_BIT = 8;
+            var CANCELED_BIT = 16;
+            function applyFilter() {
+              var mask = 0;
+              if (document.getElementById('succeeded_checkbox').checked) 
+                mask |= SUCCEEDED_BIT;  
+              if (document.getElementById('failed_checkbox').checked) 
+                mask |= FAILED_BIT; 
+              if (document.getElementById('ignored_checkbox').checked) 
+                mask |= IGNORED_BIT; 
+              if (document.getElementById('pending_checkbox').checked) 
+                mask |= PENDING_BIT; 
+              if (document.getElementById('canceled_checkbox').checked)
+                mask |= CANCELED_BIT;
+              for (var key in tagMap) { 
+                if (tagMap.hasOwnProperty(key)) { 
+                  var bitSet = tagMap[key]; 
+                  var element = document.getElementById(key);
+                  if ((bitSet & mask) != 0) 
+                    element.style.display = "table-row"; 
+                  else  
+                    element.style.display = "none";
+                }
+              }
+            }
+            function showDetails(suiteName) {
+              document.getElementById('details_view').innerHTML = "<iframe src='" + suiteName + ".html' width='100%' height='100%'></iframe>";
+            }
+            function resizeDetailsView() {
+              var headerView = document.getElementById('scalatest-header'); 
+              var detailsView = document.getElementById('details_view'); 
+              var summaryView = document.getElementById('summary_view');
+              var left = summaryView.offsetWidth + 30;
+              detailsView.style.left = left + "px"; 
+              detailsView.style.width = (window.innerWidth - left - 30) + "px";
+              detailsView.style.height = (window.innerHeight - headerView.offsetHeight - 20) + "px";
+            }
+        //]]>
+        </script>
+      </head>
+      <body onresize="resizeDetailsView()">
+        <div class="scalatest-report"> 
+          <div id="scalatest-header" class="scalatest-header-passed">
+      <div id="title">
+        ScalaTest Results
+      </div>
+
+      <div id="summary">
+        <p id="duration">Run completed in 42 seconds, 487 milliseconds.</p>
+        <p id="totalTests">Total number of tests run: 215</p>
+        <p id="suiteSummary">Suites: completed 49, aborted 0</p>
+        <p id="testSummary">Tests: succeeded 215, failed 0, canceled 0, ignored 0, pending 0</p>
+      </div>
+    </div>
+          <table id="summary_view">
+            <tr id="summary_view_row_1">
+              <td id="summary_view_row_1_chart">
+                <div id="chart_div"></div>
+              </td>
+              <td id="summary_view_row_1_legend">
+                <table id="summary_view_row_1_legend_table">
+                  <tr id="summary_view_row_1_legend_table_row_succeeded">
+                    <td id="summary_view_row_1_legend_succeeded_label">Succeeded</td>
+                    <td id="summary_view_row_1_legend_succeeded_count">215</td>
+                    <td id="summary_view_row_1_legend_succeeded_percent">(100%)</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_failed">
+                    <td id="summary_view_row_1_legend_failed_label">Failed</td>
+                    <td id="summary_view_row_1_legend_failed_count">0</td>
+                    <td id="summary_view_row_1_legend_failed_percent">(0%)</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_canceled">
+                    <td id="summary_view_row_1_legend_canceled_label">Canceled</td>
+                    <td id="summary_view_row_1_legend_canceled_count">0</td>
+                    <td id="summary_view_row_1_legend_canceled_percent">(0%)</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_ignored">
+                    <td id="summary_view_row_1_legend_ignored_label">Ignored</td>
+                    <td id="summary_view_row_1_legend_ignored_count">0</td>
+                    <td id="summary_view_row_1_legend_ignored_percent">(0%)</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_pending">
+                    <td id="summary_view_row_1_legend_pending_label">Pending</td>
+                    <td id="summary_view_row_1_legend_pending_count">0</td>
+                    <td id="summary_view_row_1_legend_pending_percent">(0%)</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr id="summary_view_row_2">
+              <td id="summary_view_row_2_results" colspan="2">
+                <div id="display-filters">
+      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()"/> <label id="succeeded_checkbox_label" for="passed_checkbox">Succeeded</label>
+      <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()"/> <label id="failed_checkbox_label" for="failed_checkbox">Failed</label>
+      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()"/> <label id="canceled_checkbox_label" for="canceled_checkbox">Canceled</label>
+      <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()"/> <label id="ignored_checkbox_label" for="ignored_checkbox">Ignored</label>
+      <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()"/> <label id="pending_checkbox_label" for="pending_checkbox">Pending</label>
+    </div>
+                <table class="sortable">
+      <tr>
+        <td>Suite</td>
+        <td>Duration (ms.)</td>
+        <td>Succeeded</td>
+        <td>Failed</td>
+        <td>Canceled</td>
+        <td>Ignored</td>
+        <td>Pending</td>
+        <td>Total</td>
+      </tr>
+    <tr id="6287d113-545c-4a17-bf7a-c8b2394e89d7">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc24ConnectorSpec')">Acc24ConnectorSpec</a></td>
+      <td class="duration_passed_all">571</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="d1e29bea-e554-4eac-8344-0d0093a16c27">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc27ConnectorSpec')">Acc27ConnectorSpec</a></td>
+      <td class="duration_passed_all">144</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="0c07fd04-dead-4941-ac6f-06eb6b8770e4">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc28ConnectorSpec')">Acc28ConnectorSpec</a></td>
+      <td class="duration_passed_all">425</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="2825fcbd-6c96-4f5a-8c8d-7e061e0c2547">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc29ConnectorSpec')">Acc29ConnectorSpec</a></td>
+      <td class="duration_passed_all">182</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="1981bae4-3cb2-4d75-92d7-2b94c100e031">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc30ConnectorSpec')">Acc30ConnectorSpec</a></td>
+      <td class="duration_passed_all">944</td>
+      <td class="succeeded">6</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">6</td>
+    </tr><tr id="f16f856a-7857-4b93-be57-91bdbb978977">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc31ConnectorSpec')">Acc31ConnectorSpec</a></td>
+      <td class="duration_passed_all">443</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="6edc3dc8-53ff-4abf-90bf-fd8ff85d27b6">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc37ConnectorSpec')">Acc37ConnectorSpec</a></td>
+      <td class="duration_passed_all">180</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="b1197d3a-0dad-43cb-9bd9-c31539b04393">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc38ConnectorSpec')">Acc38ConnectorSpec</a></td>
+      <td class="duration_passed_all">191</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="bdf1031e-5b5e-4166-b451-91db7b62c618">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc40ConnectorSpec')">Acc40ConnectorSpec</a></td>
+      <td class="duration_passed_all">676</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="9a8b220c-204b-4de6-a57f-5d402fdf4c2d">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Acc41ConnectorSpec')">Acc41ConnectorSpec</a></td>
+      <td class="duration_passed_all">325</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="d4ffa973-1ee0-4400-9a3d-a2fef5f5618e">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.AccountAuthoritiesControllerSpec')">AccountAuthoritiesControllerSpec</a></td>
+      <td class="duration_passed_all">2244</td>
+      <td class="succeeded">15</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">15</td>
+    </tr><tr id="df5d4aad-80b4-43b5-b19b-1211bf74c781">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.AccountAuthorityServiceSpec')">AccountAuthorityServiceSpec</a></td>
+      <td class="duration_passed_all">699</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="8a45031e-5629-46ad-ab93-7a41f11ae1da">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.AccountContactDetailsServiceSpec')">AccountContactDetailsServiceSpec</a></td>
+      <td class="duration_passed_all">275</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="2a4e566b-d08b-4356-8ce4-29a24317dafc">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.AuditingServiceSpec')">AuditingServiceSpec</a></td>
+      <td class="duration_passed_all">1842</td>
+      <td class="succeeded">13</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">13</td>
+    </tr><tr id="e30ab2ef-2367-41d3-9f5a-0fa4688df2a7">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.AuthoritiesCsvGenerationControllerSpec')">AuthoritiesCsvGenerationControllerSpec</a></td>
+      <td class="duration_passed_all">310</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="9f760fc3-76c0-48ec-bc6c-ba275c2826c3">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.CashTransactionsControllerSpec')">CashTransactionsControllerSpec</a></td>
+      <td class="duration_passed_all">781</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="a5323b71-325d-4b21-987a-cb50e5e26665">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.CashTransactionsServiceSpec')">CashTransactionsServiceSpec</a></td>
+      <td class="duration_passed_all">797</td>
+      <td class="succeeded">4</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">4</td>
+    </tr><tr id="ecb1891b-3496-4911-9fbd-4a9262c79b47">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.CustomsAccountsControllerSpec')">CustomsAccountsControllerSpec</a></td>
+      <td class="duration_passed_all">391</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="dba2f184-bfc6-4492-bab1-f3ab5994bf41">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.DataStoreConnectorSpec')">DataStoreConnectorSpec</a></td>
+      <td class="duration_passed_all">558</td>
+      <td class="succeeded">4</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">4</td>
+    </tr><tr id="1de07adf-1ba1-4eea-8de0-011fc0557c76">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Dec64ConnectorSpec')">Dec64ConnectorSpec</a></td>
+      <td class="duration_passed_all">415</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="f059579f-ca9e-4516-af83-73b4e72567d1">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.definition.DocumentationControllerSpec')">DocumentationControllerSpec</a></td>
+      <td class="duration_passed_all">201</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="b1cec207-dcb3-42d5-9d23-b0eb4dcf4037">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.DutyDefermentContactDetailsSpec')">DutyDefermentContactDetailsSpec</a></td>
+      <td class="duration_passed_all">802</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="4a531f16-0c93-4272-96ab-bb8d2429bcb1">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('domain.EmailGetSpecificClaimRequestSpec')">EmailGetSpecificClaimRequestSpec</a></td>
+      <td class="duration_passed_all">38</td>
+      <td class="succeeded">14</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">14</td>
+    </tr><tr id="b7cba490-887f-4b06-a649-8ef0f32155f5">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.EmailThrottlerConnectorSpec')">EmailThrottlerConnectorSpec</a></td>
+      <td class="duration_passed_all">910</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="cfe8d6ea-90c2-499a-8ef8-39f67b88663e">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.FileUploadCacheSpec')">FileUploadCacheSpec</a></td>
+      <td class="duration_passed_all">710</td>
+      <td class="succeeded">4</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">4</td>
+    </tr><tr id="3a595714-afe7-46ca-baae-9ccf3643ce59">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.FileUploadControllerSpec')">FileUploadControllerSpec</a></td>
+      <td class="duration_passed_all">244</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="1c1cf87d-b619-43fa-b36f-bae8e1471a8e">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.FileUploadJobHandlerSpec')">FileUploadJobHandlerSpec</a></td>
+      <td class="duration_passed_all">900</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="114c6bbb-2768-4601-b0b7-c0ce2545a9a9">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.FileUploadServiceSpec')">FileUploadServiceSpec</a></td>
+      <td class="duration_passed_all">232</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="b6c29e4a-9bbc-4ff9-84b3-2c9660e2761a">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.GuaranteeTransactionControllerSpec')">GuaranteeTransactionControllerSpec</a></td>
+      <td class="duration_passed_all">1123</td>
+      <td class="succeeded">8</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">8</td>
+    </tr><tr id="097ceb31-39fb-4985-bcd1-c448e52e6c0f">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.GuaranteeTransactionsServiceSpec')">GuaranteeTransactionsServiceSpec</a></td>
+      <td class="duration_passed_all">343</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="37d98ac2-458a-4768-9628-56b96e3d16ab">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.HistoricDocumentGetSpecificClaimRequestControllerSpec')">HistoricDocumentGetSpecificClaimRequestControllerSpec</a></td>
+      <td class="duration_passed_all">1133</td>
+      <td class="succeeded">5</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">5</td>
+    </tr><tr id="2973b657-306b-480a-aef7-f4d3efa883ae">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.HistoricDocumentServiceSpec')">HistoricDocumentServiceSpec</a></td>
+      <td class="duration_passed_all">446</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="45f9338f-3d0a-45d7-9482-0d87ad55a27d">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.metadata.MetadataControllerSpec')">MetadataControllerSpec</a></td>
+      <td class="duration_passed_all">2312</td>
+      <td class="succeeded">14</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">14</td>
+    </tr><tr id="7003921b-851c-495a-b690-7fac17ebf305">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.MetricsReporterServiceSpec')">MetricsReporterServiceSpec</a></td>
+      <td class="duration_passed_all">1025</td>
+      <td class="succeeded">6</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">6</td>
+    </tr><tr id="8a882724-197a-4c7f-8c2c-88487b5cd254">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.NotificationCacheSpec')">NotificationCacheSpec</a></td>
+      <td class="duration_passed_all">828</td>
+      <td class="succeeded">4</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">4</td>
+    </tr><tr id="7af782a7-24f5-4681-bdac-4582ef2ae419">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('domain.NotificationSpec')">NotificationSpec</a></td>
+      <td class="duration_passed_all">5</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="07599764-1c38-4de2-b3f9-e616abdd9598">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.RequestToDec64PayloadSpec')">RequestToDec64PayloadSpec</a></td>
+      <td class="duration_passed_all">6007</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="7213c9c9-e2bb-48cb-90b9-4d2ac9ad97f4">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.SDESNotificationsControllerSpec')">SDESNotificationsControllerSpec</a></td>
+      <td class="duration_passed_all">2324</td>
+      <td class="succeeded">7</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">7</td>
+    </tr><tr id="ca675a94-e6ba-4385-bdd6-4c346c72e13e">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.SchedulerSpec')">SchedulerSpec</a></td>
+      <td class="duration_passed_all">211</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="fbbbd668-ec37-45d1-b9a6-daeafb9c3082">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.SearchAuthoritiesControllerSpec')">SearchAuthoritiesControllerSpec</a></td>
+      <td class="duration_passed_all">651</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="3ecc06f7-79de-4c8c-9bd9-6d700c5f4324">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Sub09ConnectorSpec')">Sub09ConnectorSpec</a></td>
+      <td class="duration_passed_all">203</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="c1d509a8-bc79-45c4-ad4a-3f7fc52af3d6">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Sub21ConnectorSpec')">Sub21ConnectorSpec</a></td>
+      <td class="duration_passed_all">165</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="7abca7cb-fa88-46df-8714-eb721dc662bc">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.SubscriptionControllerSpec')">SubscriptionControllerSpec</a></td>
+      <td class="duration_passed_all">446</td>
+      <td class="succeeded">3</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">3</td>
+    </tr><tr id="a7692599-0be4-48ac-85c1-0e4fe212a910">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.SubscriptionDisplayGetSpecificClaimRequestControllerSpec')">SubscriptionDisplayGetSpecificClaimRequestControllerSpec</a></td>
+      <td class="duration_passed_all">268</td>
+      <td class="succeeded">2</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">2</td>
+    </tr><tr id="353f338c-7f97-4b4e-8655-7972c1d63cf8">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.SubscriptionServiceSpec')">SubscriptionServiceSpec</a></td>
+      <td class="duration_passed_all">169</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="241f1444-e893-498c-9efb-4111e35e498a">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('controllers.TPIClaimsControllerSpec')">TPIClaimsControllerSpec</a></td>
+      <td class="duration_passed_all">993</td>
+      <td class="succeeded">7</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">7</td>
+    </tr><tr id="85922446-9d36-4d74-9631-94359adbdbd5">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('services.TPIClaimsServiceSpec')">TPIClaimsServiceSpec</a></td>
+      <td class="duration_passed_all">4655</td>
+      <td class="succeeded">27</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">27</td>
+    </tr><tr id="f165e133-b9c4-49ad-b331-53c2a1be0507">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Tpi01ConnectorSpec')">Tpi01ConnectorSpec</a></td>
+      <td class="duration_passed_all">265</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr><tr id="e82d8095-8bf0-4945-b806-883f63836672">
+      <td class="suite_name_passed_all"><a href="javascript: showDetails('connectors.Tpi02ConnectorSpec')">Tpi02ConnectorSpec</a></td>
+      <td class="duration_passed_all">177</td>
+      <td class="succeeded">1</td>
+      <td class="failed_zero">0</td>
+      <td class="canceled_zero">0</td>
+      <td class="ignored_zero">0</td>
+      <td class="pending_zero">0</td>
+      <td class="total_passed_all">1</td>
+    </tr>
+    </table>
+              </td>
+            </tr>
+          </table>
+          <div id="details_view">
+            <span id="click_suite_hint">Click on suite name to view details.</span> <br/>
+            <span id="click_column_hint">Click on column name to sort.</span>
+          </div>
+        </div>
+        <script type="text/javascript">
+          /* modified from http://www.permadi.com/tutorial/cssGettingBackgroundColor/index.html - */
+function getBgColor(elementId)
+{
+  var element = document.getElementById(elementId);
+  if (element.currentStyle)
+    return element.currentStyle.backgroundColor;
+  if (window.getComputedStyle)
+  {
+    var elementStyle=window.getComputedStyle(element,"");
+    if (elementStyle)
+      return elementStyle.getPropertyValue("background-color");
+  }
+  // Return 0 if both methods failed.
+  return 0;
+}
+var data = [215, 0, 0, 0, 0];
+var color = [getBgColor('summary_view_row_1_legend_succeeded_label'), 
+             getBgColor('summary_view_row_1_legend_failed_label'), 
+             getBgColor('summary_view_row_1_legend_ignored_label'), 
+             getBgColor('summary_view_row_1_legend_pending_label'), 
+             getBgColor('summary_view_row_1_legend_canceled_label')
+            ];
+var width = document.getElementById('chart_div').offsetWidth,
+    height = document.getElementById('chart_div').offsetHeight,
+    outerRadius = Math.min(width, height) / 2,
+    innerRadius = 0,
+    donut = d3.layout.pie(),
+    arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+var vis = d3.select("#chart_div")
+            .append("svg")
+            .data([data])
+            .attr("width", width)
+            .attr("height", height);
+var arcs = vis.selectAll("g.arc")
+              .data(donut)
+              .enter().append("g")
+              .attr("class", "arc")
+              .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+arcs.append("path")
+    .attr("fill", function(d, i) { return color[i]; })
+    .attr("d", arc);
+
+        </script>
+        <script type="text/javascript">
+          tagMap = { 
+"2825fcbd-6c96-4f5a-8c8d-7e061e0c2547": 1, 
+"353f338c-7f97-4b4e-8655-7972c1d63cf8": 1, 
+"8a45031e-5629-46ad-ab93-7a41f11ae1da": 1, 
+"3ecc06f7-79de-4c8c-9bd9-6d700c5f4324": 1, 
+"2a4e566b-d08b-4356-8ce4-29a24317dafc": 1, 
+"37d98ac2-458a-4768-9628-56b96e3d16ab": 1, 
+"1981bae4-3cb2-4d75-92d7-2b94c100e031": 1, 
+"1de07adf-1ba1-4eea-8de0-011fc0557c76": 1, 
+"6287d113-545c-4a17-bf7a-c8b2394e89d7": 1, 
+"a7692599-0be4-48ac-85c1-0e4fe212a910": 1, 
+"c1d509a8-bc79-45c4-ad4a-3f7fc52af3d6": 1, 
+"a5323b71-325d-4b21-987a-cb50e5e26665": 1, 
+"d4ffa973-1ee0-4400-9a3d-a2fef5f5618e": 1, 
+"7213c9c9-e2bb-48cb-90b9-4d2ac9ad97f4": 1, 
+"dba2f184-bfc6-4492-bab1-f3ab5994bf41": 1, 
+"ecb1891b-3496-4911-9fbd-4a9262c79b47": 1, 
+"114c6bbb-2768-4601-b0b7-c0ce2545a9a9": 1, 
+"8a882724-197a-4c7f-8c2c-88487b5cd254": 1, 
+"d1e29bea-e554-4eac-8344-0d0093a16c27": 1, 
+"2973b657-306b-480a-aef7-f4d3efa883ae": 1, 
+"3a595714-afe7-46ca-baae-9ccf3643ce59": 1, 
+"7af782a7-24f5-4681-bdac-4582ef2ae419": 1, 
+"b7cba490-887f-4b06-a649-8ef0f32155f5": 1, 
+"1c1cf87d-b619-43fa-b36f-bae8e1471a8e": 1, 
+"cfe8d6ea-90c2-499a-8ef8-39f67b88663e": 1, 
+"e30ab2ef-2367-41d3-9f5a-0fa4688df2a7": 1, 
+"0c07fd04-dead-4941-ac6f-06eb6b8770e4": 1, 
+"45f9338f-3d0a-45d7-9482-0d87ad55a27d": 1, 
+"241f1444-e893-498c-9efb-4111e35e498a": 1, 
+"bdf1031e-5b5e-4166-b451-91db7b62c618": 1, 
+"f165e133-b9c4-49ad-b331-53c2a1be0507": 1, 
+"df5d4aad-80b4-43b5-b19b-1211bf74c781": 1, 
+"6edc3dc8-53ff-4abf-90bf-fd8ff85d27b6": 1, 
+"9f760fc3-76c0-48ec-bc6c-ba275c2826c3": 1, 
+"b1197d3a-0dad-43cb-9bd9-c31539b04393": 1, 
+"fbbbd668-ec37-45d1-b9a6-daeafb9c3082": 1, 
+"07599764-1c38-4de2-b3f9-e616abdd9598": 1, 
+"f059579f-ca9e-4516-af83-73b4e72567d1": 1, 
+"b1cec207-dcb3-42d5-9d23-b0eb4dcf4037": 1, 
+"9a8b220c-204b-4de6-a57f-5d402fdf4c2d": 1, 
+"e82d8095-8bf0-4945-b806-883f63836672": 1, 
+"097ceb31-39fb-4985-bcd1-c448e52e6c0f": 1, 
+"b6c29e4a-9bbc-4ff9-84b3-2c9660e2761a": 1, 
+"7abca7cb-fa88-46df-8714-eb721dc662bc": 1, 
+"f16f856a-7857-4b93-be57-91bdbb978977": 1, 
+"ca675a94-e6ba-4385-bdd6-4c346c72e13e": 1, 
+"7003921b-851c-495a-b690-7fac17ebf305": 1, 
+"85922446-9d36-4d74-9631-94359adbdbd5": 1, 
+"4a531f16-0c93-4272-96ab-bb8d2429bcb1": 1};
+applyFilter();
+        </script>
+        <script type="text/javascript">
+          //<![CDATA[
+          resizeDetailsView();
+          //]]>
+        </script>
+      </body>
+    </html>

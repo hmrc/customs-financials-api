@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+      <head>
+        <title>ScalaTest Suite controllers.AccountAuthoritiesControllerSpec Results</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="Expires" content="-1"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <link href="css/styles.css" rel="stylesheet"/>
+        
+        <script type="text/javascript">
+        //<![CDATA[
+            function toggleDetails(contentId, linkId) { 
+              var ele = document.getElementById(contentId); 
+              var text = document.getElementById(linkId); 
+              if(ele.style.display == "block") { 
+                ele.style.display = "none"; 
+                text.innerHTML = "(Show Details)"; 
+              } 
+              else { 
+                ele.style.display = "block"; 
+                text.innerHTML = "(Hide Details)";
+              }
+            } 
+            function hideOpenInNewTabIfRequired() { 
+              if (top === self) { document.getElementById('printlink').style.display = 'none'; } 
+            }
+        //]]>
+        </script>
+      </head>
+      <body class="specification">
+        <div id="suite_header_name">AccountAuthoritiesControllerSpec</div>
+        <div id="suite_header_statistic_passed">
+          Tests: total 15, succeeded 15, failed 0, canceled 0, ignored 0, pending 0
+        </div>
+        <div id="e4989681-81c1-412b-ae08-269444bc802e" class="scope" style="margin-left: 0px;">
+      AccountAuthoritiesController.get
+    </div><div id="be559d26-2e83-441f-840d-05c8e4112dfd" class="test_passed" style="margin-left: 0px;">
+      <dl>
+        <dt>should delegate to the service and return a list of account authorities with a 200 status code</dt>
+      </dl>
+    </div><div id="4b859af3-cd23-4909-aeb2-2253dcc2b905" class="test_passed" style="margin-left: 0px;">
+      <dl>
+        <dt>should return an error when no EORINumber found in auth record</dt>
+      </dl>
+    </div><div id="3b3964b4-daec-4521-beee-aa96e0f2079d" class="scope" style="margin-left: 15px;">
+      should return 503 (service unavailable)
+    </div><div id="c1066c51-85ff-4cfc-a4f8-9debdc2929b8" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when get account authorities call fails with BadRequestException (4xx) </dt>
+      </dl>
+    </div><div id="fdb209f6-f3cd-4859-8a58-d6cc9e8864ba" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when get account authorities call fails with InternalServerException (5xx) </dt>
+      </dl>
+    </div><div id="589dc444-3ed1-4d64-948b-caf178228a28" class="scope" style="margin-left: 15px;">
+      should return 500 (InternalServerError)
+    </div><div id="61daaf68-1c65-4174-8a95-c31282e52908" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>when get account authorities call fails with InternalServerException (5xx) </dt>
+      </dl>
+    </div><div id="199c34b3-17a9-415e-9fd1-2cf501ca414e" class="scope" style="margin-left: 0px;">
+      AccountAuthoritiesController.grant
+    </div><div id="db5940d9-c3fe-421a-a811-27880264ee35" class="scope" style="margin-left: 15px;">
+      when request is valid and API call is successful
+    </div><div id="795ea155-0a67-4b8d-9de6-f1633434608f" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should delegate to the service and return a 204 status code</dt>
+      </dl>
+    </div><div id="0b70bdd8-3c15-4ed4-bdc9-6e18ba96962e" class="scope" style="margin-left: 15px;">
+      when request is valid but API call fails
+    </div><div id="d7b89d18-462e-4ac6-a30a-b773791900e5" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 500</dt>
+      </dl>
+    </div><div id="c424f7a6-f08a-423a-8e95-e2021d89ddaf" class="scope" style="margin-left: 15px;">
+      when request JSON is invalid
+    </div><div id="07622a9b-036e-4a42-a26e-f9abd1143c4f" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 400</dt>
+      </dl>
+    </div><div id="d138630c-4718-4374-97ca-723e6eaf927a" class="scope" style="margin-left: 15px;">
+      when no EORINumber found in auth record
+    </div><div id="58950d3e-eec3-4bf7-82e8-42496549ba6f" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 403</dt>
+      </dl>
+    </div><div id="63b90668-d652-4bb1-9729-d03079197c67" class="scope" style="margin-left: 0px;">
+      AccountAuthoritiesController.revoke
+    </div><div id="656bff0c-1ee8-47f7-92d1-83ae09423bf1" class="scope" style="margin-left: 15px;">
+      when request is valid and API call is successful
+    </div><div id="812a8382-fbb8-453b-a0f4-5e079aef614f" class="scope" style="margin-left: 30px;">
+      should delegate to the service and return a 204 status code
+    </div><div id="88461ff3-a1f7-4610-8c1f-daedd60f568b" class="test_passed" style="margin-left: 30px;">
+      <dl>
+        <dt>when revoking for a cash account</dt>
+      </dl>
+    </div><div id="bacbe36d-1253-4243-84d0-64901147e56e" class="test_passed" style="margin-left: 30px;">
+      <dl>
+        <dt>when revoking for a guarantee account</dt>
+      </dl>
+    </div><div id="75fcc8c5-2b11-49ff-8827-629419026b76" class="test_passed" style="margin-left: 30px;">
+      <dl>
+        <dt>when revoking for a deferment account</dt>
+      </dl>
+    </div><div id="5e759cca-3be4-4c42-93fa-60accaa54118" class="scope" style="margin-left: 15px;">
+      when request is valid but API call fails
+    </div><div id="f6a3e4d9-3e09-4dd8-ab29-7a3f0a3f1eb3" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 500</dt>
+      </dl>
+    </div><div id="2de3e964-e705-4ea0-9335-45d2cce6553d" class="scope" style="margin-left: 15px;">
+      when request JSON is invalid
+    </div><div id="e3df9fbf-8190-4c97-bb47-5d443a9c7f3f" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 400</dt>
+      </dl>
+    </div><div id="bf7f70f2-0e60-437d-9064-30efcb865671" class="scope" style="margin-left: 15px;">
+      when no EORINumber found in auth record
+    </div><div id="216375e2-d344-44cb-bf31-a35d3a96548b" class="test_passed" style="margin-left: 15px;">
+      <dl>
+        <dt>should return 403</dt>
+      </dl>
+    </div>
+        <table id="suite_footer">
+          <tr id="suite_footer_id">
+            <td id="suite_footer_id_label_passed">Suite ID</td>
+            <td id="suite_footer_id_value" colspan="5">controllers.AccountAuthoritiesControllerSpec</td>
+          </tr>
+          <tr id="suite_footer_class">
+            <td id="suite_footer_class_label_passed">Class name</td>
+            <td id="suite_footer_class_value" colspan="5">controllers.AccountAuthoritiesControllerSpec</td>
+          </tr>
+          <tr id="suite_footer_duration">
+            <td id="suite_footer_duration_label_passed">Total duration</td>
+            <td id="suite_footer_duration_value" colspan="2">
+              2 seconds, 244 milliseconds
+              </td>
+          </tr>
+        </table>
+           <div id="printlink">(<a href="controllers.AccountAuthoritiesControllerSpec.html" target="_blank">Open AccountAuthoritiesControllerSpec in new tab</a>)</div>
+      </body>
+      <script type="text/javascript">
+        //<![CDATA[
+          hideOpenInNewTabIfRequired();
+        //]]>
+      </script>
+    </html>

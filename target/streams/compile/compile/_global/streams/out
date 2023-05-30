@@ -1,0 +1,73 @@
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/AccountAuthoritiesController.scala:40:80: parameter value request in anonymous function is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m  def get(eori: EORI): Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                               ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/AuthoritiesCsvGenerationController.scala:19:20: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport connectors.{Acc40Connector, Acc41Connector}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                   ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/CustomsAccountsController.scala:32:9: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method eoriPresent,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    if (eoriPresent)[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/domain/SDESInputFormats.scala:36:17: symbol literal is deprecated; use Symbol("eori") instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m      (JsPath \ 'eori).read[EORI] and[0m
+[0m[[0m[33mwarn[0m] [0m[0m                ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/domain/SDESInputFormats.scala:37:19: symbol literal is deprecated; use Symbol("fileName") instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m        (JsPath \ 'fileName).read[String] and[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/domain/SDESInputFormats.scala:38:19: symbol literal is deprecated; use Symbol("fileSize") instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m        (JsPath \ 'fileSize).read[Long] and[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/domain/SDESInputFormats.scala:39:19: symbol literal is deprecated; use Symbol("metadata") instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m        (JsPath \ 'metadata).read[Seq[InputMetadata]][0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/app.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/prod.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/prod.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/app.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/definition.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/definition.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/app.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/metadata.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/metadata.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/definition.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/metadata.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/conf/prod.routes: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/views/definition.scala.txt:1:1: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m@import play.api.libs.json.Json[0m
+[0m[[0m[33mwarn[0m] [0m[0m^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/views/definition.scala.txt:1:28: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0m@import play.api.libs.json.Json[0m
+[0m[[0m[33mwarn[0m] [0m[0m                           ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/connectors/Acc40Connector.scala:59:19: method readFromJson in trait HttpReadsLegacyJson is deprecated (since 11.0.0): Use uk.gov.hmrc.http.HttpReads.Implicits instead. See README for differences.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    )(implicitly, implicitly, HeaderCarrier(), implicitly)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/connectors/Acc41Connector.scala:58:19: method readFromJson in trait HttpReadsLegacyJson is deprecated (since 11.0.0): Use uk.gov.hmrc.http.HttpReads.Implicits instead. See README for differences.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    )(implicitly, implicitly, HeaderCarrier(), implicitly)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/connectors/Dec64Connector.scala:44:47: value readRaw in object HttpReads is deprecated (since 11.0.0): Use uk.gov.hmrc.http.HttpReads.Implicits instead. See README for differences.[0m
+[0m[[0m[33mwarn[0m] [0m[0m      payload.headers ++ xmlHeaders)(HttpReads[HttpResponse], hc, executionContext).collect {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/models/EORI.scala:30:37: method right in class Either is deprecated (since 2.13.0): Either is now right-biased, use methods directly on Either[0m
+[0m[[0m[33mwarn[0m] [0m[0m      stringBinder.bind(key, value).right.map(EORI(_))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/models/FileRole.scala:30:37: method right in class Either is deprecated (since 2.13.0): Either is now right-biased, use methods directly on Either[0m
+[0m[[0m[33mwarn[0m] [0m[0m      stringBinder.bind(key, value).right.map(FileRole(_))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/connectors/Acc41Connector.scala:61:53: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: ResponseDetail(None, None), ResponseDetail(Some(_), Some(_))[0m
+[0m[[0m[33mwarn[0m] [0m[0m      res => res.standingAuthoritiesForEORIResponse.responseDetail match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/AuthoritiesCsvGenerationController.scala:35:78: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Left(AuthoritiesCsvGenerationResponse(_))[0m
+[0m[[0m[33mwarn[0m] [0m[0m      acc41Connector.initiateAuthoritiesCSV(request.body.requestingEori).map {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                             ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/SearchAuthoritiesController.scala:34:96: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Left(AuthoritiesFound(_, _, _, _))[0m
+[0m[[0m[33mwarn[0m] [0m[0m      acc40Connector.searchAuthorities(request.body.requestingEORI, request.body.searchID).map {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                               ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/app/controllers/SubscriptionDisplayRequestController.scala:36:81: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: true[0m
+[0m[[0m[33mwarn[0m] [0m[0m      subscriptionDisplay.subscriptionDisplayResponse.responseCommon.statusText.isEmpty match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m30 warnings found[0m

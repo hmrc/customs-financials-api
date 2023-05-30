@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite 
+errors="0" failures="0" hostname="FVFC61W2L414" name="controllers.FileUploadControllerSpec" tests="2" time="0.244" timestamp="2023-05-30T11:33:02">
+  <properties>
+    <property name="jline.esc.timeout" value="0"/>
+    <property name="jna.platform.library.path" value="/usr/lib:/usr/lib"/>
+    <property
+    name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="java.vm.version" value="11.0.18+9-LTS-195"/>
+    <property
+    name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/lib"/>
+    <property name="gopherProxySet" value="false"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="java.vendor.url" value="https://openjdk.java.net/"/>
+    <property name="path.separator" value=":"/>
+    <property name="jna.loaded" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="user.country" value="GB"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="jna.nosys" value="true"/>
+    <property
+    name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property
+    name="user.dir" value="/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="java.runtime.version" value="11.0.18+9-LTS-195"/>
+    <property
+    name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="os.arch" value="x86_64"/>
+    <property
+    name="java.io.tmpdir" value="/var/folders/mr/kfkv2yws6y70zyg16b_hx9dc0000gp/T/"/>
+    <property name="line.separator" value=" "/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="log4j.ignoreTCL" value="true"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property
+    name="scala.ext.dirs" value="/Users/adamcooper/.sbt/0.13/java9-rt-ext-oracle_corporation_11_0_18"/>
+    <property
+    name="jnidispatch.path" value="/Users/adamcooper/Library/Caches/JNA/temp/jna16062569943651715786.tmp"/>
+    <property
+    name="java.library.path" value="/Users/adamcooper/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="jdk.debug" value="release"/>
+    <property name="java.class.version" value="55.0"/>
+    <property
+    name="java.specification.name" value="Java Platform API Specification"/>
+    <property
+    name="sbt.ipcsocket.tmpdir" value="/var/folders/mr/kfkv2yws6y70zyg16b_hx9dc0000gp/T/.sbt260f86cc/ipcsocket"/>
+    <property
+    name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.15.7"/>
+    <property
+    name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/adamcooper"/>
+    <property
+    name="swoval.tmpdir" value="/var/folders/mr/kfkv2yws6y70zyg16b_hx9dc0000gp/T/.sbt260f86cc/swoval"/>
+    <property name="user.timezone" value="Europe/London"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.specification.version" value="11"/>
+    <property name="user.name" value="adamcooper"/>
+    <property
+    name="java.class.path" value="/usr/local/Cellar/sbt/1.4.2/libexec/bin/sbt-launch.jar"/>
+    <property name="jline.shutdownhook" value="false"/>
+    <property name="java.vm.specification.version" value="11"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property
+    name="sun.java.command" value="/usr/local/Cellar/sbt/1.4.2/libexec/bin/sbt-launch.jar test"/>
+    <property
+    name="java.home" value="/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="11.0.18"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.version.date" value="2023-01-17"/>
+    <property
+    name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="java.vendor.version" value="18.9"/>
+    <property
+    name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property
+    name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase 
+  name="enqueueUploadedFiles should return 204 status when file upload successful" classname="controllers.FileUploadControllerSpec" time="0.133">
+</testcase>
+  <testcase 
+  name="enqueueUploadedFiles should return 400 for bad request error" classname="controllers.FileUploadControllerSpec" time="0.11">
+</testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

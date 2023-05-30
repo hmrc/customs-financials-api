@@ -1,0 +1,25 @@
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/controllers/AuthoritiesCsvGenerationControllerSpec.scala:28:25: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport uk.gov.hmrc.http.HeaderCarrier[0m
+[0m[[0m[33mwarn[0m] [0m[0m                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/controllers/TPIClaimsControllerSpec.scala:19:15: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport domain._[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/controllers/metadata/MetadataControllerSpec.scala:22:36: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport models.{EORI, EmailAddress, NoAssociatedDataException}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                   ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/services/FileUploadCacheSpec.scala:22:31: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport play.api.{Application, inject}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/services/FileUploadCacheSpec.scala:26:15: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport utils.{RandomUUIDGenerator, SpecBase}[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/utils/SpecBase.scala:22:51: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport models.claims.responses.{NdrcClaimDetails, NdrcClaimItem, SctyClaimDetails, Reimbursement => ReimbursementResponse, Goods => GoodsResponse}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/connectors/Dec64ConnectorSpec.scala:46:39: method apply in object HttpResponse is deprecated (since 11.0.0): Use alternative HttpResponse.apply functions instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m        .thenReturn(Future.successful(HttpResponse(BAD_REQUEST)))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/Users/adamcooper/Documents/GitHub/CDS/customs-financials-api/test/connectors/Sub21ConnectorSpec.scala:49:95: method copyArrayToImmutableIndexedSeq in class LowPriorityImplicits2 is deprecated (since 2.13.0): Implicit conversions from Array to immutable.IndexedSeq are implemented by copying; Use the more efficient non-copying ArraySeq.unsafeWrapArray or an explicit toIndexedSeq call[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m8 warnings found[0m

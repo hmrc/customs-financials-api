@@ -123,7 +123,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "request JSON is invalid" should {
       "return 400" in new Setup {
-        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant().url).withJsonBody(Json.parse("""{"valid": "nope"}"""))
+        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(
+          POST, controllers.routes.AccountAuthoritiesController.grant(EORI("testEori")).url)
+          .withJsonBody(Json.parse("""{"valid": "nope"}"""))
 
         running(app) {
           val result = route(app, invalidRequest).value
@@ -205,7 +207,8 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     "request JSON is invalid" should {
       "return 400" in new Setup {
 
-        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke().url)
+        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(
+          POST, controllers.routes.AccountAuthoritiesController.revoke(EORI("testEori")).url)
           .withJsonBody(Json.parse("""{"valid": "nope"}"""))
 
         running(app) {
@@ -235,11 +238,11 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     val getRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
 
     def grantRequest(request: GrantAuthorityRequest): FakeRequest[AnyContentAsJson] =
-      FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant().url)
+      FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant(traderEORI).url)
         .withJsonBody(Json.toJson(request))
 
     def revokeRequest(request: RevokeAuthorityRequest): FakeRequest[AnyContentAsJson] =
-      FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke().url)
+      FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke(traderEORI).url)
         .withJsonBody(Json.toJson(request))
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
