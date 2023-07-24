@@ -19,7 +19,7 @@ package domain.acc41
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
-case class RequestDetail(requestingEORI: EORI)
+case class RequestDetail(requestingEORI: EORI, alternateEORI: Option[EORI])
 
 object RequestDetail {
   implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]
