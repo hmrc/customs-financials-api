@@ -19,7 +19,7 @@ package domain
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
-case class InitiateAuthoritiesCsvGenerationRequest(requestingEori: EORI)
+case class InitiateAuthoritiesCsvGenerationRequest(requestingEori: EORI, alternateEORI: Option[EORI])
 
 object InitiateAuthoritiesCsvGenerationRequest {
   implicit val format: OFormat[InitiateAuthoritiesCsvGenerationRequest] = Json.format[InitiateAuthoritiesCsvGenerationRequest]

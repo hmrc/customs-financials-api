@@ -404,7 +404,7 @@ class AuditingServiceSpec extends SpecBase {
     "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
 
       val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(""), Some(""))
-      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"))
+      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"), Some(EORI("someAltEori")))
 
       val auditRequest =
         """{

@@ -32,7 +32,7 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def initiateAuthoritiesCSV(requestingEori: EORI)
+  def initiateAuthoritiesCSV(requestingEori: EORI, alternateEORI: Option[EORI])
     (implicit hc: HeaderCarrier): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
 
     val commonRequest = acc41.RequestCommon(
@@ -43,7 +43,8 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     )
 
     val requestDetail = acc41.RequestDetail(
-      requestingEORI = requestingEori
+      requestingEORI = requestingEori,
+      alternateEORI = alternateEORI
     )
 
     val request = acc41.StandingAuthoritiesForEORIRequest(acc41.Request(

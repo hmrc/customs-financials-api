@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{Acc40Connector, Acc41Connector}
+import connectors.Acc41Connector
 import domain.{Acc41ErrorResponse, InitiateAuthoritiesCsvGenerationRequest}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
@@ -30,9 +30,10 @@ class AuthoritiesCsvGenerationController @Inject()(
                                          cc: ControllerComponents)
                                          (implicit ec: ExecutionContext) extends BackendController(cc) {
 
-  def initiateAuthoritiesCsvGeneration: Action[InitiateAuthoritiesCsvGenerationRequest] = Action.async(parse.json[InitiateAuthoritiesCsvGenerationRequest]) {
+  def initiateAuthoritiesCsvGeneration: Action[InitiateAuthoritiesCsvGenerationRequest] = Action.async(
+    parse.json[InitiateAuthoritiesCsvGenerationRequest]) {
     implicit request =>
-      acc41Connector.initiateAuthoritiesCSV(request.body.requestingEori).map {
+      acc41Connector.initiateAuthoritiesCSV(request.body.requestingEori, request.body.alternateEORI).map {
         case Left(Acc41ErrorResponse) => InternalServerError
         case Right(value) => Ok(Json.toJson(value))
       }
