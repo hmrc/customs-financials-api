@@ -41,7 +41,7 @@ class Acc41ConnectorSpec extends SpecBase {
       }
     }
 
-    "return Right AuthoritiesCsvGeneration when when no alt Eori" in new Setup {
+    "return Right AuthoritiesCsvGeneration when no alternateEORI" in new Setup {
       when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
