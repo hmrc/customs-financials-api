@@ -42,10 +42,10 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
       regime = "CDS"
     )
 
-    val requestDetail = acc41.RequestDetail(
-      requestingEORI = requestingEori,
-      alternateEORI = alternateEORI
-    )
+    val requestDetail = alternateEORI match {
+      case Some(x) if x.value.nonEmpty  => acc41.RequestDetail(requestingEori, alternateEORI)
+      case _ => acc41.RequestDetail(requestingEori, None)
+    }
 
     val request = acc41.StandingAuthoritiesForEORIRequest(acc41.Request(
       commonRequest,

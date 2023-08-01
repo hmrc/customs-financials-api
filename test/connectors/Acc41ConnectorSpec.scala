@@ -41,6 +41,17 @@ class Acc41ConnectorSpec extends SpecBase {
       }
     }
 
+    "return Right AuthoritiesCsvGeneration when no alternateEORI" in new Setup {
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
+
+      running(app) {
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI(""))))
+        result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
+      }
+    }
+
+
     "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
       when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
