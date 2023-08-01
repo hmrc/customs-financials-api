@@ -43,7 +43,7 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     )
 
     val requestDetail = alternateEORI match {
-      case Some(x) if x.value != "" => acc41.RequestDetail(requestingEori, alternateEORI)
+      case Some(x) if x.value.nonEmpty  => acc41.RequestDetail(requestingEori, alternateEORI)
       case _ => acc41.RequestDetail(requestingEori, None)
     }
 
