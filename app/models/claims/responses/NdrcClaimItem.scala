@@ -16,9 +16,6 @@
 
 package models.claims.responses
 
-import domain.tpi01.NDRCCaseDetails
-import play.api.libs.json.{Json, OFormat}
-
 case class NdrcClaimItem(
   CDFPayCaseNumber: String,
   declarationID: Option[String],
@@ -35,26 +32,3 @@ case class NdrcClaimItem(
   declarantReferenceNumber: Option[String],
   basisOfClaim: Option[String]
 )
-
-object NdrcClaimItem {
-  implicit val format: OFormat[NdrcClaimItem] = Json.format[NdrcClaimItem]
-
-  def fromTpi01Response(caseDetails: NDRCCaseDetails): NdrcClaimItem = {
-    NdrcClaimItem(
-      CDFPayCaseNumber = caseDetails.CDFPayCaseNumber,
-      declarationID = caseDetails.declarationID,
-      claimStartDate = caseDetails.claimStartDate,
-      closedDate = caseDetails.closedDate,
-      caseStatus = NdrcClaimDetails.transformedCaseStatus(caseDetails.caseStatus),
-      caseSubStatus = NdrcClaimDetails.caseSubStatus(caseDetails.caseStatus),
-      declarantEORI = caseDetails.declarantEORI,
-      importerEORI = caseDetails.importerEORI,
-      claimantEORI = caseDetails.claimantEORI,
-      totalCustomsClaimAmount = caseDetails.totalCustomsClaimAmount,
-      totalVATClaimAmount = caseDetails.totalVATClaimAmount,
-      totalExciseClaimAmount = caseDetails.totalExciseClaimAmount,
-      declarantReferenceNumber = caseDetails.declarantReferenceNumber,
-      basisOfClaim = caseDetails.basisOfClaim,
-    )
-  }
-}

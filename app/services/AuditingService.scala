@@ -31,7 +31,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Suc
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import javax.inject.{Inject, Singleton}
-import models.dec64.FileUploadDetail
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -158,16 +157,6 @@ class AuditingService @Inject()(appConfig: AppConfig,
       "%02d".format(historicDocumentRequest.periodEndMonth)))
 
     audit(AuditModel(HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME, auditJson, HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE))
-  }
-
-  def auditFileUploadDetail(fileUploadDetail: FileUploadDetail)(implicit hc: HeaderCarrier): Future[AuditResult] = {
-    val auditJson = Json.toJson(FileUploadRequestAuditDetail(
-      fileUploadDetail.eori.value,
-      fileUploadDetail.caseNumber,
-      fileUploadDetail.applicationName,
-      Properties(Seq(fileUploadDetail.file))))
-
-    audit(AuditModel(FILE_UPLOAD_REQUEST_TRANSACTION_NAME, auditJson, FILE_UPLOAD_REQUEST_AUDIT_TYPE))
   }
 
   private def audit(auditModel: AuditModel)(implicit hc: HeaderCarrier): Future[AuditResult] = {

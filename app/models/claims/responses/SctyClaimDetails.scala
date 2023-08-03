@@ -16,7 +16,6 @@
 
 package models.claims.responses
 
-import domain.tpi02.scty.SCTYCase
 import play.api.libs.json.{Json, OFormat}
 
 case class SctyClaimDetails(
@@ -43,35 +42,6 @@ case class SctyClaimDetails(
 
 object SctyClaimDetails {
   implicit val format: OFormat[SctyClaimDetails] = Json.format[SctyClaimDetails]
-
-  def fromTpi02Response(caseDetails: SCTYCase): SctyClaimDetails = {
-    SctyClaimDetails(
-      CDFPayCaseNumber = caseDetails.CDFPayCaseNumber,
-      declarationID = caseDetails.declarationID,
-      reasonForSecurity = caseDetails.reasonForSecurity,
-      procedureCode = caseDetails.procedureCode,
-      caseStatus = transformedCaseStatus(caseDetails.caseStatus),
-      caseSubStatus = caseSubStatus(caseDetails.caseStatus),
-      goods = caseDetails.goods.map(_.map(g => Goods(g.itemNumber, g.goodsDescription))),
-      declarantEORI = caseDetails.declarantEORI,
-      importerEORI = caseDetails.importerEORI,
-      claimantEORI = caseDetails.claimantEORI,
-      totalCustomsClaimAmount = caseDetails.totalCustomsClaimAmount,
-      totalVATClaimAmount = caseDetails.totalVATClaimAmount,
-      totalClaimAmount = caseDetails.totalClaimAmount,
-      totalReimbursementAmount = caseDetails.totalReimbursementAmount,
-      claimStartDate = caseDetails.claimStartDate,
-      claimantName = caseDetails.claimantName,
-      claimantEmailAddress = caseDetails.claimantEmailAddress,
-      closedDate = caseDetails.closedDate,
-      reimbursements = caseDetails.reimbursement.map(_.map(r => Reimbursement(
-        r.reimbursementDate,
-        r.reimbursementAmount,
-        r.taxType,
-        r.reimbursementMethod
-      )))
-    )
-  }
 
   def caseSubStatus(caseStatus: String): Option[String] = caseStatus match {
     case "Resolved-Refund" => Some("Resolved-Refund")

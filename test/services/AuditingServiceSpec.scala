@@ -19,7 +19,6 @@ package services
 import java.time.LocalDate
 import domain.{Notification, StandingAuthority, acc41}
 import models._
-import models.dec64.{FileUploadDetail, UploadedFile}
 import models.requests.HistoricDocumentRequest
 import models.requests.manageAuthorities._
 import org.mockito.ArgumentCaptor
@@ -292,49 +291,6 @@ class AuditingServiceSpec extends SpecBase {
         result.auditType mustBe "RequestHistoricStatement"
         result.auditSource mustBe "customs-financials-api"
         result.tags.get("transactionName") mustBe Some("Request historic statements")
-      }
-    }
-
-    "audit file upload request to Dec64" in new Setup {
-      val auditRequest: JsValue = Json.parse(
-        """{
-          |   "eori":"eori",
-          |   "caseNumber":"casenumber",
-          |   "applicationName":"appName",
-          |   "properties":{
-          |      "uploadedFiles":[
-          |         {
-          |            "upscanReference":"upscanRef",
-          |            "downloadUrl":"url",
-          |            "uploadTimestamp":"String",
-          |            "checksum":"sum",
-          |            "fileName":"filename",
-          |            "fileMimeType":"mimeType",
-          |            "fileSize":12,
-          |            "description":"file type"
-          |         }
-          |      ]
-          |   }
-          |}""".stripMargin)
-
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-
-      val uploadedFiles: UploadedFile = UploadedFile(upscanReference = "upscanRef", downloadUrl = "url", uploadTimestamp = "String",
-        checksum = "sum", fileName = "filename", fileMimeType = "mimeType", fileSize = 12, "file type")
-
-      val fileUploadDetail: FileUploadDetail = FileUploadDetail(id = "id", eori = EORI("eori"), caseNumber = "casenumber", declarationId = "MRN",
-        entryNumber = false, applicationName = "appName", declarationType = "MRN", fileCount = 0, file = uploadedFiles, index = 0)
-
-      running(app) {
-        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
-          .thenReturn(Future.successful(AuditResult.Success))
-
-        service.auditFileUploadDetail(fileUploadDetail)
-        val result = extendedDataEventCaptor.getValue
-        result.detail mustBe auditRequest
-        result.auditType mustBe "ViewAmendFileUpload"
-        result.auditSource mustBe "customs-financials-api"
-        result.tags.get("transactionName") mustBe Some("View and amend file upload")
       }
     }
 
