@@ -17,13 +17,11 @@
 package config
 
 import com.google.inject.AbstractModule
-import services.dec64.{DefaultFileUploadCache, FileUploadCache}
 import services.{DefaultNotificationCache, NotificationCache}
 
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[FileUploadCache]).to(classOf[DefaultFileUploadCache]).asEagerSingleton()
   }
 }

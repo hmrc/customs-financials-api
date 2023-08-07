@@ -30,11 +30,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val notificationCacheCollectionName = "notificationStore"
   lazy val fileUploadCacheCollectionName = "fileUploadStore"
 
-  lazy val fileUploadPerInstancePerSecond: Double = configuration.get[Double]("fileUploadPerInstancePerSecond")
-  lazy val housekeepingHours: Int = configuration.get[Int]("housekeepingHours")
-  lazy val fileUploadMaxAgeMins: Int = configuration.get[Int]("fileUploadMaxAgeMins")
-  lazy val fileUploadFailCount: Int = configuration.get[Int]("fileUploadFailCount")
-
   lazy val hodsEndpoint: String = baseUrl("acc27") + getConfString("acc27.context-base", "/") + getConfString("acc27.endpoint", "/")
 
   lazy val onlyOpenItems: Boolean = configuration.get[Boolean]("features.onlyOpenItems")
@@ -88,16 +83,5 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val sub09HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc37.host-header")
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
-
-  lazy val tpi01GetReimbursementClaimsEndpoint: String = baseUrl("tpi01") + getConfString("tpi01.context-base", "/") + "/tpi/getreimbursementclaims/v1"
-  lazy val tpi01HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi01.host-header")
-  lazy val tpi01BearerToken: String = getConfString("tpi01.bearer-token", "test")
-
-  lazy val tpi02GetReimbursementClaimsEndpoint: String = baseUrl("tpi02") + getConfString("tpi02.context-base", "/") + "/tpi/getspecificclaim/v1"
-  lazy val tpi02HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.tpi02.host-header")
-  lazy val tpi02BearerToken: String = getConfString("tpi02.bearer-token", "test")
-
-  lazy val dec64FileUploadEndpoint: String = baseUrl("dec64") + getConfString("dec64.context-base", "/") + "/filetransfer/init/v1"
-  lazy val dec64BearerToken: String = configuration.get[String]("microservice.services.dec64.bearer-token")
 
 }

@@ -16,7 +16,6 @@
 
 package models.claims.responses
 
-import domain.tpi01.SCTYCaseDetails
 import play.api.libs.json.{Json, OFormat}
 
 case class SctyClaimItem(
@@ -37,22 +36,4 @@ case class SctyClaimItem(
 
 object SctyClaimItem {
   implicit val format: OFormat[SctyClaimItem] = Json.format[SctyClaimItem]
-
-  def fromTpi01Response(caseDetails: SCTYCaseDetails): SctyClaimItem = {
-    SctyClaimItem(
-      CDFPayCaseNumber = caseDetails.CDFPayCaseNumber,
-      declarationID = caseDetails.declarationID,
-      claimStartDate = caseDetails.claimStartDate,
-      closedDate = caseDetails.closedDate,
-      reasonForSecurity = caseDetails.reasonForSecurity,
-      caseStatus = SctyClaimDetails.transformedCaseStatus(caseDetails.caseStatus),
-      caseSubStatus = SctyClaimDetails.caseSubStatus(caseDetails.caseStatus),
-      declarantEORI = caseDetails.declarantEORI,
-      importerEORI = caseDetails.importerEORI,
-      claimantEORI = caseDetails.claimantEORI,
-      totalCustomsClaimAmount = caseDetails.totalCustomsClaimAmount,
-      totalVATClaimAmount = caseDetails.totalVATClaimAmount,
-      declarantReferenceNumber = caseDetails.declarantReferenceNumber,
-    )
-  }
 }

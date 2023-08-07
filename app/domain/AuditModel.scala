@@ -17,7 +17,6 @@
 package domain
 
 import domain.acc40.{CashAccount, DutyDefermentAccount, GeneralGuaranteeAccount}
-import models.dec64.UploadedFile
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
 
@@ -83,12 +82,7 @@ object HistoricDocumentRequestAuditDetail {
 
 case class FileUploadRequestAuditDetail(eori: String,
                                         caseNumber: String,
-                                        applicationName: String,
-                                        properties: Properties)
-
-object FileUploadRequestAuditDetail {
-  implicit val fileUploadRequestAuditDetailWrites: OWrites[FileUploadRequestAuditDetail] = Json.writes[FileUploadRequestAuditDetail]
-}
+                                        applicationName: String)
 
 case class RequestAuthAuditDetail(requestingEori: String,
                                   seachType: String,
@@ -124,10 +118,4 @@ case class RequestDisplayStandingAuthCSVAuditDetail(
 object RequestDisplayStandingAuthCSVAuditDetail {
   implicit val requestStandingAuthCSVAuditDetailsWrites: OWrites[RequestDisplayStandingAuthCSVAuditDetail] =
     Json.writes[RequestDisplayStandingAuthCSVAuditDetail]
-}
-
-case class Properties(uploadedFiles: Seq[UploadedFile])
-
-object Properties {
-  implicit val PropertiesWrites: OWrites[Properties] = Json.writes[Properties]
 }
