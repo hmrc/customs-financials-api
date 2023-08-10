@@ -12,7 +12,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
   .settings(
     majorVersion := 0,
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.11",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     ScoverageKeys.coverageExcludedPackages := List("<empty>"
       , ".*Reverse.*"
