@@ -84,4 +84,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
 
+  lazy val mongoHistDocSearchCollectionName: String =
+    configuration.get[String]("mongodb.historic-document-request-search.name")
+  lazy val mongoHistDocSearchTtl: Long =
+    configuration.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")
+
 }

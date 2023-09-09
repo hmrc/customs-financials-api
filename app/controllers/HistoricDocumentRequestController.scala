@@ -20,10 +20,14 @@ import connectors.DataStoreConnector
 import models.requests.HistoricDocumentRequest
 import models.{EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OFormat}
-import play.api.{Logger, LoggerLike}
 import play.api.mvc.{Action, ControllerComponents}
+import play.api.{Logger, LoggerLike}
 import services.HistoricDocumentService
+import services.cache.HistoricDocumentRequestCache
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.Utils.emptyString
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -32,6 +36,7 @@ import scala.concurrent._
 class HistoricDocumentRequestController @Inject()(service: HistoricDocumentService,
                                                   dataStoreService: DataStoreConnector,
                                                   authorisedRequest: AuthorisedRequest,
+                                                  historicDocRequestCache:HistoricDocumentRequestCache,
                                                   cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
@@ -41,8 +46,9 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
     withJsonBody[RequestForHistoricDocuments] { frontEndRequest =>
       for {
         historicEoris <- dataStoreService.getEoriHistory(request.eori)
+         userId <- internalId
         allEoris = historicEoris.toSet + request.eori
-        historicDocumentRequests = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
+        historicDocumentRequests: Set[HistoricDocumentRequest] = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
         result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
       } yield {
         log.info(s"Historic Documents requested ${allEoris.size}")
@@ -51,6 +57,11 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
     }
   }
 
+  private def internalId()(implicit hc: HeaderCarrier): Future[String] =
+    authorisedRequest.authorised().retrieve(Retrievals.internalId) {
+      case Some(internalId) => Future.successful(internalId)
+      case _ => Future.successful(emptyString)
+    }
 }
 
 case class RequestForHistoricDocuments(
