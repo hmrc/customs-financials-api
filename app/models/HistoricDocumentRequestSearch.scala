@@ -22,29 +22,52 @@ import utils.Utils.emptyString
 
 import java.util.UUID
 
-case class HistoricDocumentRequestSearch(searcID: UUID,
+case class HistoricDocumentRequestSearch(searchID: UUID,
                                          userId: String,
                                          resultsFound: String,
                                          searchStatusUpdateDate: String = emptyString,
                                          currentEori: String,
                                          params: Params,
-                                         searchRequests: Seq[SearchRequest]) {
-  require(List("yes","no","inProcess").contains(resultsFound),  "resultsFound should have a valid value")
+                                         searchRequests: Set[SearchRequest]) {
+  require(List("yes", "no", "inProcess").contains(resultsFound), "resultsFound should have a valid value")
+  require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
 object HistoricDocumentRequestSearch {
   implicit val historicDocumentRequestSearchFormat: OFormat[HistoricDocumentRequestSearch] =
     Json.format[HistoricDocumentRequestSearch]
 
-  def from(historicDocumentRequests: Set[HistoricDocumentRequest]): HistoricDocumentRequestSearch = {
+  def from(historicDocumentRequests: Set[HistoricDocumentRequest],
+           userId: String,
+           requestEori: String): HistoricDocumentRequestSearch = {
+
+    val headHistDocRequest = historicDocumentRequests.head
+    val params = Params(
+      headHistDocRequest.periodStartMonth.toString,
+      headHistDocRequest.periodStartYear.toString,
+      headHistDocRequest.periodEndMonth.toString,
+      headHistDocRequest.periodEndYear.toString,
+      headHistDocRequest.documentType.value,
+      headHistDocRequest.dan.getOrElse(emptyString))
+
+    val searchDocReqs = historicDocumentRequests.map {
+      histDoc =>
+        SearchRequest(
+          histDoc.eori.value,
+          UUID.randomUUID().toString,
+          "inProcess",
+          emptyString,
+          emptyString,
+          0)
+    }
 
     HistoricDocumentRequestSearch(
       UUID.randomUUID(),
-      FileRole(""),
-      2021,
-      2,
-      2021,
-      3,
-      Some(""))
+      userId,
+      "inProcess",
+      emptyString,
+      requestEori,
+      params,
+      searchDocReqs)
   }
 }
