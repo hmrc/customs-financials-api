@@ -23,7 +23,7 @@ import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, LoggerLike}
 import services.HistoricDocumentService
-import services.cache.HistoricDocumentRequestCache
+import services.cache.HistoricDocumentRequestCacheService
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -36,25 +36,27 @@ import scala.concurrent._
 class HistoricDocumentRequestController @Inject()(service: HistoricDocumentService,
                                                   dataStoreService: DataStoreConnector,
                                                   authorisedRequest: AuthorisedRequest,
-                                                  historicDocRequestCache:HistoricDocumentRequestCache,
-                                                  cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                  histDocRequestCacheService: HistoricDocumentRequestCacheService,
+                                                  cc: ControllerComponents)(implicit ec: ExecutionContext)
+  extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def makeRequest( ): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def makeRequest(): Action[JsValue] = authorisedRequest.async(parse.json) {
+    implicit request: RequestWithEori[JsValue] =>
 
-    withJsonBody[RequestForHistoricDocuments] { frontEndRequest =>
-      for {
-        historicEoris <- dataStoreService.getEoriHistory(request.eori)
-         userId <- internalId
-        allEoris = historicEoris.toSet + request.eori
-        historicDocumentRequests: Set[HistoricDocumentRequest] = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
-        result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
-      } yield {
-        log.info(s"Historic Documents requested ${allEoris.size}")
-        if (result.contains(false)) ServiceUnavailable else NoContent
+      withJsonBody[RequestForHistoricDocuments] { frontEndRequest =>
+        for {
+          historicEoris <- dataStoreService.getEoriHistory(request.eori)
+          userId <- internalId
+          allEoris = historicEoris.toSet + request.eori
+          historicDocumentRequests: Set[HistoricDocumentRequest] = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
+          result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
+        } yield {
+          log.info(s"Historic Documents requested ${allEoris.size}")
+          if (result.contains(false)) ServiceUnavailable else NoContent
+        }
       }
-    }
   }
 
   private def internalId()(implicit hc: HeaderCarrier): Future[String] =
@@ -72,11 +74,19 @@ case class RequestForHistoricDocuments(
                                       ) {
 
   def toHistoricDocumentRequest(eori: EORI): HistoricDocumentRequest = {
-    new HistoricDocumentRequest(eori, this.documentType, this.from.getYear, this.from.getMonthValue, this.until.getYear, this.until.getMonthValue, dan)
+    new HistoricDocumentRequest(
+      eori,
+      this.documentType,
+      this.from.getYear,
+      this.from.getMonthValue,
+      this.until.getYear,
+      this.until.getMonthValue,
+      dan)
   }
 }
 
 object RequestForHistoricDocuments {
-  implicit val requestForHistoricDocumentsFormat: OFormat[RequestForHistoricDocuments] = Json.format[RequestForHistoricDocuments]
+  implicit val requestForHistoricDocumentsFormat: OFormat[RequestForHistoricDocuments] =
+    Json.format[RequestForHistoricDocuments]
 }
 

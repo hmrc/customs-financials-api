@@ -29,7 +29,8 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
                                          currentEori: String,
                                          params: Params,
                                          searchRequests: Set[SearchRequest]) {
-  require(List("yes", "no", "inProcess").contains(resultsFound), "resultsFound should have a valid value")
+  //require(List("yes", "no", "inProcess").contains(resultsFound), "resultsFound should have a valid value")
+  require(SearchStatus.fromString(resultsFound).nonEmpty, "resultsFound should have a valid value")
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
@@ -55,7 +56,7 @@ object HistoricDocumentRequestSearch {
         SearchRequest(
           histDoc.eori.value,
           UUID.randomUUID().toString,
-          "inProcess",
+          SearchStatus.inProcess.toString,
           emptyString,
           emptyString,
           0)
@@ -64,10 +65,19 @@ object HistoricDocumentRequestSearch {
     HistoricDocumentRequestSearch(
       UUID.randomUUID(),
       userId,
-      "inProcess",
+      SearchStatus.inProcess.toString,
       emptyString,
       requestEori,
       params,
       searchDocReqs)
+  }
+}
+
+object SearchStatus extends Enumeration {
+  type SearchStatus = Value
+  val yes, no, inProcess = Value
+
+  def fromString(value: String): Option[SearchStatus] = {
+    values.find(_.toString.toLowerCase == value.toLowerCase)
   }
 }

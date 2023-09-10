@@ -47,13 +47,13 @@ class HistoricDocumentRequestCache @Inject()(
     )
   )
 ) {
-  def insertHistoricDocRequestSearchRecord(req: HistoricDocumentRequestSearch): Future[Boolean] =
+  def insertRecord(req: HistoricDocumentRequestSearch): Future[Boolean] =
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
  /* def upsertHistoricDocRequestSearchRecord(req: HistoricDocumentRequestSearch) =
     collection.updateOne(filter = Filters.and(),req, new FindOneAndUpdateOptions().upsert(true)).toFuture().map(_ => ())*/
 
-  def retrieveHistoricDocRequestSearchRecord(userId: String): Future[Seq[HistoricDocumentRequestSearch]] =
+  def retrieveRecords(userId: String): Future[Seq[HistoricDocumentRequestSearch]] =
     collection.find(equal("userId", userId)).toFuture()
 
   def deleteAllRecords: Future[String] =
