@@ -90,8 +90,10 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
         searchRequests)
 
     val historicDocumentRequests: Set[HistoricDocumentRequest] = Set(
-      HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDefermentStatement"), 2021, 2, 2021, 4, Some("1234567")),
-      HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDefermentStatement"), 2021, 2, 2021, 4, Some("1234567")))
+      HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDefermentStatement"),
+        2021, 2, 2021, 4, Some("1234567")),
+      HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDefermentStatement"),
+        2021, 2, 2021, 4, Some("1234567")))
 
     val jsValue: String =
       s"""{"searchID": "${searchID}",

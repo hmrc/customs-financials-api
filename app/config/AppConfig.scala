@@ -88,5 +88,4 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
     configuration.get[String]("mongodb.historic-document-request-search.name")
   lazy val mongoHistDocSearchTtl: Long =
     configuration.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")
-
 }

@@ -92,7 +92,8 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
         _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
-        documentsInDB <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori("GB123456789012")
+        documentsInDB <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori(
+          "GB123456789012")
       } yield documentsInDB
 
       whenReady(documentsInDB) { documentsInDB =>

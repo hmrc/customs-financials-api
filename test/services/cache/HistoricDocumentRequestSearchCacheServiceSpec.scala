@@ -78,7 +78,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    val mockHistDocReqSearchCache: HistoricDocumentRequestSearchCache = mock[HistoricDocumentRequestSearchCache]
+    val mockHistDocReqSearchCache: HistoricDocumentRequestSearchCache =
+      mock[HistoricDocumentRequestSearchCache]
 
     val app: Application = application().overrides(
       inject.bind[HistoricDocumentRequestSearchCache].toInstance(mockHistDocReqSearchCache)
