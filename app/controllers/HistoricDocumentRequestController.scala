@@ -24,10 +24,7 @@ import play.api.mvc.{Action, ControllerComponents, Result}
 import play.api.{Logger, LoggerLike}
 import services.HistoricDocumentService
 import services.cache.HistoricDocumentRequestSearchCacheService
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import utils.Utils.emptyString
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -48,7 +45,7 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
       withJsonBody[RequestForHistoricDocuments] { frontEndRequest =>
         for {
           historicEoris <- dataStoreService.getEoriHistory(request.eori)
-          userId <- internalId
+          //userId <- internalId
           allEoris = historicEoris.toSet + request.eori
           historicDocumentRequests: Set[HistoricDocumentRequest] = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
           result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
@@ -56,17 +53,15 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
           log.info(s"Historic Documents requested ${allEoris.size}")
           if (result.contains(false))
             ServiceUnavailable
-          else saveHistoricDocRequestsAndReturnNoContent(request, userId, historicDocumentRequests)
+          else saveHistoricDocRequestsAndReturnNoContent(request, historicDocumentRequests)
         }
       }
   }
 
   private def saveHistoricDocRequestsAndReturnNoContent(request: RequestWithEori[JsValue],
-                                                       userId: String,
-                                                       historicDocRequests: Set[HistoricDocumentRequest]): Result = {
+                                                        historicDocRequests: Set[HistoricDocumentRequest]): Result = {
     saveHistoricDocRequests(
       historicDocRequests,
-      userId,
       request.eori.value,
       histDocRequestCacheService).map(identity)
 
@@ -74,19 +69,19 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
   }
 
   private def saveHistoricDocRequests(historicDocumentRequests: Set[HistoricDocumentRequest],
-                                      userId: String,
                                       requestEori: String,
                                       histDocRequestCacheService: HistoricDocumentRequestSearchCacheService):
   Future[Boolean] = {
-    val histDocRequestSearch = HistoricDocumentRequestSearch.from(historicDocumentRequests, userId, requestEori)
+    val histDocRequestSearch = HistoricDocumentRequestSearch.from(historicDocumentRequests, requestEori)
     histDocRequestCacheService.saveHistoricDocumentRequestSearch(histDocRequestSearch)
   }
 
-private def internalId()(implicit hc: HeaderCarrier): Future[String] =
+  /*private def internalId()(implicit hc: HeaderCarrier): Future[String] =
     authorisedRequest.authorised().retrieve(Retrievals.internalId) {
       case Some(internalId) => Future.successful(internalId)
       case _ => Future.successful(emptyString)
     }
+}*/
 }
 
 case class RequestForHistoricDocuments(

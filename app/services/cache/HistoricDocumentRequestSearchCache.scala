@@ -38,9 +38,9 @@ class HistoricDocumentRequestSearchCache @Inject()(
   domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
   indexes = Seq(
     IndexModel(
-      ascending("userId"),
+      ascending("currentEori"),
       IndexOptions()
-        .name("UserIdIndex")
+        .name("CurrentEoriIndex")
         .unique(false)
         .sparse(false)
         .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
@@ -53,8 +53,8 @@ class HistoricDocumentRequestSearchCache @Inject()(
  /* def upsertHistoricDocRequestSearchRecord(req: HistoricDocumentRequestSearch) =
     collection.updateOne(filter = Filters.and(),req, new FindOneAndUpdateOptions().upsert(true)).toFuture().map(_ => ())*/
 
-  def retrieveRecords(userId: String): Future[Seq[HistoricDocumentRequestSearch]] =
-    collection.find(equal("userId", userId)).toFuture()
+  def retrieveRecords(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
+    collection.find(equal("currentEori", currentEori)).toFuture()
 
   def deleteAllRecords: Future[String] =
     collection.deleteMany(BsonDocument()).toFuture() map { _ => "All records removed" }

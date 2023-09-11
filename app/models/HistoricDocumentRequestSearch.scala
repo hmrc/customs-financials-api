@@ -23,7 +23,6 @@ import utils.Utils.emptyString
 import java.util.UUID
 
 case class HistoricDocumentRequestSearch(searchID: UUID,
-                                         userId: String,
                                          resultsFound: String,
                                          searchStatusUpdateDate: String = emptyString,
                                          currentEori: String,
@@ -39,7 +38,6 @@ object HistoricDocumentRequestSearch {
     Json.format[HistoricDocumentRequestSearch]
 
   def from(historicDocumentRequests: Set[HistoricDocumentRequest],
-           userId: String,
            requestEori: String): HistoricDocumentRequestSearch = {
 
     val headHistDocRequest = historicDocumentRequests.head
@@ -64,7 +62,6 @@ object HistoricDocumentRequestSearch {
 
     HistoricDocumentRequestSearch(
       UUID.randomUUID(),
-      userId,
       SearchStatus.inProcess.toString,
       emptyString,
       requestEori,

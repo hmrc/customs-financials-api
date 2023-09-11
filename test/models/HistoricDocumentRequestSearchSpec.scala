@@ -53,10 +53,9 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
   "from" should {
     "return the correct HistoricDocumentRequestSearchSpec object" in new Setup {
       val actualHistDocReqSearch: HistoricDocumentRequestSearch =
-        HistoricDocumentRequestSearch.from(historicDocumentRequests, userId, currentEori)
+        HistoricDocumentRequestSearch.from(historicDocumentRequests, currentEori)
       val expected: HistoricDocumentRequestSearch = histDocRequestSearch
 
-      actualHistDocReqSearch.userId mustBe expected.userId
       actualHistDocReqSearch.resultsFound mustBe expected.resultsFound
       actualHistDocReqSearch.params mustBe expected.params
       actualHistDocReqSearch.searchRequests.size mustBe expected.searchRequests.size
@@ -84,7 +83,6 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
       HistoricDocumentRequestSearch(searchID,
-        userId,
         resultsFound,
         searchStatusUpdateDate,
         currentEori,
@@ -97,7 +95,6 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
     val jsValue: String =
       s"""{"searchID": "${searchID}",
-         |"userId":"${userId}",
          |"resultsFound": "inProcess",
          |"searchStatusUpdateDate": "",
          |"currentEori": "GB123456789012",

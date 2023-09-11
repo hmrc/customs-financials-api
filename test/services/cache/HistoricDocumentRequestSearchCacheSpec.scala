@@ -39,7 +39,6 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
   import HistoricDocumentRequestSearchCacheSpec._
 
-  private val externalId = "externalId"
   var historicDocumentRequestCache: HistoricDocumentRequestSearchCache = _
 
   override def beforeAll(): Unit = {
@@ -93,7 +92,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
         _ <- historicDocumentRequestCache.insertRecord(getHistoricDocumentRequestSearchDoc)
-        documentsInDB <- historicDocumentRequestCache.retrieveRecords("test_userId")
+        documentsInDB <- historicDocumentRequestCache.retrieveRecords("GB123456789012")
       } yield documentsInDB
 
       whenReady(documentsInDB) { documentsInDB =>
@@ -104,7 +103,6 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
   private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
-    val userId: String = "test_userId"
     val resultsFound: String = "inProcess"
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
@@ -117,7 +115,6 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     )
 
     HistoricDocumentRequestSearch(searchID,
-      userId,
       resultsFound,
       searchStatusUpdateDate,
       currentEori,

@@ -59,7 +59,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.retrieveHistDocRequestSearchRecordsForUserId("test_id").map {
+      service.retrieveHistDocRequestSearchRecordsForCurrentEori("test_eori").map {
         records => records mustBe Seq(histDocRequestSearch, histDocRequestSearch)
       }
     }
@@ -71,7 +71,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.retrieveHistDocRequestSearchRecordsForUserId("test_id").map {
+      service.retrieveHistDocRequestSearchRecordsForCurrentEori("test_eori").map {
         records => records mustBe Seq()
       }
     }
@@ -99,7 +99,6 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
       HistoricDocumentRequestSearch(searchID,
-        userId,
         resultsFound,
         searchStatusUpdateDate,
         currentEori,
