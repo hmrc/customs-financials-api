@@ -45,7 +45,6 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
       withJsonBody[RequestForHistoricDocuments] { frontEndRequest =>
         for {
           historicEoris <- dataStoreService.getEoriHistory(request.eori)
-          //userId <- internalId
           allEoris = historicEoris.toSet + request.eori
           historicDocumentRequests: Set[HistoricDocumentRequest] = allEoris.map(frontEndRequest.toHistoricDocumentRequest)
           result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
@@ -58,6 +57,9 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
       }
   }
 
+  /**
+   * Saves the HistoricDocumentRequests and return 204 NO_CONTENT
+   */
   private def saveHistoricDocRequestsAndReturnNoContent(request: RequestWithEori[JsValue],
                                                         historicDocRequests: Set[HistoricDocumentRequest]): Result = {
     saveHistoricDocRequests(
@@ -75,13 +77,6 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
     val histDocRequestSearch = HistoricDocumentRequestSearch.from(historicDocumentRequests, requestEori)
     histDocRequestCacheService.saveHistoricDocumentRequestSearch(histDocRequestSearch)
   }
-
-  /*private def internalId()(implicit hc: HeaderCarrier): Future[String] =
-    authorisedRequest.authorised().retrieve(Retrievals.internalId) {
-      case Some(internalId) => Future.successful(internalId)
-      case _ => Future.successful(emptyString)
-    }
-}*/
 }
 
 case class RequestForHistoricDocuments(
@@ -107,4 +102,3 @@ object RequestForHistoricDocuments {
   implicit val requestForHistoricDocumentsFormat: OFormat[RequestForHistoricDocuments] =
     Json.format[RequestForHistoricDocuments]
 }
-
