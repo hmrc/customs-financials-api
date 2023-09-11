@@ -25,8 +25,10 @@ case class SearchRequest(eoriNumber: String,
                          searchDateTime: String = emptyString,
                          searchFailureReasonCode: String,
                          failureRetryCount: Int) {
-  require(List("yes", "no", "inProcess").contains(searchSuccessful), "invalid value for searchSuccessful")
-  require(failureRetryCount >= 0 && failureRetryCount < 6, "invalid value for failureRetryCount")
+  require(SearchStatus.fromString(searchSuccessful).nonEmpty,
+    "invalid value for searchSuccessful, valid values are yes,no,inProcess")
+  require(failureRetryCount >= 0 && failureRetryCount < 6,
+    "invalid value for failureRetryCount, valid values are 0,1,2,3,4,5")
 }
 
 object SearchRequest {
