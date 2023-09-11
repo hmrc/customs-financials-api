@@ -16,12 +16,16 @@
 
 package utils
 
-import models.claims.responses.{SctyClaimDetails, Reimbursement => ReimbursementResponse, Goods => GoodsResponse}
+import com.codahale.metrics.MetricRegistry
+import com.kenshoo.play.metrics.Metrics
+import models.claims.responses.{SctyClaimDetails, Goods => GoodsResponse, Reimbursement => ReimbursementResponse}
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import play.api.inject.bind
 
 trait SpecBase extends AnyWordSpecLike
   with MockitoSugar
@@ -54,4 +58,17 @@ trait SpecBase extends AnyWordSpecLike
     Some("20221012"),
     Some(Seq(reimbursementResponse))
   )
+
+  def application(): GuiceApplicationBuilder = new GuiceApplicationBuilder().overrides(
+    bind[Metrics].toInstance(new FakeMetrics)
+  ).configure(
+    "play.filters.csp.nonce.enabled" -> false,
+    "auditing.enabled" -> "false",
+    "microservice.metrics.graphite.enabled" -> "false",
+    "metrics.enabled" -> "false")
+
+  class FakeMetrics extends Metrics {
+    override val defaultRegistry: MetricRegistry = new MetricRegistry
+    override val toJson: String = "{}"
+  }
 }

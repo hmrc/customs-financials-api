@@ -19,6 +19,7 @@ object AppDependencies {
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
     "org.mockito" %% "mockito-scala-scalatest" % "1.17.14" % "test",
     "com.vladsch.flexmark" % "flexmark-all" % "0.64.8" % "test",
-    "uk.gov.hmrc" %% "bootstrap-test-play-28" % bootstrapVersion % "test"
+    "uk.gov.hmrc" %% "bootstrap-test-play-28" % bootstrapVersion % "test",
+    "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "3.5.3" % Test,
   )
 }
