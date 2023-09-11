@@ -25,7 +25,7 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class HistoricDocumentRequestCacheServiceSpec extends SpecBase {
+class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
   "saveHistoricDocumentRequestSearch" should {
     "return true when record is insert successfully" in new Setup {
