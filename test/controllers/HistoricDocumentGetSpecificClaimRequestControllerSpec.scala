@@ -27,6 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, inject}
 import services._
+import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
 
@@ -41,12 +42,16 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
         val expectedHistoricDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(eori, FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
         when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(Future.successful(Nil))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(meq(expectedHistoricDocumentRequest))(any)).thenReturn(Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
+          Future.successful(true))
 
         running(app) {
           val result = route(app, request).value
           status(result) mustBe NO_CONTENT
           verify(mockDataStoreService, times(1)).getEoriHistory(any)(any)
           verify(mockHistoricDocumentService, times(1)).sendHistoricDocumentRequest(any)(any)
+          verify(mockHistDocReqSearchCacheService,
+            times(1)).saveHistoricDocumentRequestSearch(any)
         }
       }
 
@@ -59,12 +64,16 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(meq(expectedHistoricDocumentRequest))(any)).thenReturn(Future.successful(true))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(meq(expectedRequestForHistoric1))(any)).thenReturn(Future.successful(true))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(meq(expectedRequestForHistoric2))(any)).thenReturn(Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
+          Future.successful(true))
 
         running(app) {
           val result = route(app, request).value
           status(result) mustBe NO_CONTENT
           verify(mockDataStoreService, times(1)).getEoriHistory(any)(any)
           verify(mockHistoricDocumentService, times(3)).sendHistoricDocumentRequest(any)(any)
+          verify(mockHistDocReqSearchCacheService,
+            times(1)).saveHistoricDocumentRequestSearch(any)
         }
       }
 
@@ -72,6 +81,8 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
         val expectedHistoricDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(eori, FileRole("DutyDefermentStatement"), 2019, 1, 2019, 3, Some("dan"))
         when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(Future.successful(Nil))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(meq(expectedHistoricDocumentRequest))(any)).thenReturn(Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
+          Future.successful(true))
 
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.HistoricDocumentRequestController.makeRequest().url)
           .withJsonBody(Json.toJson(frontEndRequest.copy(documentType = FileRole("DutyDefermentStatement"), dan = Some("dan"))))
@@ -119,6 +130,8 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockHistoricDocumentService: HistoricDocumentService = mock[HistoricDocumentService]
     val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
+    val mockHistDocReqSearchCacheService: HistoricDocumentRequestSearchCacheService =
+      mock[HistoricDocumentRequestSearchCacheService]
 
     val frontEndRequest: RequestForHistoricDocuments = RequestForHistoricDocuments(
       FileRole("C79Certificate"),
@@ -134,7 +147,8 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
       inject.bind[DataStoreConnector].toInstance(mockDataStoreService),
-      inject.bind[HistoricDocumentService].toInstance(mockHistoricDocumentService)
+      inject.bind[HistoricDocumentService].toInstance(mockHistoricDocumentService),
+      inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,
