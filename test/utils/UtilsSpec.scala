@@ -52,5 +52,14 @@ class UtilsSpec extends SpecBase {
       isDateTimeStringInIso8601(emptyString) mustBe false
     }
   }
+
+  "zeroPad" should {
+    "return correct value" in {
+      zeroPad(2) mustBe "02"
+      zeroPad(5) mustBe "05"
+      zeroPad(10) mustBe "10"
+      zeroPad(9) mustBe "09"
+    }
+  }
 }
 }

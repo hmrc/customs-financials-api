@@ -73,7 +73,7 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
     val resultsFound: String = "inProcess"
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
-    val params: Params = Params("2", "2021", "4", "2021", "DutyDeferment", "1234567")
+    val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
         "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
@@ -90,8 +90,8 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
         searchRequests)
 
     val historicDocumentRequests: Set[HistoricDocumentRequest] = Set(
-      HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDeferment"), 2021, 2, 2021, 4, Some("1234567")),
-      HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDeferment"), 2021, 2, 2021, 4, Some("1234567")))
+      HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDefermentStatement"), 2021, 2, 2021, 4, Some("1234567")),
+      HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDefermentStatement"), 2021, 2, 2021, 4, Some("1234567")))
 
     val jsValue: String =
       s"""{"searchID": "${searchID}",
@@ -99,11 +99,11 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
          |"searchStatusUpdateDate": "",
          |"currentEori": "GB123456789012",
          |"params": {
-         |"periodStartMonth": "2",
+         |"periodStartMonth": "02",
          |"periodStartYear": "2021",
-         |"periodEndMonth": "4",
+         |"periodEndMonth": "04",
          |"periodEndYear": "2021",
-         |"accountType": "DutyDeferment",
+         |"accountType": "DutyDefermentStatement",
          |"dan": "1234567"
          |},
          |"searchRequests":[

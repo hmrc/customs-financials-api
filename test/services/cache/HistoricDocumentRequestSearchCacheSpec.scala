@@ -106,7 +106,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     val resultsFound: String = "inProcess"
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
-    val params: Params = Params("2", "2021", "4", "2021", "DutyDeferment", "1234567")
+    val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
         "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),

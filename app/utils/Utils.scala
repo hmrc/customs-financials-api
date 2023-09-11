@@ -28,4 +28,11 @@ object Utils {
     s"${DateTimeFormatter.ISO_DATE_TIME.format(dateTime.truncatedTo(ChronoUnit.SECONDS))}Z"
 
   def isDateTimeStringInIso8601(isoDate: String): Boolean = isoDate.trim.matches(iso8601DateTimeRegEx)
+
+  /**
+   * Returns the value with zero padding
+   * ex - input - 2  returns 02
+   * input  - 10 returns 10
+   */
+  def zeroPad(value: Int): String = "%02d".format(value)
 }

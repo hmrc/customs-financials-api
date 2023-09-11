@@ -28,7 +28,7 @@ class ParamsSpec extends SpecBase {
         "2021",
         "3",
         "2021",
-        "DutyDeferment",
+        AccountTypeForParams.DutyDefermentStatement.toString,
         "1234567")
 
       val jsValue =
@@ -36,7 +36,7 @@ class ParamsSpec extends SpecBase {
           |"periodStartYear": "2021",
           |"periodEndMonth": "3",
           |"periodEndYear": "2021",
-          |"accountType": "DutyDeferment",
+          |"accountType": "DutyDefermentStatement",
           |"dan": "1234567"}""".stripMargin
 
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(paramsOb)
@@ -49,7 +49,7 @@ class ParamsSpec extends SpecBase {
         "2021",
         "3",
         "2021",
-        "DutyDeferment",
+        "DutyDefermentStatement",
         "1234567")
 
       val jsValue =
@@ -57,7 +57,7 @@ class ParamsSpec extends SpecBase {
           |"periodStartYear": "2021",
           |"periodEndMonth": "3",
           |"periodEndYear": "2021",
-          |"accountType": "DutyDeferment",
+          |"accountType": "DutyDefermentStatement",
           |"dan": "1234567"}""".stripMargin
 
       Json.toJson(paramsOb) mustBe Json.parse(jsValue)

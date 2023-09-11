@@ -18,7 +18,7 @@ package models
 
 import models.requests.HistoricDocumentRequest
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils.emptyString
+import utils.Utils.{emptyString, zeroPad}
 
 import java.util.UUID
 
@@ -43,9 +43,9 @@ object HistoricDocumentRequestSearch {
 
     val headHistDocRequest = historicDocumentRequests.head
     val params = Params(
-      headHistDocRequest.periodStartMonth.toString,
+      zeroPad(headHistDocRequest.periodStartMonth),
       headHistDocRequest.periodStartYear.toString,
-      headHistDocRequest.periodEndMonth.toString,
+      zeroPad(headHistDocRequest.periodEndMonth),
       headHistDocRequest.periodEndYear.toString,
       headHistDocRequest.documentType.value,
       headHistDocRequest.dan.getOrElse(emptyString))
