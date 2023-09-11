@@ -58,11 +58,11 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   override def afterAll(): Unit =
     stopMongoD()
 
-  "insertRecord " should {
-    "insert the record in Mongo collection when collection is empty" in {
+  "insertDocument " should {
+    "insert the document in Mongo collection when collection is empty" in {
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertRecord(getHistoricDocumentRequestSearchDoc)
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
         documentsInDB <- historicDocumentRequestCache.collection.find().toFuture()
       } yield documentsInDB
 
@@ -72,11 +72,11 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       }
     }
 
-    "insert the record in Mongo collection when collection has one doc already" in {
+    "insert the document in Mongo collection when collection has one doc already" in {
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertRecord(getHistoricDocumentRequestSearchDoc)
-        _ <- historicDocumentRequestCache.insertRecord(getHistoricDocumentRequestSearchDoc)
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
         documentsInDB <- historicDocumentRequestCache.collection.find().toFuture()
       } yield documentsInDB
 
@@ -87,12 +87,12 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     }
   }
 
-  "retrieveRecords" should {
-    "retrieve the records correctly" in {
+  "retrieveDocumentsForCurrentEori" should {
+    "retrieve the documents correctly" in {
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertRecord(getHistoricDocumentRequestSearchDoc)
-        documentsInDB <- historicDocumentRequestCache.retrieveRecords("GB123456789012")
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        documentsInDB <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori("GB123456789012")
       } yield documentsInDB
 
       whenReady(documentsInDB) { documentsInDB =>

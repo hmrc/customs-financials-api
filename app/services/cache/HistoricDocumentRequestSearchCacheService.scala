@@ -25,9 +25,9 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
                                                          (implicit ec: ExecutionContext) {
 
   def saveHistoricDocumentRequestSearch(req: HistoricDocumentRequestSearch): Future[Boolean] =
-    historicDocRequestCache.insertRecord(req)
+    historicDocRequestCache.insertDocument(req)
 
-  def retrieveHistDocRequestSearchRecordsForCurrentEori(currentEori: String):
+  def retrieveHistDocRequestSearchDocsForCurrentEori(currentEori: String):
   Future[Seq[HistoricDocumentRequestSearch]] =
-    historicDocRequestCache.retrieveRecords(currentEori)
+    historicDocRequestCache.retrieveDocumentsForCurrentEori(currentEori)
 }

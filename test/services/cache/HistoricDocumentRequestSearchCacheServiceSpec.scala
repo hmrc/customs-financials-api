@@ -28,8 +28,8 @@ import scala.concurrent.Future
 class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
   "saveHistoricDocumentRequestSearch" should {
-    "return true when record is insert successfully" in new Setup {
-      when(mockHistDocReqSearchCache.insertRecord(any)).thenReturn(Future.successful(true))
+    "return true when document is insert successfully" in new Setup {
+      when(mockHistDocReqSearchCache.insertDocument(any)).thenReturn(Future.successful(true))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
@@ -39,8 +39,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       }
     }
 
-    "return false when record is not inserted" in new Setup {
-      when(mockHistDocReqSearchCache.insertRecord(any)).thenReturn(Future.successful(false))
+    "return false when document is not inserted" in new Setup {
+      when(mockHistDocReqSearchCache.insertDocument(any)).thenReturn(Future.successful(false))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
@@ -51,27 +51,27 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
     }
   }
 
-  "retrieveHistDocRequestSearchRecordsForUserId" should {
-    "retrieve the records when records are present in the DB" in new Setup {
-      when(mockHistDocReqSearchCache.retrieveRecords(any)).thenReturn(Future.successful(
+  "retrieveHistDocRequestSearchDocsForCurrentEori" should {
+    "retrieve the documents when documents are present in the DB" in new Setup {
+      when(mockHistDocReqSearchCache.retrieveDocumentsForCurrentEori(any)).thenReturn(Future.successful(
         Seq(histDocRequestSearch, histDocRequestSearch)))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.retrieveHistDocRequestSearchRecordsForCurrentEori("test_eori").map {
+      service.retrieveHistDocRequestSearchDocsForCurrentEori("test_eori").map {
         records => records mustBe Seq(histDocRequestSearch, histDocRequestSearch)
       }
     }
 
-    "return the empty records when records are not present in the DB" in new Setup {
-      when(mockHistDocReqSearchCache.retrieveRecords(any)).thenReturn(Future.successful(
+    "return the empty documents when documents are not present in the DB" in new Setup {
+      when(mockHistDocReqSearchCache.retrieveDocumentsForCurrentEori(any)).thenReturn(Future.successful(
         Seq()))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.retrieveHistDocRequestSearchRecordsForCurrentEori("test_eori").map {
+      service.retrieveHistDocRequestSearchDocsForCurrentEori("test_eori").map {
         records => records mustBe Seq()
       }
     }

@@ -19,7 +19,6 @@ package services.cache
 import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
 import models.HistoricDocumentRequestSearch
-import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{IndexModel, IndexOptions}
 import uk.gov.hmrc.mongo.MongoComponent
@@ -29,33 +28,27 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class HistoricDocumentRequestSearchCache @Inject()(
-                                              appConfig: AppConfig,
-                                              mongoComponent: MongoComponent)
-                                                  (implicit val ec: ExecutionContext) extends PlayMongoRepository[HistoricDocumentRequestSearch](
-  mongoComponent = mongoComponent,
-  collectionName = appConfig.mongoHistDocSearchCollectionName,
-  domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
-  indexes = Seq(
-    IndexModel(
-      ascending("currentEori"),
-      IndexOptions()
-        .name("CurrentEoriIndex")
-        .unique(false)
-        .sparse(false)
-        .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
+class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
+                                                   mongoComponent: MongoComponent)
+                                                  (implicit val ec: ExecutionContext)
+  extends PlayMongoRepository[HistoricDocumentRequestSearch](
+    mongoComponent = mongoComponent,
+    collectionName = appConfig.mongoHistDocSearchCollectionName,
+    domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
+    indexes = Seq(
+      IndexModel(
+        ascending("currentEori"),
+        IndexOptions()
+          .name("CurrentEoriIndex")
+          .unique(false)
+          .sparse(false)
+          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
+      )
     )
-  )
-) {
-  def insertRecord(req: HistoricDocumentRequestSearch): Future[Boolean] =
+  ) {
+  def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] =
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
- /* def upsertHistoricDocRequestSearchRecord(req: HistoricDocumentRequestSearch) =
-    collection.updateOne(filter = Filters.and(),req, new FindOneAndUpdateOptions().upsert(true)).toFuture().map(_ => ())*/
-
-  def retrieveRecords(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
+  def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     collection.find(equal("currentEori", currentEori)).toFuture()
-
-  def deleteAllRecords: Future[String] =
-    collection.deleteMany(BsonDocument()).toFuture() map { _ => "All records removed" }
 }
