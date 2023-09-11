@@ -28,11 +28,11 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
     "throw exception if parameters' values are invalid" in new Setup {
       intercept[RuntimeException] {
         histDocRequestSearch.copy(searchRequests = Set.empty)
-      }
+      }.getMessage.contains("searchRequests is empty")
 
       intercept[RuntimeException] {
         histDocRequestSearch.copy(resultsFound = emptyString)
-      }
+      }.getMessage.contains("invalid value for resultsFound, valid values are yes,no,inProcess")
     }
   }
 

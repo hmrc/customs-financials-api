@@ -24,7 +24,10 @@ case class Params(periodStartMonth: String,
                   periodEndYear: String,
                   accountType: String,
                   dan: String) {
-  require(AccountTypeForParams.fromString(accountType).nonEmpty, "invalid value for accountType")
+  require(
+    AccountTypeForParams.fromString(accountType).nonEmpty,
+    "invalid value for accountType," +
+      " valid values are C79Certificate,PostponedVATStatement,SecurityStatement,DutyDefermentStatement")
 }
 
 object Params {

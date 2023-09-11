@@ -20,6 +20,33 @@ import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
 class ParamsSpec extends SpecBase {
+  "object should be created" should {
+    "for correct parameter values" in {
+      val paramsOb = Params("2",
+        "2021",
+        "3",
+        "2021",
+        AccountTypeForParams.DutyDefermentStatement.toString,
+        "1234567")
+
+      paramsOb.accountType mustBe AccountTypeForParams.DutyDefermentStatement.toString
+    }
+  }
+
+  "Exception must be thrown" should {
+    "for incorrect parameter values" in {
+      intercept[RuntimeException] {
+        val paramsOb = Params("2",
+          "2021",
+          "3",
+          "2021",
+          "DutyDeferment",
+          "1234567")
+      }.getMessage.contains("invalid value for accountType," +
+        " valid values are C79Certificate,PostponedVATStatement,SecurityStatement,DutyDefermentStatement")
+    }
+  }
+
   "Json Reads" should {
     "result the correct output" in {
       import Params.paramsFormat

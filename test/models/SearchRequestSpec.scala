@@ -43,7 +43,7 @@ class SearchRequestSpec extends SpecBase {
           emptyString,
           emptyString,
           6)
-      }
+      }.getMessage.contains("invalid value for failureRetryCount, valid values are 0,1,2,3,4,5")
     }
   }
 
