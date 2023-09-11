@@ -18,12 +18,12 @@ package controllers
 
 import connectors.DataStoreConnector
 import models.requests.HistoricDocumentRequest
-import models.{EORI, FileRole}
+import models.{EORI, FileRole, HistoricDocumentRequestSearch}
 import play.api.libs.json.{JsValue, Json, OFormat}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import play.api.{Logger, LoggerLike}
 import services.HistoricDocumentService
-import services.cache.HistoricDocumentRequestCacheService
+import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -36,7 +36,7 @@ import scala.concurrent._
 class HistoricDocumentRequestController @Inject()(service: HistoricDocumentService,
                                                   dataStoreService: DataStoreConnector,
                                                   authorisedRequest: AuthorisedRequest,
-                                                  histDocRequestCacheService: HistoricDocumentRequestCacheService,
+                                                  histDocRequestCacheService: HistoricDocumentRequestSearchCacheService,
                                                   cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends BackendController(cc) {
 
@@ -54,12 +54,35 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
           result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
         } yield {
           log.info(s"Historic Documents requested ${allEoris.size}")
-          if (result.contains(false)) ServiceUnavailable else NoContent
+          if (result.contains(false))
+            ServiceUnavailable
+          else saveHistoricDocRequestsAndReturnNoContent(request, userId, historicDocumentRequests)
         }
       }
   }
 
-  private def internalId()(implicit hc: HeaderCarrier): Future[String] =
+  private def saveHistoricDocRequestsAndReturnNoContent(request: RequestWithEori[JsValue],
+                                                       userId: String,
+                                                       historicDocRequests: Set[HistoricDocumentRequest]): Result = {
+    saveHistoricDocRequests(
+      historicDocRequests,
+      userId,
+      request.eori.value,
+      histDocRequestCacheService).map(identity)
+
+    NoContent
+  }
+
+  private def saveHistoricDocRequests(historicDocumentRequests: Set[HistoricDocumentRequest],
+                                      userId: String,
+                                      requestEori: String,
+                                      histDocRequestCacheService: HistoricDocumentRequestSearchCacheService):
+  Future[Boolean] = {
+    val histDocRequestSearch = HistoricDocumentRequestSearch.from(historicDocumentRequests, userId, requestEori)
+    histDocRequestCacheService.saveHistoricDocumentRequestSearch(histDocRequestSearch)
+  }
+
+private def internalId()(implicit hc: HeaderCarrier): Future[String] =
     authorisedRequest.authorised().retrieve(Retrievals.internalId) {
       case Some(internalId) => Future.successful(internalId)
       case _ => Future.successful(emptyString)

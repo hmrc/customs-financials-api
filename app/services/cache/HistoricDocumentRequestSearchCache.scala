@@ -29,10 +29,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class HistoricDocumentRequestCache @Inject()(
+class HistoricDocumentRequestSearchCache @Inject()(
                                               appConfig: AppConfig,
                                               mongoComponent: MongoComponent)
-                                            (implicit val ec: ExecutionContext) extends PlayMongoRepository[HistoricDocumentRequestSearch](
+                                                  (implicit val ec: ExecutionContext) extends PlayMongoRepository[HistoricDocumentRequestSearch](
   mongoComponent = mongoComponent,
   collectionName = appConfig.mongoHistDocSearchCollectionName,
   domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,

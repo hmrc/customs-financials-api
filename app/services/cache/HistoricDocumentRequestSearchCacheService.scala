@@ -16,10 +16,19 @@
 
 package services.cache
 
+import models.HistoricDocumentRequestSearch
+
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class HistoricDocumentRequestCacheService@Inject()(historicDocRequestCache: HistoricDocumentRequestCache)
-                                         (implicit ec: ExecutionContext) {
+class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCache: HistoricDocumentRequestSearchCache)
+                                                         (implicit ec: ExecutionContext) {
 
+  def saveHistoricDocumentRequestSearch(req: HistoricDocumentRequestSearch): Future[Boolean] = {
+    historicDocRequestCache.insertRecord(req)
+  }
+
+  def retrieveHistDocRequestSearchRecordsForUserId(userId: String): Future[Seq[HistoricDocumentRequestSearch]] = {
+    historicDocRequestCache.retrieveRecords(userId)
+  }
 }

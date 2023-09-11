@@ -29,7 +29,7 @@ import utils.Utils.emptyString
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HistoricDocumentRequestCacheSpec extends SpecBase
+class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   with EmbeddedMongoDBSupport
   with BeforeAndAfter
   with BeforeAndAfterAll
@@ -37,10 +37,10 @@ class HistoricDocumentRequestCacheSpec extends SpecBase
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(30, Seconds), Span(1, Millis))
 
-  import HistoricDocumentRequestCacheSpec._
+  import HistoricDocumentRequestSearchCacheSpec._
 
   private val externalId = "externalId"
-  var historicDocumentRequestCache: HistoricDocumentRequestCache = _
+  var historicDocumentRequestCache: HistoricDocumentRequestSearchCache = _
 
   override def beforeAll(): Unit = {
     when(mockConfig.get[String]("mongodb.historic-document-request-search.name")).thenReturn(
@@ -126,16 +126,16 @@ class HistoricDocumentRequestCacheSpec extends SpecBase
   }
 }
 
-object HistoricDocumentRequestCacheSpec extends SpecBase {
+object HistoricDocumentRequestSearchCacheSpec extends SpecBase {
 
   private val mockAppConfig = mock[AppConfig]
   private val mockConfig = mock[Configuration]
   private val ttlValue = 28
 
   private def buildFormRepository(mongoHost: String,
-                                  mongoPort: Int): HistoricDocumentRequestCache = {
+                                  mongoPort: Int): HistoricDocumentRequestSearchCache = {
     val databaseName = "historic-document-request-search"
     val mongoUri = s"mongodb://$mongoHost:$mongoPort/$databaseName?heartbeatFrequencyMS=1000&rm.failover=default"
-    new HistoricDocumentRequestCache(mockAppConfig, MongoComponent(mongoUri))
+    new HistoricDocumentRequestSearchCache(mockAppConfig, MongoComponent(mongoUri))
   }
 }

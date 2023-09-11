@@ -30,7 +30,7 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
                                          params: Params,
                                          searchRequests: Set[SearchRequest]) {
   //require(List("yes", "no", "inProcess").contains(resultsFound), "resultsFound should have a valid value")
-  require(SearchStatus.fromString(resultsFound).nonEmpty, "resultsFound should have a valid value")
+  require(SearchStatus.fromString(resultsFound).nonEmpty, "invalid value for resultsFound, valid values are yes,no,inProcess")
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
