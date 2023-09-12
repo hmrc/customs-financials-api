@@ -19,6 +19,8 @@ package models.requests
 import models.{EORI, FileRole}
 import play.api.libs.json._
 
+import java.util.UUID
+
 case class HistoricDocumentRequest(
                                     eori: EORI,
                                     documentType: FileRole,
@@ -26,7 +28,8 @@ case class HistoricDocumentRequest(
                                     periodStartMonth: Int,
                                     periodEndYear: Int,
                                     periodEndMonth: Int,
-                                    dan: Option[String]
+                                    dan: Option[String],
+                                    statementRequestID: UUID = UUID.randomUUID()
                                   )
 
 object HistoricDocumentRequest {

@@ -18,13 +18,12 @@ package connectors
 
 import config.AppConfig
 import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
-import play.api.{Logger, LoggerLike}
 import play.api.http.Status
+import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,7 +38,7 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
       httpClient.POST[HistoricStatementRequest, HttpResponse](
         appConfig.acc24HistoricalStatementRetrievalEndpoint,
-        HistoricStatementRequest.from(historicDocumentRequest, UUID.randomUUID()),
+        HistoricStatementRequest.from(historicDocumentRequest),
         mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
         log.info(s"HistoricDocumentResponse :  $response")

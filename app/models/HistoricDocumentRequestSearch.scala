@@ -54,7 +54,7 @@ object HistoricDocumentRequestSearch {
       histDoc =>
         SearchRequest(
           histDoc.eori.value,
-          UUID.randomUUID().toString,
+          histDoc.statementRequestID.toString,
           SearchStatus.inProcess.toString,
           emptyString,
           emptyString,
