@@ -19,15 +19,13 @@ package models.requests
 import models.HistoricalStatementRetrievalInterfaceMetadata
 import play.api.libs.json.Json
 
-import java.util.UUID
-
 case class HistoricStatementRequest(HistoricalStatementRetrievalInterfaceMetadata: HistoricalStatementRetrievalInterfaceMetadata)
 
 object HistoricStatementRequest {
-  def from(historicDocumentRequest: HistoricDocumentRequest, requestId: UUID): HistoricStatementRequest = {
+  def from(historicDocumentRequest: HistoricDocumentRequest): HistoricStatementRequest = {
     HistoricStatementRequest(
       HistoricalStatementRetrievalInterfaceMetadata(
-        statementRequestID = requestId.toString,
+        statementRequestID = historicDocumentRequest.statementRequestID.toString,
         eori = historicDocumentRequest.eori,
         statementType = historicDocumentRequest.documentType,
         periodStartYear = historicDocumentRequest.periodStartYear.toString,
