@@ -34,7 +34,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               jsonSchemaValidator: JSONSchemaValidator,
                                                               authorizationHeaderFilter: AuthorizationHeaderFilter,
                                                               mdgHeaderFilter: MdgHeaderFilter,
-                                                              cacheService:HistoricDocumentRequestSearchCacheService
+                                                              cacheService: HistoricDocumentRequestSearchCacheService
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
@@ -50,8 +50,9 @@ class StatementSearchFailureNotificationController @Inject()(
       }
   }
 
-private def buildErrorResponse(errors: Throwable, correlationId: String) = {
-  StatementSearchFailureNotificationErrorResponse(errors,correlationId)
-}
+  private def buildErrorResponse(errors: Throwable, correlationId: String) = {
+    StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+  }
+
   private def updateHistoricDocumentRequestSearchForStatReqId(reqJsValue: JsValue): Unit = ()
 }
