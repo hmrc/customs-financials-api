@@ -67,17 +67,17 @@ object StatementSearchFailureNotificationErrorResponse {
     }
   }
 
-  private def isBothSchemaFieldsMissingError(agMsg: String,
+  private def isBothSchemaFieldsMissingError(aggregateErrorMsg: String,
                                              errorList: Seq[String]): Boolean = {
-    agMsg.contains("missing required properties") &&
-      agMsg.contains("reason") &&
-      agMsg.contains("statementRequestID") &&
+    aggregateErrorMsg.contains("missing required properties") &&
+      aggregateErrorMsg.contains("reason") &&
+      aggregateErrorMsg.contains("statementRequestID") &&
       errorList.size == 1
   }
 
-  private def isSingleMandatoryFieldMissingError(agMsg: String, errorList: Seq[String]) = {
-    agMsg.contains("missing required properties") && errorList.size == 1
-  }
+  private def isSingleMandatoryFieldMissingError(aggregateErrorMsg: String,
+                                                 errorList: Seq[String]) =
+    aggregateErrorMsg.contains("missing required properties") && errorList.size == 1
 }
 
 case class ErrorDetail(timestamp: String,
