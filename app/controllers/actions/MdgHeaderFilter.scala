@@ -42,7 +42,7 @@ class MdgHeaderDefaultFilter @Inject()(
 
   // Play 2.6 updates Content-Type key to lower case which means we need to do a case insensitive check
   private def checkForMissingHeaders[A](request: Request[A]): Either[Result, Request[A]] = {
-    val mandatoryHeaders = List("Date", "X-Correlation-ID", "X-Forwarded-Host", "Content-Type", "Accept")
+    val mandatoryHeaders = List("Date", "X-Correlation-ID", "X-Forwarded-Host", "Content-Type", "Accept", "Authorization")
     val missingHeaders = mandatoryHeaders.filterNot(request.headers.get(_).isDefined)
 
     missingHeaders match {

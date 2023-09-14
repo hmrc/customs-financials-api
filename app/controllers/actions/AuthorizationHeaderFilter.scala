@@ -16,14 +16,15 @@
 
 package controllers.actions
 
+import config.AppConfig
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-
 class DefaultAuthorizationHeaderFilter @Inject()(
                                                   val parser: BodyParsers.Default,
+                                                  appConfig: AppConfig
                                                 )(implicit val executionContext: ExecutionContext) extends AuthorizationHeaderFilter {
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(for {
@@ -33,9 +34,8 @@ class DefaultAuthorizationHeaderFilter @Inject()(
 
   private def validateAuthorization[A](request: Request[A]): Either[Result, Request[A]] = {
     request.headers.get("Authorization") match {
-      case Some("Bearer test1234567") => Right(request)
-      case Some("Bearer secret-token") => Right(request)
-      case _ => Left(Unauthorized("Invalid Authorization"))
+      case Some(s"${appConfig.bearerTokenValuePrefix} ${appConfig.ssfnBearerToken}") => Right(request)
+      case _ => Left(Unauthorized("Invalid Authorization token"))
     }
   }
 }

@@ -16,13 +16,29 @@
 
 package models.responses
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
+import utils.Utils.currentDateTimeAsRFC7231
+
+import java.time.LocalDateTime
 
 case class StatementSearchFailureNotificationErrorResponse(errorDetail: ErrorDetail)
 
 object StatementSearchFailureNotificationErrorResponse {
-  implicit val ssfnErrorResponseWrites: OWrites[StatementSearchFailureNotificationErrorResponse] =
-    Json.writes[StatementSearchFailureNotificationErrorResponse]
+  import ErrorDetail.errorDetailsFormat
+  implicit val ssfnErrorResponseFormat: OFormat[StatementSearchFailureNotificationErrorResponse] =
+    Json.format[StatementSearchFailureNotificationErrorResponse]
+
+  def apply(errors: Throwable,
+            correlationId: String): StatementSearchFailureNotificationErrorResponse = {
+
+    StatementSearchFailureNotificationErrorResponse(ErrorDetail(
+      timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
+      correlationId = correlationId,
+      errorCode = "400",
+      errorMessage = "Bad request received",
+      sourceFaultDetail = SourceFaultDetail(Seq("BadRequest"))
+    ))
+  }
 }
 
 case class ErrorDetail(timestamp: String,
@@ -33,11 +49,11 @@ case class ErrorDetail(timestamp: String,
                        sourceFaultDetail: SourceFaultDetail)
 
 object ErrorDetail {
-  implicit val errorDetailsWrites: OWrites[ErrorDetail] = Json.writes[ErrorDetail]
+  implicit val errorDetailsFormat: OFormat[ErrorDetail] = Json.format[ErrorDetail]
 }
 
 case class SourceFaultDetail(detail: Seq[String])
 
 object SourceFaultDetail {
-  implicit val errorDetailsWrites: OWrites[SourceFaultDetail] = Json.writes[SourceFaultDetail]
+  implicit val errorDetailsFormat: OFormat[SourceFaultDetail] = Json.format[SourceFaultDetail]
 }

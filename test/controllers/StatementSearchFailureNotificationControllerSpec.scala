@@ -19,7 +19,7 @@ package controllers
 import models.StatementSearchFailureNotificationMetadata
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
-import play.api.http.Status.NO_CONTENT
+import play.api.http.Status.{BAD_REQUEST, NO_CONTENT}
 import play.api.inject
 import play.api.libs.json.JsObject
 import play.api.mvc._
@@ -30,6 +30,7 @@ import services.cache.HistoricDocumentRequestSearchCacheService
 import utils.{JSONSchemaValidator, SpecBase}
 
 import java.util.UUID
+import scala.concurrent.Future
 
 class StatementSearchFailureNotificationControllerSpec extends SpecBase {
   "processNotification" should {
@@ -41,7 +42,10 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     }
 
     "send error response when the request is not valid" in new Setup {
-
+      running(app) {
+        val response: Future[Result] = route(app, invalidRequest).value
+        status(response) mustBe BAD_REQUEST
+      }
     }
   }
 
@@ -51,12 +55,30 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     val ssfnReq = StatementSearchFailureNotificationRequest(ssfnMeteData)
 
     val validRequestJSON: JsObject = ssfnRequestFormat.writes(ssfnReq)
+    val inValidRequestJSON = ssfnRequestFormat.writes(ssfnReq.copy(
+      StatementSearchFailureNotificationMetadata = ssfnReq.StatementSearchFailureNotificationMetadata.copy(reason = "UnKnown")))
+
     val validRequestWithoutHeaders = FakeRequest(
       "POST",
       routes.StatementSearchFailureNotificationController.processNotification().url)
       .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(validRequestJSON)
 
+    val inValidRequestWithoutHeaders = FakeRequest(
+      "POST",
+      routes.StatementSearchFailureNotificationController.processNotification().url)
+      .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(inValidRequestJSON)
+
     val validRequest: FakeRequest[JsObject] = validRequestWithoutHeaders
+      .withHeaders(
+        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "X-Correlation-ID" -> "some-id",
+        "X-Forwarded-Host" -> "MD/TP",
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json",
+        "Authorization" -> "Bearer test1234567"
+      )
+
+    val invalidRequest = inValidRequestWithoutHeaders
       .withHeaders(
         "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
         "X-Correlation-ID" -> "some-id",

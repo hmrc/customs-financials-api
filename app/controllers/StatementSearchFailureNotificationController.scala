@@ -17,14 +17,17 @@
 package controllers
 
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import models.responses.StatementSearchFailureNotificationErrorResponse
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
+import utils.Utils.writable
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 class StatementSearchFailureNotificationController @Inject()(
                                                               cc: ControllerComponents,
@@ -39,19 +42,17 @@ class StatementSearchFailureNotificationController @Inject()(
     implicit request =>
       jsonSchemaValidator.validatePayload(request.body,
         "/schemas/statement-search-failure-notification-request-schema.json") match {
-        case scala.util.Success(_) => {
+        case Success(_) =>
           updateHistoricDocumentRequestSearchForStatReqId(request.body)
           NoContent
-        }
-        case scala.util.Failure(errors) => {
-          sendErrorResponse(errors)
-        }
+        case Failure(errors) =>
+          import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
+          BadRequest(buildErrorResponse(errors, request.headers.get("X-Correlation-ID").getOrElse("")))
       }
   }
 
-private def sendErrorResponse(errors: Throwable) = {
-  BadRequest
+private def buildErrorResponse(errors: Throwable, correlationId: String) = {
+  StatementSearchFailureNotificationErrorResponse(errors,correlationId)
 }
   private def updateHistoricDocumentRequestSearchForStatReqId(reqJsValue: JsValue): Unit = ()
-
 }

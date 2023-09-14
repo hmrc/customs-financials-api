@@ -61,5 +61,12 @@ class UtilsSpec extends SpecBase {
         zeroPad(9) mustBe "09"
       }
     }
+
+    "currentDateTimeAsRFC7231" should {
+      "return correct output datetime string " in {
+        val localDateTime = LocalDateTime.of(2023,9,14,16,30,30)
+        currentDateTimeAsRFC7231(localDateTime) mustBe "Thu, 14 Sep 2023 16:30:30 GMT"
+      }
+    }
   }
 }

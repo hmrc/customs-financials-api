@@ -17,7 +17,9 @@
 package models.responses
 
 import play.api.libs.json.Json
-import utils.SpecBase
+import utils.{SpecBase, Utils}
+
+import java.time.LocalDateTime
 
 class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
@@ -25,6 +27,29 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
     "generate correct output" in new Setup {
       Json.toJson(ssfnNotErrorResOb1) mustBe Json.parse(ssfnNotErrorResJsValue1)
       Json.toJson(ssfnNotErrorResOb2) mustBe Json.parse(ssfnNotErrorResJsValue2)
+    }
+  }
+
+  "apply" should {
+    "create the object correctly" in {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val sourceFaultDetail = SourceFaultDetail(Seq("BadRequest"))
+
+      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        "400",
+        "Bad request received",
+        "CDS Financials",
+      sourceFaultDetail)
+
+      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+      val actualOb = StatementSearchFailureNotificationErrorResponse(new RuntimeException(), correlationId)
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail mustBe expectedSSFNErrorResOb.errorDetail.sourceFaultDetail
     }
   }
 
