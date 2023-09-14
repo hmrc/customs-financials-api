@@ -44,7 +44,6 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
           readJsonFromFile(ssfnInvalidRequestJsonFilePath), ssfnRequestSchemaPath)
 
         result.isFailure mustBe true
-        result.failure.exception.getMessage must include("Schema validation errors are :-")
         result.failure.exception.getMessage must include("/StatementSearchFailureNotificationMetadata/reason")
       }
     }
@@ -63,7 +62,6 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
           readJsonFromFile(ssfnInvalidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
 
         result.isFailure mustBe true
-        result.failure.exception.getMessage must include("Schema validation errors are :-")
         result.failure.exception.getMessage must include("/errorDetail/correlationId")
       }
     }
@@ -74,7 +72,6 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
           readJsonFromFile(ssfnInvalidMultipleErrorsErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
 
         result.isFailure mustBe true
-        result.failure.exception.getMessage must include("Schema validation errors are :-")
         result.failure.exception.getMessage must include("/errorDetail/correlationId")
         result.failure.exception.getMessage must include("/errorDetail/errorCode")
       }

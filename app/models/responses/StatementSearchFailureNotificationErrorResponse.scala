@@ -24,20 +24,59 @@ import java.time.LocalDateTime
 case class StatementSearchFailureNotificationErrorResponse(errorDetail: ErrorDetail)
 
 object StatementSearchFailureNotificationErrorResponse {
-  import ErrorDetail.errorDetailsFormat
   implicit val ssfnErrorResponseFormat: OFormat[StatementSearchFailureNotificationErrorResponse] =
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
   def apply(errors: Throwable,
             correlationId: String): StatementSearchFailureNotificationErrorResponse = {
 
-    StatementSearchFailureNotificationErrorResponse(ErrorDetail(
+    val defaultErrorDetail = ErrorDetail(
       timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
       correlationId = correlationId,
-      errorCode = "400",
-      errorMessage = "Bad request received",
-      sourceFaultDetail = SourceFaultDetail(Seq("BadRequest"))
-    ))
+      errorCode = ErrorCode.code400,
+      errorMessage = ErrorMessage.invalidMessage,
+      source = ErrorSource.jsonValidation,
+      sourceFaultDetail = SourceFaultDetail(Seq("Invalid values"))
+    )
+
+    StatementSearchFailureNotificationErrorResponse(updateErrorDetails(errors, defaultErrorDetail))
+  }
+
+  private def updateErrorDetails(errors: Throwable,
+                                 errorDetail: ErrorDetail): ErrorDetail = {
+    val aggregateErrorMsg = errors.getMessage
+    val errorMsgList: Seq[String] = aggregateErrorMsg.split("\\),").toSeq
+
+    (aggregateErrorMsg, errorMsgList) match {
+      case (agMsg, errorList) if isBothSchemaFieldsMissingError(agMsg, errorList) =>
+        errorDetail.copy(
+          errorMessage = ErrorMessage.badRequestReceived,
+          source = ErrorSource.backEnd,
+          sourceFaultDetail = SourceFaultDetail(errorMsgList))
+
+      case (agMsg, errorList) if isSingleMandatoryFieldMissingError(agMsg, errorList) =>
+        errorDetail.copy(sourceFaultDetail = SourceFaultDetail(errorMsgList))
+
+      case (_, errorList) if errorList.size > 1 =>
+        errorDetail.copy(
+          errorMessage = ErrorMessage.badRequestReceived,
+          source = ErrorSource.backEnd,
+          sourceFaultDetail = SourceFaultDetail(errorMsgList))
+
+      case _ => errorDetail.copy(sourceFaultDetail = SourceFaultDetail(errorMsgList))
+    }
+  }
+
+  private def isBothSchemaFieldsMissingError(agMsg: String,
+                                             errorList: Seq[String]): Boolean = {
+    agMsg.contains("missing required properties") &&
+      agMsg.contains("reason") &&
+      agMsg.contains("statementRequestID") &&
+      errorList.size == 1
+  }
+
+  private def isSingleMandatoryFieldMissingError(agMsg: String, errorList: Seq[String]) = {
+    agMsg.contains("missing required properties") && errorList.size == 1
   }
 }
 
@@ -45,7 +84,7 @@ case class ErrorDetail(timestamp: String,
                        correlationId: String,
                        errorCode: String,
                        errorMessage: String,
-                       source: String = "CDS Financials",
+                       source: String = ErrorSource.cdsFinancials,
                        sourceFaultDetail: SourceFaultDetail)
 
 object ErrorDetail {
@@ -56,4 +95,20 @@ case class SourceFaultDetail(detail: Seq[String])
 
 object SourceFaultDetail {
   implicit val errorDetailsFormat: OFormat[SourceFaultDetail] = Json.format[SourceFaultDetail]
+}
+
+object ErrorMessage {
+  val invalidMessage = "Invalid message"
+  val badRequestReceived = "Bad request received"
+}
+
+object ErrorSource {
+  val jsonValidation = "JSON validation"
+  val backEnd = "Backend"
+  val cdsFinancials = "CDS Financials"
+}
+
+object ErrorCode {
+  val code400 = "400"
+  val code500 = "500"
 }

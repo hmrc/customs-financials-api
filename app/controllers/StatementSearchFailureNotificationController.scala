@@ -43,7 +43,6 @@ class StatementSearchFailureNotificationController @Inject()(
       jsonSchemaValidator.validatePayload(request.body,
         "/schemas/statement-search-failure-notification-request-schema.json") match {
         case Success(_) =>
-          updateHistoricDocumentRequestSearchForStatReqId(request.body)
           NoContent
         case Failure(errors) =>
           import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
