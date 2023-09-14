@@ -16,11 +16,18 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Reads, Writes}
 
-case class StatementSearchFailureNotificationMetadata(statementRequestID: String, reason: String)
+case class SearchResultStatus(value: String)
 
-object StatementSearchFailureNotificationMetadata {
-  implicit val ssfnMetaDataFormats: OFormat[StatementSearchFailureNotificationMetadata] =
-    Json.format[StatementSearchFailureNotificationMetadata]
+object SearchResultStatus extends Enumeration {
+  type SearchResultStatus = Value
+  val yes, no, inProcess = Value
+
+  def fromString(value: String): Option[SearchResultStatus] = {
+    values.find(_.toString.toLowerCase == value.toLowerCase)
+  }
+
+  implicit val searchResultStatusReads = Reads.enumNameReads(SearchResultStatus)
+  implicit val searchResultStatusWrites = Writes.enumNameWrites
 }

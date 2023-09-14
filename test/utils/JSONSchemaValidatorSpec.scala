@@ -33,16 +33,50 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "validate the ssfn valid request" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnValidRequestJsonFilePath), ssfnRequestSchemaPath, "")
+          readJsonFromFile(ssfnValidRequestJsonFilePath), ssfnRequestSchemaPath)
         result.success.value mustBe()
+      }
+    }
+
+    "return error for ssfn invalid request" in new Setup {
+      running(app) {
+        val result = jsonPayloadSchemaValidator.validatePayload(
+          readJsonFromFile(ssfnInvalidRequestJsonFilePath), ssfnRequestSchemaPath)
+
+        result.isFailure mustBe true
+        result.failure.exception.getMessage must include("Schema validation errors are :-")
+        result.failure.exception.getMessage must include("/StatementSearchFailureNotificationMetadata/reason")
       }
     }
 
     "validate the ssfn valid error response" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnValidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath, "")
+          readJsonFromFile(ssfnValidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
         result.success.value mustBe()
+      }
+    }
+
+    "return error for ssfn invalid error response" in new Setup {
+      running(app) {
+        val result = jsonPayloadSchemaValidator.validatePayload(
+          readJsonFromFile(ssfnInvalidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+
+        result.isFailure mustBe true
+        result.failure.exception.getMessage must include("Schema validation errors are :-")
+        result.failure.exception.getMessage must include("/errorDetail/correlationId")
+      }
+    }
+
+    "return errors for ssfn invalid error response that has multiple incorrect values" in new Setup {
+      running(app) {
+        val result = jsonPayloadSchemaValidator.validatePayload(
+          readJsonFromFile(ssfnInvalidMultipleErrorsErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+
+        result.isFailure mustBe true
+        result.failure.exception.getMessage must include("Schema validation errors are :-")
+        result.failure.exception.getMessage must include("/errorDetail/correlationId")
+        result.failure.exception.getMessage must include("/errorDetail/errorCode")
       }
     }
   }

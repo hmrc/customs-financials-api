@@ -24,7 +24,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import play.api.inject.bind
 
 trait SpecBase extends AnyWordSpecLike
@@ -66,6 +66,11 @@ trait SpecBase extends AnyWordSpecLike
     "auditing.enabled" -> "false",
     "microservice.metrics.graphite.enabled" -> "false",
     "metrics.enabled" -> "false")
+
+  def requestWithoutHeaders[A](request: FakeRequest[A], keys: String*): FakeRequest[A] = {
+    val incompleteHeaders = request.headers.remove(keys: _*)
+    request.withHeaders(incompleteHeaders)
+  }
 
   class FakeMetrics extends Metrics {
     override val defaultRegistry: MetricRegistry = new MetricRegistry

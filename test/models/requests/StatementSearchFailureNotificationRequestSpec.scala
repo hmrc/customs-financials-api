@@ -24,13 +24,13 @@ class StatementSearchFailureNotificationRequestSpec extends SpecBase {
 
   "ssfnRequestReads" should {
     "read the JsValue and create the object correctly" in new Setup {
-      import StatementSearchFailureNotificationRequest.ssfnRequestReads
+      import StatementSearchFailureNotificationRequest.ssfnRequestFormat
 
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(ssfnReqOb)
     }
 
     "generate error for incorrect JsValue" in new Setup {
-      import StatementSearchFailureNotificationRequest.ssfnRequestReads
+      import StatementSearchFailureNotificationRequest.ssfnRequestFormat
 
       Json.fromJson(Json.parse(incorrectJsValue)).isError mustBe true
     }

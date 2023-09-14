@@ -56,11 +56,11 @@ class JSONSchemaValidator {
     }
   }
 
-  def validatePayload(data: JsValue, apiSchemaPath: String, eventName: String): Try[Unit] = {
+  def validatePayload(data: JsValue, apiSchemaPath: String): Try[Unit] = {
     validateJsonPayload(apiSchemaPath, data) match {
       case Right(()) => Success(())
       case Left(errors) =>
-        val allErrorsAsString = s"Schema validation errors for $eventName :-\n" + errors.mkString(",\n")
+        val allErrorsAsString = s"Schema validation errors are :-\n" + errors.mkString(",\n")
         Failure(new BadRequestException(allErrorsAsString))
     }
   }

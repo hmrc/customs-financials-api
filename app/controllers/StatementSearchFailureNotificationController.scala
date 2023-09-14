@@ -16,9 +16,42 @@
 
 package controllers
 
-class StatementSearchFailureNotificationController {
+import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, ControllerComponents}
+import services.cache.HistoricDocumentRequestSearchCacheService
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.JSONSchemaValidator
 
-  def processNotification()  = {
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
+class StatementSearchFailureNotificationController @Inject()(
+                                                              cc: ControllerComponents,
+                                                              jsonSchemaValidator: JSONSchemaValidator,
+                                                              authorizationHeaderFilter: AuthorizationHeaderFilter,
+                                                              mdgHeaderFilter: MdgHeaderFilter,
+                                                              cacheService:HistoricDocumentRequestSearchCacheService
+                                                            )(implicit execution: ExecutionContext)
+  extends BackendController(cc) {
+
+  def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
+    implicit request =>
+      jsonSchemaValidator.validatePayload(request.body,
+        "/schemas/statement-search-failure-notification-request-schema.json") match {
+        case scala.util.Success(_) => {
+          updateHistoricDocumentRequestSearchForStatReqId(request.body)
+          NoContent
+        }
+        case scala.util.Failure(errors) => {
+          sendErrorResponse(errors)
+        }
+      }
   }
+
+private def sendErrorResponse(errors: Throwable) = {
+  BadRequest
+}
+  private def updateHistoricDocumentRequestSearchForStatReqId(reqJsValue: JsValue): Unit = ()
+
 }

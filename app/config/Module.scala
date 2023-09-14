@@ -17,11 +17,14 @@
 package config
 
 import com.google.inject.AbstractModule
+import controllers.actions.{AuthorizationHeaderFilter, DefaultAuthorizationHeaderFilter, MdgHeaderDefaultFilter, MdgHeaderFilter}
 import services.{DefaultNotificationCache, NotificationCache}
 
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
+    bind(classOf[AuthorizationHeaderFilter]).to(classOf[DefaultAuthorizationHeaderFilter]).asEagerSingleton()
+    bind(classOf[MdgHeaderFilter]).to(classOf[MdgHeaderDefaultFilter]).asEagerSingleton()
   }
 }
