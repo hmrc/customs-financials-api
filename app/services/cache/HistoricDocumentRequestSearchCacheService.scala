@@ -48,9 +48,9 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
    * Updates the searchRequest (for given statementRequestID) in searchRequests field of the Document
    * for given HistoricDocumentRequestSearch Document
    */
-  def updateSearchRequestsForHisReqSearchDocument(req: HistoricDocumentRequestSearch,
-                                                  statementRequestID: String,
-                                                  failureReason: String):
+  def updateSearchRequestForStatementRequestId(req: HistoricDocumentRequestSearch,
+                                               statementRequestID: String,
+                                               failureReason: String):
   Future[Option[HistoricDocumentRequestSearch]] =
-      historicDocRequestCache.updateDocument(req, statementRequestID, failureReason)
+      historicDocRequestCache.updateSearchRequestForStatementRequestId(req, statementRequestID, failureReason)
 }

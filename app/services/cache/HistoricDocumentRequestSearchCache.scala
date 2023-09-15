@@ -67,9 +67,9 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
     collection.find(equal("searchRequests.statementRequestId", statementRequestID)).headOption()
 
-  def updateDocument(req: HistoricDocumentRequestSearch,
-                     statementRequestID: String,
-                     failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
+  def updateSearchRequestForStatementRequestId(req: HistoricDocumentRequestSearch,
+                                               statementRequestID: String,
+                                               failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
 
     val queryFiler = Filters.equal(docFieldSearchID, req.searchID.toString)
 

@@ -105,7 +105,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
         _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
-        retrievedDoc: Option[HistoricDocumentRequestSearch] <- historicDocumentRequestCache.updateDocument(docToBeInserted,
+        retrievedDoc: Option[HistoricDocumentRequestSearch] <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(docToBeInserted,
           "5b89895-f0da-4472-af5a-d84d340e7mn5", "")
         finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
         "5b89895-f0da-4472-af5a-d84d340e7mn5")

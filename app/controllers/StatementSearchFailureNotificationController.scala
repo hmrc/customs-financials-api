@@ -95,7 +95,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                              optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch])
   : Future[Option[HistoricDocumentRequestSearch]] = {
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID))
-      cacheService.updateSearchRequestsForHisReqSearchDocument(
+      cacheService.updateSearchRequestForStatementRequestId(
         optHistDocReqSearchDoc.get,
         statementRequestID,
         failureReasonCode)
