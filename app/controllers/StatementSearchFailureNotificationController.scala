@@ -17,16 +17,19 @@
 package controllers
 
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import models.{HistoricDocumentRequestSearch, SearchStatus}
+import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses.StatementSearchFailureNotificationErrorResponse
-import play.api.libs.json.JsValue
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.{Logger, LoggerLike}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.mvc.{Action, ControllerComponents, Request}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
 import utils.Utils.writable
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class StatementSearchFailureNotificationController @Inject()(
@@ -38,21 +41,73 @@ class StatementSearchFailureNotificationController @Inject()(
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
+  val log: LoggerLike = Logger(this.getClass)
+
   def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
     implicit request =>
       jsonSchemaValidator.validatePayload(request.body,
         "/schemas/statement-search-failure-notification-request-schema.json") match {
         case Success(_) =>
+          processStatementReqId(request)
           NoContent
+
         case Failure(errors) =>
           import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
           BadRequest(buildErrorResponse(errors, request.headers.get("X-Correlation-ID").getOrElse("")))
       }
   }
 
-  private def buildErrorResponse(errors: Throwable, correlationId: String) = {
-    StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+  private def processStatementReqId(request: Request[JsValue]) = {
+    Json.fromJson(request.body) match {
+      case JsSuccess(value, _) => {
+        val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
+        val failureReasonCode = value.StatementSearchFailureNotificationMetadata.reason
+
+        updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
+      }
+      case JsError(_) => log.warn("Request is not properly formed and failing in parsing")
+    }
   }
 
-  private def updateHistoricDocumentRequestSearchForStatReqId(reqJsValue: JsValue): Unit = ()
+  private def buildErrorResponse(errors: Throwable,
+                                 correlationId: String) =
+    StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+
+  private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
+                                                              failureReasonCode: String): Future[Option[Unit]] = {
+    for {
+      optHistDocReqSearchDoc <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
+      histDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
+        failureReasonCode, optHistDocReqSearchDoc)
+    } yield {
+      histDoc.map {
+        _ => ()
+      }
+    }
+  }
+
+  /**
+   * Updates the SearchRequest for given statementRequestID
+   * if it is inProcess (searchRequests.statementRequestID field in the Mongo document)
+   */
+  private def updateSearchRequestIfInProcess(statementRequestID: String,
+                                             failureReasonCode: String,
+                                             optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch])
+  : Future[Option[HistoricDocumentRequestSearch]] = {
+    if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID))
+      cacheService.updateSearchRequestsForHisReqSearchDocument(
+        optHistDocReqSearchDoc.get,
+        statementRequestID,
+        failureReasonCode)
+    else
+      Future(None)
+  }
+
+  private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch],
+                                         statementRequestID: String) = {
+    optHistDocReqSearchDoc.fold(false)(
+      histReqSearchDoc => histReqSearchDoc.searchRequests.find(
+        sr => sr.statementRequestId == statementRequestID).fold(false)(
+        serReq => serReq.searchSuccessful == SearchStatus.inProcess.toString))
+  }
 }

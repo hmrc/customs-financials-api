@@ -16,17 +16,21 @@
 
 package services.cache
 
+import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
-import models.HistoricDocumentRequestSearch
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchStatus}
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.model.{IndexModel, IndexOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import utils.Utils
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 
 class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
                                                    mongoComponent: MongoComponent)
@@ -44,11 +48,44 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
           .sparse(false)
           .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
       )
+    ),
+    extraCodecs = Seq(
+      Codecs.playFormatCodec(Params.paramsFormat),
+      Codecs.playFormatCodec(SearchRequest.searchRequestFormat)
     )
   ) {
+
+  private val docFieldSearchID = "searchID"
+  private val docFieldSearchRequests = "searchRequests"
+
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] =
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     collection.find(equal("currentEori", currentEori)).toFuture()
+
+  def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
+    collection.find(equal("searchRequests.statementRequestId", statementRequestID)).headOption()
+
+  def updateDocument(req: HistoricDocumentRequestSearch,
+                     statementRequestID: String,
+                     failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
+
+    val queryFiler = Filters.equal(docFieldSearchID, req.searchID.toString)
+
+    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
+      sr =>
+        if (sr.statementRequestId.equals(statementRequestID)) sr.copy(
+          searchSuccessful = SearchStatus.no.toString,
+          searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now),
+          searchFailureReasonCode = failureReason) else sr
+    }
+
+    val updates = Updates.set(docFieldSearchRequests, updatedSearchRequests)
+
+    collection.findOneAndUpdate(
+      filter = queryFiler,
+      update = updates,
+      new FindOneAndUpdateOptions().upsert(false)).headOption()
+  }
 }

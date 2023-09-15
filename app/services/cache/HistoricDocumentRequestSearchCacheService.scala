@@ -24,10 +24,33 @@ import scala.concurrent.{ExecutionContext, Future}
 class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCache: HistoricDocumentRequestSearchCache)
                                                          (implicit ec: ExecutionContext) {
 
+  /**
+   * Inserts the Document
+   */
   def saveHistoricDocumentRequestSearch(req: HistoricDocumentRequestSearch): Future[Boolean] =
     historicDocRequestCache.insertDocument(req)
 
+  /**
+   * Retrieves the Document for given currentEori (mapped to currentEori)
+   */
   def retrieveHistDocRequestSearchDocsForCurrentEori(currentEori: String):
   Future[Seq[HistoricDocumentRequestSearch]] =
     historicDocRequestCache.retrieveDocumentsForCurrentEori(currentEori)
+
+  /**
+   * Retrieves the Document for given statementRequestID (mapped to searchRequest.statementRequestId)
+   */
+  def retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID: String):
+  Future[Option[HistoricDocumentRequestSearch]]  =
+    historicDocRequestCache.retrieveDocumentForStatementRequestID(statementRequestID)
+
+  /**
+   * Updates the searchRequest (for given statementRequestID) in searchRequests field of the Document
+   * for given HistoricDocumentRequestSearch Document
+   */
+  def updateSearchRequestsForHisReqSearchDocument(req: HistoricDocumentRequestSearch,
+                                                  statementRequestID: String,
+                                                  failureReason: String):
+  Future[Option[HistoricDocumentRequestSearch]] =
+      historicDocRequestCache.updateDocument(req, statementRequestID, failureReason)
 }

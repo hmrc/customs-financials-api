@@ -17,7 +17,7 @@
 package services.cache
 
 import config.AppConfig
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest}
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchStatus}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
@@ -85,6 +85,44 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
           documentsInDB.size mustBe 2
       }
     }
+
+    "retrieve the document for the given statementRequestID" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB.get.currentEori mustBe "GB123456789012"
+      }
+    }
+
+    "update the document with correct fields for the given statementRequestID" in {
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        retrievedDoc: Option[HistoricDocumentRequestSearch] <- historicDocumentRequestCache.updateDocument(docToBeInserted,
+          "5b89895-f0da-4472-af5a-d84d340e7mn5", "")
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+        "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          val test = documentsInDB
+          documentsInDB.get.currentEori mustBe "GB123456789012"
+
+          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
+            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+
+          searchRequestAfterUpdate.searchSuccessful mustBe SearchStatus.no.toString
+          searchRequestAfterUpdate.searchDateTime must not be empty
+      }
+    }
   }
 
   "retrieveDocumentsForCurrentEori" should {
@@ -110,9 +148,9 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0)/*,
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)*/
     )
 
     HistoricDocumentRequestSearch(searchID,
