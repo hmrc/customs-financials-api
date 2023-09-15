@@ -46,7 +46,13 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
           .name("CurrentEoriIndex")
           .unique(false)
           .sparse(false)
-          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
+          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
+      ), IndexModel(
+        ascending("searchID"),
+        IndexOptions()
+          .name("SearchIDIndex")
+          .unique(false)
+          .sparse(false).background(true)
       )
     ),
     extraCodecs = Seq(
