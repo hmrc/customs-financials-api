@@ -101,7 +101,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     }
 
     val updates = Updates.set(docFieldSearchRequests, updatedSearchRequests)
-    
+
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 }
