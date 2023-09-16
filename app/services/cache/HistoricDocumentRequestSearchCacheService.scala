@@ -52,5 +52,9 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
                                                statementRequestID: String,
                                                failureReason: String):
   Future[Option[HistoricDocumentRequestSearch]] =
-      historicDocRequestCache.updateSearchRequestForStatementRequestId(req, statementRequestID, failureReason)
+    historicDocRequestCache.updateSearchRequestForStatementRequestId(
+      req.searchRequests,
+      req.searchID.toString,
+      statementRequestID,
+      failureReason)
 }
