@@ -29,6 +29,22 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
   val ssfnInvalidErrorResponseJsonFilePath = "/ssfn-invalid-error-response.json"
   val ssfnInvalidMultipleErrorsErrorResponseJsonFilePath = "/ssfn-invalid-multiple-errors-error-response.json"
 
+  "ssfnRequestSchema" should {
+    "return correct value for the schema path" in new Setup {
+      running(app) {
+        jsonPayloadSchemaValidator.ssfnRequestSchema mustBe ssfnRequestSchemaPath
+      }
+    }
+  }
+
+  "ssfnErrorResponseSchema" should {
+    "return correct value for the schema path" in new Setup {
+      running(app) {
+        jsonPayloadSchemaValidator.ssfnErrorResponseSchema mustBe ssfnErrorResponseSchemaPath
+      }
+    }
+  }
+
   "validateJson" must {
     "validate the ssfn valid request" in new Setup {
       running(app) {

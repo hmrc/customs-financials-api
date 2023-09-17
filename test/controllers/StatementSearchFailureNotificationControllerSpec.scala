@@ -16,17 +16,18 @@
 
 package controllers
 
-import models.StatementSearchFailureNotificationMetadata
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, StatementSearchFailureNotificationMetadata}
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import play.api.http.Status.{BAD_REQUEST, NO_CONTENT}
-import play.api.inject
+import play.api.{Application, inject}
 import play.api.libs.json.JsObject
 import play.api.mvc._
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, running, status}
 import services.cache.HistoricDocumentRequestSearchCacheService
+import utils.Utils.emptyString
 import utils.{JSONSchemaValidator, SpecBase}
 
 import java.util.UUID
@@ -36,6 +37,9 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
   "processNotification" should {
     "return 204 when the request is valid" in new Setup {
       running(app) {
+        when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc))
+        )
         val response = route(app, validRequest).value
         status(response) mustBe NO_CONTENT
       }
@@ -49,21 +53,24 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     }
   }
 
-  trait Setup {
-    val ssfnMeteData = StatementSearchFailureNotificationMetadata(UUID.randomUUID().toString, "NoDocumentsFound")
 
-    val ssfnReq = StatementSearchFailureNotificationRequest(ssfnMeteData)
+  trait Setup {
+    val ssfnMeteData: StatementSearchFailureNotificationMetadata =
+      StatementSearchFailureNotificationMetadata(UUID.randomUUID().toString, "NoDocumentsFound")
+
+    val ssfnReq: StatementSearchFailureNotificationRequest = StatementSearchFailureNotificationRequest(ssfnMeteData)
 
     val validRequestJSON: JsObject = ssfnRequestFormat.writes(ssfnReq)
-    val inValidRequestJSON = ssfnRequestFormat.writes(ssfnReq.copy(
-      StatementSearchFailureNotificationMetadata = ssfnReq.StatementSearchFailureNotificationMetadata.copy(reason = "UnKnown")))
+    val inValidRequestJSON: JsObject = ssfnRequestFormat.writes(ssfnReq.copy(
+      StatementSearchFailureNotificationMetadata = ssfnReq.StatementSearchFailureNotificationMetadata.copy(
+        reason = "UnKnown")))
 
-    val validRequestWithoutHeaders = FakeRequest(
+    val validRequestWithoutHeaders: FakeRequest[JsObject] = FakeRequest(
       "POST",
       routes.StatementSearchFailureNotificationController.processNotification().url)
       .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(validRequestJSON)
 
-    val inValidRequestWithoutHeaders = FakeRequest(
+    val inValidRequestWithoutHeaders: FakeRequest[JsObject] = FakeRequest(
       "POST",
       routes.StatementSearchFailureNotificationController.processNotification().url)
       .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(inValidRequestJSON)
@@ -78,7 +85,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         "Authorization" -> "Bearer test1234567"
       )
 
-    val invalidRequest = inValidRequestWithoutHeaders
+    val invalidRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
         "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
         "X-Correlation-ID" -> "some-id",
@@ -89,12 +96,34 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       )
 
     val schemaValidator = new JSONSchemaValidator()
-    val mockHistDocReqSearchCacheService = mock[HistoricDocumentRequestSearchCacheService]
+    val mockHistDocReqSearchCacheService: HistoricDocumentRequestSearchCacheService =
+      mock[HistoricDocumentRequestSearchCacheService]
 
-    val app = application().overrides(
+    val app: Application = application().overrides(
       inject.bind[JSONSchemaValidator].toInstance(schemaValidator),
       inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService)
     ).build()
+
+    val historicDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
+      val searchID: UUID = UUID.randomUUID()
+      val resultsFound: String = "inProcess"
+      val searchStatusUpdateDate: String = emptyString
+      val currentEori: String = "GB123456789012"
+      val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+      val searchRequests: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+      )
+
+      HistoricDocumentRequestSearch(searchID,
+        resultsFound,
+        searchStatusUpdateDate,
+        currentEori,
+        params,
+        searchRequests)
+    }
   }
 
 }

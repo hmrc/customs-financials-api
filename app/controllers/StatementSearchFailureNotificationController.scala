@@ -19,15 +19,16 @@ package controllers
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
 import models.{HistoricDocumentRequestSearch, SearchStatus}
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
-import models.responses.StatementSearchFailureNotificationErrorResponse
+import models.responses.{ErrorCode, ErrorDetail, ErrorMessage, ErrorSource, SourceFaultDetail, StatementSearchFailureNotificationErrorResponse}
 import play.api.{Logger, LoggerLike}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Request}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
-import utils.Utils.writable
+import utils.Utils.{currentDateTimeAsRFC7231, writable}
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -45,8 +46,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
   def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
     implicit request =>
-      jsonSchemaValidator.validatePayload(request.body,
-        "/schemas/statement-search-failure-notification-request-schema.json") match {
+      jsonSchemaValidator.validatePayload(request.body, jsonSchemaValidator.ssfnRequestSchema) match {
         case Success(_) =>
           processStatementReqId(request)
           NoContent
@@ -70,8 +70,20 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def buildErrorResponse(errors: Throwable,
-                                 correlationId: String) =
-    StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+                                 correlationId: String) = {
+    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+
+    jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
+      case Success(_) => errorResponse
+      case _ => StatementSearchFailureNotificationErrorResponse(ErrorDetail(
+        currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        ErrorCode.code500,
+        ErrorMessage.badRequestReceived,
+        ErrorSource.cdsFinancials,
+        SourceFaultDetail(Seq("JSON validation failed for the request"))))
+    }
+  }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
                                                               failureReasonCode: String): Future[Option[Unit]] = {

@@ -173,7 +173,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     }
   }
 
-  private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
+  private val getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
     val resultsFound: String = "inProcess"
     val searchStatusUpdateDate: String = emptyString
@@ -181,9 +181,9 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0)/*,
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)*/
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
     )
 
     HistoricDocumentRequestSearch(searchID,
