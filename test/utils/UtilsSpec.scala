@@ -33,6 +33,12 @@ class UtilsSpec extends SpecBase {
       }
     }
 
+    "rfc7231DateTimePattern" should {
+      "return correct value" in {
+        rfc7231DateTimePattern mustBe "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+      }
+    }
+
     "dateTimeAsIso8601" should {
       "return correct ISO 8601 date time string for input date" in {
         val date = LocalDateTime.of(2023, 9, 11, 11, 10, 35)

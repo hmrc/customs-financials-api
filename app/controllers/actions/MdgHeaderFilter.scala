@@ -18,6 +18,7 @@ package controllers.actions
 
 import play.api.mvc.Results.BadRequest
 import play.api.mvc._
+import utils.Utils.rfc7231DateTimePattern
 
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -37,7 +38,7 @@ class MdgHeaderDefaultFilter @Inject()(
   private val authorizationHeader = "Authorization"
 
   // HTTP Date format from https://tools.ietf.org/html/rfc7231#section-7.1.1.1
-  private val httpDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'")
+  private val httpDateFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(
