@@ -28,6 +28,17 @@ class MdgHeaderDefaultFilter @Inject()(
                                         val parser: BodyParsers.Default,
                                       )(implicit val executionContext: ExecutionContext)
   extends MdgHeaderFilter {
+
+  private val dateHeader = "Date"
+  private val correlationIdHeader = "X-Correlation-ID"
+  private val forwardHostHeader = "X-Forwarded-Host"
+  private val contentTypeHeader = "Content-Type"
+  private val acceptHeader = "Accept"
+  private val authorizationHeader = "Authorization"
+
+  // HTTP Date format from https://tools.ietf.org/html/rfc7231#section-7.1.1.1
+  private val httpDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'")
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(
       for {
@@ -42,7 +53,9 @@ class MdgHeaderDefaultFilter @Inject()(
 
   // Play 2.6 updates Content-Type key to lower case which means we need to do a case insensitive check
   private def checkForMissingHeaders[A](request: Request[A]): Either[Result, Request[A]] = {
-    val mandatoryHeaders = List("Date", "X-Correlation-ID", "X-Forwarded-Host", "Content-Type", "Accept", "Authorization")
+    val mandatoryHeaders =
+      List(dateHeader, correlationIdHeader, forwardHostHeader, contentTypeHeader, acceptHeader, authorizationHeader)
+
     val missingHeaders = mandatoryHeaders.filterNot(request.headers.get(_).isDefined)
 
     missingHeaders match {
@@ -51,18 +64,15 @@ class MdgHeaderDefaultFilter @Inject()(
     }
   }
 
-  // HTTP Date format from https://tools.ietf.org/html/rfc7231#section-7.1.1.1
-  private val httpDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'")
-
   private def validateAcceptHeader[A](request: Request[A]): Either[Result, Request[A]] = {
-    request.headers.get("Accept").map(_.toLowerCase == "application/json") match {
+    request.headers.get(acceptHeader).map(_.toLowerCase == "application/json") match {
       case Some(false) => Left(BadRequest("Accept header must be application/json"))
       case _ => Right(request)
     }
   }
 
   private def validateContentTypeHeader[A](request: Request[A]): Either[Result, Request[A]] = {
-    request.headers.get("Content-Type").map(_.toLowerCase == "application/json") match {
+    request.headers.get(contentTypeHeader).map(_.toLowerCase == "application/json") match {
       case Some(false) => Left(BadRequest("Content-Type header must be application/json"))
       case _ => Right(request)
     }
@@ -70,7 +80,7 @@ class MdgHeaderDefaultFilter @Inject()(
 
   private def validateCorrelationId[A](request: Request[A]): Either[Result, Request[A]] = {
     val MAX_CORRELATION_ID_LENGTH = 36
-    request.headers.get("X-Correlation-ID").map(_.length) match {
+    request.headers.get(correlationIdHeader).map(_.length) match {
       case Some(length) if length > MAX_CORRELATION_ID_LENGTH => Left(
         BadRequest("header.*X-Correlation-ID exceeds 36 characters"))
       case _ => Right(request)
@@ -78,7 +88,7 @@ class MdgHeaderDefaultFilter @Inject()(
   }
 
   private def validateRequestDate[A](request: Request[A]): Either[Result, Request[A]] = {
-    Try(request.headers.get("Date").map(httpDateFormatter.parse(_))).toOption.flatten match {
+    Try(request.headers.get(dateHeader).map(httpDateFormatter.parse(_))).toOption.flatten match {
       case Some(_) => Right(request)
       case None => Left(BadRequest("Date header has invalid format"))
     }

@@ -41,6 +41,9 @@ object Utils {
    */
   def zeroPad(value: Int): String = "%02d".format(value)
 
+  /**
+   * Returns dateTime string in "Thu, 14 Sep 2023 16:30:30 GMT" format
+   */
   def currentDateTimeAsRFC7231(dateTime: LocalDateTime): String = httpDateFormatter.format(dateTime)
 
   implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {

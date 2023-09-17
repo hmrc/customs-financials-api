@@ -16,7 +16,9 @@
 
 package utils
 
+import models.responses.StatementSearchFailureNotificationErrorResponse
 import utils.Utils._
+
 import java.time.LocalDateTime
 
 class UtilsSpec extends SpecBase {
@@ -66,6 +68,13 @@ class UtilsSpec extends SpecBase {
       "return correct output datetime string " in {
         val localDateTime = LocalDateTime.of(2023,9,14,16,30,30)
         currentDateTimeAsRFC7231(localDateTime) mustBe "Thu, 14 Sep 2023 16:30:30 GMT"
+      }
+    }
+
+    "writable" should {
+      "return the correct result" in {
+        val writableResult = Utils.writable(StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat)
+        writableResult.contentType.value mustBe "application/json"
       }
     }
   }

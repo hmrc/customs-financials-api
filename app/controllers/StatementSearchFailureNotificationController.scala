@@ -53,7 +53,8 @@ class StatementSearchFailureNotificationController @Inject()(
 
         case Failure(errors) =>
           import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
-          BadRequest(buildErrorResponse(errors, request.headers.get("X-Correlation-ID").getOrElse("")))
+          BadRequest(buildErrorResponse(errors, request.headers.get("X-Correlation-ID").getOrElse(
+            "Correlation-ID is missing")))
       }
   }
 
