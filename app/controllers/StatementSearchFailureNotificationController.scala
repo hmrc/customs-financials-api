@@ -17,12 +17,12 @@
 package controllers
 
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
-import models.{HistoricDocumentRequestSearch, SearchStatus}
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
-import models.responses.{ErrorCode, ErrorDetail, ErrorMessage, ErrorSource, SourceFaultDetail, StatementSearchFailureNotificationErrorResponse}
-import play.api.{Logger, LoggerLike}
+import models.responses._
+import models.{HistoricDocumentRequestSearch, SearchStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Request}
+import play.api.{Logger, LoggerLike}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
@@ -75,13 +75,14 @@ class StatementSearchFailureNotificationController @Inject()(
 
     jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
       case Success(_) => errorResponse
-      case _ => StatementSearchFailureNotificationErrorResponse(ErrorDetail(
-        currentDateTimeAsRFC7231(LocalDateTime.now()),
-        correlationId,
-        ErrorCode.code500,
-        ErrorMessage.badRequestReceived,
-        ErrorSource.cdsFinancials,
-        SourceFaultDetail(Seq("JSON validation failed for the request"))))
+      case _ =>
+        StatementSearchFailureNotificationErrorResponse(ErrorDetail(
+          currentDateTimeAsRFC7231(LocalDateTime.now()),
+          correlationId,
+          ErrorCode.code500,
+          ErrorMessage.badRequestReceived,
+          ErrorSource.cdsFinancials,
+          SourceFaultDetail(Seq("JSON validation failed for the request"))))
     }
   }
 
