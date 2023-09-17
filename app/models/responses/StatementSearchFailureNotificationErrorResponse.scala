@@ -16,6 +16,7 @@
 
 package models.responses
 
+import models.responses.ErrorMessage.missingReqProps
 import play.api.libs.json.{Json, OFormat}
 import utils.Utils.currentDateTimeAsRFC7231
 
@@ -69,7 +70,7 @@ object StatementSearchFailureNotificationErrorResponse {
 
   private def isBothSchemaFieldsMissingError(aggregateErrorMsg: String,
                                              errorList: Seq[String]): Boolean = {
-    aggregateErrorMsg.contains("missing required properties") &&
+    aggregateErrorMsg.contains(missingReqProps) &&
       aggregateErrorMsg.contains("reason") &&
       aggregateErrorMsg.contains("statementRequestID") &&
       errorList.size == 1
@@ -77,7 +78,7 @@ object StatementSearchFailureNotificationErrorResponse {
 
   private def isSingleMandatoryFieldMissingError(aggregateErrorMsg: String,
                                                  errorList: Seq[String]) =
-    aggregateErrorMsg.contains("missing required properties") && errorList.size == 1
+    aggregateErrorMsg.contains(missingReqProps) && errorList.size == 1
 }
 
 case class ErrorDetail(timestamp: String,
@@ -100,6 +101,7 @@ object SourceFaultDetail {
 object ErrorMessage {
   val invalidMessage = "Invalid message"
   val badRequestReceived = "Bad request received"
+  val missingReqProps = "missing required properties"
 }
 
 object ErrorSource {
