@@ -24,9 +24,10 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
-import utils.SpecBase
+import utils.{SpecBase, Utils}
 import utils.Utils.emptyString
 
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -148,14 +149,21 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   "updateSearchRequestForStatementRequestId" should {
     "update the document with correct fields for the given statementRequestID" in {
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+      val updatedSearchRequests = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchStatus.no.toString,
+          updatedDateTime, "AWSUnreachable", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+      )
+
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
         _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
         _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
-          docToBeInserted.searchRequests,
-          docToBeInserted.searchID.toString,
-          "5b89895-f0da-4472-af5a-d84d340e7mn5",
-          "AWSUnreachable")
+          updatedSearchRequests,
+          docToBeInserted.searchID.toString)
         finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
           "5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield finalDoc
@@ -173,7 +181,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     }
   }
 
-  private val getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
+  private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
     val resultsFound: String = "inProcess"
     val searchStatusUpdateDate: String = emptyString

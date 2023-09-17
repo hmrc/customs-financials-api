@@ -18,8 +18,8 @@ package services.cache
 
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchStatus}
 import play.api.{Application, inject}
-import utils.{SpecBase, Utils}
 import utils.Utils.emptyString
+import utils.{SpecBase, Utils}
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -110,7 +110,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
       val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
       val searchFailureReasonCode = "AWSUnreachable"
-      val searchDtTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+      val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
 
       val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
         sr =>
@@ -121,10 +121,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       }
 
       when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(
-        histDocRequestSearch.searchRequests,
-        searchID.toString,
-        statReqId,
-        searchFailureReasonCode)).thenReturn(Future.successful(
+        updatedSearchRequests,
+        searchID.toString)).thenReturn(Future.successful(
         Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
 
       val service: HistoricDocumentRequestSearchCacheService =
@@ -144,7 +142,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       }
 
       verify(mockHistDocReqSearchCache, times(1)).updateSearchRequestForStatementRequestId(
-        histDocRequestSearch.searchRequests, searchID.toString, statReqId, searchFailureReasonCode)
+        updatedSearchRequests, searchID.toString)
     }
   }
 

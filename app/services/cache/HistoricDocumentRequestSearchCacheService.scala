@@ -16,8 +16,10 @@
 
 package services.cache
 
-import models.HistoricDocumentRequestSearch
+import models.{HistoricDocumentRequestSearch, SearchRequest, SearchStatus}
+import utils.Utils
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,10 +53,18 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
   def updateSearchRequestForStatementRequestId(req: HistoricDocumentRequestSearch,
                                                statementRequestID: String,
                                                failureReason: String):
-  Future[Option[HistoricDocumentRequestSearch]] =
+  Future[Option[HistoricDocumentRequestSearch]] = {
+
+    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
+      sr =>
+        if (sr.statementRequestId.equals(statementRequestID)) sr.copy(
+          searchSuccessful = SearchStatus.no.toString,
+          searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now),
+          searchFailureReasonCode = failureReason) else sr
+    }
+
     historicDocRequestCache.updateSearchRequestForStatementRequestId(
-      req.searchRequests,
-      req.searchID.toString,
-      statementRequestID,
-      failureReason)
+      updatedSearchRequests,
+      req.searchID.toString)
+  }
 }
