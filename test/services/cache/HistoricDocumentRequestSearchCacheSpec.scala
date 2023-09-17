@@ -17,7 +17,8 @@
 package services.cache
 
 import config.AppConfig
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchStatus}
+import models.SearchResultStatus._
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import org.mongodb.scala.model.{Filters, Updates}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -151,7 +152,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
       val searchId = docToBeInserted.searchID.toString
       val queryFilter = Filters.equal("searchID", searchId)
-      val updates = Updates.set("resultsFound", SearchStatus.no.toString)
+      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
 
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
@@ -167,7 +168,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
           docInDB.currentEori mustBe "GB123456789012"
           docInDB.searchID.toString mustBe searchId
-          docInDB.resultsFound mustBe SearchStatus.no.toString
+          docInDB.resultsFound mustBe SearchResultStatus.no
       }
     }
 
@@ -175,7 +176,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
       val searchId = docToBeInserted.searchID.toString
       val queryFilter = Filters.equal("searchID", searchId)
-      val updates = Updates.set("resultsFound", SearchStatus.no.toString)
+      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
 
       val documentsInDB = for {
         _ <- historicDocumentRequestCache.collection.drop().toFuture()
@@ -195,12 +196,13 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     "update the document with correct fields for the given statementRequestID" in {
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
       val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchStatus.no.toString,
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
           updatedDateTime, "AWSUnreachable", 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val documentsInDB = for {
@@ -220,7 +222,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
           val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
             sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
 
-          searchRequestAfterUpdate.searchSuccessful mustBe SearchStatus.no.toString
+          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
           searchRequestAfterUpdate.searchDateTime must not be empty
       }
     }
@@ -230,10 +232,10 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
       val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchStatus.no.toString,
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
           updatedDateTime, "AWSUnreachable", 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val documentsInDB = for {
@@ -254,15 +256,15 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
   private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
-    val resultsFound: String = "inProcess"
+    val resultsFound = SearchResultStatus.inProcess
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", inProcess, emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
     )
 
     HistoricDocumentRequestSearch(searchID,

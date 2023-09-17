@@ -16,7 +16,7 @@
 
 package services.cache
 
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchStatus}
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import play.api.{Application, inject}
 import utils.Utils.emptyString
 import utils.{SpecBase, Utils}
@@ -115,7 +115,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
         sr =>
           if (sr.statementRequestId.equals(statReqId)) sr.copy(
-            searchSuccessful = SearchStatus.no.toString,
+            searchSuccessful = SearchResultStatus.no,
             searchDateTime = searchDtTime,
             searchFailureReasonCode = searchFailureReasonCode) else sr
       }
@@ -156,15 +156,15 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
     val searchID: UUID = UUID.randomUUID()
     val userId: String = "test_userId"
-    val resultsFound: String = "inProcess"
+    val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
     )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =

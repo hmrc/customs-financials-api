@@ -19,7 +19,7 @@ package services.cache
 import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest}
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
@@ -55,7 +55,8 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     ),
     extraCodecs = Seq(
       Codecs.playFormatCodec(Params.paramsFormat),
-      Codecs.playFormatCodec(SearchRequest.searchRequestFormat)
+      Codecs.playFormatCodec(SearchRequest.searchRequestFormat),
+      Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
     )
   ) {
 

@@ -23,14 +23,11 @@ import utils.Utils.{emptyString, zeroPad}
 import java.util.UUID
 
 case class HistoricDocumentRequestSearch(searchID: UUID,
-                                         resultsFound: String,
+                                         resultsFound: SearchResultStatus.SearchResultStatus,
                                          searchStatusUpdateDate: String = emptyString,
                                          currentEori: String,
                                          params: Params,
                                          searchRequests: Set[SearchRequest]) {
-  require(
-    SearchStatus.fromString(resultsFound).nonEmpty,
-    "invalid value for resultsFound, valid values are yes,no,inProcess")
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
@@ -55,7 +52,7 @@ object HistoricDocumentRequestSearch {
         SearchRequest(
           histDoc.eori.value,
           histDoc.statementRequestID.toString,
-          SearchStatus.inProcess.toString,
+          SearchResultStatus.inProcess,
           emptyString,
           emptyString,
           0)
@@ -63,19 +60,10 @@ object HistoricDocumentRequestSearch {
 
     HistoricDocumentRequestSearch(
       UUID.randomUUID(),
-      SearchStatus.inProcess.toString,
+      SearchResultStatus.inProcess,
       emptyString,
       requestEori,
       params,
       searchDocReqs)
-  }
-}
-
-object SearchStatus extends Enumeration {
-  type SearchStatus = Value
-  val yes, no, inProcess = Value
-
-  def fromString(value: String): Option[SearchStatus] = {
-    values.find(_.toString.toLowerCase == value.toLowerCase)
   }
 }

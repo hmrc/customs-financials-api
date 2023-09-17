@@ -16,18 +16,13 @@
 
 package models
 
-import play.api.libs.json.{Reads, Writes}
-
-case class SearchResultStatus(value: String)
+import play.api.libs.json.{Format, Json}
 
 object SearchResultStatus extends Enumeration {
   type SearchResultStatus = Value
+
   val yes, no, inProcess = Value
 
-  def fromString(value: String): Option[SearchResultStatus] = {
-    values.find(_.toString.toLowerCase == value.toLowerCase)
-  }
-
-  implicit val searchResultStatusReads = Reads.enumNameReads(SearchResultStatus)
-  implicit val searchResultStatusWrites = Writes.enumNameWrites
+  implicit val searchResultStatusFormat: Format[models.SearchResultStatus.Value] =
+    Json.formatEnum(SearchResultStatus)
 }

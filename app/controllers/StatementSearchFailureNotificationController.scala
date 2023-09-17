@@ -19,7 +19,7 @@ package controllers
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses._
-import models.{HistoricDocumentRequestSearch, SearchStatus}
+import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Request}
 import play.api.{Logger, LoggerLike}
@@ -122,6 +122,6 @@ class StatementSearchFailureNotificationController @Inject()(
     optHistDocReqSearchDoc.fold(false)(
       histReqSearchDoc => histReqSearchDoc.searchRequests.find(
         sr => sr.statementRequestId == statementRequestID).fold(false)(
-        serReq => serReq.searchSuccessful == SearchStatus.inProcess.toString))
+        serReq => serReq.searchSuccessful == SearchResultStatus.inProcess))
   }
 }

@@ -25,7 +25,7 @@ class SearchRequestSpec extends SpecBase {
     "for correct parameter values" in {
       val srOb = SearchRequest("GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
-        "inProcess",
+        SearchResultStatus.inProcess,
         emptyString,
         emptyString,
         0)
@@ -39,7 +39,7 @@ class SearchRequestSpec extends SpecBase {
       intercept[RuntimeException] {
         SearchRequest("GB123456789012",
           "5b89895-f0da-4472-af5a-d84d340e7mn5",
-          "inProcess",
+          SearchResultStatus.inProcess,
           emptyString,
           emptyString,
           6)
@@ -53,7 +53,7 @@ class SearchRequestSpec extends SpecBase {
 
       val srOb = SearchRequest("GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
-        "inProcess",
+        SearchResultStatus.inProcess,
         emptyString,
         emptyString,
         0)
@@ -72,7 +72,7 @@ class SearchRequestSpec extends SpecBase {
     "result in correct output" in {
       val srOb = SearchRequest("GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
-        "inProcess",
+        SearchResultStatus.inProcess,
         emptyString,
         emptyString,
         0)

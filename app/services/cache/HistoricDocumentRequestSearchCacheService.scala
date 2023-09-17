@@ -16,7 +16,7 @@
 
 package services.cache
 
-import models.{HistoricDocumentRequestSearch, SearchRequest, SearchStatus}
+import models.{HistoricDocumentRequestSearch, SearchRequest, SearchResultStatus}
 import utils.Utils
 
 import java.time.LocalDateTime
@@ -58,7 +58,7 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
     val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
       sr =>
         if (sr.statementRequestId.equals(statementRequestID)) sr.copy(
-          searchSuccessful = SearchStatus.no.toString,
+          searchSuccessful = SearchResultStatus.no,
           searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now),
           searchFailureReasonCode = failureReason) else sr
     }
