@@ -24,8 +24,8 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
-import utils.{SpecBase, Utils}
 import utils.Utils.emptyString
+import utils.{SpecBase, Utils}
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -103,6 +103,19 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
           documentsInDB.get.currentEori mustBe "GB123456789012"
       }
     }
+
+    "return None if there is no document for the provided value" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe empty
+      }
+    }
   }
 
   "retrieveDocumentsForCurrentEori" should {
@@ -116,6 +129,19 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
       whenReady(documentsInDB) { documentsInDB =>
         documentsInDB.nonEmpty mustBe true
+      }
+    }
+
+    "return None if there is no document for the provided value" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori(
+          "GB123456789012")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe Seq()
       }
     }
   }
@@ -142,6 +168,25 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
           docInDB.currentEori mustBe "GB123456789012"
           docInDB.searchID.toString mustBe searchId
           docInDB.resultsFound mustBe SearchStatus.no.toString
+      }
+    }
+
+    "return None when there is no document to update" in {
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val searchId = docToBeInserted.searchID.toString
+      val queryFilter = Filters.equal("searchID", searchId)
+      val updates = Updates.set("resultsFound", SearchStatus.no.toString)
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe empty
       }
     }
   }
@@ -177,6 +222,32 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
           searchRequestAfterUpdate.searchSuccessful mustBe SearchStatus.no.toString
           searchRequestAfterUpdate.searchDateTime must not be empty
+      }
+    }
+
+    "return None when there is no document to update" in {
+      val histSearchDoc = getHistoricDocumentRequestSearchDoc
+      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+      val updatedSearchRequests = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchStatus.no.toString,
+          updatedDateTime, "AWSUnreachable", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+      )
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
+          updatedSearchRequests,
+          histSearchDoc.searchID.toString)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe None
       }
     }
   }

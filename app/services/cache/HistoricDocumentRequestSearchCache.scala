@@ -68,10 +68,10 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
-    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture()
+    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover { case _ => Seq() }
 
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
-    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption()
+    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption().recover(_ => None)
 
   /**
    * Updates the matching document (as per queryFilter) with the provided updates
@@ -81,7 +81,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.findOneAndUpdate(
       filter = queryFilter,
       update = updates,
-      new FindOneAndUpdateOptions().upsert(false)).headOption()
+      new FindOneAndUpdateOptions().upsert(false)).headOption().recover(_ => None)
 
   /**
    * Retrieves the document using SearchId and
