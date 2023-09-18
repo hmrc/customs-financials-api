@@ -65,7 +65,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
         updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
       }
-      case JsError(_) => logger.warn("Request is not properly formed and failing in parsing")
+      case JsError(_) => logger.error("Request is not properly formed and failing in parsing")
     }
   }
 
@@ -128,7 +128,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                            updatedDoc: Option[HistoricDocumentRequestSearch]):
   Option[HistoricDocumentRequestSearch] =
     if (updatedDoc.isEmpty) {
-      logger.warn(s"update failed for statementRequestID :: $statementRequestID" +
+      logger.error(s"update failed for statementRequestID :: $statementRequestID" +
         s" and reasonCode :: $failureReasonCode")
       None
     } else {
