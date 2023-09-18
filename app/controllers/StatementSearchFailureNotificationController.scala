@@ -63,6 +63,9 @@ class StatementSearchFailureNotificationController @Inject()(
         val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
         val failureReasonCode = value.StatementSearchFailureNotificationMetadata.reason
 
+        logger.info(s"Request has been successfully validated for statementRequestID" +
+          s" ::: $statementRequestID with reason :: $failureReasonCode")
+
         updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
       }
       case JsError(_) => logger.error("Request is not properly formed and failing in parsing")
