@@ -59,7 +59,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
     )
   ) {
-
   private val logger = play.api.Logger(getClass)
 
   private val searchIDFieldKey = "searchID"

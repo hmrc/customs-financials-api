@@ -22,7 +22,6 @@ import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Request}
-import play.api.{Logger, LoggerLike}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
@@ -42,7 +41,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
-  private val logger: LoggerLike = Logger(this.getClass)
+  private val logger = play.api.Logger(getClass)
 
   def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
     implicit request =>
@@ -133,6 +132,7 @@ class StatementSearchFailureNotificationController @Inject()(
         s" and reasonCode :: $failureReasonCode")
       None
     } else {
+      println("====== In else part of the update ===========")
       updatedDoc
     }
 }
