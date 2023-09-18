@@ -42,7 +42,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
-  val log: LoggerLike = Logger(this.getClass)
+  private val logger: LoggerLike = Logger(this.getClass)
 
   def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
     implicit request =>
@@ -66,7 +66,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
         updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
       }
-      case JsError(_) => log.warn("Request is not properly formed and failing in parsing")
+      case JsError(_) => logger.warn("Request is not properly formed and failing in parsing")
     }
   }
 
@@ -88,7 +88,7 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-                                                              failureReasonCode: String): Future[Option[Unit]] = {
+                                                              failureReasonCode: String): Future[Option[Unit]] =
     for {
       optHistDocReqSearchDoc <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
       histDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
@@ -98,7 +98,6 @@ class StatementSearchFailureNotificationController @Inject()(
         _ => ()
       }
     }
-  }
 
   /**
    * Updates the SearchRequest for given statementRequestID
@@ -107,21 +106,33 @@ class StatementSearchFailureNotificationController @Inject()(
   private def updateSearchRequestIfInProcess(statementRequestID: String,
                                              failureReasonCode: String,
                                              optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch])
-  : Future[Option[HistoricDocumentRequestSearch]] = {
+  : Future[Option[HistoricDocumentRequestSearch]] =
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID))
       cacheService.updateSearchRequestForStatementRequestId(
         optHistDocReqSearchDoc.get,
         statementRequestID,
-        failureReasonCode)
+        failureReasonCode).map {
+        updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
+      }
     else
       Future(None)
-  }
 
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch],
-                                         statementRequestID: String) = {
+                                         statementRequestID: String) =
     optHistDocReqSearchDoc.fold(false)(
       histReqSearchDoc => histReqSearchDoc.searchRequests.find(
         sr => sr.statementRequestId == statementRequestID).fold(false)(
         serReq => serReq.searchSuccessful == SearchResultStatus.inProcess))
-  }
+
+  private def logErrorMessageIfUpdateFails(statementRequestID: String,
+                                           failureReasonCode: String,
+                                           updatedDoc: Option[HistoricDocumentRequestSearch]):
+  Option[HistoricDocumentRequestSearch] =
+    if (updatedDoc.isEmpty) {
+      logger.warn(s"update failed for statementRequestID :: $statementRequestID" +
+        s" and reasonCode :: $failureReasonCode")
+      None
+    } else {
+      updatedDoc
+    }
 }

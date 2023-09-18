@@ -60,6 +60,8 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     )
   ) {
 
+  private val logger = play.api.Logger(getClass)
+
   private val searchIDFieldKey = "searchID"
   private val searchRequestsFieldKey = "searchRequests"
   private val currentEoriFieldKey = "currentEori"
@@ -69,10 +71,20 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
-    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover { case _ => Seq() }
+    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover {
+      case exception =>
+        logger.warn(s"Failed to retrieve the document for currentEori ::: $currentEori " +
+          s"and error is ::: ${exception.getMessage}")
+        Seq()
+    }
 
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
-    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption().recover(_ => None)
+    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption().recover {
+      case exception =>
+        logger.warn(s"Failed to retrieve the document for $statementRequestID " +
+          s"and error is ::: ${exception.getMessage}")
+        None
+    }
 
   /**
    * Updates the matching document (as per queryFilter) with the provided updates
@@ -82,7 +94,11 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.findOneAndUpdate(
       filter = queryFilter,
       update = updates,
-      new FindOneAndUpdateOptions().upsert(false)).headOption().recover(_ => None)
+      new FindOneAndUpdateOptions().upsert(false)).headOption().recover {
+      case exception =>
+        logger.warn(s"Failed to update the document and error is ::: ${exception.getMessage}")
+        None
+    }
 
   /**
    * Retrieves the document using SearchId and
