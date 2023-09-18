@@ -132,7 +132,6 @@ class StatementSearchFailureNotificationController @Inject()(
         s" and reasonCode :: $failureReasonCode")
       None
     } else {
-      println("====== In else part of the update ===========")
       updatedDoc
     }
 }
