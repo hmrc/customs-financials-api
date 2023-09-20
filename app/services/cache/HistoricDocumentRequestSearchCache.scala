@@ -16,13 +16,15 @@
 
 package services.cache
 
+import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
-import models.HistoricDocumentRequestSearch
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.model.{IndexModel, IndexOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -42,13 +44,71 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
           .name("CurrentEoriIndex")
           .unique(false)
           .sparse(false)
-          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
+          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
+      ), IndexModel(
+        ascending("searchID"),
+        IndexOptions()
+          .name("SearchIDIndex")
+          .unique(false)
+          .sparse(false).background(true)
       )
+    ),
+    extraCodecs = Seq(
+      Codecs.playFormatCodec(Params.paramsFormat),
+      Codecs.playFormatCodec(SearchRequest.searchRequestFormat),
+      Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
     )
   ) {
+  private val logger = play.api.Logger(getClass)
+
+  private val searchIDFieldKey = "searchID"
+  private val searchRequestsFieldKey = "searchRequests"
+  private val currentEoriFieldKey = "currentEori"
+  private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
+
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] =
     collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
-    collection.find(equal("currentEori", currentEori)).toFuture()
+    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover {
+      case exception =>
+        logger.error(s"Failed to retrieve the document for currentEori ::: $currentEori " +
+          s"and error is ::: ${exception.getMessage}")
+        Seq()
+    }
+
+  def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
+    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption().recover {
+      case exception =>
+        logger.error(s"Failed to retrieve the document for $statementRequestID " +
+          s"and error is ::: ${exception.getMessage}")
+        None
+    }
+
+  /**
+   * Updates the matching document (as per queryFilter) with the provided updates
+   */
+  def updateDocumentForQueryFilter(queryFilter: Bson,
+                                   updates: Bson): Future[Option[HistoricDocumentRequestSearch]] =
+    collection.findOneAndUpdate(
+      filter = queryFilter,
+      update = updates,
+      new FindOneAndUpdateOptions().upsert(false)).headOption().recover {
+      case exception =>
+        logger.error(s"Failed to update the document and error is ::: ${exception.getMessage}")
+        None
+    }
+
+  /**
+   * Retrieves the document using SearchId and
+   * Updates the search requests array with the provided searchRequests
+   */
+  def updateSearchRequestForStatementRequestId(searchRequests: Set[SearchRequest],
+                                               searchID: String): Future[Option[HistoricDocumentRequestSearch]] = {
+
+    val queryFiler = Filters.equal(searchIDFieldKey, searchID)
+    val updates = Updates.set(searchRequestsFieldKey, searchRequests)
+
+    updateDocumentForQueryFilter(queryFiler, updates)
+  }
 }

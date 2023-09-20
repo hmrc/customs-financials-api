@@ -31,6 +31,18 @@ class AppConfigSpec extends SpecBase {
     }
   }
 
+  "acc24BearerToken" should {
+    "return correct value" in new Setup {
+      appConfig.ssfnBearerToken mustBe "test1234567"
+    }
+  }
+
+  "bearerTokenValuePrefix" should {
+    "return correct value" in new Setup {
+      appConfig.bearerTokenValuePrefix mustBe "Bearer"
+    }
+  }
+
   trait Setup {
     val app: Application = application().build()
     val appConfig: AppConfig = app.injector.instanceOf[AppConfig]

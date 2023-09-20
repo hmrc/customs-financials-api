@@ -29,6 +29,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   private def baseUrl(path: String) = servicesConfig.baseUrl(path)
   lazy val notificationCacheCollectionName = "notificationStore"
   lazy val fileUploadCacheCollectionName = "fileUploadStore"
+  lazy val bearerTokenValuePrefix = "Bearer"
 
   lazy val hodsEndpoint: String = baseUrl("acc27") + getConfString("acc27.context-base", "/") + getConfString("acc27.endpoint", "/")
 
@@ -83,6 +84,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val sub09HostHeader: Option[String] = configuration.getOptional[String]("microservice.services.acc37.host-header")
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
+
+  lazy val ssfnBearerToken: String = getConfString("ssfn.bearer-token", "test")
 
   lazy val mongoHistDocSearchCollectionName: String =
     configuration.get[String]("mongodb.historic-document-request-search.name")

@@ -1,0 +1,14 @@
+{
+  "errorDetail": {
+    "timestamp": "2019-08-1618:15:41",
+    "correlationId": "3jh1f6b3-f8b1-4f3c-973a-05b4720e-4567899",
+    "errorCode": 400,
+    "errorMessage": "Bad request received",
+    "source": "CDS Financials",
+    "sourceFaultDetail": {
+      "detail": [
+        "Invalid value supplied for field statementRequestId: 32"
+      ]
+    }
+  }
+}

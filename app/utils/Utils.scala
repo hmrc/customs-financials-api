@@ -16,12 +16,18 @@
 
 package utils
 
+import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
+import play.api.libs.json.Writes
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 object Utils {
   val emptyString = ""
+  val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+  val httpDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
+  val singleSpace123456 = " "
 
   val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =
@@ -35,4 +41,14 @@ object Utils {
    * input  - 10 returns 10
    */
   def zeroPad(value: Int): String = "%02d".format(value)
+
+  /**
+   * Returns dateTime string in "Thu, 14 Sep 2023 16:30:30 GMT" format
+   */
+  def currentDateTimeAsRFC7231(dateTime: LocalDateTime): String = httpDateFormatter.format(dateTime)
+
+  implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
+    implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))
+    Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
+  }
 }

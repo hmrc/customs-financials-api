@@ -16,15 +16,13 @@
 
 package config
 
-import com.google.inject.AbstractModule
-import controllers.actions.{AuthorizationHeaderFilter, DefaultAuthorizationHeaderFilter, MdgHeaderDefaultFilter, MdgHeaderFilter}
-import services.{DefaultNotificationCache, NotificationCache}
+import config.MetaConfig.Platform
+import utils.SpecBase
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-    bind(classOf[NotificationCache]).to(classOf[DefaultNotificationCache]).asEagerSingleton()
-    bind(classOf[AuthorizationHeaderFilter]).to(classOf[DefaultAuthorizationHeaderFilter]).asEagerSingleton()
-    bind(classOf[MdgHeaderFilter]).to(classOf[MdgHeaderDefaultFilter]).asEagerSingleton()
+class MetaConfigSpec extends SpecBase {
+  "Platform.MDTP" should {
+    "return correct value for MDTP" in {
+      Platform.MDTP mustBe "MDTP"
+    }
   }
 }

@@ -16,7 +16,9 @@
 
 package utils
 
+import models.responses.StatementSearchFailureNotificationErrorResponse
 import utils.Utils._
+
 import java.time.LocalDateTime
 
 class UtilsSpec extends SpecBase {
@@ -28,6 +30,12 @@ class UtilsSpec extends SpecBase {
     "iso8601DateTimeRegEx" should {
       "return correct value of reg ex" in {
         iso8601DateTimeRegEx mustBe "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
+      }
+    }
+
+    "rfc7231DateTimePattern" should {
+      "return correct value" in {
+        rfc7231DateTimePattern mustBe "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
       }
     }
 
@@ -59,6 +67,20 @@ class UtilsSpec extends SpecBase {
         zeroPad(5) mustBe "05"
         zeroPad(10) mustBe "10"
         zeroPad(9) mustBe "09"
+      }
+    }
+
+    "currentDateTimeAsRFC7231" should {
+      "return correct output datetime string " in {
+        val localDateTime = LocalDateTime.of(2023,9,14,16,30,30)
+        currentDateTimeAsRFC7231(localDateTime) mustBe "Thu, 14 Sep 2023 16:30:30 GMT"
+      }
+    }
+
+    "writable" should {
+      "return the correct result" in {
+        val writableResult = Utils.writable(StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat)
+        writableResult.contentType.value mustBe "application/json"
       }
     }
   }

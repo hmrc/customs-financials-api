@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "CDS Financials Statement Search Failure Notification metadata ",
+  "type": "object",
+  "properties": {
+    "StatementSearchFailureNotificationMetadata": {
+      "type": "object",
+      "properties": {
+        "statementRequestID": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9-]{36}$"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "NoDocumentsFound",
+            "DocumentumUnreachable",
+            "DocumentumException",
+            "AWSUnreachable",
+            "AWSException",
+            "BadRequestReceived",
+            "CDDMInternalError"
+          ]
+        }
+      },
+      "required": [
+        "statementRequestID",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "StatementSearchFailureNotificationMetadata"
+  ],
+  "additionalProperties": false
+}

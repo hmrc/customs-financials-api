@@ -24,17 +24,6 @@ import utils.Utils.emptyString
 import java.util.UUID
 
 class HistoricDocumentRequestSearchSpec extends SpecBase {
-  "class Object" should {
-    "throw exception if parameters' values are invalid" in new Setup {
-      intercept[RuntimeException] {
-        histDocRequestSearch.copy(searchRequests = Set.empty)
-      }.getMessage.contains("searchRequests is empty")
-
-      intercept[RuntimeException] {
-        histDocRequestSearch.copy(resultsFound = emptyString)
-      }.getMessage.contains("invalid value for resultsFound, valid values are yes,no,inProcess")
-    }
-  }
 
   "Json Reads" should {
     "result the correct output" in new Setup {
@@ -61,7 +50,7 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
       actualHistDocReqSearch.searchRequests.size mustBe expected.searchRequests.size
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB123456789012") mustBe true
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB234567890121") mustBe true
-      actualHistDocReqSearch.searchRequests.exists(req => req.searchSuccessful == "inProcess") mustBe true
+      actualHistDocReqSearch.searchRequests.exists(req => req.searchSuccessful == SearchResultStatus.inProcess) mustBe true
       actualHistDocReqSearch.searchRequests.exists(req => req.failureRetryCount == 0) mustBe true
     }
   }
@@ -70,15 +59,15 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
     val searchID: UUID = UUID.randomUUID()
     val userId: String = "test_userId"
-    val resultsFound: String = "inProcess"
+    val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
     )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =

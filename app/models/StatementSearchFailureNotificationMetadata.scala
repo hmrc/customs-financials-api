@@ -17,18 +17,10 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils.emptyString
 
-case class SearchRequest(eoriNumber: String,
-                         statementRequestId: String,
-                         searchSuccessful: SearchResultStatus.SearchResultStatus,
-                         searchDateTime: String = emptyString,
-                         searchFailureReasonCode: String,
-                         failureRetryCount: Int) {
-  require(failureRetryCount >= 0 && failureRetryCount < 6,
-    "invalid value for failureRetryCount, valid values are 0,1,2,3,4,5")
-}
+case class StatementSearchFailureNotificationMetadata(statementRequestID: String, reason: String)
 
-object SearchRequest {
-  implicit val searchRequestFormat: OFormat[SearchRequest] = Json.format[SearchRequest]
+object StatementSearchFailureNotificationMetadata {
+  implicit val ssfnMetaDataFormats: OFormat[StatementSearchFailureNotificationMetadata] =
+    Json.format[StatementSearchFailureNotificationMetadata]
 }

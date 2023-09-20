@@ -36,7 +36,7 @@ class ParamsSpec extends SpecBase {
   "Exception must be thrown" should {
     "for incorrect parameter values" in {
       intercept[RuntimeException] {
-        val paramsOb = Params("2",
+        Params("2",
           "2021",
           "3",
           "2021",

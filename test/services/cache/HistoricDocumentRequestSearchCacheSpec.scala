@@ -17,15 +17,18 @@
 package services.cache
 
 import config.AppConfig
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest}
+import models.SearchResultStatus._
+import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.mongodb.scala.model.{Filters, Updates}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
-import utils.SpecBase
 import utils.Utils.emptyString
+import utils.{SpecBase, Utils}
 
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -87,6 +90,35 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     }
   }
 
+  "retrieveDocumentForStatementRequestID" should {
+    "retrieve the document for the given statementRequestID" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB.get.currentEori mustBe "GB123456789012"
+      }
+    }
+
+    "return None if there is no document for the provided value" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe empty
+      }
+    }
+  }
+
   "retrieveDocumentsForCurrentEori" should {
     "retrieve the documents correctly" in {
       val documentsInDB = for {
@@ -100,19 +132,139 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
         documentsInDB.nonEmpty mustBe true
       }
     }
+
+    "return None if there is no document for the provided value" in {
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori(
+          "GB123456789012")
+      } yield retrievedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe Seq()
+      }
+    }
+  }
+
+  "updateDocumentForQueryFilter" should {
+    "update the document correctly for the given queryFilter and updates" in {
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val searchId = docToBeInserted.searchID.toString
+      val queryFilter = Filters.equal("searchID", searchId)
+      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        _ <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          val docInDB = documentsInDB.get
+
+          docInDB.currentEori mustBe "GB123456789012"
+          docInDB.searchID.toString mustBe searchId
+          docInDB.resultsFound mustBe SearchResultStatus.no
+      }
+    }
+
+    "return None when there is no document to update" in {
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val searchId = docToBeInserted.searchID.toString
+      val queryFilter = Filters.equal("searchID", searchId)
+      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe empty
+      }
+    }
+  }
+
+  "updateSearchRequestForStatementRequestId" should {
+    "update the document with correct fields for the given statementRequestID" in {
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc
+      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val updatedSearchRequests = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
+          updatedDateTime, "AWSUnreachable", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+      )
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
+          updatedSearchRequests,
+          docToBeInserted.searchID.toString)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB.get.currentEori mustBe "GB123456789012"
+
+          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
+            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+
+          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
+          searchRequestAfterUpdate.searchDateTime must not be empty
+      }
+    }
+
+    "return None when there is no document to update" in {
+      val histSearchDoc = getHistoricDocumentRequestSearchDoc
+      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+      val updatedSearchRequests = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
+          updatedDateTime, "AWSUnreachable", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+      )
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
+          updatedSearchRequests,
+          histSearchDoc.searchID.toString)
+        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
+          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+      } yield finalDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          documentsInDB mustBe None
+      }
+    }
   }
 
   private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
-    val resultsFound: String = "inProcess"
+    val resultsFound = SearchResultStatus.inProcess
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", "inProcess", emptyString, emptyString, 0),
+        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", inProcess, emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", "inProcess", emptyString, emptyString, 0)
+        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
     )
 
     HistoricDocumentRequestSearch(searchID,
