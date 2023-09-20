@@ -30,7 +30,7 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
                                          currentEori: String,
                                          params: Params,
                                          searchRequests: Set[SearchRequest],
-                                         expireAt:DateTime = DateTime.now()) {
+                                         expireAt:Option[DateTime] = None) {
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 

@@ -20,6 +20,7 @@ import com.mongodb.client.model.Indexes.ascending
 import com.mongodb.client.model.{FindOneAndUpdateOptions, ReturnDocument}
 import config.AppConfig
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.joda.time.DateTime
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
@@ -67,10 +68,13 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val  resultsFoundFieldKey = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
-  def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] =
+  def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
+    val expireAtTS = req.expireAt.fold(DateTime.now())(identity).plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
+
     collection.insertOne(req.copy(
-      expireAt = req.expireAt.plusSeconds(appConfig.mongoHistDocSearchTtl.toInt))
+      expireAt = Option(expireAtTS))
     ).toFuture() map { _ => false } recover { case _ => true }
+  }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover {

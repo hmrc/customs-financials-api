@@ -93,11 +93,14 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               failureReasonCode: String): Future[Option[Unit]] =
     for {
       optHistDocReqSearchDoc <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
-      histDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
+      updatedHistDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
     } yield {
-      histDoc.map {
-        _ => ()
+      updatedHistDoc.map {
+        histDoc => {
+          if (!(histDoc.resultsFound == SearchResultStatus.yes)) cacheService.updateResultsFoundStatus(histDoc)
+          else ()
+        }
       }
     }
 
