@@ -16,7 +16,6 @@
 
 package models.responses
 
-import models.responses.ErrorMessage.missingReqProps
 import play.api.libs.json.{Json, OFormat}
 import utils.Utils.currentDateTimeAsRFC7231
 
@@ -29,56 +28,24 @@ object StatementSearchFailureNotificationErrorResponse {
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
   def apply(errors: Throwable,
-            correlationId: String): StatementSearchFailureNotificationErrorResponse = {
+            correlationId: String,
+            statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
 
-    val defaultErrorDetail = ErrorDetail(
-      timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
-      correlationId = correlationId,
-      errorCode = ErrorCode.code400,
-      errorMessage = ErrorMessage.invalidMessage,
-      source = ErrorSource.jsonValidation,
-      sourceFaultDetail = SourceFaultDetail(Seq("Invalid values"))
-    )
-
-    StatementSearchFailureNotificationErrorResponse(updateErrorDetails(errors, defaultErrorDetail))
-  }
-
-  private def updateErrorDetails(errors: Throwable,
-                                 errorDetail: ErrorDetail): ErrorDetail = {
     val aggregateErrorMsg = errors.getMessage
     val errorMsgList: Seq[String] = aggregateErrorMsg.split("\\),").toSeq
 
-    (aggregateErrorMsg, errorMsgList) match {
-      case (agMsg, errorList) if isBothSchemaFieldsMissingError(agMsg, errorList) =>
-        errorDetail.copy(
-          errorMessage = ErrorMessage.badRequestReceived,
-          source = ErrorSource.backEnd,
-          sourceFaultDetail = SourceFaultDetail(errorMsgList))
+    val errorDetail = ErrorDetail(
+      timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
+      correlationId = correlationId,
+      errorCode = ErrorCode.code400,
+      errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ => ErrorMessage.invalidStatementReqId),
+      source = ErrorSource.cdsFinancials,
+      sourceFaultDetail = SourceFaultDetail(
+        statementRequestID.fold(errorMsgList)(stReqId => Seq(ErrorMessage.invalidStatementReqIdDetail(stReqId))))
+    )
 
-      case (agMsg, errorList) if isSingleMandatoryFieldMissingError(agMsg, errorList) =>
-        errorDetail.copy(sourceFaultDetail = SourceFaultDetail(errorMsgList))
-
-      case (_, errorList) if errorList.size > 1 =>
-        errorDetail.copy(
-          errorMessage = ErrorMessage.badRequestReceived,
-          source = ErrorSource.backEnd,
-          sourceFaultDetail = SourceFaultDetail(errorMsgList))
-
-      case _ => errorDetail.copy(sourceFaultDetail = SourceFaultDetail(errorMsgList))
-    }
+    StatementSearchFailureNotificationErrorResponse(errorDetail)
   }
-
-  private def isBothSchemaFieldsMissingError(aggregateErrorMsg: String,
-                                             errorList: Seq[String]): Boolean = {
-    aggregateErrorMsg.contains(missingReqProps) &&
-      aggregateErrorMsg.contains("reason") &&
-      aggregateErrorMsg.contains("statementRequestID") &&
-      errorList.size == 1
-  }
-
-  private def isSingleMandatoryFieldMissingError(aggregateErrorMsg: String,
-                                                 errorList: Seq[String]) =
-    aggregateErrorMsg.contains(missingReqProps) && errorList.size == 1
 }
 
 case class ErrorDetail(timestamp: String,
@@ -102,6 +69,9 @@ object ErrorMessage {
   val invalidMessage = "Invalid message"
   val badRequestReceived = "Bad request received"
   val missingReqProps = "missing required properties"
+  val invalidStatementReqId = "Invalid statementRequestId"
+  def invalidStatementReqIdDetail: String => String =
+    statementReqId =>  s"statementRequestId : $statementReqId is not recognised"
 }
 
 object ErrorSource {

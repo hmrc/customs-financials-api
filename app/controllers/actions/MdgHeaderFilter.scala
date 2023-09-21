@@ -16,9 +16,10 @@
 
 package controllers.actions
 
-import play.api.mvc.Results.BadRequest
+import _root_.config.AppConfig
+import play.api.mvc.Results.{BadRequest, Unauthorized}
 import play.api.mvc._
-import utils.Utils.rfc7231DateTimePattern
+import utils.Utils.{emptyString, rfc7231DateTimePattern}
 
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -27,8 +28,11 @@ import scala.util.Try
 
 class MdgHeaderDefaultFilter @Inject()(
                                         val parser: BodyParsers.Default,
+                                        appConfig: AppConfig
                                       )(implicit val executionContext: ExecutionContext)
   extends MdgHeaderFilter {
+
+  private val logger = play.api.Logger(getClass)
 
   private val dateHeader = "Date"
   private val correlationIdHeader = "X-Correlation-ID"
@@ -48,7 +52,8 @@ class MdgHeaderDefaultFilter @Inject()(
         requestWithValidContentType <- validateContentTypeHeader(requestWithValidAccept)
         requestWithValidDate <- validateRequestDate(requestWithValidContentType)
         requestWithValidCorrelationId <- validateCorrelationId(requestWithValidDate)
-      } yield requestWithValidCorrelationId
+        requestWithValidForwardHost <- validateForwardHost(requestWithValidCorrelationId)
+      } yield requestWithValidForwardHost
     )
   }
 
@@ -61,20 +66,26 @@ class MdgHeaderDefaultFilter @Inject()(
 
     missingHeaders match {
       case Nil => Right(request)
-      case _ => Left(BadRequest(s"Missing header(s): ${missingHeaders.mkString(",")}"))
+      case _ =>
+        logger.error(s"Missing header(s): ${missingHeaders.mkString(",")}")
+        Left(BadRequest)
     }
   }
 
   private def validateAcceptHeader[A](request: Request[A]): Either[Result, Request[A]] = {
     request.headers.get(acceptHeader).map(_.toLowerCase == "application/json") match {
-      case Some(false) => Left(BadRequest("Accept header must be application/json"))
+      case Some(false) =>
+        logger.error("Accept header must be application/json")
+        Left(BadRequest)
       case _ => Right(request)
     }
   }
 
   private def validateContentTypeHeader[A](request: Request[A]): Either[Result, Request[A]] = {
     request.headers.get(contentTypeHeader).map(_.toLowerCase == "application/json") match {
-      case Some(false) => Left(BadRequest("Content-Type header must be application/json"))
+      case Some(false) =>
+        logger.error("Content-Type header must be application/json")
+        Left(BadRequest)
       case _ => Right(request)
     }
   }
@@ -82,8 +93,9 @@ class MdgHeaderDefaultFilter @Inject()(
   private def validateCorrelationId[A](request: Request[A]): Either[Result, Request[A]] = {
     val MAX_CORRELATION_ID_LENGTH = 36
     request.headers.get(correlationIdHeader).map(_.length) match {
-      case Some(length) if length > MAX_CORRELATION_ID_LENGTH => Left(
-        BadRequest("header.*X-Correlation-ID exceeds 36 characters"))
+      case Some(length) if length > MAX_CORRELATION_ID_LENGTH =>
+        logger.error("header.*X-Correlation-ID exceeds 36 characters")
+        Left(BadRequest)
       case _ => Right(request)
     }
   }
@@ -91,7 +103,19 @@ class MdgHeaderDefaultFilter @Inject()(
   private def validateRequestDate[A](request: Request[A]): Either[Result, Request[A]] = {
     Try(request.headers.get(dateHeader).map(httpDateFormatter.parse(_))).toOption.flatten match {
       case Some(_) => Right(request)
-      case None => Left(BadRequest("Date header has invalid format"))
+      case None =>
+        logger.error("Date header has invalid format")
+        Left(BadRequest)
+    }
+  }
+
+  private def validateForwardHost[A](request: Request[A]): Either[Result, Request[A]] = {
+    request.headers.get(forwardHostHeader).map(_.toLowerCase == appConfig.ssfnForwardedHost.getOrElse(
+      emptyString).toLowerCase) match {
+      case Some(false) =>
+        logger.error(s"$forwardHostHeader has invalid value")
+        Left(Unauthorized)
+      case _ => Right(request)
     }
   }
 }

@@ -86,6 +86,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
 
   lazy val ssfnBearerToken: String = getConfString("ssfn.bearer-token", "test")
+  lazy val ssfnForwardedHost: Option[String] = configuration.getOptional[String]("microservice.services.ssfn.forwarded-host")
 
   lazy val mongoHistDocSearchCollectionName: String =
     configuration.get[String]("mongodb.historic-document-request-search.name")

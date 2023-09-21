@@ -82,10 +82,10 @@ class StatementSearchFailureNotificationController @Inject()(
         StatementSearchFailureNotificationErrorResponse(ErrorDetail(
           currentDateTimeAsRFC7231(LocalDateTime.now()),
           correlationId,
-          ErrorCode.code500,
+          ErrorCode.code400,
           ErrorMessage.badRequestReceived,
           ErrorSource.cdsFinancials,
-          SourceFaultDetail(Seq("JSON validation failed for the request"))))
+          SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
     }
   }
 

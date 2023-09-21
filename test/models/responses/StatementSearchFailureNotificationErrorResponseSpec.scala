@@ -42,8 +42,8 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
-        errorMessage = ErrorMessage.invalidMessage,
-        source = ErrorSource.jsonValidation,
+        errorMessage = ErrorMessage.badRequestReceived,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -71,7 +71,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
         correlationId,
         errorCode = ErrorCode.code400,
         errorMessage = ErrorMessage.badRequestReceived,
-        source = ErrorSource.backEnd,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -100,8 +100,8 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
-        errorMessage = ErrorMessage.invalidMessage,
-        source = ErrorSource.jsonValidation,
+        errorMessage = ErrorMessage.badRequestReceived,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -118,12 +118,13 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       actualOb.errorDetail.sourceFaultDetail mustBe expectedSSFNErrorResOb.errorDetail.sourceFaultDetail
     }
 
-    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail" +
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
       "when schema validator generates multiple errors" in {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(/StatementSearchFailureNotificationMetadata: object instance has properties which are not allowed by the schema: [\"statementReq\"])",
+        "(/StatementSearchFailureNotificationMetadata: object instance has properties which are not allowed" +
+          " by the schema: [\"statementReq\"])",
         "(/StatementSearchFailureNotificationMetadata: object has missing required properties ([\"statementRequestID\"]))",
         "(/StatementSearchFailureNotificationMetadata/reason:" +
           " instance value (\"Unknown\") not found in enum (possible values:" +
@@ -135,7 +136,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
         correlationId,
         errorCode = ErrorCode.code400,
         errorMessage = ErrorMessage.badRequestReceived,
-        source = ErrorSource.backEnd,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -155,7 +156,40 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
       actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
       actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
-      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+    }
+
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
+      "when statementRequestID is present in the " in new Setup {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
+
+      val sourceFaultDetail = SourceFaultDetail(Seq(ErrorMessage.invalidStatementReqIdDetail(statementReqId)))
+
+      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        errorCode = ErrorCode.code400,
+        errorMessage = ErrorMessage.invalidStatementReqId,
+        source = ErrorSource.cdsFinancials,
+        sourceFaultDetail = sourceFaultDetail)
+
+      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+
+      val schemaErrorMsg = ""
+
+      val actualOb = StatementSearchFailureNotificationErrorResponse(
+        new BadRequestException(schemaErrorMsg), correlationId, Option(statementReqId))
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+
+      actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
     }
   }
 

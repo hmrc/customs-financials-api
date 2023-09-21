@@ -26,6 +26,9 @@ class DefaultAuthorizationHeaderFilter @Inject()(
                                                   val parser: BodyParsers.Default,
                                                   appConfig: AppConfig
                                                 )(implicit val executionContext: ExecutionContext) extends AuthorizationHeaderFilter {
+
+  private val logger = play.api.Logger(getClass)
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(for {
       requestWithAuthorizationHeader <- validateAuthorization(request)
@@ -35,7 +38,9 @@ class DefaultAuthorizationHeaderFilter @Inject()(
   private def validateAuthorization[A](request: Request[A]): Either[Result, Request[A]] = {
     request.headers.get("Authorization") match {
       case Some(s"${appConfig.bearerTokenValuePrefix} ${appConfig.ssfnBearerToken}") => Right(request)
-      case _ => Left(Unauthorized("Invalid Authorization token"))
+      case _ =>
+        logger.error("Invalid Authorization token")
+        Left(Unauthorized)
     }
   }
 }
