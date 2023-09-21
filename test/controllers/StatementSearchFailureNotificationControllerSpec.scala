@@ -16,30 +16,96 @@
 
 package controllers
 
-import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus, StatementSearchFailureNotificationMetadata}
+import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
+import org.mockito.Mockito
 import play.api.http.Status.{BAD_REQUEST, NO_CONTENT}
-import play.api.{Application, inject}
 import play.api.libs.json.JsObject
 import play.api.mvc._
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, running, status}
+import play.api.{Application, inject}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import utils.Utils.emptyString
-import utils.{JSONSchemaValidator, SpecBase}
+import utils.{JSONSchemaValidator, SpecBase, Utils}
 
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.Future
 
 class StatementSearchFailureNotificationControllerSpec extends SpecBase {
   "processNotification" should {
     "return 204 when the request is valid" in new Setup {
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(None)
+      )
+
       running(app) {
-        when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
-          Future.successful(Option(historicDocumentRequestSearchDoc))
-        )
+        val response = route(app, validRequest).value
+        status(response) mustBe NO_CONTENT
+      }
+    }
+
+    "return 204 when one searchRequest is already in no status and other is inProcess" in new Setup {
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
+        incomingStatementReqId)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc))
+      )
+
+      val updatedSearchRequests: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, emptyString, 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
+          emptyString, emptyString, 0)
+      )
+
+      when(mockHistDocReqSearchCacheService.updateSearchRequestForStatementRequestId(
+        historicDocumentRequestSearchDoc,
+        incomingStatementReqId,
+        "NoDocumentsFound"
+      )).thenReturn(Future.successful(Some(historicDocumentRequestSearchDoc.copy(
+        searchRequests = updatedSearchRequests))))
+
+      when(mockHistDocReqSearchCacheService.updateResultsFoundStatusToNoIfEligible(
+        historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests))).thenReturn(
+        Future.successful(Some(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests))))
+
+      running(app) {
+        val response = route(app, validRequest).value
+        status(response) mustBe NO_CONTENT
+
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .retrieveHistDocRequestSearchDocForStatementReqId(any)
+
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .updateSearchRequestForStatementRequestId(any, any, any)
+
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .updateResultsFoundStatusToNoIfEligible(any)
+      }
+    }
+
+    "return 204 when all searchRequests have no for searchSuccessful" in new Setup {
+
+      val searchDateTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val searchRequestsWithNoStatus: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, searchDateTime, "NoDocumentsFound", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.no,
+          searchDateTime, "NoDocumentsFound", 0)
+      )
+
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
+        incomingStatementReqId)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsWithNoStatus)))
+      )
+
+      running(app) {
         val response = route(app, validRequest).value
         status(response) mustBe NO_CONTENT
       }
@@ -53,10 +119,10 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     }
   }
 
-
   trait Setup {
+    val incomingStatementReqId = UUID.randomUUID().toString
     val ssfnMeteData: StatementSearchFailureNotificationMetadata =
-      StatementSearchFailureNotificationMetadata(UUID.randomUUID().toString, "NoDocumentsFound")
+      StatementSearchFailureNotificationMetadata(incomingStatementReqId, "NoDocumentsFound")
 
     val ssfnReq: StatementSearchFailureNotificationRequest = StatementSearchFailureNotificationRequest(ssfnMeteData)
 
@@ -112,9 +178,10 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
       val searchRequests: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
+          emptyString, emptyString, 0)
       )
 
       HistoricDocumentRequestSearch(searchID,
@@ -125,5 +192,4 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         searchRequests)
     }
   }
-
 }

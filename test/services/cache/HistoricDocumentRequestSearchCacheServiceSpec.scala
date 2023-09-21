@@ -146,7 +146,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
     }
   }
 
-  "updateResultsFoundStatus" should {
+  "updateResultsFoundStatusToNoIfEligible" should {
     "update the resultsFound to no if all the search requests have no for searchSuccessful field" in new Setup {
       val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
       val searchFailureReasonCode = "AWSUnreachable"
@@ -172,7 +172,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.updateResultsFoundStatus(histDocSearchWithAllSearchRequestsProcessed).map {
+      service.updateResultsFoundStatusToNoIfEligible(histDocSearchWithAllSearchRequestsProcessed).map {
         optDoc => {
           val doc = optDoc.get
 
@@ -190,7 +190,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
-      service.updateResultsFoundStatus(histDocRequestSearch).map {
+      service.updateResultsFoundStatusToNoIfEligible(histDocRequestSearch).map {
         optDoc => {
           val doc = optDoc.get
 
@@ -212,7 +212,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
           Utils.dateTimeAsIso8601(LocalDateTime.now), "AWSUnreachable", 0)
       )
 
-      service.updateResultsFoundStatus(histDocRequestSearch.copy(searchRequests = searchRequestsOb)).map {
+      service.updateResultsFoundStatusToNoIfEligible(histDocRequestSearch.copy(searchRequests = searchRequestsOb)).map {
         optDoc => {
           val doc = optDoc.get
 

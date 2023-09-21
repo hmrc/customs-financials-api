@@ -68,7 +68,12 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
       req.searchID.toString)
   }
 
-  def updateResultsFoundStatus(req: HistoricDocumentRequestSearch):Future[Option[HistoricDocumentRequestSearch]] = {
+  /**
+   * Updates the resultsFound status to no if all the searchRequests have no for
+   * searchSuccessful field
+   */
+  def updateResultsFoundStatusToNoIfEligible(req: HistoricDocumentRequestSearch
+                                            ):Future[Option[HistoricDocumentRequestSearch]] = {
   val isAllSearchRequestsSearchStatusNo: Boolean = !req.searchRequests.exists(
     sr => sr.searchSuccessful == SearchResultStatus.inProcess || sr.searchSuccessful == SearchResultStatus.yes)
 

@@ -43,7 +43,8 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     indexes = Seq(
       IndexModel(
         ascending("expireAt"),
-        IndexOptions().name("dataExpiry_idx").expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
+        IndexOptions().name("dataExpiry_idx").expireAfter(
+          appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
       ),
       IndexModel(
         ascending("searchID"),
@@ -69,7 +70,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
-    val expireAtTS = req.expireAt.fold(DateTime.now())(identity).plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
+    val expireAtTS = DateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
 
     collection.insertOne(req.copy(expireAt = Option(expireAtTS))).toFuture() map { _ => false } recover {
       case _ => true
