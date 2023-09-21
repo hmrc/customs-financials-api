@@ -16,16 +16,19 @@
 
 package services.cache
 
-import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.Indexes.ascending
+import com.mongodb.client.model.{FindOneAndUpdateOptions, ReturnDocument}
 import config.AppConfig
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.joda.time.DateTime
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import utils.Utils
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,13 +42,11 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
     indexes = Seq(
       IndexModel(
-        ascending("currentEori"),
-        IndexOptions()
-          .name("CurrentEoriIndex")
-          .unique(false)
-          .sparse(false)
-          .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
-      ), IndexModel(
+        ascending("expireAt"),
+        IndexOptions().name("dataExpiry_idx").expireAfter(
+          appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
+      ),
+      IndexModel(
         ascending("searchID"),
         IndexOptions()
           .name("SearchIDIndex")
@@ -65,9 +66,16 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val searchRequestsFieldKey = "searchRequests"
   private val currentEoriFieldKey = "currentEori"
   private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
+  private val  resultsFoundFieldKey = "resultsFound"
+  private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
-  def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] =
-    collection.insertOne(req).toFuture() map { _ => false } recover { case _ => true }
+  def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
+    val expireAtTS = DateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
+
+    collection.insertOne(req.copy(expireAt = Option(expireAtTS))).toFuture() map { _ => false } recover {
+      case _ => true
+    }
+  }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover {
@@ -93,7 +101,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.findOneAndUpdate(
       filter = queryFilter,
       update = updates,
-      new FindOneAndUpdateOptions().upsert(false)).headOption().recover {
+      new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption().recover {
       case exception =>
         logger.error(s"Failed to update the document and error is ::: ${exception.getMessage}")
         None
@@ -108,6 +116,22 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
 
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
     val updates = Updates.set(searchRequestsFieldKey, searchRequests)
+
+    updateDocumentForQueryFilter(queryFiler, updates)
+  }
+
+  /**
+   * Updates the resultsFound status to the provided updatedStatus
+   * for the given searchID
+   */
+  def updateResultsFoundStatus(searchID: String,
+                               updatedStatus: SearchResultStatus.Value):Future[Option[HistoricDocumentRequestSearch]] = {
+    val queryFiler = Filters.equal(searchIDFieldKey, searchID)
+
+    val updates = Updates.combine(
+      Updates.set(resultsFoundFieldKey, updatedStatus.toString),
+      Updates.set(searchStatusUpdateDateFieldKey, Utils.dateTimeAsIso8601(LocalDateTime.now))
+    )
 
     updateDocumentForQueryFilter(queryFiler, updates)
   }

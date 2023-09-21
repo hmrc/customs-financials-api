@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
 class StatementSearchFailureNotificationMetadataSpec extends SpecBase {

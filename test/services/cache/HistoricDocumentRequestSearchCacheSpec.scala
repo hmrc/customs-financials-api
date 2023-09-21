@@ -254,6 +254,45 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
     }
   }
 
+  "updateResultsFoundStatus" should {
+    "update the document correctly" in {
+      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val updatedSearchRequests = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
+          updatedDateTime, "AWSUnreachable", 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
+          SearchResultStatus.no, updatedDateTime, "NoDocumentsFound", 0)
+      )
+
+      val docToBeInserted = getHistoricDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)
+
+      val documentsInDB = for {
+        _ <- historicDocumentRequestCache.collection.drop().toFuture()
+        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        updatedDoc <- historicDocumentRequestCache.updateResultsFoundStatus(docToBeInserted.searchID.toString,
+          SearchResultStatus.no)
+      } yield updatedDoc
+
+      whenReady(documentsInDB) {
+        documentsInDB =>
+          val updateDoc = documentsInDB.get
+          documentsInDB.get.currentEori mustBe "GB123456789012"
+
+          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
+            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+
+          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
+          searchRequestAfterUpdate.searchDateTime must not be empty
+
+          updateDoc.resultsFound mustBe SearchResultStatus.no
+          updateDoc.searchStatusUpdateDate must not be empty
+      }
+    }
+  }
+
   private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
     val searchID: UUID = UUID.randomUUID()
     val resultsFound = SearchResultStatus.inProcess

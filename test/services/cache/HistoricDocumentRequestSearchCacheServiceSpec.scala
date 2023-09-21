@@ -146,6 +146,82 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
     }
   }
 
+  "updateResultsFoundStatusToNoIfEligible" should {
+    "update the resultsFound to no if all the search requests have no for searchSuccessful field" in new Setup {
+      val searchFailureReasonCode = "AWSUnreachable"
+      val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
+        sr =>
+          sr.copy(
+            searchSuccessful = SearchResultStatus.no,
+            searchDateTime = searchDtTime,
+            searchFailureReasonCode = searchFailureReasonCode)
+      }
+
+      val histDocSearchWithAllSearchRequestsProcessed: HistoricDocumentRequestSearch =
+        histDocRequestSearch.copy(searchRequests = updatedSearchRequests)
+
+      when(mockHistDocReqSearchCache.updateResultsFoundStatus(
+        histDocSearchWithAllSearchRequestsProcessed.searchID.toString,
+        SearchResultStatus.no
+      )).thenReturn(Future.successful(
+        Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
+
+      val service: HistoricDocumentRequestSearchCacheService =
+        app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
+
+      service.updateResultsFoundStatusToNoIfEligible(histDocSearchWithAllSearchRequestsProcessed).map {
+        optDoc => {
+          val doc = optDoc.get
+
+          doc.resultsFound mustBe SearchResultStatus.no
+          doc.searchStatusUpdateDate must not be empty
+        }
+      }
+
+      verify(mockHistDocReqSearchCache, times(1)).updateResultsFoundStatus(
+        histDocSearchWithAllSearchRequestsProcessed.searchID.toString,
+        SearchResultStatus.no)
+    }
+
+    "not update the resultsFound if all the search requests do not have no for searchSuccessful field" in new Setup {
+      val service: HistoricDocumentRequestSearchCacheService =
+        app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
+
+      service.updateResultsFoundStatusToNoIfEligible(histDocRequestSearch).map {
+        optDoc => {
+          val doc = optDoc.get
+
+          doc.resultsFound mustBe SearchResultStatus.inProcess
+          doc.searchStatusUpdateDate mustBe empty
+        }
+      }
+    }
+
+    "not update the resultsFound to no if one or more search requests do not have no for searchSuccessful field" in new Setup {
+      val service: HistoricDocumentRequestSearchCacheService =
+        app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
+
+      val searchRequestsOb: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.no,
+          Utils.dateTimeAsIso8601(LocalDateTime.now), "AWSUnreachable", 0)
+      )
+
+      service.updateResultsFoundStatusToNoIfEligible(histDocRequestSearch.copy(searchRequests = searchRequestsOb)).map {
+        optDoc => {
+          val doc = optDoc.get
+
+          doc.resultsFound mustBe SearchResultStatus.inProcess
+          doc.searchStatusUpdateDate mustBe empty
+        }
+      }
+    }
+  }
+
   trait Setup {
     val mockHistDocReqSearchCache: HistoricDocumentRequestSearchCache =
       mock[HistoricDocumentRequestSearchCache]

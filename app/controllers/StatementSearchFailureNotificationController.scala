@@ -59,7 +59,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
   private def processStatementReqId(request: Request[JsValue]) = {
     Json.fromJson(request.body) match {
-      case JsSuccess(value, _) => {
+      case JsSuccess(value, _) =>
         val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
         val failureReasonCode = value.StatementSearchFailureNotificationMetadata.reason
 
@@ -67,7 +67,7 @@ class StatementSearchFailureNotificationController @Inject()(
           s" ::: $statementRequestID with reason :: $failureReasonCode")
 
         updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
-      }
+
       case JsError(_) => logger.error("Request is not properly formed and failing in parsing")
     }
   }
@@ -93,11 +93,15 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               failureReasonCode: String): Future[Option[Unit]] =
     for {
       optHistDocReqSearchDoc <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
-      histDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
+      updatedHistDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
     } yield {
-      histDoc.map {
-        _ => ()
+      updatedHistDoc.map {
+        histDoc => {
+          if (!(histDoc.resultsFound == SearchResultStatus.yes))
+            cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
+          else ()
+        }
       }
     }
 
