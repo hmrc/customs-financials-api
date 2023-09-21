@@ -148,7 +148,6 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
   "updateResultsFoundStatusToNoIfEligible" should {
     "update the resultsFound to no if all the search requests have no for searchSuccessful field" in new Setup {
-      val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
       val searchFailureReasonCode = "AWSUnreachable"
       val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
 
