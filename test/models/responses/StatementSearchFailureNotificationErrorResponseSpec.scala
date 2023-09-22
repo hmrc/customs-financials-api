@@ -50,7 +50,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val schemaErrorMsg = "(: object has missing required properties ([\"StatementSearchFailureNotificationMetadata\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -79,7 +79,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata:" +
         " object has missing required properties ([\"reason\",\"statementRequestID\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -109,7 +109,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata/statementRequestID:" +
         " ECMA 262 regex \"^[A-Fa-f0-9-]{36}$\" does not match input string \"1641bd46\")"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -150,7 +150,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
         "\"DocumentumException\",\"AWSUnreachable\",\"AWSException\",\"BadRequestReceived\",\"CDDMInternalError\"]))"
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -179,7 +179,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = ""
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId, Option(statementReqId))
+        Option(new BadRequestException(schemaErrorMsg)), correlationId, Option(statementReqId))
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId

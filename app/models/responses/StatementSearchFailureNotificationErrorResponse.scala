@@ -17,6 +17,7 @@
 package models.responses
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.http.BadRequestException
 import utils.Utils.currentDateTimeAsRFC7231
 
 import java.time.LocalDateTime
@@ -27,11 +28,11 @@ object StatementSearchFailureNotificationErrorResponse {
   implicit val ssfnErrorResponseFormat: OFormat[StatementSearchFailureNotificationErrorResponse] =
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
-  def apply(errors: Throwable,
+  def apply(errors: Option[Throwable] = None,
             correlationId: String,
             statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
 
-    val aggregateErrorMsg = errors.getMessage
+    val aggregateErrorMsg = errors.fold[Throwable](new BadRequestException(""))(identity).getMessage
     val errorMsgList: Seq[String] = aggregateErrorMsg.split("\\),").toSeq
 
     val errorDetail = ErrorDetail(
