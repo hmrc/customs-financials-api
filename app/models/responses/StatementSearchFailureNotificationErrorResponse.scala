@@ -32,8 +32,10 @@ object StatementSearchFailureNotificationErrorResponse {
             correlationId: String,
             statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
 
-    val aggregateErrorMsg = errors.fold[Throwable](new BadRequestException(""))(identity).getMessage
-    val errorMsgList: Seq[String] = aggregateErrorMsg.split("\\),").toSeq
+    val aggregateErrorMsg = errors.fold[Throwable](
+      new BadRequestException(ErrorMessage.badRequestReceived))(identity).getMessage
+
+    val errorMsgList: Seq[String] = formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg)
 
     val errorDetail = ErrorDetail(
       timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
@@ -47,6 +49,11 @@ object StatementSearchFailureNotificationErrorResponse {
 
     StatementSearchFailureNotificationErrorResponse(errorDetail)
   }
+
+  private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] =
+    aggregateErrorMsg.split("\\),").toSeq.map {
+      msgStr => msgStr.replace("\"", "").substring(1)
+    }
 }
 
 case class ErrorDetail(timestamp: String,
