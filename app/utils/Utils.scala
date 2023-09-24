@@ -25,6 +25,7 @@ import java.time.temporal.ChronoUnit
 
 object Utils {
   val emptyString = ""
+  val threeColons = ":::"
   val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
   val httpDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
 

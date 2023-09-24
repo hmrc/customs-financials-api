@@ -18,7 +18,7 @@ package models.responses
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.BadRequestException
-import utils.Utils.{currentDateTimeAsRFC7231, emptyString}
+import utils.Utils.{currentDateTimeAsRFC7231, emptyString, threeColons}
 
 import java.time.LocalDateTime
 
@@ -58,10 +58,9 @@ object StatementSearchFailureNotificationErrorResponse {
     val leftParenthesis = "("
     val parenWithColonSpace = "(: "
     val doubleQuotes = "\""
-    val splitRegex = ":::"
 
     if (aggregateErrorMsg.nonEmpty) {
-      aggregateErrorMsg.split(splitRegex).toSeq.map {
+      aggregateErrorMsg.split(threeColons).toSeq.map {
         msgStr => {
           val strAfterQuotesReplacement = msgStr.replace(doubleQuotes, emptyString)
 

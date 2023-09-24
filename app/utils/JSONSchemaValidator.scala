@@ -21,6 +21,7 @@ import com.github.fge.jsonschema.core.report.ListProcessingReport
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 import play.api.libs.json._
 import uk.gov.hmrc.http.BadRequestException
+import utils.Utils.threeColons
 
 import scala.util.{Failure, Success, Try}
 
@@ -39,7 +40,7 @@ class JSONSchemaValidator {
     validateJsonPayload(apiSchemaPath, data) match {
       case Right(()) => Success(())
       case Left(errors) =>
-        val allErrorsAsString = errors.mkString(":::")
+        val allErrorsAsString = errors.mkString(threeColons)
         Failure(new BadRequestException(allErrorsAsString))
     }
   }
