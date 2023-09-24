@@ -58,17 +58,18 @@ object StatementSearchFailureNotificationErrorResponse {
     val leftParenthesis = "("
     val parenWithColonSpace = "(: "
     val doubleQuotes = "\""
-    val splitExp = "\\),"
+    val splitRegex = ":::"
 
     if (aggregateErrorMsg.nonEmpty) {
-      aggregateErrorMsg.split(splitExp).toSeq.map {
+      aggregateErrorMsg.split(splitRegex).toSeq.map {
         msgStr => {
           val strAfterQuotesReplacement = msgStr.replace(doubleQuotes, emptyString)
 
           if (strAfterQuotesReplacement.startsWith(parenWithColonSpace)) {
-            strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
+            val strAfterParenReplacement = strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
+            strAfterParenReplacement.substring(1, strAfterParenReplacement.length - 1)
           } else
-            strAfterQuotesReplacement
+            strAfterQuotesReplacement.substring(1, strAfterQuotesReplacement.length - 1)
         }
       }
     } else Seq(aggregateErrorMsg)

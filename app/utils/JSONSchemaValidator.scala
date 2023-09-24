@@ -39,7 +39,7 @@ class JSONSchemaValidator {
     validateJsonPayload(apiSchemaPath, data) match {
       case Right(()) => Success(())
       case Left(errors) =>
-        val allErrorsAsString = errors.mkString(",")
+        val allErrorsAsString = errors.mkString(":::")
         Failure(new BadRequestException(allErrorsAsString))
     }
   }
