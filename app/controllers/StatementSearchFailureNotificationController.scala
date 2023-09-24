@@ -72,7 +72,8 @@ class StatementSearchFailureNotificationController @Inject()(
             Option(statementRequestID)))
 
           case optHistDocReqSearchDoc =>
-            updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
+            updateHistoricDocumentRequestSearchForStatReqId(
+              statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
             NoContent
         }
 
@@ -156,6 +157,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
   private def requestBody(request: Request[AnyContent]): JsValue =
     request.body.asJson.getOrElse(Json.toJson(emptyString))
+
   private def correlationId(request: Request[AnyContent]): String =
     request.headers.get("X-Correlation-ID").getOrElse("Correlation-ID is missing")
 }
