@@ -37,7 +37,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(: object has missing required properties ([\"StatementSearchFailureNotificationMetadata\"]))"))
+        "(object has missing required properties ([StatementSearchFailureNotificationMetadata]))"))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
@@ -65,7 +65,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
         "(/StatementSearchFailureNotificationMetadata:" +
-          " object has missing required properties ([\"reason\",\"statementRequestID\"]))"))
+          " object has missing required properties ([reason,statementRequestID]))"))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
@@ -94,7 +94,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
         "(/StatementSearchFailureNotificationMetadata/statementRequestID:" +
-          " ECMA 262 regex \"^[A-Fa-f0-9-]{36}$\" does not match input string \"1641bd46\")"
+          " ECMA 262 regex ^[A-Fa-f0-9-]{36}$ does not match input string 1641bd46)"
       ))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),

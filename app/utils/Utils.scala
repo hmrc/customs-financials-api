@@ -27,7 +27,6 @@ object Utils {
   val emptyString = ""
   val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
   val httpDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
-  val singleSpace123456 = " "
 
   val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =

@@ -18,7 +18,7 @@ package models.responses
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.BadRequestException
-import utils.Utils.currentDateTimeAsRFC7231
+import utils.Utils.{currentDateTimeAsRFC7231, emptyString}
 
 import java.time.LocalDateTime
 
@@ -50,10 +50,25 @@ object StatementSearchFailureNotificationErrorResponse {
     StatementSearchFailureNotificationErrorResponse(errorDetail)
   }
 
-  private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] =
-    aggregateErrorMsg.split("\\),").toSeq.map {
-      msgStr => msgStr.replace("\"", "").substring(1)
-    }
+  private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] = {
+    val leftParenthesis = "("
+    val parenWithColonSpace = "(: "
+    val doubleQuotes = "\""
+    val splitExp = "\\),"
+
+    if (aggregateErrorMsg.nonEmpty) {
+      aggregateErrorMsg.split(splitExp).toSeq.map {
+        msgStr => {
+          val strAfterQuotesReplacement = msgStr.replace(doubleQuotes, emptyString)
+
+          if (strAfterQuotesReplacement.startsWith(parenWithColonSpace)) {
+            strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
+          } else
+            strAfterQuotesReplacement
+        }
+      }
+    } else Seq(aggregateErrorMsg)
+  }
 }
 
 case class ErrorDetail(timestamp: String,
