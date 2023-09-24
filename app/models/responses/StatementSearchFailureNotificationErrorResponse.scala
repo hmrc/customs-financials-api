@@ -50,6 +50,10 @@ object StatementSearchFailureNotificationErrorResponse {
     StatementSearchFailureNotificationErrorResponse(errorDetail)
   }
 
+  /**
+   * Formats the aggregate error msg into Seq of error msgs for individual fields
+   * for error response
+   */
   private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] = {
     val leftParenthesis = "("
     val parenWithColonSpace = "(: "
