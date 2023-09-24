@@ -65,17 +65,7 @@ class StatementSearchFailureNotificationController @Inject()(
         logger.info(s"Request has been successfully validated for statementRequestID" +
           s" ::: $statementRequestID with reason :: $failureReasonCode")
 
-        cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID).map {
-          case None => BadRequest(buildErrorResponse(
-            errors = None,
-            correlationId = correlationId,
-            Option(statementRequestID)))
-
-          case optHistDocReqSearchDoc =>
-            updateHistoricDocumentRequestSearchForStatReqId(
-              statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
-            NoContent
-        }
+        checkStatementReqIdInDBAndProcess(statementRequestID, correlationId, failureReasonCode)
 
       case JsError(_) =>
         logger.error("Request is not properly formed and failing in parsing")
@@ -98,6 +88,27 @@ class StatementSearchFailureNotificationController @Inject()(
           ErrorMessage.badRequestReceived,
           ErrorSource.cdsFinancials,
           SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
+    }
+  }
+
+  /**
+   * Checks whether request's statementRequestID is present in the DB
+   * Process statementRequestId if found in the DB
+   * otherwise reply with BAD_REQUEST error response
+   */
+  private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
+                                            correlationId: String,
+                                            failureReasonCode: String): Future[Result] = {
+    cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID).map {
+      case None => BadRequest(buildErrorResponse(
+        errors = None,
+        correlationId = correlationId,
+        Option(statementRequestID)))
+
+      case optHistDocReqSearchDoc =>
+        updateHistoricDocumentRequestSearchForStatReqId(
+          statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
+        NoContent
     }
   }
 
