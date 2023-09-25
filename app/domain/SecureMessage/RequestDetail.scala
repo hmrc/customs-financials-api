@@ -16,10 +16,11 @@
 
 package domain.SecureMessage
 
-import play.api.libs.json._
+import models.EORI
+import play.api.libs.json.{Json, OFormat}
 
-case class Response(id: String)
+case class RequestDetail(requestingEORI: EORI, alternateEORI: Option[EORI])
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+object RequestDetail {
+  implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]
 }

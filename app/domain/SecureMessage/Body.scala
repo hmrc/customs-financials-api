@@ -16,22 +16,19 @@
 
 package domain.SecureMessage
 
-import play.api.libs.json.Json
-import java.time
-
 case class Body(eori: String)
 
 case class ExternalReference(id: String, source: String)
 case class Recipient(regime: String, taxIdentifier: TaxIdentifier, name: Name, email: String)
 
 case class TaxIdentifier(name: String, value: String)
-case class Name(line1: String, line2: String2, line3: String)
+case class Name(line1: String, line2: String, line3: String)
 
 case class Tags(notificationType: String)
 case class AlertsDetails(data: Data)
 case class Data(key1: String, key2: String)
 
-case class Details(formId: Stirng, issueDate: String, batchId: String,
+case class Details(formId: String, issueDate: String, batchId: String,
   sourceData: String, properties: List[Property])
 
 case class Property(name: String, value: String)

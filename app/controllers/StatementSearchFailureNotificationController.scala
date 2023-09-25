@@ -99,7 +99,7 @@ class StatementSearchFailureNotificationController @Inject()(
     } yield {
       updatedHistDoc.map {
         histDoc => {
-          if (histDoc.resultsFound == SearchResultStatus.inProgress)
+          if (histDoc.resultsFound == SearchResultStatus.inProcess)
             cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
           else if (histDoc.resultsFound == SearchResultStatus.no) {
             smc.sendSecureMessage(histDoc.currentEori)

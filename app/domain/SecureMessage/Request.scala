@@ -16,10 +16,17 @@
 
 package domain.SecureMessage
 
-import play.api.libs.json._
 
-case class Response(id: String)
+import play.api.libs.json.{Json, OFormat}
 
-object Response {
-  implicit val format: OFormat[Response] = Json.format[Response]
+case class SecureMessageRequest(secureMessageRequest: Request)
+
+object SecureMessageRequest {
+  implicit val format: OFormat[SecureMessageRequest] = Json.format[SecureMessageRequest]
+}
+
+case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)
+
+object Request {
+  implicit val format: OFormat[Request] = Json.format[Request]
 }

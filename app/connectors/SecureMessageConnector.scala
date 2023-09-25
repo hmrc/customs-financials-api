@@ -17,24 +17,36 @@
 package connectors
 
 import config.AppConfig
-import models.EORI
 import domain.SecureMessage
 import services.DateTimeService
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import models.EORI
 
 class SecureMessageConnector @Inject()(httpClient: HttpClient,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def sendSecureMessage(eori: String): Future[String] = {
+  def sendSecureMessage(eori: String): Future[SecureMessage.Response] = {
 
-    val request = SecureMessage.Body(eori)
+    val commonRequest = SecureMessage.RequestCommon(
+      receiptDate = dateTimeService.currentDateTimeAsIso8601,
+      acknowledgementReference = mdgHeaders.acknowledgementReference,
+      originatingSystem = "MDTP",
+      regime = "CDS"
+    )
 
-    httpClient.POST[request, SecureMessage.Response](
+    val requestDetail = SecureMessage.RequestDetail(EORI(eori), Option(EORI("")))
+
+    val request = SecureMessage.Request(
+      commonRequest,
+      requestDetail
+    )
+
+    httpClient.POST[SecureMessage.Request, SecureMessage.Response](
       appConfig.secureMessageEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
