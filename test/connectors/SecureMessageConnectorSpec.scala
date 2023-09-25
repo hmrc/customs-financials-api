@@ -25,7 +25,7 @@ class SecureMessageConnectorSpec extends SpecBase {
 
   "SecureMessageConnector" should {
     "Populate RequestCommon" in new Setup {
-      
+
       val commonRequest = SecureMessage.RequestCommon(
         externalRef = SecureMessage.ExternalReference("123456","mdtp"),
         recipient = SecureMessage.Recipient("CDS Financials",
@@ -34,78 +34,19 @@ class SecureMessageConnectorSpec extends SpecBase {
         email = "email@email.com",
         tags = SecureMessage.Tags("CDS Financials"),
         content = contents,
-        messageType = "newMEssageAlert",
+        messageType = "newMessageAlert",
         validForm = LocalDate.now().toString(),
         alertQueue = "DEFAULT"
       )
 
       commonRequest mustBe compareRequest
-
     }
   }
 
-/*  "initiateAuthoritiesCSV" should {
-    "return Left Acc41ErrorResponse when request returns error message" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
-
-      running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI("someAltEori"))))
-        result mustBe Left(Acc41ErrorResponse)
-      }
-    }
-
-    "return Right AuthoritiesCsvGeneration when no alternateEORI" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
-
-      running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI(""))))
-        result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
-      }
-    }
-
-
-    "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
-
-      running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI("someAltEori"))))
-        result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
-      }
-    }
-  }
-
-
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
 
-    def response(error: Option[String],
-                 requestAcceptedDate: Option[String]
-                ): domain.acc41.Response = domain.acc41.Response(
-      RequestCommon("date", "MDTP", "reference", "CDS"),
-      RequestDetail(EORI("someEORI"),Some(EORI("someAltEori"))),
-      ResponseDetail(
-        errorMessage = error,
-        requestAcceptedDate = requestAcceptedDate
-      )
-    )
-
-
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
-
-    val connector: Acc41Connector = app.injector.instanceOf[Acc41Connector]
-  }*/
-
-  trait Setup {
+    val alert = "DEFAULT"
+    val mType = "newMessageAlert"
 
     val contents: List[SecureMessage.Content] = List(
       SecureMessage.Content("en", AccountType("asd"), "asd"),
@@ -120,9 +61,9 @@ class SecureMessageConnectorSpec extends SpecBase {
       email = "email@email.com",
       tags = SecureMessage.Tags("CDS Financials"),
       content = contents,
-      messageType = "newMEssageAlert",
+      messageType = mType,
       validForm = LocalDate.now().toString(),
-      alertQueue = "DEFAULT"
+      alertQueue = alert
     )
   }
 }

@@ -30,8 +30,6 @@ case class Content(lang: String, subject: AccountType, body: String)
 
 
 object SecureMessage {
-  val contentType = "application/json"
-
   val body: String = "Dear Apples & Pears Ltd\n\n" +
     "The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
     "There are 2 possible reasons for this:\n\n" +
