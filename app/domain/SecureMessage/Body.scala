@@ -16,29 +16,31 @@
 
 package domain.SecureMessage
 
+import java.time.LocalDate
+import models.AccountType
+
 case class Body(eori: String)
 
 case class ExternalReference(id: String, source: String)
-case class Recipient(regime: String, taxIdentifier: TaxIdentifier, name: Name, email: String)
-
+case class Recipient(regime: String, taxIdentifier: TaxIdentifier)
 case class TaxIdentifier(name: String, value: String)
-case class Name(line1: String, line2: String, line3: String)
-
+case class Params(startDate: LocalDate, endDate: LocalDate, documentType: String)
 case class Tags(notificationType: String)
-case class AlertsDetails(data: Data)
-case class Data(key1: String, key2: String)
+case class Content(lang: String, subject: AccountType, body: String)
 
-case class Details(formId: String, issueDate: String, batchId: String,
-  sourceData: String, properties: List[Property])
-
-case class Property(name: String, value: String)
-
-case class Content(metaData: MetaData, messageType: String,
-  validForm: String, alertQue: String)
-case class MetaData(lang: String, subject: String, body: String)
 
 object SecureMessage {
   val contentType = "application/json"
+
+  val body: String = "Dear Apples & Pears Ltd\n\n" +
+    "The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
+    "There are 2 possible reasons for this:\n\n" +
+    "Statements are only created for the periods in which you imported goods. " +
+    "Check that you imported goods during the dates you requested.\n" +
+    "Notification of adjustment statements for declarations made using " +
+    "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
+    "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
+    "From the Customs Declaration Service"
 }
 
 object SecureMessageResponse

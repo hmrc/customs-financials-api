@@ -17,14 +17,26 @@
 package domain.SecureMessage
 
 import play.api.libs.json.{Json, OFormat}
+import domain.SecureMessage
 
 case class RequestCommon(
-                          receiptDate: String,
-                          originatingSystem: String,
-                          acknowledgementReference: String,
-                          regime: String
-                        )
+  externalRef: SecureMessage.ExternalReference,
+  recipient: SecureMessage.Recipient,
+  params: SecureMessage.Params,
+  email: String,
+  tags: SecureMessage.Tags,
+  content: List[SecureMessage.Content],
+  messageType: String,
+  validForm: String,
+  alertQueue: String
+)
 
 object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
+  implicit val Refformat: OFormat[SecureMessage.ExternalReference] = Json.format[SecureMessage.ExternalReference]
+  implicit val Taxformat: OFormat[SecureMessage.TaxIdentifier] = Json.format[SecureMessage.TaxIdentifier]
+  implicit val Recipientformat: OFormat[SecureMessage.Recipient] = Json.format[SecureMessage.Recipient]
+  implicit val Paramformat: OFormat[SecureMessage.Params] = Json.format[SecureMessage.Params]
+  implicit val Tagformat: OFormat[SecureMessage.Tags] = Json.format[SecureMessage.Tags]
+  implicit val Contentformat: OFormat[SecureMessage.Content] = Json.format[SecureMessage.Content]
 }

@@ -127,7 +127,7 @@ class StatementSearchFailureNotificationController @Inject()(
           if (histDoc.resultsFound == SearchResultStatus.inProcess)
             cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
           else if (histDoc.resultsFound == SearchResultStatus.no) {
-            smc.sendSecureMessage(histDoc.currentEori)
+            smc.sendSecureMessage(histDoc)
           } else ()
         }
       }
