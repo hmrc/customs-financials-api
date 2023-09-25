@@ -43,6 +43,12 @@ class AppConfigSpec extends SpecBase {
     }
   }
 
+  "ssfnForwardedHost" should {
+    "return correct value" in new Setup {
+      appConfig.ssfnForwardedHost mustBe Option("CDDM")
+    }
+  }
+
   trait Setup {
     val app: Application = application().build()
     val appConfig: AppConfig = app.injector.instanceOf[AppConfig]

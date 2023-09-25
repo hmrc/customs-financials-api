@@ -90,6 +90,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val secureMessageBearerToken: String = getConfString("secureMessage.bearer-token", "test")
 
   lazy val ssfnBearerToken: String = getConfString("ssfn.bearer-token", "test")
+  lazy val ssfnForwardedHost: Option[String] = configuration.getOptional[String]("microservice.services.ssfn.forwarded-host")
 
   lazy val mongoHistDocSearchCollectionName: String =
     configuration.get[String]("mongodb.historic-document-request-search.name")

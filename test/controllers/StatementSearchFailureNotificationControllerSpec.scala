@@ -19,13 +19,14 @@ package controllers
 import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
+import models.responses.StatementSearchFailureNotificationErrorResponse
 import org.mockito.Mockito
-import play.api.http.Status.{BAD_REQUEST, NO_CONTENT}
-import play.api.libs.json.JsObject
+import play.api.http.Status.{BAD_REQUEST, NO_CONTENT, UNAUTHORIZED}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, running, status}
+import play.api.test.Helpers.{contentAsJson, route, running, status}
 import play.api.{Application, inject}
 import services.cache.HistoricDocumentRequestSearchCacheService
 import utils.Utils.emptyString
@@ -37,18 +38,22 @@ import scala.concurrent.Future
 
 class StatementSearchFailureNotificationControllerSpec extends SpecBase {
   "processNotification" should {
-    "return 204 when the request is valid" in new Setup {
+
+    "return BAD_REQUEST with correct error response when statementRequestId is not present in the db" in new Setup {
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
         Future.successful(None)
       )
 
       running(app) {
         val response = route(app, validRequest).value
-        status(response) mustBe NO_CONTENT
+        status(response) mustBe BAD_REQUEST
+
+        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
+          None, correlationId, Option(incomingStatementReqId)))
       }
     }
 
-    "return 204 when one searchRequest is already in no status and other is inProcess" in new Setup {
+    "return 204 when req is valid and one searchRequest is already in no status and other is inProcess" in new Setup {
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
         incomingStatementReqId)).thenReturn(
         Future.successful(Option(historicDocumentRequestSearchDoc))
@@ -88,7 +93,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       }
     }
 
-    "return 204 when all searchRequests have no for searchSuccessful" in new Setup {
+    "return 204 when request is valid and all searchRequests have no for searchSuccessful" in new Setup {
 
       val searchDateTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
 
@@ -114,13 +119,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "send error response when the request is not valid" in new Setup {
       running(app) {
         val response: Future[Result] = route(app, invalidRequest).value
-        status(response) mustBe BAD_REQUEST
+        status(response) mustBe UNAUTHORIZED
       }
     }
   }
 
   trait Setup {
-    val incomingStatementReqId = UUID.randomUUID().toString
+    val incomingStatementReqId: String = UUID.randomUUID().toString
     val ssfnMeteData: StatementSearchFailureNotificationMetadata =
       StatementSearchFailureNotificationMetadata(incomingStatementReqId, "NoDocumentsFound")
 
@@ -141,11 +146,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       routes.StatementSearchFailureNotificationController.processNotification().url)
       .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(inValidRequestJSON)
 
+    val correlationId = "some-id"
+
     val validRequest: FakeRequest[JsObject] = validRequestWithoutHeaders
       .withHeaders(
         "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
-        "X-Correlation-ID" -> "some-id",
-        "X-Forwarded-Host" -> "MD/TP",
+        "X-Correlation-ID" -> correlationId,
+        "X-Forwarded-Host" -> "CDDM",
         "Content-Type" -> "application/json",
         "Accept" -> "application/json",
         "Authorization" -> "Bearer test1234567"
@@ -154,7 +161,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     val invalidRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
         "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
-        "X-Correlation-ID" -> "some-id",
+        "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "MD/TP",
         "Content-Type" -> "application/json",
         "Accept" -> "application/json",
