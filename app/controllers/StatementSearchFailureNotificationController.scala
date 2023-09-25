@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import connectors.SecureMessageConnector
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
@@ -26,7 +27,6 @@ import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
 import utils.Utils.{currentDateTimeAsRFC7231, writable}
-
 import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +37,8 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               jsonSchemaValidator: JSONSchemaValidator,
                                                               authorizationHeaderFilter: AuthorizationHeaderFilter,
                                                               mdgHeaderFilter: MdgHeaderFilter,
-                                                              cacheService: HistoricDocumentRequestSearchCacheService
+                                                              cacheService: HistoricDocumentRequestSearchCacheService,
+                                                              smc: SecureMessageConnector
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
@@ -100,7 +101,9 @@ class StatementSearchFailureNotificationController @Inject()(
         histDoc => {
           if (!(histDoc.resultsFound == SearchResultStatus.yes))
             cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
-          else ()
+          else if (histDoc.resultsFound == SearchResultStatus.yes) {
+            smc.sendSecureMessage(histDoc.currentEori)
+          } else ()
         }
       }
     }
