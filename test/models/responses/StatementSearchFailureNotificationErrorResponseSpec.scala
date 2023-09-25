@@ -37,20 +37,20 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(: object has missing required properties ([\"StatementSearchFailureNotificationMetadata\"]))"))
+        "object has missing required properties ([StatementSearchFailureNotificationMetadata])"))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
-        errorMessage = ErrorMessage.invalidMessage,
-        source = ErrorSource.jsonValidation,
+        errorMessage = ErrorMessage.badRequestReceived,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
 
       val schemaErrorMsg = "(: object has missing required properties ([\"StatementSearchFailureNotificationMetadata\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -64,14 +64,14 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(/StatementSearchFailureNotificationMetadata:" +
-          " object has missing required properties ([\"reason\",\"statementRequestID\"]))"))
+        "/StatementSearchFailureNotificationMetadata:" +
+          " object has missing required properties ([reason,statementRequestID])"))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
         errorMessage = ErrorMessage.badRequestReceived,
-        source = ErrorSource.backEnd,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -79,7 +79,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata:" +
         " object has missing required properties ([\"reason\",\"statementRequestID\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -93,15 +93,15 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(/StatementSearchFailureNotificationMetadata/statementRequestID:" +
-          " ECMA 262 regex \"^[A-Fa-f0-9-]{36}$\" does not match input string \"1641bd46\")"
+        "/StatementSearchFailureNotificationMetadata/statementRequestID:" +
+          " ECMA 262 regex ^[A-Fa-f0-9-]{36}$ does not match input string 1641bd46"
       ))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
-        errorMessage = ErrorMessage.invalidMessage,
-        source = ErrorSource.jsonValidation,
+        errorMessage = ErrorMessage.badRequestReceived,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -109,7 +109,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata/statementRequestID:" +
         " ECMA 262 regex \"^[A-Fa-f0-9-]{36}$\" does not match input string \"1641bd46\")"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -118,44 +118,75 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       actualOb.errorDetail.sourceFaultDetail mustBe expectedSSFNErrorResOb.errorDetail.sourceFaultDetail
     }
 
-    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail" +
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
       "when schema validator generates multiple errors" in {
 
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+
       val sourceFaultDetail = SourceFaultDetail(Seq(
-        "(/StatementSearchFailureNotificationMetadata: object instance has properties which are not allowed by the schema: [\"statementReq\"])",
-        "(/StatementSearchFailureNotificationMetadata: object has missing required properties ([\"statementRequestID\"]))",
-        "(/StatementSearchFailureNotificationMetadata/reason:" +
-          " instance value (\"Unknown\") not found in enum (possible values:" +
-          " [\"NoDocumentsFound\",\"DocumentumUnreachable\",\"DocumentumException\"," +
-          "\"AWSUnreachable\",\"AWSException\",\"BadRequestReceived\",\"CDDMInternalError\"]))"
+        "/StatementSearchFailureNotificationMetadata: object has missing required properties ([statementRequestID])",
+        "/StatementSearchFailureNotificationMetadata/reason: instance value (Unknown) not found in enum" +
+          " (possible values: [NoDocumentsFound,DocumentumUnreachable,DocumentumException,AWSUnreachable," +
+          "AWSException,BadRequestReceived,CDDMInternalError])"
       ))
 
       val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
         errorMessage = ErrorMessage.badRequestReceived,
-        source = ErrorSource.backEnd,
+        source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
 
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata:" +
-        " object instance has properties which are not allowed by the schema:" +
-        " [\"statementReq\"]),\n(/StatementSearchFailureNotificationMetadata:" +
-        " object has missing required properties ([\"statementRequestID\"])),\n(" +
-        "/StatementSearchFailureNotificationMetadata/reason: instance value (\"Unknown\")" +
+        " object has missing required properties ([\"statementRequestID\"])):::" +
+        "(/StatementSearchFailureNotificationMetadata/reason: instance value (\"Unknown\")" +
         " not found in enum (possible values: [\"NoDocumentsFound\",\"DocumentumUnreachable\"," +
-        "\"DocumentumException\",\"AWSUnreachable\",\"AWSException\",\"BadRequestReceived\",\"CDDMInternalError\"]))"
+        "\"DocumentumException\"," +
+        "\"AWSUnreachable\",\"AWSException\",\"BadRequestReceived\",\"CDDMInternalError\"]))"
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        new BadRequestException(schemaErrorMsg), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
       actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
       actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
-      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+    }
+
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
+      "when statementRequestID is present in the " in new Setup {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
+
+      val sourceFaultDetail = SourceFaultDetail(Seq(ErrorMessage.invalidStatementReqIdDetail(statementReqId)))
+
+      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        errorCode = ErrorCode.code400,
+        errorMessage = ErrorMessage.invalidStatementReqId,
+        source = ErrorSource.cdsFinancials,
+        sourceFaultDetail = sourceFaultDetail)
+
+      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+
+      val schemaErrorMsg = ""
+
+      val actualOb = StatementSearchFailureNotificationErrorResponse(
+        Option(new BadRequestException(schemaErrorMsg)), correlationId, Option(statementReqId))
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+
+      actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
     }
   }
 

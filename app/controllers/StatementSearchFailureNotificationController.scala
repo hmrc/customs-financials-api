@@ -21,11 +21,11 @@ import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestForm
 import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Request}
+import play.api.mvc._
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
-import utils.Utils.{currentDateTimeAsRFC7231, writable}
+import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
 
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -43,22 +43,21 @@ class StatementSearchFailureNotificationController @Inject()(
 
   private val logger = play.api.Logger(getClass)
 
-  def processNotification(): Action[JsValue] = (authorizationHeaderFilter andThen mdgHeaderFilter)(parse.json) {
-    implicit request =>
-      jsonSchemaValidator.validatePayload(request.body, jsonSchemaValidator.ssfnRequestSchema) match {
+  def processNotification(): Action[AnyContent] = (authorizationHeaderFilter andThen mdgHeaderFilter).async {
+    request =>
+      jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
         case Success(_) =>
-          processStatementReqId(request)
-          NoContent
+          processStatementReqId(requestBody(request), correlationId(request))
 
         case Failure(errors) =>
           import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
-          BadRequest(buildErrorResponse(errors, request.headers.get("X-Correlation-ID").getOrElse(
-            "Correlation-ID is missing")))
+          Future(BadRequest(buildErrorResponse(Option(errors), correlationId(request))))
       }
   }
 
-  private def processStatementReqId(request: Request[JsValue]) = {
-    Json.fromJson(request.body) match {
+  private def processStatementReqId(request: JsValue,
+                                    correlationId: String): Future[Result] = {
+    Json.fromJson(request) match {
       case JsSuccess(value, _) =>
         val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
         val failureReasonCode = value.StatementSearchFailureNotificationMetadata.reason
@@ -66,15 +65,18 @@ class StatementSearchFailureNotificationController @Inject()(
         logger.info(s"Request has been successfully validated for statementRequestID" +
           s" ::: $statementRequestID with reason :: $failureReasonCode")
 
-        updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode)
+        checkStatementReqIdInDBAndProcess(statementRequestID, correlationId, failureReasonCode)
 
-      case JsError(_) => logger.error("Request is not properly formed and failing in parsing")
+      case JsError(_) =>
+        logger.error("Request is not properly formed and failing in parsing")
+        Future(BadRequest)
     }
   }
 
-  private def buildErrorResponse(errors: Throwable,
-                                 correlationId: String) = {
-    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, correlationId)
+  private def buildErrorResponse(errors: Option[Throwable] = None,
+                                 correlationId: String,
+                                 statementReqId: Option[String] = None) = {
+    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, correlationId, statementReqId)
 
     jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
       case Success(_) => errorResponse
@@ -82,18 +84,40 @@ class StatementSearchFailureNotificationController @Inject()(
         StatementSearchFailureNotificationErrorResponse(ErrorDetail(
           currentDateTimeAsRFC7231(LocalDateTime.now()),
           correlationId,
-          ErrorCode.code500,
+          ErrorCode.code400,
           ErrorMessage.badRequestReceived,
           ErrorSource.cdsFinancials,
-          SourceFaultDetail(Seq("JSON validation failed for the request"))))
+          SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
+    }
+  }
+
+  /**
+   * Checks whether request's statementRequestID is present in the DB
+   * Process statementRequestId if found in the DB
+   * otherwise reply with BAD_REQUEST error response
+   */
+  private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
+                                            correlationId: String,
+                                            failureReasonCode: String): Future[Result] = {
+    cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID).map {
+      case None => BadRequest(buildErrorResponse(
+        errors = None,
+        correlationId = correlationId,
+        Option(statementRequestID)))
+
+      case optHistDocReqSearchDoc =>
+        updateHistoricDocumentRequestSearchForStatReqId(
+          statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
+        NoContent
     }
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-                                                              failureReasonCode: String): Future[Option[Unit]] =
+                                                              failureReasonCode: String,
+                                                              optHistDocReqSearchDoc: Option[
+                                                                HistoricDocumentRequestSearch]): Future[Option[Unit]] =
     for {
-      optHistDocReqSearchDoc <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
-      updatedHistDoc: Option[HistoricDocumentRequestSearch] <- updateSearchRequestIfInProcess(statementRequestID,
+      updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
     } yield {
       updatedHistDoc.map {
@@ -141,4 +165,10 @@ class StatementSearchFailureNotificationController @Inject()(
     } else {
       updatedDoc
     }
+
+  private def requestBody(request: Request[AnyContent]): JsValue =
+    request.body.asJson.getOrElse(Json.toJson(emptyString))
+
+  private def correlationId(request: Request[AnyContent]): String =
+    request.headers.get("X-Correlation-ID").getOrElse("Correlation-ID is missing")
 }

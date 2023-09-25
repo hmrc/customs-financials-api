@@ -83,5 +83,11 @@ class UtilsSpec extends SpecBase {
         writableResult.contentType.value mustBe "application/json"
       }
     }
+
+    "threeColons" should {
+      "return correct value" in {
+        threeColons mustBe ":::"
+      }
+    }
   }
 }
