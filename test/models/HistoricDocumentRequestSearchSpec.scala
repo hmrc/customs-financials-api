@@ -63,11 +63,12 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+
     val searchRequests: Set[SearchRequest] = Set(
-      SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
-      SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
+      SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0),
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0)
     )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =

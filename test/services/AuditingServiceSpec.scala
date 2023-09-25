@@ -25,7 +25,7 @@ import org.mockito.ArgumentCaptor
 import org.scalatest.matchers.should.Matchers._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._

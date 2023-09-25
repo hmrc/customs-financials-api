@@ -19,7 +19,7 @@ package controllers.metadata
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import controllers.CustomAuthConnector
 import models.requests.EmailRequest
-import models.{EORI, EmailAddress, NoAssociatedDataException}
+import models.{EORI, EmailAddress}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.http.Status.BAD_REQUEST
