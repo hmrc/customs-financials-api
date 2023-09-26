@@ -62,6 +62,11 @@ class SctyClaimDetailsSpec extends SpecBase {
         val result = SctyClaimDetails.caseSubStatus("Resolved-Withdrawn")
         result mustBe testResolvedWithdrawn
       }
+
+      "Other" in new Setup {
+        val result = SctyClaimDetails.caseSubStatus("Other")
+        result mustBe None
+      }
     }
 
     "transformedCaseStatus" should {

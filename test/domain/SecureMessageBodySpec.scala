@@ -66,7 +66,6 @@ class SecureMessageBodySpec extends SpecBase {
     }
   }
 
-
   trait Setup {
 
     val TestBody = Body("eori")
