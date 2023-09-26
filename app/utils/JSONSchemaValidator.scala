@@ -71,5 +71,4 @@ class JSONSchemaValidator {
       Right(())
     }
   }
-
 }

@@ -18,18 +18,29 @@ package connectors
 
 import config.AppConfig
 import domain.SecureMessage
-import services.DateTimeService
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import models.{EORI, AccountType, HistoricDocumentRequestSearch}
-import java.time.LocalDate
 
-class SecureMessageConnector @Inject()(httpClient: HttpClient,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+import scala.concurrent.{ExecutionContext, Future}
+import models.{AccountType, EORI, HistoricDocumentRequestSearch}
+import java.time.{LocalDate, LocalDateTime}
+
+import models.responses.{ErrorCode, ErrorDetail, ErrorMessage, ErrorSource, SourceFaultDetail, StatementSearchFailureNotificationErrorResponse}
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{AnyContent, AnyContentAsJson, Request}
+import play.api.mvc.Results.BadRequest
+import utils.JSONSchemaValidator
+import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
+
+import scala.util.{Failure, Success}
+
+class SecureMessageConnector @Inject()(
+  httpClient: HttpClient,
+  appConfig: AppConfig,
+  jsonSchemaValidator: JSONSchemaValidator,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[SecureMessage.Response] = {
 
@@ -46,7 +57,7 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
     )
 
     val commonRequest = SecureMessage.RequestCommon(
-      externalRef = SecureMessage.ExternalReference(histDoc.currentEori,"mdtp"),
+      externalRef = SecureMessage.ExternalReference(histDoc.currentEori, "mdtp"),
       recipient = SecureMessage.Recipient("CDS Financials",
         SecureMessage.TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori)),
       params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
@@ -61,11 +72,18 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
     val requestDetail = SecureMessage.RequestDetail(EORI(histDoc.currentEori), Option(EORI("")))
     val request = SecureMessage.Request(commonRequest, requestDetail)
 
-    httpClient.POST[SecureMessage.Request, SecureMessage.Response](
-      appConfig.secureMessageEndpoint,
-      request,
-      headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
-        appConfig.secureMessageHostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
+      case Success(_) =>
+        httpClient.POST[SecureMessage.Request, SecureMessage.Response](
+          appConfig.secureMessageEndpoint,
+          request,
+          headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
+            appConfig.secureMessageHostHeader)
+        )(implicitly, implicitly, HeaderCarrier(), implicitly)
+
+    }
   }
+
+  private def requestBody(request: SecureMessage.Request): JsValue = Json.toJson(request)
+
 }

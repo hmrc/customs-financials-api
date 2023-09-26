@@ -17,15 +17,14 @@
 package domain.SecureMessage
 
 import play.api.libs.json.{Json, OFormat}
-import domain.SecureMessage
 
 case class RequestCommon(
-  externalRef: SecureMessage.ExternalReference,
-  recipient: SecureMessage.Recipient,
-  params: SecureMessage.Params,
+  externalRef: ExternalReference,
+  recipient: Recipient,
+  params: Params,
   email: String,
-  tags: SecureMessage.Tags,
-  content: List[SecureMessage.Content],
+  tags: Tags,
+  content: List[Content],
   messageType: String,
   validForm: String,
   alertQueue: String
@@ -33,10 +32,10 @@ case class RequestCommon(
 
 object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
-  implicit val Refformat: OFormat[SecureMessage.ExternalReference] = Json.format[SecureMessage.ExternalReference]
-  implicit val Taxformat: OFormat[SecureMessage.TaxIdentifier] = Json.format[SecureMessage.TaxIdentifier]
-  implicit val Recipientformat: OFormat[SecureMessage.Recipient] = Json.format[SecureMessage.Recipient]
-  implicit val Paramformat: OFormat[SecureMessage.Params] = Json.format[SecureMessage.Params]
-  implicit val Tagformat: OFormat[SecureMessage.Tags] = Json.format[SecureMessage.Tags]
-  implicit val Contentformat: OFormat[SecureMessage.Content] = Json.format[SecureMessage.Content]
+  implicit val Refformat: OFormat[ExternalReference] = Json.format[ExternalReference]
+  implicit val Taxformat: OFormat[TaxIdentifier] = Json.format[TaxIdentifier]
+  implicit val Recipientformat: OFormat[Recipient] = Json.format[Recipient]
+  implicit val Paramformat: OFormat[Params] = Json.format[Params]
+  implicit val Tagformat: OFormat[Tags] = Json.format[Tags]
+  implicit val Contentformat: OFormat[Content] = Json.format[Content]
 }
