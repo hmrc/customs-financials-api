@@ -20,7 +20,6 @@ import java.time.LocalDate
 import models.AccountType
 
 case class Body(eori: String)
-
 case class ExternalReference(id: String, source: String)
 case class Recipient(regime: String, taxIdentifier: TaxIdentifier)
 case class TaxIdentifier(name: String, value: String)

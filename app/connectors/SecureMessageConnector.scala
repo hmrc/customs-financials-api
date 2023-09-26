@@ -24,16 +24,10 @@ import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
 import models.{AccountType, EORI, HistoricDocumentRequestSearch}
-import java.time.{LocalDate, LocalDateTime}
-
-import models.responses.{ErrorCode, ErrorDetail, ErrorMessage, ErrorSource, SourceFaultDetail, StatementSearchFailureNotificationErrorResponse}
+import java.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContent, AnyContentAsJson, Request}
-import play.api.mvc.Results.BadRequest
 import utils.JSONSchemaValidator
-import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
-
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 class SecureMessageConnector @Inject()(
   httpClient: HttpClient,
