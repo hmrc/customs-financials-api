@@ -52,7 +52,8 @@ class SecureMessageConnector @Inject()(
         httpClient.POST[Request, Response](
           appConfig.secureMessageEndpoint,
           request,
-          headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
+          headers = mdgHeaders.headers(
+            appConfig.secureMessageBearerToken,
             appConfig.secureMessageHostHeader)
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
       case Failure(_) => Future(SecureMessage.Response(histDoc.currentEori))
@@ -75,7 +76,7 @@ class SecureMessageConnector @Inject()(
     )
   }
 
-  def getRequestDetail(eori : EORI): SecureMessage.RequestDetail = {
+  def getRequestDetail(eori: EORI): SecureMessage.RequestDetail = {
     SecureMessage.RequestDetail(eori, Option(EORI("")))
   }
 
@@ -89,8 +90,8 @@ class SecureMessageConnector @Inject()(
   }
 
   def getContents(subjectHeader: AccountType): List[SecureMessage.Content] = {
-   List(SecureMessage.Content("en", subjectHeader, SecureMessage.SecureMessage.body),
-        SecureMessage.Content("cy", subjectHeader, SecureMessage.SecureMessage.body))
+    List(SecureMessage.Content("en", subjectHeader, SecureMessage.SecureMessage.body),
+      SecureMessage.Content("cy", subjectHeader, SecureMessage.SecureMessage.body))
   }
 
   private def requestBody(request: SecureMessage.Request): JsValue = Json.toJson(request)

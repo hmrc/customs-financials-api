@@ -17,15 +17,20 @@
 package connectors
 
 import java.time.LocalDate
+import java.util.UUID
 
 import domain.SecureMessage
-import models.{AccountType, EORI}
+import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.Utils.emptyString
+
+import scala.concurrent.Future
+import scala.util.Success
 
 class SecureMessageConnectorSpec extends SpecBase {
 
@@ -88,7 +93,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     "getRequestDetails" should {
       "return requestDetails" in new Setup {
         running(app) {
-          val result = connector.getRequestDetail(EORI("GB123456789"))
+          val result = connector.getRequestDetail(EORI("123123123"))
           result mustBe testRequestDetail
         }
       }
@@ -102,16 +107,29 @@ class SecureMessageConnectorSpec extends SpecBase {
         }
       }
     }
+
+    "sendSecureMessage" should {
+      "successfully post httpclient" in new Setup {
+        when[Future[SecureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.successful(response))
+
+        running(app) {
+          val result = await(connector.sendSecureMessage(histDoc = doc))
+          result mustBe Success
+        }
+      }
+    }
   }
 
   trait Setup {
 
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    val mockHttpClient: HttpClient = mock[HttpClient]
+
     val alert = "DEFAULT"
     val mType = "newMessageAlert"
-
-    val eori: EORI = EORI("GB123456789")
+    val eori: EORI = EORI("123123123")
     val requestDetail = SecureMessage.RequestDetail(eori, Option(EORI("")))
-
     val dutyStatement = AccountType("DutyDefermentStatement")
     val c79cert = AccountType("C79Certificate")
     val sercStatement = AccountType("SecurityStatement")
@@ -119,10 +137,21 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val TestContents = {
       List(SecureMessage.Content("en", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body),
-        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))
-    }
+        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))}
 
-    val testRequestDetail = SecureMessage.RequestDetail(EORI("GB123456789"), Option(EORI("")))
+    val searchID: UUID = UUID.randomUUID()
+    val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "123123123")
+
+    val searchRequests: Set[SearchRequest] = Set(
+      SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0),
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0))
+
+    val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
+      SearchResultStatus.no,"","123123123", params, searchRequests)
+
+    val testRequestDetail = SecureMessage.RequestDetail(EORI("123123123"), Option(EORI("")))
 
     val compareRequest = SecureMessage.RequestCommon(
       externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
@@ -137,9 +166,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       alertQueue = alert
     )
 
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val response: SecureMessage.Response = SecureMessage.Response("123123123")
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
@@ -151,5 +178,4 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
   }
-
 }
