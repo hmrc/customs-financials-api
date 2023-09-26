@@ -19,7 +19,7 @@ package controllers.metadata
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.SDESInputFormats._
 import domain.{Notification, NotificationsForEori}
-import models.{EmailTemplate, SearchResultStatus}
+import models.{EmailTemplate, HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, LoggerLike}
@@ -72,22 +72,11 @@ class MetadataController @Inject()(
 
     if (statementRequestID.nonEmpty) {
       val result = for {
-        optHisDocReq <- histDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
+        optHisDocReq <- histDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
+          statementRequestID)
       } yield {
-        optHisDocReq match {
-          case Some(histDocReq) =>
-            if (histDocReq.resultsFound == SearchResultStatus.inProcess) {
-              val emailSentResult: Future[Boolean] = {
-                histDocReqSearchCacheService.processSDESNotificationForStatReqId(histDocReq, statementRequestID)
-                log.info(s"sending email for statementRequestID ::: $statementRequestID")
-                sendEmailIfVerified(notification)
-              }
-              emailSentResult
-            } else Future(false)
-          case _ => Future(false)
-        }
+        updateHistReqSearchDocumentAndSendMail(notification, statementRequestID, optHisDocReq)
       }
-
       result.flatten
     } else sendEmailIfVerified(notification)
   }
@@ -112,4 +101,26 @@ class MetadataController @Inject()(
     }
   }
 
+  private def updateHistReqSearchDocumentAndSendMail(notification: Notification,
+                                                     statementRequestID: String,
+                                                     optHisDocReq: Option[HistoricDocumentRequestSearch])(
+                                                      implicit hc: HeaderCarrier): Future[Boolean] =
+    optHisDocReq match {
+      case Some(histDocReq) =>
+        if (histDocReq.resultsFound == SearchResultStatus.inProcess) {
+          val emailSentResult = {
+            histDocReqSearchCacheService.processSDESNotificationForStatReqId(histDocReq,
+              statementRequestID).recover {
+              case err =>
+                log.error(s"update failed for historic request search document and" +
+                  s" error is ::: ${err.getMessage}")
+            }
+            log.info(s"sending email for statementRequestID ::: $statementRequestID")
+            sendEmailIfVerified(notification)
+          }
+          emailSentResult
+        } else Future(false)
+
+      case _ => Future(false)
+    }
 }
