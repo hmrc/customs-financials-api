@@ -18,7 +18,7 @@ package connectors
 
 import java.time.LocalDate
 
-import domain.{RequestDetail, SecureMessage}
+import domain.SecureMessage
 import models.{AccountType, EORI}
 import play.api.Application
 import play.api.inject.bind
@@ -33,13 +33,13 @@ class SecureMessageConnectorSpec extends SpecBase {
     "Populate RequestCommon" in new Setup {
 
       val commonRequest = SecureMessage.RequestCommon(
-        externalRef = SecureMessage.ExternalReference("123456", "mdtp"),
+        externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
         recipient = SecureMessage.Recipient("CDS Financials",
           SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
         params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
         email = "email@email.com",
         tags = SecureMessage.Tags("CDS Financials"),
-        content = contents,
+        content = TestContents,
         messageType = "newMessageAlert",
         validForm = LocalDate.now().toString(),
         alertQueue = "DEFAULT"
@@ -86,10 +86,19 @@ class SecureMessageConnectorSpec extends SpecBase {
     }
 
     "getRequestDetails" should {
-      "return requestDetails" in new Setup{
+      "return requestDetails" in new Setup {
         running(app) {
           val result = connector.getRequestDetail(EORI("GB123456789"))
-          result mustBe TestContents
+          result mustBe testRequestDetail
+        }
+      }
+    }
+
+    "getCommonRequest" should {
+      "return the secure message common request" in new Setup {
+        running(app) {
+          val result = connector.getCommonRequest("123123123", TestContents)
+          result mustBe compareRequest
         }
       }
     }
@@ -113,23 +122,21 @@ class SecureMessageConnectorSpec extends SpecBase {
         SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))
     }
 
-    val contents: List[SecureMessage.Content] = List(
-      SecureMessage.Content("en", AccountType("asd"), "asd"),
-      SecureMessage.Content("cy", AccountType("asd"), "asd")
-    )
+    val testRequestDetail = SecureMessage.RequestDetail(EORI("GB123456789"), Option(EORI("")))
 
     val compareRequest = SecureMessage.RequestCommon(
-      externalRef = SecureMessage.ExternalReference("123456", "mdtp"),
+      externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
       recipient = SecureMessage.Recipient("CDS Financials",
         SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
       params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
       email = "email@email.com",
       tags = SecureMessage.Tags("CDS Financials"),
-      content = contents,
+      content = TestContents,
       messageType = mType,
       validForm = LocalDate.now().toString(),
       alertQueue = alert
     )
+
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]

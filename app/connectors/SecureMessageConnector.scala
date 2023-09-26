@@ -26,6 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import models.{AccountType, EORI, HistoricDocumentRequestSearch}
 import java.time.LocalDate
 
+import domain.SecureMessage.{Content, Request, RequestCommon, Response}
 import play.api.libs.json.{JsValue, Json}
 import utils.JSONSchemaValidator
 
@@ -40,28 +41,15 @@ class SecureMessageConnector @Inject()(
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[SecureMessage.Response] = {
 
-
     val subjectHeader = getSubjectHeader(histDoc.params.accountType)
     val contents = getContents(subjectHeader)
-
-    val commonRequest = SecureMessage.RequestCommon(
-      externalRef = SecureMessage.ExternalReference(histDoc.currentEori, "mdtp"),
-      recipient = SecureMessage.Recipient("CDS Financials",
-        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori)),
-      params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
-      email = "email@email.com",
-      tags = SecureMessage.Tags("CDS Financials"),
-      content = contents,
-      messageType = "newMEssageAlert",
-      validForm = LocalDate.now().toString(),
-      alertQueue = "DEFAULT"
-    )
+    val commonRequest: RequestCommon = getCommonRequest(histDoc.currentEori, contents)
     val requestDetail = getRequestDetail(EORI(histDoc.currentEori))
     val request = SecureMessage.Request(commonRequest, requestDetail)
 
     jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
       case Success(_) =>
-        httpClient.POST[SecureMessage.Request, SecureMessage.Response](
+        httpClient.POST[Request, Response](
           appConfig.secureMessageEndpoint,
           request,
           headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
@@ -69,6 +57,22 @@ class SecureMessageConnector @Inject()(
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
       case Failure(_) => Future(SecureMessage.Response(histDoc.currentEori))
     }
+  }
+
+  def getCommonRequest(eori: String, contents: List[Content]): SecureMessage.RequestCommon = {
+
+    SecureMessage.RequestCommon(
+      externalRef = SecureMessage.ExternalReference(eori, "mdtp"),
+      recipient = SecureMessage.Recipient("CDS Financials",
+        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", eori)),
+      params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
+      email = "email@email.com",
+      tags = SecureMessage.Tags("CDS Financials"),
+      content = contents,
+      messageType = "newMessageAlert",
+      validForm = LocalDate.now().toString(),
+      alertQueue = "DEFAULT"
+    )
   }
 
   def getRequestDetail(eori : EORI): SecureMessage.RequestDetail = {
