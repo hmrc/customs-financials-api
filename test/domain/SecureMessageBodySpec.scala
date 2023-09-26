@@ -86,7 +86,6 @@ class SecureMessageBodySpec extends SpecBase {
       "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
       "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
       "From the Customs Declaration Service"
-
   }
 }
 

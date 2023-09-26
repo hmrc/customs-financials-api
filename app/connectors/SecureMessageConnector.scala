@@ -56,8 +56,7 @@ class SecureMessageConnector @Inject()(
       validForm = LocalDate.now().toString(),
       alertQueue = "DEFAULT"
     )
-
-    val requestDetail = SecureMessage.RequestDetail(EORI(histDoc.currentEori), Option(EORI("")))
+    val requestDetail = getRequestDetail(EORI(histDoc.currentEori))
     val request = SecureMessage.Request(commonRequest, requestDetail)
 
     jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
@@ -70,6 +69,10 @@ class SecureMessageConnector @Inject()(
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
       case Failure(_) => Future(SecureMessage.Response(histDoc.currentEori))
     }
+  }
+
+  def getRequestDetail(eori : EORI): SecureMessage.RequestDetail = {
+    SecureMessage.RequestDetail(eori, Option(EORI("")))
   }
 
   def getSubjectHeader(accountType: String): AccountType = {
@@ -87,5 +90,4 @@ class SecureMessageConnector @Inject()(
   }
 
   private def requestBody(request: SecureMessage.Request): JsValue = Json.toJson(request)
-
 }

@@ -18,8 +18,8 @@ package connectors
 
 import java.time.LocalDate
 
-import domain.SecureMessage
-import models.AccountType
+import domain.{RequestDetail, SecureMessage}
+import models.{AccountType, EORI}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -33,7 +33,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     "Populate RequestCommon" in new Setup {
 
       val commonRequest = SecureMessage.RequestCommon(
-        externalRef = SecureMessage.ExternalReference("123456","mdtp"),
+        externalRef = SecureMessage.ExternalReference("123456", "mdtp"),
         recipient = SecureMessage.Recipient("CDS Financials",
           SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
         params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
@@ -47,39 +47,48 @@ class SecureMessageConnectorSpec extends SpecBase {
 
       commonRequest mustBe compareRequest
     }
-  }
 
-  "getSubjetHeader" should {
-    "return DutyDefermentStatement" in new Setup {
-      running(app) {
-        val result = connector.getSubjectHeader("DutyDefermentStatement")
-        result mustBe dutyStatement
-      }
-    }
-
-    "return C79Certificate" in new Setup {
-      running(app) {
-        val result = connector.getSubjectHeader("C79Certificate")
-        result mustBe c79cert
-      }
-    }
-    "return SecurityStatement" in new Setup {
-      running(app) {
-        val result = connector.getSubjectHeader("SecurityStatement")
-        result mustBe sercStatement
-      }
-    }
-    "return PostponedVATStatement" in new Setup {
-      running(app) {
-        val result = connector.getSubjectHeader("PostponedVATStatement")
-        result mustBe PostPonedVATStatement
-      }
-    }
-
-    "getContents" should {
-      "return eng and cy in list" in new Setup {
+    "getSubjetHeader" should {
+      "return DutyDefermentStatement" in new Setup {
         running(app) {
-          val result = connector.getContents(dutyStatement)
+          val result = connector.getSubjectHeader("DutyDefermentStatement")
+          result mustBe dutyStatement
+        }
+      }
+
+      "return C79Certificate" in new Setup {
+        running(app) {
+          val result = connector.getSubjectHeader("C79Certificate")
+          result mustBe c79cert
+        }
+      }
+      "return SecurityStatement" in new Setup {
+        running(app) {
+          val result = connector.getSubjectHeader("SecurityStatement")
+          result mustBe sercStatement
+        }
+      }
+      "return PostponedVATStatement" in new Setup {
+        running(app) {
+          val result = connector.getSubjectHeader("PostponedVATStatement")
+          result mustBe PostPonedVATStatement
+        }
+      }
+
+      "getContents" should {
+        "return eng and cy in list" in new Setup {
+          running(app) {
+            val result = connector.getContents(dutyStatement)
+            result mustBe TestContents
+          }
+        }
+      }
+    }
+
+    "getRequestDetails" should {
+      "return requestDetails" in new Setup{
+        running(app) {
+          val result = connector.getRequestDetail(EORI("GB123456789"))
           result mustBe TestContents
         }
       }
@@ -90,6 +99,9 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val alert = "DEFAULT"
     val mType = "newMessageAlert"
+
+    val eori: EORI = EORI("GB123456789")
+    val requestDetail = SecureMessage.RequestDetail(eori, Option(EORI("")))
 
     val dutyStatement = AccountType("DutyDefermentStatement")
     val c79cert = AccountType("C79Certificate")
@@ -107,7 +119,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     )
 
     val compareRequest = SecureMessage.RequestCommon(
-      externalRef = SecureMessage.ExternalReference("123456","mdtp"),
+      externalRef = SecureMessage.ExternalReference("123456", "mdtp"),
       recipient = SecureMessage.Recipient("CDS Financials",
         SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
       params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
@@ -132,4 +144,5 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
   }
+
 }
