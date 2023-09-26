@@ -469,7 +469,6 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
-
     "send email when a requested PVAT statement is available" in new Setup {
       val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
         s"""
@@ -567,7 +566,6 @@ class MetadataControllerSpec extends SpecBase {
         Future.successful(Option(histDocRequestSearch))
       )
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] =
           FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
@@ -584,7 +582,6 @@ class MetadataControllerSpec extends SpecBase {
           None,
           None)
 
-        //verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
         verify(mockEmailThrottler, Mockito.times(1)).sendEmail(is(expectedEmailRequest))(any)
         verify(mockDataStore, Mockito.times(1)).getVerifiedEmail(any)(any)
       }
@@ -686,10 +683,10 @@ class MetadataControllerSpec extends SpecBase {
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
-      SearchRequest(
-        "GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789", SearchResultStatus.inProcess, emptyString, emptyString, 0),
-      SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
+      SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0),
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0)
     )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
@@ -700,6 +697,4 @@ class MetadataControllerSpec extends SpecBase {
         params,
         searchRequests)
   }
-
-
 }
