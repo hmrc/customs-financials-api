@@ -23,6 +23,7 @@ import play.api.test.Helpers.running
 class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReader {
   val ssfnRequestSchemaPath = "/schemas/statement-search-failure-notification-request-schema.json"
   val ssfnErrorResponseSchemaPath = "/schemas/statement-search-failure-notification-error-response-schema.json"
+  val ssfnSecrureMessageResponseSchemaPath = "/schemas/Secure-Message-Body-Response.json"
   val ssfnValidRequestJsonFilePath = "/ssfn-valid-request.json"
   val ssfnInvalidRequestJsonFilePath = "/ssfn-invalid-request.json"
   val ssfnValidErrorResponseJsonFilePath = "/ssfn-valid-error-response.json"
@@ -41,6 +42,14 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "return correct value for the schema path" in new Setup {
       running(app) {
         jsonPayloadSchemaValidator.ssfnErrorResponseSchema mustBe ssfnErrorResponseSchemaPath
+      }
+    }
+  }
+
+  "ssfnSecrureMessageResponseSchema" should {
+    "return correct value for the schema path" in new Setup {
+      running(app) {
+        jsonPayloadSchemaValidator.ssfnSecureMessageResponseSchema mustBe ssfnSecrureMessageResponseSchemaPath
       }
     }
   }
@@ -90,6 +99,15 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
         result.isFailure mustBe true
         result.failure.exception.getMessage must include("/errorDetail/correlationId")
         result.failure.exception.getMessage must include("/errorDetail/errorCode")
+      }
+    }
+
+
+    "validate the ssfn secure message request" in new Setup {
+      running(app) {
+        val result = jsonPayloadSchemaValidator.validatePayload(
+          readJsonFromFile(ssfnValidRequestJsonFilePath), ssfnSecrureMessageResponseSchemaPath)
+        result.success.value mustBe()
       }
     }
   }
