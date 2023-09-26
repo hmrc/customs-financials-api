@@ -25,9 +25,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import models.{AccountType, EORI, HistoricDocumentRequestSearch}
 import java.time.LocalDate
+
 import play.api.libs.json.{JsValue, Json}
 import utils.JSONSchemaValidator
-import scala.util.Success
+
+import scala.util.{Failure, Success}
 
 class SecureMessageConnector @Inject()(
   httpClient: HttpClient,
@@ -38,17 +40,9 @@ class SecureMessageConnector @Inject()(
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[SecureMessage.Response] = {
 
-    val subjectHeader: AccountType = histDoc.params.accountType match {
-      case "DutyDefermentStatement" => AccountType("DutyDefermentStatement")
-      case "C79Certificate" => AccountType("C79Certificate")
-      case "SecurityStatement" => AccountType("SecurityStatement")
-      case "PostponedVATStatement" => AccountType("PostponedVATStatement")
-    }
 
-    val contents: List[SecureMessage.Content] = List(
-      SecureMessage.Content("en", subjectHeader, SecureMessage.SecureMessage.body),
-      SecureMessage.Content("cy", subjectHeader, SecureMessage.SecureMessage.body)
-    )
+    val subjectHeader = getSubjectHeader(histDoc.params.accountType)
+    val contents = getContents(subjectHeader)
 
     val commonRequest = SecureMessage.RequestCommon(
       externalRef = SecureMessage.ExternalReference(histDoc.currentEori, "mdtp"),
@@ -74,8 +68,22 @@ class SecureMessageConnector @Inject()(
           headers = mdgHeaders.headers(appConfig.secureMessageBearerToken,
             appConfig.secureMessageHostHeader)
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
-
+      case Failure(_) => Future(SecureMessage.Response(histDoc.currentEori))
     }
+  }
+
+  def getSubjectHeader(accountType: String): AccountType = {
+    accountType match {
+      case "DutyDefermentStatement" => AccountType("DutyDefermentStatement")
+      case "C79Certificate" => AccountType("C79Certificate")
+      case "SecurityStatement" => AccountType("SecurityStatement")
+      case "PostponedVATStatement" => AccountType("PostponedVATStatement")
+    }
+  }
+
+  def getContents(subjectHeader: AccountType): List[SecureMessage.Content] = {
+   List(SecureMessage.Content("en", subjectHeader, SecureMessage.SecureMessage.body),
+        SecureMessage.Content("cy", subjectHeader, SecureMessage.SecureMessage.body))
   }
 
   private def requestBody(request: SecureMessage.Request): JsValue = Json.toJson(request)

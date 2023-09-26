@@ -17,8 +17,14 @@
 package connectors
 
 import java.time.LocalDate
+
 import domain.SecureMessage
 import models.AccountType
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.running
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 
 class SecureMessageConnectorSpec extends SpecBase {
@@ -43,10 +49,57 @@ class SecureMessageConnectorSpec extends SpecBase {
     }
   }
 
+  "getSubjetHeader" should {
+    "return DutyDefermentStatement" in new Setup {
+      running(app) {
+        val result = connector.getSubjectHeader("DutyDefermentStatement")
+        result mustBe dutyStatement
+      }
+    }
+
+    "return C79Certificate" in new Setup {
+      running(app) {
+        val result = connector.getSubjectHeader("C79Certificate")
+        result mustBe c79cert
+      }
+    }
+    "return SecurityStatement" in new Setup {
+      running(app) {
+        val result = connector.getSubjectHeader("SecurityStatement")
+        result mustBe sercStatement
+      }
+    }
+    "return PostponedVATStatement" in new Setup {
+      running(app) {
+        val result = connector.getSubjectHeader("PostponedVATStatement")
+        result mustBe PostPonedVATStatement
+      }
+    }
+
+    "getContents" should {
+      "return eng and cy in list" in new Setup {
+        running(app) {
+          val result = connector.getContents(dutyStatement)
+          result mustBe TestContents
+        }
+      }
+    }
+  }
+
   trait Setup {
 
     val alert = "DEFAULT"
     val mType = "newMessageAlert"
+
+    val dutyStatement = AccountType("DutyDefermentStatement")
+    val c79cert = AccountType("C79Certificate")
+    val sercStatement = AccountType("SecurityStatement")
+    val PostPonedVATStatement = AccountType("PostponedVATStatement")
+
+    val TestContents = {
+      List(SecureMessage.Content("en", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body),
+        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))
+    }
 
     val contents: List[SecureMessage.Content] = List(
       SecureMessage.Content("en", AccountType("asd"), "asd"),
@@ -65,5 +118,18 @@ class SecureMessageConnectorSpec extends SpecBase {
       validForm = LocalDate.now().toString(),
       alertQueue = alert
     )
+
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    val mockHttpClient: HttpClient = mock[HttpClient]
+
+    val app: Application = GuiceApplicationBuilder().overrides(
+      bind[HttpClient].toInstance(mockHttpClient)
+    ).configure(
+      "microservice.metrics.enabled" -> false,
+      "metrics.enabled" -> false,
+      "auditing.enabled" -> false
+    ).build()
+
+    val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
   }
 }
