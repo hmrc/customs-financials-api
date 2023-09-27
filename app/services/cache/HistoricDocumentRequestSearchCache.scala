@@ -135,4 +135,22 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
 
     updateDocumentForQueryFilter(queryFiler, updates)
   }
+
+  /**
+   * Updates the resultsFound status and  searchRequests to the provided values
+   * for the given searchID
+   */
+  def updateSearchReqsAndResultsFoundStatus(searchID: String,
+                                            searchRequests: Set[SearchRequest],
+                                            updatedStatus: SearchResultStatus.Value): Future[Option[HistoricDocumentRequestSearch]] = {
+    val queryFiler = Filters.equal(searchIDFieldKey, searchID)
+
+    val updates = Updates.combine(
+      Updates.set(searchRequestsFieldKey, searchRequests),
+      Updates.set(resultsFoundFieldKey, updatedStatus.toString),
+      Updates.set(searchStatusUpdateDateFieldKey, Utils.dateTimeAsIso8601(LocalDateTime.now))
+    )
+
+    updateDocumentForQueryFilter(queryFiler, updates)
+  }
 }

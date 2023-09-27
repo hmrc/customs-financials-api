@@ -82,4 +82,28 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
     else
       Future(Option(req))
   }
+
+  /**
+   * Updates the searchRequest (for given statementRequestID) in searchRequests field of the Document
+   * for given HistoricDocumentRequestSearch Document
+   */
+  def processSDESNotificationForStatReqId(req: HistoricDocumentRequestSearch,
+                                          statementRequestID: String):
+  Future[Option[HistoricDocumentRequestSearch]] = {
+
+    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
+      sr =>
+        if (sr.statementRequestId.equals(statementRequestID) &&
+          sr.searchSuccessful == SearchResultStatus.inProcess)
+          sr.copy(
+            searchSuccessful = SearchResultStatus.yes,
+            searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+          ) else sr
+    }
+
+    historicDocRequestCache.updateSearchReqsAndResultsFoundStatus(req.searchID.toString,
+      updatedSearchRequests,
+      SearchResultStatus.yes)
+  }
+
 }
