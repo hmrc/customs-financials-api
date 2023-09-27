@@ -18,15 +18,13 @@ package domain
 
 import utils.SpecBase
 import domain.SecureMessage._
-import java.time.LocalDate
-
 import models.AccountType
 
 class SecureMessageBodySpec extends SpecBase {
 
   "Case Classes should be populated correctly" should {
     "ExternalReference" in new Setup {
-      val exRef = ExternalReference("id","source")
+      val exRef = ExternalReference("id", "source")
       exRef mustBe TestRef
     }
 
@@ -36,18 +34,19 @@ class SecureMessageBodySpec extends SpecBase {
     }
 
     "Tax" in new Setup {
-      val tax = TaxIdentifier("name","value")
+      val tax = TaxIdentifier("name", "value")
       tax mustBe TestTax
     }
 
     "Receipient" in new Setup {
-      val tax = TaxIdentifier("name","value")
-      val recip = Recipient("regime", tax)
+      val tax = TaxIdentifier("name", "value")
+      val params = Params("01", "2022", "01", "2023", "Financials")
+      val recip = Recipient("regime", tax, params, "test@test.com")
       recip mustBe TestRecip
     }
 
     "Params" in new Setup {
-      val params = Params(LocalDate.now(),LocalDate.now(), "documentType")
+      val params = Params("01", "2022", "01", "2023", "Financials")
       params mustBe TestParams
     }
 
@@ -69,10 +68,10 @@ class SecureMessageBodySpec extends SpecBase {
   trait Setup {
 
     val TestBody = Body("eori")
-    val TestRef = ExternalReference("id","source")
-    val TestTax = TaxIdentifier("name","value")
-    val TestRecip = Recipient("regime", TestTax)
-    val TestParams = Params(LocalDate.now(),LocalDate.now(), "documentType")
+    val TestRef = ExternalReference("id", "source")
+    val TestTax = TaxIdentifier("name", "value")
+    val TestParams = Params("01", "2022", "01", "2023", "Financials")
+    val TestRecip = Recipient("regime", TestTax, TestParams, "test@test.com")
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", AccountType("accountType"), "body")
 

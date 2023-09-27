@@ -28,7 +28,6 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
   "Json Reads" should {
     "result the correct output" in new Setup {
       import HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat
-
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(histDocRequestSearch)
     }
   }
@@ -68,8 +67,7 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
       SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
         SearchResultStatus.inProcess, emptyString, emptyString, 0),
       SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
-        SearchResultStatus.inProcess, emptyString, emptyString, 0)
-    )
+        SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
       HistoricDocumentRequestSearch(searchID,
@@ -117,6 +115,5 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
          |}
          |]
          |}""".stripMargin
-
   }
 }

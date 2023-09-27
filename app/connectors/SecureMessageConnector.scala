@@ -23,10 +23,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.{AccountType, HistoricDocumentRequestSearch}
+import models.{AccountType, EORI, HistoricDocumentRequestSearch}
 import java.time.LocalDate
 
 import domain.SecureMessage.{Content, Request, Response}
+import services.SubscriptionService
+import play.api.{Logger, LoggerLike}
 import play.api.libs.json.{JsValue, Json}
 import utils.JSONSchemaValidator
 
@@ -36,14 +38,17 @@ class SecureMessageConnector @Inject()(
   httpClient: HttpClient,
   appConfig: AppConfig,
   jsonSchemaValidator: JSONSchemaValidator,
-  mdgHeaders: MdgHeaders
+  mdgHeaders: MdgHeaders,
+  service: SubscriptionService
 )(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[SecureMessage.Response] = {
 
+    val log: LoggerLike = Logger(this.getClass)
+
     val subjectHeader = getSubjectHeader(histDoc.params.accountType)
     val contents = getContents(subjectHeader)
-    val request: Request = getRequest(histDoc.currentEori, contents)
+    val request: Request = getRequest(histDoc, contents)
 
     jsonSchemaValidator.validatePayload(requestBody(request),
       jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
@@ -56,18 +61,20 @@ class SecureMessageConnector @Inject()(
             appConfig.secureMessageHostHeader)
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
       case Failure(_) =>
+        log.error(s"Json Schema Failed Validation for SendSecureMessage")
         Future(SecureMessage.Response(histDoc.currentEori))
     }
   }
 
-  def getRequest(eori: String, contents: List[Content]): SecureMessage.Request = {
+  def getRequest(hisDoc: HistoricDocumentRequestSearch, contents: List[Content]): SecureMessage.Request = {
 
     SecureMessage.Request(
-      externalRef = SecureMessage.ExternalReference(eori, "mdtp"),
-      recipient = SecureMessage.Recipient("CDS Financials",
-        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", eori)),
-      params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
-      email = "email@email.com",
+      externalRef = SecureMessage.ExternalReference(hisDoc.searchID.toString, "mdtp"),
+      recipient = SecureMessage.Recipient("cds",
+        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", hisDoc.currentEori),
+        params = SecureMessage.Params(hisDoc.params.periodStartMonth, hisDoc.params.periodStartYear,
+        hisDoc.params.periodEndMonth,hisDoc.params.periodEndYear, "Financials"),
+      email = "test@test.com"),
       tags = SecureMessage.Tags("CDS Financials"),
       content = contents,
       messageType = "newMessageAlert",

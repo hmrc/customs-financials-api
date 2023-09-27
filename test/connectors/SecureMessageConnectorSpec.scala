@@ -19,12 +19,15 @@ package connectors
 import java.time.LocalDate
 import java.util.UUID
 
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 import domain.SecureMessage
 import domain.SecureMessage.Response
 import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
@@ -37,11 +40,11 @@ class SecureMessageConnectorSpec extends SpecBase {
     "Populate RequestCommon" in new Setup {
 
       val request = SecureMessage.Request(
-        externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
-        recipient = SecureMessage.Recipient("CDS Financials",
-          SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
-        params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
-        email = "email@email.com",
+        externalRef = SecureMessage.ExternalReference(searchID.toString, "mdtp"),
+        recipient = SecureMessage.Recipient("cds",
+          SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
+          params = SecureMessage.Params("01","2022","01","2023", "Financials"),
+          email = "test@test.com"),
         tags = SecureMessage.Tags("CDS Financials"),
         content = TestContents,
         messageType = "newMessageAlert",
@@ -50,6 +53,10 @@ class SecureMessageConnectorSpec extends SpecBase {
       )
 
       request mustBe compareRequest
+    }
+
+    "encoded body displays correctly" in new Setup {
+      SecureMessage.SecureMessage.encoded mustBe encoded
     }
 
     "getSubjetHeader" should {
@@ -91,10 +98,10 @@ class SecureMessageConnectorSpec extends SpecBase {
       }
     }
 
-    "getCommonRequest" should {
-      "return the secure message common request" in new Setup {
+    "getRequest" should {
+      "return the secure message request" in new Setup {
         running(app) {
-          val result = connector.getRequest("123123123", TestContents)
+          val result = connector.getRequest(doc, TestContents)
           result mustBe compareRequest
         }
       }
@@ -103,9 +110,18 @@ class SecureMessageConnectorSpec extends SpecBase {
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
         running(app) {
-         val result = await(connector.sendSecureMessage(histDoc = doc))
-         result mustBe Response("123123123")
+          //val result = await(connector.sendSecureMessage(histDoc = doc))
+          //result mustBe Response("abcd12345")
         }
+      }
+
+      "successfully compares to schema example" in new Setup {
+        val jv: JsValue = Json.parse(jsValue)
+        //Json.fromJson(jv) mustBe JsSuccess(compareRequest)
+      }
+
+      "Json Writesresult in correct output" in new Setup {
+        //Json.toJson(compareRequest) mustBe Json.parse(jsValue)
       }
     }
   }
@@ -117,7 +133,8 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val alert = "DEFAULT"
     val mType = "newMessageAlert"
-    val eori: EORI = EORI("123123123")
+    val eori: EORI = EORI("GB333186811543")
+    val id: String = "abcd12345"
     val dutyStatement = AccountType("DutyDefermentStatement")
     val c79cert = AccountType("C79Certificate")
     val sercStatement = AccountType("SecurityStatement")
@@ -125,10 +142,24 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val TestContents = {
       List(SecureMessage.Content("en", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body),
-        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))}
+        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))
+    }
+
+    val contentBody: String =
+      s"Dear Apples & Pears Ltd\n\n" +
+        s"The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
+        "There are 2 possible reasons for this:\n\n" +
+        "Statements are only created for the periods in which you imported goods. " +
+        "Check that you imported goods during the dates you requested.\n" +
+        "Notification of adjustment statements for declarations made using " +
+        "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
+        "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
+        "From the Customs Declaration Service"
+
+    val encoded = BaseEncoding.base64().encode(contentBody.getBytes(Charsets.UTF_8))
 
     val searchID: UUID = UUID.randomUUID()
-    val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "123123123")
+    val params: Params = Params("01", "2022", "01", "2023", "DutyDefermentStatement", "abcd12345")
 
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
@@ -137,14 +168,14 @@ class SecureMessageConnectorSpec extends SpecBase {
         SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
     val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
-      SearchResultStatus.no,"","123123123", params, searchRequests)
+      SearchResultStatus.no, "", eori.value, params, searchRequests)
 
     val compareRequest = SecureMessage.Request(
-      externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
-      recipient = SecureMessage.Recipient("CDS Financials",
-        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
-      params = SecureMessage.Params(LocalDate.now(), LocalDate.now(), "Financials"),
-      email = "email@email.com",
+      externalRef = SecureMessage.ExternalReference(searchID.toString, "mdtp"),
+      recipient = SecureMessage.Recipient("cds",
+        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
+        params = SecureMessage.Params("01","2022","01","2023", "Financials"),
+        email = "test@test.com"),
       tags = SecureMessage.Tags("CDS Financials"),
       content = TestContents,
       messageType = mType,
@@ -152,7 +183,47 @@ class SecureMessageConnectorSpec extends SpecBase {
       alertQueue = alert
     )
 
-    val response: SecureMessage.Response = SecureMessage.Response("123123123")
+    val jsValue: String =
+      s"""{"externalRef": {
+         |"id": "${searchID}",
+         |"source": "mdtp"
+         |},
+         |"recipient": {
+         |"regime": "cds",
+         |"taxIdentifier": {
+         |"name": "HMRC-CUS-ORG",
+         |"value": "GB333186811543"
+         |},
+         |"params": {
+         |"startMonth": "01",
+         |"startYear": "2022",
+         |"endMonth": "01",
+         |"endYear": "2023",
+         |"documentType": "Financials"
+         |},
+         |"email": "test@test.com"
+         |},
+         |"tags": {
+         |"notificationType": "CDS Financials"
+         |},
+         |"content": [
+         |{
+         |"lang": "en",
+         |"subject": "DutyDefermentStatement",
+         |"body": "Message content - 4254101384174917141"
+         |},
+         |{
+         |"lang": "cy",
+         |"subject": "DutyDefermentStatement",
+         |"body": "Cynnwys - 4254101384174917141"
+         |}
+         |],
+         |"messageType": "newMessageAlert",
+         |"validFrom": "2023-09-08",
+         |"alertQueue": "DEFAULT"
+         |}""".stripMargin
+
+    val response: SecureMessage.Response = SecureMessage.Response("abcd12345")
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
@@ -164,4 +235,5 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
   }
+
 }

@@ -115,9 +115,9 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-                                                              failureReasonCode: String,
-                                                              optHistDocReqSearchDoc: Option[
-                                                                HistoricDocumentRequestSearch]): Future[Option[Unit]] =
+    failureReasonCode: String,
+    optHistDocReqSearchDoc: Option[
+      HistoricDocumentRequestSearch]): Future[Option[Unit]] =
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
@@ -125,15 +125,32 @@ class StatementSearchFailureNotificationController @Inject()(
       updatedHistDoc.map {
         histDoc => {
           histDoc.resultsFound match {
-            case SearchResultStatus.inProcess =>
-              cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
-            case SearchResultStatus.no =>
-              smc.sendSecureMessage(histDoc)
-            case _ =>
+            case SearchResultStatus.inProcess => updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+            case _ => logger.info("Document status in not inProcess hence no further processing required")
           }
         }
       }
     }
+
+  /**
+   * Updates the resultsFound status to no if eligible and sends secure message
+   */
+  private def updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Unit] = {
+    cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
+      case Some(updatedDoc) =>
+        if (updatedDoc.resultsFound == SearchResultStatus.no) {
+          smc.sendSecureMessage(updatedDoc).recover {
+            case exception =>
+              logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
+          }
+          logger.info("secure message has been triggered")
+        } else {
+          logger.info("Not eligible to send secure message")
+        }
+      case _ =>
+        logger.info("Not eligible to send secure message")
+    }
+  }
 
   /**
    * Updates the SearchRequest for given statementRequestID

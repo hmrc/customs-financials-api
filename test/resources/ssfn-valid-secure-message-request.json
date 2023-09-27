@@ -9,15 +9,17 @@
       "name": "HMRC-CUS-ORG",
       "value": "GB333186811543"
     },
-    "name": {
-      "line1": "Test",
-      "line2": "CDS",
-      "line3": "Financials"
+    "params": {
+      "startMonth": "01",
+      "startYear": "2022",
+      "endMonth": "01",
+      "endYear": "2023",
+      "documentType": "Financials"
     },
     "email": "test@test.com"
   },
   "tags": {
-    "notificationType": "CDS Direct Debit"
+    "notificationType": "CDS Financials"
   },
   "content": [
     {
