@@ -28,8 +28,6 @@ object SecureMessageRequest {
 case class Request(
   externalRef: ExternalReference,
   recipient: Recipient,
-  //params: Params,
-  //email: String,
   tags: Tags,
   content: List[Content],
   messageType: String,
