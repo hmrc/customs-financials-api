@@ -23,10 +23,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.{AccountType, EORI, HistoricDocumentRequestSearch}
+import models.{AccountType, HistoricDocumentRequestSearch}
 import java.time.LocalDate
 
-import domain.SecureMessage.{Content, Request, RequestCommon, Response}
+import domain.SecureMessage.{Content, Request, Response}
 import play.api.libs.json.{JsValue, Json}
 import utils.JSONSchemaValidator
 
@@ -43,11 +43,10 @@ class SecureMessageConnector @Inject()(
 
     val subjectHeader = getSubjectHeader(histDoc.params.accountType)
     val contents = getContents(subjectHeader)
-    val commonRequest: RequestCommon = getCommonRequest(histDoc.currentEori, contents)
-    val requestDetail = getRequestDetail(EORI(histDoc.currentEori))
-    val request = SecureMessage.Request(commonRequest, requestDetail)
+    val request: Request = getRequest(histDoc.currentEori, contents)
 
-    jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
+    jsonSchemaValidator.validatePayload(requestBody(request),
+      jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
       case Success(_) =>
         httpClient.POST[Request, Response](
           appConfig.secureMessageEndpoint,
@@ -56,13 +55,14 @@ class SecureMessageConnector @Inject()(
             appConfig.secureMessageBearerToken,
             appConfig.secureMessageHostHeader)
         )(implicitly, implicitly, HeaderCarrier(), implicitly)
-      case Failure(_) => Future(SecureMessage.Response(histDoc.currentEori))
+      case Failure(_) =>
+        Future(SecureMessage.Response(histDoc.currentEori))
     }
   }
 
-  def getCommonRequest(eori: String, contents: List[Content]): SecureMessage.RequestCommon = {
+  def getRequest(eori: String, contents: List[Content]): SecureMessage.Request = {
 
-    SecureMessage.RequestCommon(
+    SecureMessage.Request(
       externalRef = SecureMessage.ExternalReference(eori, "mdtp"),
       recipient = SecureMessage.Recipient("CDS Financials",
         SecureMessage.TaxIdentifier("HMRC-CUS-ORG", eori)),
@@ -74,10 +74,6 @@ class SecureMessageConnector @Inject()(
       validForm = LocalDate.now().toString(),
       alertQueue = "DEFAULT"
     )
-  }
-
-  def getRequestDetail(eori: EORI): SecureMessage.RequestDetail = {
-    SecureMessage.RequestDetail(eori, Option(EORI("")))
   }
 
   def getSubjectHeader(accountType: String): AccountType = {

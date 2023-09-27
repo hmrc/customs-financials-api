@@ -1,34 +1,34 @@
 {
   "externalRef": {
-    "id": "abcd123466",
+    "id": "abcd12345",
     "source": "mdtp"
   },
   "recipient": {
     "regime": "cds",
     "taxIdentifier": {
       "name": "HMRC-CUS-ORG",
-      "value": "GB333186811540"
+      "value": "GB333186811543"
     },
-    "params": {
-      "startdate": "Test",
-      "enddate": "CDS",
-      "documentType": "Financials"
+    "name": {
+      "line1": "Test",
+      "line2": "CDS",
+      "line3": "Financials"
     },
     "email": "test@test.com"
   },
   "tags": {
-    "notificationType": "CDS Financials"
+    "notificationType": "CDS Direct Debit"
   },
   "content": [
     {
       "lang": "en",
       "subject": "Test CDS Financials",
-      "body": "Message content2 - 4254101384174917141"
+      "body": "Message content - 4254101384174917141"
     },
     {
       "lang": "cy",
       "subject": "Nodyn atgoffa i ffeilio ffurflen Hunanasesiad",
-      "body": "Cynnwys2 - 4254101384174917141"
+      "body": "Cynnwys - 4254101384174917141"
     }
   ],
   "messageType": "newMessageAlert",

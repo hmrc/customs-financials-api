@@ -25,8 +25,24 @@ object SecureMessageRequest {
   implicit val format: OFormat[SecureMessageRequest] = Json.format[SecureMessageRequest]
 }
 
-case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)
+case class Request(
+  externalRef: ExternalReference,
+  recipient: Recipient,
+  params: Params,
+  email: String,
+  tags: Tags,
+  content: List[Content],
+  messageType: String,
+  validForm: String,
+  alertQueue: String
+)
 
 object Request {
+  implicit val Refformat: OFormat[ExternalReference] = Json.format[ExternalReference]
+  implicit val Taxformat: OFormat[TaxIdentifier] = Json.format[TaxIdentifier]
+  implicit val Recipientformat: OFormat[Recipient] = Json.format[Recipient]
+  implicit val Paramformat: OFormat[Params] = Json.format[Params]
+  implicit val Tagformat: OFormat[Tags] = Json.format[Tags]
+  implicit val Contentformat: OFormat[Content] = Json.format[Content]
   implicit val format: OFormat[Request] = Json.format[Request]
 }

@@ -20,6 +20,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 import domain.SecureMessage
+import domain.SecureMessage.Response
 import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import play.api.Application
 import play.api.inject.bind
@@ -29,15 +30,13 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
 
-import scala.concurrent.Future
-import scala.util.Success
 
 class SecureMessageConnectorSpec extends SpecBase {
 
   "SecureMessageConnector" should {
     "Populate RequestCommon" in new Setup {
 
-      val commonRequest = SecureMessage.RequestCommon(
+      val request = SecureMessage.Request(
         externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
         recipient = SecureMessage.Recipient("CDS Financials",
           SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
@@ -50,7 +49,7 @@ class SecureMessageConnectorSpec extends SpecBase {
         alertQueue = "DEFAULT"
       )
 
-      commonRequest mustBe compareRequest
+      request mustBe compareRequest
     }
 
     "getSubjetHeader" should {
@@ -67,12 +66,14 @@ class SecureMessageConnectorSpec extends SpecBase {
           result mustBe c79cert
         }
       }
+
       "return SecurityStatement" in new Setup {
         running(app) {
           val result = connector.getSubjectHeader("SecurityStatement")
           result mustBe sercStatement
         }
       }
+
       "return PostponedVATStatement" in new Setup {
         running(app) {
           val result = connector.getSubjectHeader("PostponedVATStatement")
@@ -90,19 +91,10 @@ class SecureMessageConnectorSpec extends SpecBase {
       }
     }
 
-    "getRequestDetails" should {
-      "return requestDetails" in new Setup {
-        running(app) {
-          val result = connector.getRequestDetail(EORI("123123123"))
-          result mustBe testRequestDetail
-        }
-      }
-    }
-
     "getCommonRequest" should {
       "return the secure message common request" in new Setup {
         running(app) {
-          val result = connector.getCommonRequest("123123123", TestContents)
+          val result = connector.getRequest("123123123", TestContents)
           result mustBe compareRequest
         }
       }
@@ -110,13 +102,10 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
-      /*  when[Future[SecureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(response))
-
         running(app) {
          val result = await(connector.sendSecureMessage(histDoc = doc))
-         result mustBe Success
-        }*/
+         result mustBe Response("123123123")
+        }
       }
     }
   }
@@ -129,7 +118,6 @@ class SecureMessageConnectorSpec extends SpecBase {
     val alert = "DEFAULT"
     val mType = "newMessageAlert"
     val eori: EORI = EORI("123123123")
-    val requestDetail = SecureMessage.RequestDetail(eori, Option(EORI("")))
     val dutyStatement = AccountType("DutyDefermentStatement")
     val c79cert = AccountType("C79Certificate")
     val sercStatement = AccountType("SecurityStatement")
@@ -151,9 +139,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
       SearchResultStatus.no,"","123123123", params, searchRequests)
 
-    val testRequestDetail = SecureMessage.RequestDetail(EORI("123123123"), Option(EORI("")))
-
-    val compareRequest = SecureMessage.RequestCommon(
+    val compareRequest = SecureMessage.Request(
       externalRef = SecureMessage.ExternalReference("123123123", "mdtp"),
       recipient = SecureMessage.Recipient("CDS Financials",
         SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "123123123")),
