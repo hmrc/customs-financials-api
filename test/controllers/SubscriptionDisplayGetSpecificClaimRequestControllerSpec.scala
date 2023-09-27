@@ -31,13 +31,20 @@ import scala.concurrent.Future
 
 class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase {
 
-  "SubsciptopRequestController.get" should {
+  "SubscriptionRequestController.get" should {
     "validate the EORI and return 200 status code" in new Setup {
       val responseCommon: ResponseCommon = ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
       val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
+      val vatIds: vatIDs = vatIDs(Some("abc"), Some("123"))
+      val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
+      val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+      val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
+        Some("12345"), Some(Array(euVatIds)), "1", Some("abc"))
+
       val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
-        cdsEstablishmentAddress, None, None, None,
-        None, None, None, None, None, ETMP_Master_Indicator = true, None)
+        cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
+        None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
+
       val response: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
       when(mockSub09Connector.getSubscriptions(any))
