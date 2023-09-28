@@ -46,7 +46,7 @@ case class ContactInformation (
                                 emailVerificationTimestamp: Option[String]
                               )
 
-case class vatIDs (
+case class VatId(
                     countryCode: Option[String],
                     VATID: Option[String]
                   )
@@ -67,7 +67,7 @@ case class ResponseDetail (
                             establishmentInTheCustomsTerritoryOfTheUnion: Option[String],
                             typeOfLegalEntity: Option[String],
                             contactInformation: Option[ContactInformation],
-                            VATIDs: Option[Array[vatIDs]],
+                            VATIDs: Option[Array[VatId]],
                             thirdCountryUniqueIdentificationNumber: Option[Array[String]],
                             consentToDisclosureOfPersonalData: Option[String],
                             shortName: Option[String],
@@ -104,7 +104,7 @@ object SubscriptionResponse {
   implicit val euVatFormat = Json.format[EUVATNumber]
   implicit val xiSubscriptionFormat = Json.format[XiSubscription]
   implicit val returnParametersFormat = Json.format[ReturnParameters]
-  implicit val VATIDsFormat = Json.format[vatIDs]
+  implicit val vatIDFormat = Json.format[VatId]
   implicit val contactInformationFormat = Json.format[ContactInformation]
   implicit val cdsEstablishmentAddressFormat = Json.format[CdsEstablishmentAddress]
   implicit val responseDetailFormat = Json.format[ResponseDetail]

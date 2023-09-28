@@ -35,7 +35,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
     "validate the EORI and return 200 status code" in new Setup {
       val responseCommon: ResponseCommon = ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
       val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
-      val vatIds: vatIDs = vatIDs(Some("abc"), Some("123"))
+      val vatIds: VatId = VatId(Some("abc"), Some("123"))
       val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
       val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
       val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),

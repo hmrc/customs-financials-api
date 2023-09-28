@@ -120,7 +120,7 @@ class SubscriptionServiceSpec extends SpecBase {
     val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress(
       "1 street", "Southampton", Some("SO1 1AA"), "GB")
 
-    val vatIds: vatIDs = vatIDs(Some("abc"), Some("123"))
+    val vatIds: VatId = VatId(Some("abc"), Some("123"))
     val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
     val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
     val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
