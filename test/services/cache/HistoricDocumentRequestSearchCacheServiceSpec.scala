@@ -222,6 +222,49 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
     }
   }
 
+  "processSDESNotificationForStatReqId" should {
+    "update the doc correctly" in new Setup {
+      val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
+      val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
+        sr =>
+          if (sr.statementRequestId.equals(statReqId)) sr.copy(
+            searchSuccessful = SearchResultStatus.yes,
+            searchDateTime = searchDtTime) else sr
+      }
+
+      when(mockHistDocReqSearchCache.updateSearchReqsAndResultsFoundStatus(
+        any, any, any)).thenReturn(Future.successful(
+        Option(histDocRequestSearch.copy(resultsFound = SearchResultStatus.yes,
+          searchRequests = updatedSearchRequests,
+          searchStatusUpdateDate = searchDtTime))))
+
+      val service: HistoricDocumentRequestSearchCacheService =
+        app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
+
+      service.processSDESNotificationForStatReqId(
+        histDocRequestSearch,
+        statReqId).map {
+        optDoc => {
+          val doc = optDoc.get
+          val updatedSR = doc.searchRequests.find(x => x.statementRequestId == statReqId).get
+
+          doc.searchID.toString mustBe searchID.toString
+          doc.resultsFound mustBe SearchResultStatus.yes
+          doc.searchStatusUpdateDate mustBe searchDtTime
+          updatedSR.searchSuccessful mustBe SearchResultStatus.yes
+          updatedSR.searchDateTime mustBe searchDtTime
+        }
+      }
+
+      verify(mockHistDocReqSearchCache, times(1)).updateSearchReqsAndResultsFoundStatus(
+        searchID.toString,
+        updatedSearchRequests,
+        SearchResultStatus.yes)
+    }
+  }
+
   trait Setup {
     val mockHistDocReqSearchCache: HistoricDocumentRequestSearchCache =
       mock[HistoricDocumentRequestSearchCache]

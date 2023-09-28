@@ -18,10 +18,11 @@ package controllers.metadata
 
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import controllers.CustomAuthConnector
+import models._
 import models.requests.EmailRequest
 import models.{EORI, EmailAddress}
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.{ArgumentMatchers, Mockito}
 import play.api.http.Status.BAD_REQUEST
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsArray, JsValue, Json}
@@ -30,8 +31,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application, inject}
 import services.NotificationCache
+import services.cache.{HistoricDocumentRequestSearchCache, HistoricDocumentRequestSearchCacheService}
 import utils.SpecBase
+import utils.Utils.emptyString
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class MetadataControllerSpec extends SpecBase {
@@ -86,7 +90,6 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
         val result = route(app, req).value
@@ -122,6 +125,12 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("foo@bar.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch)))
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url).withJsonBody(newFileNotificationFromSDES)
@@ -157,6 +166,12 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("foo@bar.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch)))
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url).withJsonBody(newFileNotificationFromSDES)
@@ -321,6 +336,12 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch)))
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(historicC79CertificateNotificationRequest)
@@ -396,6 +417,12 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch)))
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedSecurityStatementNotificationRequest)
@@ -443,7 +470,6 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
-
     "send email when a requested PVAT statement is available" in new Setup {
       val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
         s"""
@@ -472,6 +498,12 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch)))
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
@@ -479,6 +511,80 @@ class MetadataControllerSpec extends SpecBase {
         status(result) mustBe OK
         val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map.empty[String, String], force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
+      }
+    }
+
+    "send the email only once in case of multiple notifications for same statementRequestID" in new Setup {
+      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
+        s"""
+           |[
+           |    {
+           |        "eori":"testEORI",
+           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileSize": 75251,
+           |        "metadata": [
+           |            {"metadata": "PeriodStartYear", "value": "2017"},
+           |            {"metadata": "PeriodStartMonth", "value": "5"},
+           |            {"metadata": "PeriodStartDay", "value": "5"},
+           |            {"metadata": "PeriodEndYear", "value": "2018"},
+           |            {"metadata": "PeriodEndMonth", "value": "6"},
+           |            {"metadata": "PeriodEndDay", "value": "5"},
+           |            {"metadata": "FileType", "value": "PDF"},
+           |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
+           |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
+           |        ]
+           |    },
+           |    {
+           |        "eori":"testEORI",
+           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileSize": 75251,
+           |        "metadata": [
+           |            {"metadata": "PeriodStartYear", "value": "2017"},
+           |            {"metadata": "PeriodStartMonth", "value": "7"},
+           |            {"metadata": "PeriodStartDay", "value": "7"},
+           |            {"metadata": "PeriodEndYear", "value": "2018"},
+           |            {"metadata": "PeriodEndMonth", "value": "8"},
+           |            {"metadata": "PeriodEndDay", "value": "5"},
+           |            {"metadata": "FileType", "value": "PDF"},
+           |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
+           |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
+           |        ]
+           |    }
+           |]
+        """.stripMargin)
+
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockDataStore.getVerifiedEmail(any)(any))
+        .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))).andThenAnswer(
+        Future.successful(Option(histDocRequestSearch.copy(resultsFound = SearchResultStatus.yes)))
+      )
+
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch))
+      )
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
+
+        val result = route(app, req).value
+        status(result) mustBe OK
+
+        val expectedEmailRequest = EmailRequest(
+          List(EmailAddress("test@test.com")),
+          "customs_financials_requested_postponed_vat_notification",
+          Map.empty[String, String],
+          force = false,
+          Some("testEORI"),
+          None,
+          None)
+
+        verify(mockEmailThrottler, Mockito.times(1)).sendEmail(is(expectedEmailRequest))(any)
+        verify(mockDataStore, Mockito.times(1)).getVerifiedEmail(any)(any)
       }
     }
 
@@ -508,12 +614,16 @@ class MetadataControllerSpec extends SpecBase {
     val mockEmailThrottler: EmailThrottlerConnector = mock[EmailThrottlerConnector]
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockDataStore: DataStoreConnector = mock[DataStoreConnector]
+    val mockHistDocReqCacheService = mock[HistoricDocumentRequestSearchCacheService]
+    val mockHistDocReqCache = mock[HistoricDocumentRequestSearchCache]
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
       inject.bind[NotificationCache].toInstance(mockNotificationCache),
       inject.bind[EmailThrottlerConnector].toInstance(mockEmailThrottler),
-      inject.bind[DataStoreConnector].toInstance(mockDataStore)
+      inject.bind[DataStoreConnector].toInstance(mockDataStore),
+      inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqCacheService),
+      inject.bind[HistoricDocumentRequestSearchCache].toInstance(mockHistDocReqCache)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,
@@ -566,7 +676,26 @@ class MetadataControllerSpec extends SpecBase {
         |    }
         |]
       """.stripMargin))
+
+    val searchID: UUID = UUID.randomUUID()
+    val userId: String = "test_userId"
+    val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
+    val searchStatusUpdateDate: String = emptyString
+    val currentEori: String = "GB123456789012"
+    val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+    val searchRequests: Set[SearchRequest] = Set(
+      SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0),
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess, emptyString, emptyString, 0)
+    )
+
+    val histDocRequestSearch: HistoricDocumentRequestSearch =
+      HistoricDocumentRequestSearch(searchID,
+        resultsFound,
+        searchStatusUpdateDate,
+        currentEori,
+        params,
+        searchRequests)
   }
-
-
 }
