@@ -16,8 +16,6 @@
 
 package domain.secureMessage
 
-import com.google.common.base.Charsets
-import com.google.common.io.BaseEncoding
 import models.AccountType
 import play.api.libs.json.{Json, OFormat}
 
@@ -44,7 +42,7 @@ object TaxIdentifier {
 case class Params(startMonth: String, startYear: String, endMonth: String, endYear: String, documentType: String)
 
 object Params {
-  implicit val paramFormat: OFormat[Params] = Json.format[Params]
+  implicit val paramsFormat: OFormat[Params] = Json.format[Params]
 }
 
 case class Tags(notificationType: String)

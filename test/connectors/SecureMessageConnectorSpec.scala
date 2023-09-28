@@ -19,8 +19,6 @@ package connectors
 import java.time.LocalDate
 import java.util.UUID
 
-import com.google.common.base.Charsets
-import com.google.common.io.BaseEncoding
 import domain.secureMessage
 import domain.secureMessage._
 import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
@@ -32,6 +30,8 @@ import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
+
+import scala.concurrent.Future
 
 class SecureMessageConnectorSpec extends SpecBase {
 
@@ -56,9 +56,13 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
+
+        when[Future[domain.secureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.successful(response))
+
         running(app) {
-         // val result = await(connector.sendSecureMessage(histDoc = doc))
-         // result mustBe Response(eori.value)
+          val result = await(connector.sendSecureMessage(histDoc = doc))
+          result mustBe Response(eori.value)
         }
       }
 
@@ -73,23 +77,8 @@ class SecureMessageConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
-    val alert = "DEFAULT"
-    val mType = "newMessageAlert"
     val eori: EORI = EORI("GB333186811543")
     val id: String = "abcd12345"
-
-    val contentBody: String =
-      s"Dear Apples & Pears Ltd\n\n" +
-        s"The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
-        "There are 2 possible reasons for this:\n\n" +
-        "Statements are only created for the periods in which you imported goods. " +
-        "Check that you imported goods during the dates you requested.\n" +
-        "Notification of adjustment statements for declarations made using " +
-        "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
-        "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
-        "From the Customs Declaration Service"
-
-    val encoded = BaseEncoding.base64().encode(contentBody.getBytes(Charsets.UTF_8))
 
     val searchID: UUID = UUID.randomUUID()
     val params: Params = Params("01", "2022", "01", "2023", "DutyDefermentStatement", "abcd12345")
@@ -116,9 +105,9 @@ class SecureMessageConnectorSpec extends SpecBase {
         email = "test@test.com"),
       tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
-      messageType = mType,
+      messageType = "newMessageAlert",
       validFrom = LocalDate.now().toString,
-      alertQueue = alert
+      alertQueue = "DEFAULT"
     )
 
     val jsValue: String =
@@ -161,7 +150,7 @@ class SecureMessageConnectorSpec extends SpecBase {
          |"alertQueue": "DEFAULT"
          |}""".stripMargin
 
-    val response: secureMessage.Response = secureMessage.Response("abcd12345")
+    val response: secureMessage.Response = secureMessage.Response("GB333186811543")
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
