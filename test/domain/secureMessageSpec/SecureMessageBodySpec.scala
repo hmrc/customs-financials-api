@@ -16,6 +16,7 @@
 
 package domain.secureMessageSpec
 
+import domain.secureMessage.SecureMessage._
 import domain.secureMessage._
 import models.AccountType
 import utils.SpecBase
@@ -59,9 +60,28 @@ class SecureMessageBodySpec extends SpecBase {
       val content = Content("en", AccountType("accountType"), "body")
       content mustBe TestContent
     }
+  }
 
-    "Test" in new Setup {
-      SecureMessage.body mustBe TestText
+  "Body Text" should {
+    "display DutyDeferementBody correctly" in new Setup {
+      DutyDefermentBody mustBe TestDutyDefermentBody
+    }
+
+    "display C79CertificateBody correctly" in new Setup {
+      C79CertificateBody mustBe TestC79CertificateBody
+    }
+
+    "display SecurityBody correctly" in new Setup {
+      SecurityBody mustBe TestSecurityBody
+    }
+
+    "display PostponedVATBody correctly" in new Setup {
+      PostponedVATBody mustBe TestPostponedVATBody
+    }
+
+    "should encode correctly" in new Setup {
+      val res = encodeToUTF8Charsets(TestDutyDefermentBody)
+      res mustBe encodedDutyDeferementBody
     }
   }
 
@@ -75,15 +95,13 @@ class SecureMessageBodySpec extends SpecBase {
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", AccountType("accountType"), "body")
 
-    val TestText = "Dear Apples & Pears Ltd\n\n" +
-      "The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
-      "There are 2 possible reasons for this:\n\n" +
-      "Statements are only created for the periods in which you imported goods. " +
-      "Check that you imported goods during the dates you requested.\n" +
-      "Notification of adjustment statements for declarations made using " +
-      "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
-      "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
-      "From the Customs Declaration Service"
+    val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd\n\nThe duty deferment statements you requested for September 2022 to October 2022 were not found.\n\nThere are 2 possible reasons for this:\n\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nImport VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. You can get duty deferment statements for declarations made using CHIEF from Duty Deferment Electronic Statements (DDES).\nFrom the Customs Declaration Service"
+    val TestC79CertificateBody: String = "Dear Apples & Pears Ltd\nThe import VAT certificates you requested for January 2022 to April 2022 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nImport VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and contact cbc-c79requests@hmrc.gov.uk to request CHIEF statements.\nFrom the Customs Declaration Service"
+    val TestSecurityBody: String = "Dear Apples & Pears Ltd\nThe notification of adjustment statements you requested for March 2021 to May 2021 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nNotification of adjustment statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\nFrom the Customs Declaration Service"
+    val TestPostponedVATBody: String = "Dear Apples & Pears Ltd\nThe postponed import VAT statements you requested for February 2022 to March 2022 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nPostponed import VAT statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to request CHIEF statements.\nFrom the Customs Declaration Service"
+
+    val encodedDutyDeferementBody: String = "RGVhciBBcHBsZXMgJiBQZWFycyBMdGQKClRoZSBkdXR5IGRlZmVybWVudCBzdGF0ZW1lbnRzIHlvdSByZXF1ZXN0ZWQgZm9yIFNlcHRlbWJlciAyMDIyIHRvIE9jdG9iZXIgMjAyMiB3ZXJlIG5vdCBmb3VuZC4KClRoZXJlIGFyZSAyIHBvc3NpYmxlIHJlYXNvbnMgZm9yIHRoaXM6CgpTdGF0ZW1lbnRzIGFyZSBvbmx5IGNyZWF0ZWQgZm9yIHRoZSBwZXJpb2RzIGluIHdoaWNoIHlvdSBpbXBvcnRlZCBnb29kcy4gQ2hlY2sgdGhhdCB5b3UgaW1wb3J0ZWQgZ29vZHMgZHVyaW5nIHRoZSBkYXRlcyB5b3UgcmVxdWVzdGVkLgpJbXBvcnQgVkFUIGNlcnRpZmljYXRlcyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ3VzdG9tcyBIYW5kbGluZyBvZiBJbXBvcnQgYW5kIEV4cG9ydCBGcmVpZ2h0IChDSElFRikgY2Fubm90IGJlIHJlcXVlc3RlZCB1c2luZyB0aGUgQ3VzdG9tcyBEZWNsYXJhdGlvbiBTZXJ2aWNlLiBZb3UgY2FuIGdldCBkdXR5IGRlZmVybWVudCBzdGF0ZW1lbnRzIGZvciBkZWNsYXJhdGlvbnMgbWFkZSB1c2luZyBDSElFRiBmcm9tIER1dHkgRGVmZXJtZW50IEVsZWN0cm9uaWMgU3RhdGVtZW50cyAoRERFUykuCkZyb20gdGhlIEN1c3RvbXMgRGVjbGFyYXRpb24gU2VydmljZQ=="
+
   }
 }
 

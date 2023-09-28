@@ -16,10 +16,12 @@
 
 package domain.secureMessage
 
-import domain.secureMessage
 import models.{AccountType, HistoricDocumentRequestSearch}
 import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
+
+import domain.secureMessage.SecureMessage._
+import play.api.{Logger, LoggerLike}
 
 case class SecureMessageRequest(secureMessageRequest: Request)
 
@@ -38,6 +40,9 @@ case class Request(
 )
 
 object Request {
+
+  val log: LoggerLike = Logger(this.getClass)
+
   def apply(histDoc: HistoricDocumentRequestSearch): Request = {
     Request(externalRef = ExternalReference(histDoc.searchID.toString, "mdtp"),
       recipient = Recipient(
@@ -51,23 +56,37 @@ object Request {
           "Financials"),
         email = "test@test.com"),
       tags = Tags("CDS Financials"),
-      content = contents(subjectHeader(histDoc.params.accountType)),
+      content = contents(histDoc.params.accountType),
       messageType = "newMessageAlert",
       validFrom = LocalDate.now().toString,
       alertQueue = "DEFAULT")
   }
 
-  private def subjectHeader(accountType: String): AccountType =
+  private def contents(accountType: String): List[Content] = {
     accountType match {
-      case "DutyDefermentStatement" => AccountType("DutyDefermentStatement")
-      case "C79Certificate" => AccountType("C79Certificate")
-      case "SecurityStatement" => AccountType("SecurityStatement")
-      case "PostponedVATStatement" => AccountType("PostponedVATStatement")
+      case "DutyDefermentStatement" => {
+        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)),
+          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)))
+      }
+      case "C79Certificate" => {
+        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)),
+          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)))
+      }
+      case "SecurityStatement" => {
+        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)),
+          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)))
+      }
+      case "PostponedVATStatement" => {
+        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)),
+          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)))
+      }
+      case _ => {
+        log.error("Unknwon Account Type found in subjectheader")
+        List(Content("en", AccountType("Unkown Account Type"), "An error as occured."),
+          Content("cy", AccountType("Unkown Account Type"), "An error as occured."))
+      }
     }
-
-  private def contents(subjectHeader: AccountType): List[Content] =
-    List(Content("en", subjectHeader, secureMessage.SecureMessage.body),
-      Content("cy", subjectHeader, secureMessage.SecureMessage.body))
+  }
 
   implicit val requestFormat: OFormat[Request] = Json.format[Request]
 }

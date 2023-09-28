@@ -54,10 +54,6 @@ class SecureMessageConnectorSpec extends SpecBase {
       request mustBe compareRequest
     }
 
-    "encoded body displays correctly" in new Setup {
-      secureMessage.SecureMessage.encoded mustBe encoded
-    }
-
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
         running(app) {

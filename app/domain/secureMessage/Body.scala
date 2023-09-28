@@ -60,18 +60,16 @@ object Content {
 }
 
 object SecureMessage {
-  val body: String =
-    s"Dear Apples & Pears Ltd\n\n" +
-      s"The notification of adjustment statements you requested for March 2021 to May 2021 were not found.\n\n" +
-      "There are 2 possible reasons for this:\n\n" +
-      "Statements are only created for the periods in which you imported goods. " +
-      "Check that you imported goods during the dates you requested.\n" +
-      "Notification of adjustment statements for declarations made using " +
-      "Customs Handling of Import and Export Freight (CHIEF) cannot be requested " +
-      "using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\n" +
-      "From the Customs Declaration Service"
+  val DutyDefermentBody: String = "Dear Apples & Pears Ltd\n\nThe duty deferment statements you requested for September 2022 to October 2022 were not found.\n\nThere are 2 possible reasons for this:\n\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nImport VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. You can get duty deferment statements for declarations made using CHIEF from Duty Deferment Electronic Statements (DDES).\nFrom the Customs Declaration Service"
+  val C79CertificateBody: String = "Dear Apples & Pears Ltd\nThe import VAT certificates you requested for January 2022 to April 2022 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nImport VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and contact cbc-c79requests@hmrc.gov.uk to request CHIEF statements.\nFrom the Customs Declaration Service"
+  val SecurityBody: String = "Dear Apples & Pears Ltd\nThe notification of adjustment statements you requested for March 2021 to May 2021 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nNotification of adjustment statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\nFrom the Customs Declaration Service"
+  val PostponedVATBody: String = "Dear Apples & Pears Ltd\nThe postponed import VAT statements you requested for February 2022 to March 2022 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nPostponed import VAT statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to request CHIEF statements.\nFrom the Customs Declaration Service"
 
-  val encoded = BaseEncoding.base64().encode(body.getBytes(Charsets.UTF_8))
+  def encodeToUTF8Charsets(msg: String): String =
+    if (msg.nonEmpty)
+      BaseEncoding.base64().encode(msg.trim.getBytes(Charsets.UTF_8))
+    else
+      msg
 }
 
 object SecureMessageResponse

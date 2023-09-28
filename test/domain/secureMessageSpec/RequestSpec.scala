@@ -21,7 +21,9 @@ import utils.SpecBase
 import utils.Utils.emptyString
 import java.time.LocalDate
 import java.util.UUID
+
 import domain.secureMessage
+import domain.secureMessage.SecureMessage._
 
 class RequestSpec extends SpecBase {
   "apply" should {
@@ -54,7 +56,7 @@ class RequestSpec extends SpecBase {
     }
   }
 
-  "getSubjetHeader" should {
+  "getContents" should {
     "return DutyDefermentStatement" in new Setup {
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
@@ -74,15 +76,15 @@ class RequestSpec extends SpecBase {
         validFrom = LocalDate.now().toString,
         alertQueue = "DEFAULT")
 
-      expectedRequest.validFrom mustBe "2023-09-28"
       expectedRequest.content(0).subject mustBe dutyStatement
+      expectedRequest.content(0).body mustBe DutyDefermentBody
     }
 
     "return C79Certificate" in new Setup {
 
       override val TestContents: List[Content] = List(
-        Content("en", AccountType("C79Certificate"), domain.secureMessage.SecureMessage.body),
-        Content("cy", AccountType("C79Certificate"), domain.secureMessage.SecureMessage.body))
+        Content("en", AccountType("C79Certificate"), C79CertificateBody),
+        Content("cy", AccountType("C79Certificate"), C79CertificateBody))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -102,13 +104,14 @@ class RequestSpec extends SpecBase {
         alertQueue = "DEFAULT")
 
       expectedRequest.content(0).subject mustBe c79cert
+      expectedRequest.content(0).body mustBe C79CertificateBody
     }
 
     "return SecurityStatement" in new Setup {
 
       override val TestContents: List[Content] = List(
-        Content("en", AccountType("SecurityStatement"), domain.secureMessage.SecureMessage.body),
-        Content("cy", AccountType("SecurityStatement"), domain.secureMessage.SecureMessage.body))
+        Content("en", AccountType("SecurityStatement"), SecurityBody),
+        Content("cy", AccountType("SecurityStatement"), SecurityBody))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -128,14 +131,15 @@ class RequestSpec extends SpecBase {
         alertQueue = "DEFAULT")
 
       expectedRequest.content(0).subject mustBe sercStatement
+      expectedRequest.content(0).body mustBe SecurityBody
 
     }
 
     "return PostponedVATStatement" in new Setup {
 
       override val TestContents: List[Content] = List(
-        Content("en", AccountType("PostponedVATStatement"), domain.secureMessage.SecureMessage.body),
-        Content("cy", AccountType("PostponedVATStatement"), domain.secureMessage.SecureMessage.body))
+        Content("en", AccountType("PostponedVATStatement"), PostponedVATBody),
+        Content("cy", AccountType("PostponedVATStatement"), PostponedVATBody))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -155,6 +159,7 @@ class RequestSpec extends SpecBase {
         alertQueue = "DEFAULT")
 
       expectedRequest.content(0).subject mustBe PostPonedVATStatement
+      expectedRequest.content(0).body mustBe PostponedVATBody
     }
   }
 
@@ -162,8 +167,8 @@ class RequestSpec extends SpecBase {
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
-        Content("en", AccountType("DutyDefermentStatement"), secureMessage.SecureMessage.body),
-        Content("cy", AccountType("DutyDefermentStatement"), secureMessage.SecureMessage.body))
+        Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
+        Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -182,6 +187,7 @@ class RequestSpec extends SpecBase {
         validFrom = LocalDate.now().toString,
         alertQueue = "DEFAULT")
 
+      expectedRequest.content.length mustBe 2
       expectedRequest.content mustBe TestContents
     }
   }
@@ -202,9 +208,8 @@ trait Setup {
       SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
   val TestContents = {
-    List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), secureMessage.SecureMessage.body),
-      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), secureMessage.SecureMessage.body))
-  }
+    List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
+      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))}
 
   val dutyStatement = AccountType("DutyDefermentStatement")
   val c79cert = AccountType("C79Certificate")
@@ -221,40 +226,40 @@ trait Setup {
 
   def requestJsValue =
     s"""{
-      |  "externalRef": {
-      |    "id": "abcd12345",
-      |    "source": "mdtp"
-      |  },
-      |  "recipient": {
-      |    "regime": "cds",
-      |    "taxIdentifier": {
-      |      "name": "HMRC-CUS-ORG",
-      |      "value": "GB333186811543"
-      |    },
-      |    "name": {
-      |      "line1": "Test",
-      |      "line2": "CDS",
-      |      "line3": "Financials"
-      |    },
-      |    "email": "test@test.com"
-      |  },
-      |  "tags": {
-      |    "notificationType": "CDS Direct Debit"
-      |  },
-      |  "content": [
-      |    {
-      |      "lang": "en",
-      |      "subject": "Test CDS Financials",
-      |      "body": "Message content - 4254101384174917141"
-      |    },
-      |    {
-      |      "lang": "cy",
-      |      "subject": "Nodyn atgoffa i ffeilio ffurflen Hunanasesiad",
-      |      "body": "Cynnwys - 4254101384174917141"
-      |    }
-      |  ],
-      |  "messageType": "newMessageAlert",
-      |  "validFrom": ${LocalDate.now.toString}",
-      |  "alertQueue": "DEFAULT"
-      |}""".stripMargin
+       |  "externalRef": {
+       |    "id": "abcd12345",
+       |    "source": "mdtp"
+       |  },
+       |  "recipient": {
+       |    "regime": "cds",
+       |    "taxIdentifier": {
+       |      "name": "HMRC-CUS-ORG",
+       |      "value": "GB333186811543"
+       |    },
+       |    "name": {
+       |      "line1": "Test",
+       |      "line2": "CDS",
+       |      "line3": "Financials"
+       |    },
+       |    "email": "test@test.com"
+       |  },
+       |  "tags": {
+       |    "notificationType": "CDS Direct Debit"
+       |  },
+       |  "content": [
+       |    {
+       |      "lang": "en",
+       |      "subject": "Test CDS Financials",
+       |      "body": "Message content - 4254101384174917141"
+       |    },
+       |    {
+       |      "lang": "cy",
+       |      "subject": "Nodyn atgoffa i ffeilio ffurflen Hunanasesiad",
+       |      "body": "Cynnwys - 4254101384174917141"
+       |    }
+       |  ],
+       |  "messageType": "newMessageAlert",
+       |  "validFrom": ${LocalDate.now.toString}",
+       |  "alertQueue": "DEFAULT"
+       |}""".stripMargin
 }
