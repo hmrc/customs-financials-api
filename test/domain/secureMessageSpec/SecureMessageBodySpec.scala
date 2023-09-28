@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package domain
+package domain.secureMessageSpec
 
-import utils.SpecBase
-import domain.SecureMessage._
+import domain.secureMessage._
 import models.AccountType
+import utils.SpecBase
 
 class SecureMessageBodySpec extends SpecBase {
 

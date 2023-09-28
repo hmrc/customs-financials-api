@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package domain.SecureMessage
+package domain.secureMessage
 
 import play.api.libs.json._
 

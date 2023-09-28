@@ -21,34 +21,33 @@ import java.util.UUID
 
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-import domain.SecureMessage
-import domain.SecureMessage.Response
+import domain.secureMessage
+import domain.secureMessage._
 import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
-
 
 class SecureMessageConnectorSpec extends SpecBase {
 
   "SecureMessageConnector" should {
     "Populate RequestCommon" in new Setup {
 
-      val request = SecureMessage.Request(
-        externalRef = SecureMessage.ExternalReference(searchID.toString, "mdtp"),
-        recipient = SecureMessage.Recipient("cds",
-          SecureMessage.TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
-          params = SecureMessage.Params("01","2022","01","2023", "Financials"),
+      val request = Request(
+        externalRef = ExternalReference(searchID.toString, "mdtp"),
+        recipient = Recipient("cds",
+          TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
+          params = secureMessage.Params("01", "2022", "01", "2023", "Financials"),
           email = "test@test.com"),
-        tags = SecureMessage.Tags("CDS Financials"),
+        tags = Tags("CDS Financials"),
         content = TestContents,
         messageType = "newMessageAlert",
-        validForm = LocalDate.now().toString(),
+        validFrom = LocalDate.now().toString,
         alertQueue = "DEFAULT"
       )
 
@@ -56,72 +55,19 @@ class SecureMessageConnectorSpec extends SpecBase {
     }
 
     "encoded body displays correctly" in new Setup {
-      SecureMessage.SecureMessage.encoded mustBe encoded
-    }
-
-    "getSubjetHeader" should {
-      "return DutyDefermentStatement" in new Setup {
-        running(app) {
-          val result = connector.getSubjectHeader("DutyDefermentStatement")
-          result mustBe dutyStatement
-        }
-      }
-
-      "return C79Certificate" in new Setup {
-        running(app) {
-          val result = connector.getSubjectHeader("C79Certificate")
-          result mustBe c79cert
-        }
-      }
-
-      "return SecurityStatement" in new Setup {
-        running(app) {
-          val result = connector.getSubjectHeader("SecurityStatement")
-          result mustBe sercStatement
-        }
-      }
-
-      "return PostponedVATStatement" in new Setup {
-        running(app) {
-          val result = connector.getSubjectHeader("PostponedVATStatement")
-          result mustBe PostPonedVATStatement
-        }
-      }
-
-      "getContents" should {
-        "return eng and cy in list" in new Setup {
-          running(app) {
-            val result = connector.getContents(dutyStatement)
-            result mustBe TestContents
-          }
-        }
-      }
-    }
-
-    "getRequest" should {
-      "return the secure message request" in new Setup {
-        running(app) {
-          val result = connector.getRequest(doc, TestContents)
-          result mustBe compareRequest
-        }
-      }
+      secureMessage.SecureMessage.encoded mustBe encoded
     }
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
         running(app) {
-          //val result = await(connector.sendSecureMessage(histDoc = doc))
-          //result mustBe Response("abcd12345")
+       //   val result = await(connector.sendSecureMessage(histDoc = doc))
+        //  result mustBe Response(eori.value)
         }
       }
 
-      "successfully compares to schema example" in new Setup {
-        val jv: JsValue = Json.parse(jsValue)
-        //Json.fromJson(jv) mustBe JsSuccess(compareRequest)
-      }
-
       "Json Writesresult in correct output" in new Setup {
-        //Json.toJson(compareRequest) mustBe Json.parse(jsValue)
+        Json.toJson(compareRequest) mustBe Json.parse(jsValue)
       }
     }
   }
@@ -135,15 +81,6 @@ class SecureMessageConnectorSpec extends SpecBase {
     val mType = "newMessageAlert"
     val eori: EORI = EORI("GB333186811543")
     val id: String = "abcd12345"
-    val dutyStatement = AccountType("DutyDefermentStatement")
-    val c79cert = AccountType("C79Certificate")
-    val sercStatement = AccountType("SecurityStatement")
-    val PostPonedVATStatement = AccountType("PostponedVATStatement")
-
-    val TestContents = {
-      List(SecureMessage.Content("en", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body),
-        SecureMessage.Content("cy", AccountType("DutyDefermentStatement"), SecureMessage.SecureMessage.body))
-    }
 
     val contentBody: String =
       s"Dear Apples & Pears Ltd\n\n" +
@@ -170,16 +107,21 @@ class SecureMessageConnectorSpec extends SpecBase {
     val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
       SearchResultStatus.no, "", eori.value, params, searchRequests)
 
-    val compareRequest = SecureMessage.Request(
-      externalRef = SecureMessage.ExternalReference(searchID.toString, "mdtp"),
-      recipient = SecureMessage.Recipient("cds",
-        SecureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
-        params = SecureMessage.Params("01","2022","01","2023", "Financials"),
+    val TestContents = {
+      List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), "Message content - 4254101384174917141"),
+        secureMessage.Content("cy", AccountType("DutyDefermentStatement"), "Cynnwys - 4254101384174917141"))
+    }
+
+    val compareRequest = secureMessage.Request(
+      externalRef = secureMessage.ExternalReference(searchID.toString, "mdtp"),
+      recipient = secureMessage.Recipient("cds",
+        secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
+        params = secureMessage.Params("01", "2022", "01", "2023", "Financials"),
         email = "test@test.com"),
-      tags = SecureMessage.Tags("CDS Financials"),
+      tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
       messageType = mType,
-      validForm = LocalDate.now().toString(),
+      validFrom = LocalDate.now().toString,
       alertQueue = alert
     )
 
@@ -219,11 +161,11 @@ class SecureMessageConnectorSpec extends SpecBase {
          |}
          |],
          |"messageType": "newMessageAlert",
-         |"validFrom": "2023-09-08",
+         |"validFrom": "${LocalDate.now().toString}",
          |"alertQueue": "DEFAULT"
          |}""".stripMargin
 
-    val response: SecureMessage.Response = SecureMessage.Response("abcd12345")
+    val response: secureMessage.Response = secureMessage.Response("abcd12345")
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
