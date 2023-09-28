@@ -120,9 +120,15 @@ class SubscriptionServiceSpec extends SpecBase {
     val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress(
       "1 street", "Southampton", Some("SO1 1AA"), "GB")
 
-    val responseDetail: ResponseDetail = ResponseDetail(Some(eori), None, None, "CDSFullName",
-      cdsEstablishmentAddress, None,
-      None, None, None, None, None, None, None, ETMP_Master_Indicator = true, None)
+    val vatIds: VatId = VatId(Some("abc"), Some("123"))
+    val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
+    val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+    val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
+      Some("12345"), Some(Array(euVatIds)), "1", Some("abc"))
+
+    val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
+      cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
+      None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
 
     val emailAddress = "test@gmil.com"
 

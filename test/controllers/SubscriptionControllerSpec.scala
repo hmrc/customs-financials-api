@@ -17,7 +17,7 @@
 package controllers
 
 import domain.sub09.{EmailUnverifiedResponse, EmailVerifiedResponse}
-import models.EORI
+import models.{EORI, EmailAddress}
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
@@ -58,12 +58,44 @@ class SubscriptionControllerSpec extends SpecBase {
       }
     }
 
+    "return 200 status code for getEmail" in new Setup {
+      val subscriptionResponse: EmailVerifiedResponse = EmailVerifiedResponse(Some(EmailAddress("test@email.com")))
+
+      when(mockSubscriptionService.getEmailAddress(is(traderEORI)))
+        .thenReturn(Future.successful(subscriptionResponse))
+
+      running(app) {
+        val result = route(app, getEmailAddressrequest).value
+        status(result) mustBe OK
+      }
+    }
+
     "return 503 for any error" in new Setup {
       when(mockSubscriptionService.getVerifiedEmail(is(traderEORI)))
         .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
 
       running(app) {
         val result = route(app, request).value
+        status(result) mustBe SERVICE_UNAVAILABLE
+      }
+    }
+
+    "return 503 for any error in unverified email" in new Setup {
+      when(mockSubscriptionService.getUnverifiedEmail(is(traderEORI)))
+        .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
+
+      running(app) {
+        val result = route(app, unVerifiedEmailRequest).value
+        status(result) mustBe SERVICE_UNAVAILABLE
+      }
+    }
+
+    "return 503 for any error in getEmail" in new Setup {
+      when(mockSubscriptionService.getEmailAddress(is(traderEORI)))
+        .thenReturn(Future.failed(new NotFoundException("ShouldNotReturnThis")))
+
+      running(app) {
+        val result = route(app, getEmailAddressrequest).value
         status(result) mustBe SERVICE_UNAVAILABLE
       }
     }
@@ -74,6 +106,7 @@ class SubscriptionControllerSpec extends SpecBase {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
+    val getEmailAddressrequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getEmail().url)
     val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
