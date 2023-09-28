@@ -103,13 +103,10 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
       }
     }
 
-
     "validate the ssfn secure message request" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(
-            ssfnValidSecureMessageRequestJsonFilePath)
-          , ssfnSecrureMessageRequestSchemaPath)
+          readJsonFromFile(ssfnValidSecureMessageRequestJsonFilePath), ssfnSecrureMessageRequestSchemaPath)
 
         result.success.value mustBe()
       }

@@ -19,7 +19,7 @@ package domain.secureMessageSpec
 import domain.secureMessage.SecureMessage._
 import domain.secureMessage._
 import models.AccountType
-import utils.SpecBase
+import utils.{SpecBase, Utils}
 
 class SecureMessageBodySpec extends SpecBase {
 
@@ -80,7 +80,7 @@ class SecureMessageBodySpec extends SpecBase {
     }
 
     "should encode correctly" in new Setup {
-      val res = encodeToUTF8Charsets(TestDutyDefermentBody)
+      val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBody)
       res mustBe encodedDutyDeferementBody
     }
   }

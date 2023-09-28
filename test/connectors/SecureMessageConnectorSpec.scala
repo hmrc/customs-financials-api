@@ -36,7 +36,7 @@ import utils.Utils.emptyString
 class SecureMessageConnectorSpec extends SpecBase {
 
   "SecureMessageConnector" should {
-    "Populate RequestCommon" in new Setup {
+    "Populate Request" in new Setup {
 
       val request = Request(
         externalRef = ExternalReference(searchID.toString, "mdtp"),
@@ -57,8 +57,8 @@ class SecureMessageConnectorSpec extends SpecBase {
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
         running(app) {
-       //   val result = await(connector.sendSecureMessage(histDoc = doc))
-        //  result mustBe Response(eori.value)
+         // val result = await(connector.sendSecureMessage(histDoc = doc))
+         // result mustBe Response(eori.value)
         }
       }
 

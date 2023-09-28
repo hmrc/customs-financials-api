@@ -65,11 +65,6 @@ object SecureMessage {
   val SecurityBody: String = "Dear Apples & Pears Ltd\nThe notification of adjustment statements you requested for March 2021 to May 2021 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nNotification of adjustment statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA statements).\nFrom the Customs Declaration Service"
   val PostponedVATBody: String = "Dear Apples & Pears Ltd\nThe postponed import VAT statements you requested for February 2022 to March 2022 were not found.\nThere are 2 possible reasons for this:\nStatements are only created for the periods in which you imported goods. Check that you imported goods during the dates you requested.\nPostponed import VAT statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to request CHIEF statements.\nFrom the Customs Declaration Service"
 
-  def encodeToUTF8Charsets(msg: String): String =
-    if (msg.nonEmpty)
-      BaseEncoding.base64().encode(msg.trim.getBytes(Charsets.UTF_8))
-    else
-      msg
 }
 
 object SecureMessageResponse

@@ -22,6 +22,7 @@ import java.time.LocalDate
 
 import domain.secureMessage.SecureMessage._
 import play.api.{Logger, LoggerLike}
+import utils.Utils.encodeToUTF8Charsets
 
 case class SecureMessageRequest(secureMessageRequest: Request)
 
