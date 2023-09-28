@@ -81,11 +81,6 @@ object Request {
         List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)),
           Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)))
       }
-      case _ => {
-        log.error("Unknwon Account Type found in subjectheader")
-        List(Content("en", AccountType("Unkown Account Type"), "An error as occured."),
-          Content("cy", AccountType("Unkown Account Type"), "An error as occured."))
-      }
     }
   }
 

@@ -18,7 +18,7 @@ package domain.secureMessage
 
 import models._
 import utils.SpecBase
-import utils.Utils.emptyString
+import utils.Utils.{emptyString, encodeToUTF8Charsets}
 import java.time.LocalDate
 import java.util.UUID
 
@@ -29,7 +29,8 @@ class RequestSpec extends SpecBase {
   "apply" should {
     "create the object correctly" in new Setup {
 
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
+      val expectedRequest: Request = Request(
+        externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
@@ -48,8 +49,8 @@ class RequestSpec extends SpecBase {
 
       val actualRequestOb: Request = Request(histDocRequestSearch)
 
-      actualRequestOb.tags mustBe expectedRequest.tags
       actualRequestOb.recipient mustBe expectedRequest.recipient
+      actualRequestOb.tags mustBe expectedRequest.tags
       actualRequestOb.validFrom mustBe expectedRequest.validFrom
       actualRequestOb.alertQueue mustBe expectedRequest.alertQueue
       actualRequestOb.messageType mustBe expectedRequest.messageType
@@ -58,112 +59,41 @@ class RequestSpec extends SpecBase {
 
   "getContents" should {
     "return DutyDefermentStatement" in new Setup {
-
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
-        recipient = Recipient(
-          regime = "cds",
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
-          email = "test@test.com"),
-        tags = Tags("CDS Financials"),
-        content = TestContents,
-        messageType = "newMessageAlert",
-        validFrom = LocalDate.now().toString,
-        alertQueue = "DEFAULT")
+      override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
       expectedRequest.content(0).subject mustBe dutyStatement
-      expectedRequest.content(0).body mustBe DutyDefermentBody
+      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(DutyDefermentBody)
     }
 
     "return C79Certificate" in new Setup {
-
-      override val TestContents: List[Content] = List(
-        Content("en", AccountType("C79Certificate"), C79CertificateBody),
-        Content("cy", AccountType("C79Certificate"), C79CertificateBody))
-
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
-        recipient = Recipient(
-          regime = "cds",
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
-          email = "test@test.com"),
-        tags = Tags("CDS Financials"),
-        content = TestContents,
-        messageType = "newMessageAlert",
-        validFrom = LocalDate.now().toString,
-        alertQueue = "DEFAULT")
+      override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
+      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
       expectedRequest.content(0).subject mustBe c79cert
-      expectedRequest.content(0).body mustBe C79CertificateBody
+      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(C79CertificateBody)
     }
 
     "return SecurityStatement" in new Setup {
-
-      override val TestContents: List[Content] = List(
-        Content("en", AccountType("SecurityStatement"), SecurityBody),
-        Content("cy", AccountType("SecurityStatement"), SecurityBody))
-
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
-        recipient = Recipient(
-          regime = "cds",
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
-          email = "test@test.com"),
-        tags = Tags("CDS Financials"),
-        content = TestContents,
-        messageType = "newMessageAlert",
-        validFrom = LocalDate.now().toString,
-        alertQueue = "DEFAULT")
+      override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
+      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
       expectedRequest.content(0).subject mustBe sercStatement
-      expectedRequest.content(0).body mustBe SecurityBody
-
+      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(SecurityBody)
     }
 
     "return PostponedVATStatement" in new Setup {
-
-      override val TestContents: List[Content] = List(
-        Content("en", AccountType("PostponedVATStatement"), PostponedVATBody),
-        Content("cy", AccountType("PostponedVATStatement"), PostponedVATBody))
-
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
-        recipient = Recipient(
-          regime = "cds",
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
-          email = "test@test.com"),
-        tags = Tags("CDS Financials"),
-        content = TestContents,
-        messageType = "newMessageAlert",
-        validFrom = LocalDate.now().toString,
-        alertQueue = "DEFAULT")
+      override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
+      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
       expectedRequest.content(0).subject mustBe PostPonedVATStatement
-      expectedRequest.content(0).body mustBe PostponedVATBody
+      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(PostponedVATBody)
     }
-  }
 
-  "getContents" should {
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
@@ -209,7 +139,8 @@ trait Setup {
 
   val TestContents = {
     List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
-      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))}
+      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))
+  }
 
   val dutyStatement = AccountType("DutyDefermentStatement")
   val c79cert = AccountType("C79Certificate")

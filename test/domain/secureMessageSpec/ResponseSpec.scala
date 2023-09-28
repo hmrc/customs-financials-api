@@ -24,9 +24,7 @@ class ResponseSpec extends SpecBase {
 
   "ExternalReference" should {
     "generate correct output using the Reads" in new Setup {
-
       import domain.secureMessage.ExternalReference.extRefFormat
-
       Json.fromJson(Json.parse(externalRefJsValue)) mustBe JsSuccess(externalRefObject)
     }
 
@@ -37,9 +35,7 @@ class ResponseSpec extends SpecBase {
 
   "Recipient" should {
     "generate correct output using the Reads" in new Setup {
-
       import domain.secureMessage.Recipient.recipientFormat
-
       Json.fromJson(Json.parse(recipientJsValue)) mustBe JsSuccess(recipientObject)
 
     }
@@ -51,9 +47,7 @@ class ResponseSpec extends SpecBase {
 
   "TaxIdentifier" should {
     "generate correct output using the Reads" in new Setup {
-
       import domain.secureMessage.TaxIdentifier.taxFormat
-
       Json.fromJson(Json.parse(taxIdentifierJsValue)) mustBe JsSuccess(taxIdentifierObject)
     }
 
@@ -64,9 +58,7 @@ class ResponseSpec extends SpecBase {
 
   "Params" should {
     "generate correct output using the Reads" in new Setup {
-
       import domain.secureMessage.Params.paramsFormat
-
       Json.fromJson(Json.parse(paramsJsValue)) mustBe JsSuccess(paramsObject)
     }
 
@@ -77,9 +69,7 @@ class ResponseSpec extends SpecBase {
 
   "Tags" should {
     "generate correct output using the Reads" in new Setup {
-
       import domain.secureMessage.Tags.tagsFormat
-
       Json.fromJson(Json.parse(tagsJsValue)) mustBe JsSuccess(tagsObject)
     }
 
