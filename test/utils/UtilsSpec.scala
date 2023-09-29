@@ -84,6 +84,14 @@ class UtilsSpec extends SpecBase {
       }
     }
 
+    "encodeToUTF8Charsets" should {
+      "Return encoded String" in {
+        val result = encodeToUTF8Charsets("abc123")
+        result mustBe "YWJjMTIz"
+
+      }
+    }
+
     "threeColons" should {
       "return correct value" in {
         threeColons mustBe ":::"

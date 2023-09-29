@@ -33,15 +33,16 @@ object SDESInputFormats {
 
   implicit val notificationReads: Reads[Notification] = {
     (
-      (JsPath \ 'eori).read[EORI] and
-        (JsPath \ 'fileName).read[String] and
-        (JsPath \ 'fileSize).read[Long] and
-        (JsPath \ 'metadata).read[Seq[InputMetadata]]
-      ) { (eoriWithOptionalDan, fileName, fileSize, rawMetadata) =>
-      val (metadata, fileRoleSeq) = rawMetadata.partition(_.metadata != "FileRole")
-      val fileRole = fileRoleSeq.headOption.map(_.value).getOrElse("UnknownFileRole")
-      val metadataToSave = metadata.map(_.toKeyValue).toMap
-      val eori = eoriWithOptionalDan.value.split('-').head
-      Notification(EORI(eori), FileRole(fileRole), fileName, fileSize, Some(LocalDate.now),metadataToSave) }
+      (JsPath \ Symbol("eori")).read[EORI] and
+        (JsPath \ Symbol("fileName")).read[String] and
+        (JsPath \ Symbol("fileSize")).read[Long] and
+        (JsPath \ Symbol("metadata")).read[Seq[InputMetadata]]
+          ) { (eoriWithOptionalDan, fileName, fileSize, rawMetadata) =>
+          val (metadata, fileRoleSeq) = rawMetadata.partition(_.metadata != "FileRole")
+          val fileRole = fileRoleSeq.headOption.map(_.value).getOrElse("UnknownFileRole")
+          val metadataToSave = metadata.map(_.toKeyValue).toMap
+          val eori = eoriWithOptionalDan.value.split('-').head
+          Notification(EORI(eori), FileRole(fileRole), fileName,
+            fileSize, Some(LocalDate.now), metadataToSave) }
   }
 }

@@ -18,10 +18,12 @@ package utils
 
 import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
 import play.api.libs.json.Writes
-
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 
 object Utils {
   val emptyString = ""
@@ -46,6 +48,13 @@ object Utils {
    * Returns dateTime string in "Thu, 14 Sep 2023 16:30:30 GMT" format
    */
   def currentDateTimeAsRFC7231(dateTime: LocalDateTime): String = httpDateFormatter.format(dateTime)
+
+  /** Returns base64 encoded string or string on failure */
+  def encodeToUTF8Charsets(msg: String): String =
+    if (msg.nonEmpty)
+      BaseEncoding.base64().encode(msg.trim.getBytes(Charsets.UTF_8))
+    else
+      msg
 
   implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
     implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))

@@ -49,6 +49,21 @@ class AppConfigSpec extends SpecBase {
     }
   }
 
+  "secureMessage" should {
+    "Endpoint returns correct value" in new Setup {
+      appConfig.secureMessageEndpoint mustBe "http://localhost:9051/secure-messaging/v4/message"
+    }
+
+    "Host returns correct value" in new Setup {
+      appConfig.secureMessageHostHeader mustBe None
+    }
+
+    "BearerToken returns correct value" in new Setup {
+      appConfig.secureMessageBearerToken mustBe "test1234567"
+    }
+  }
+
+
   trait Setup {
     val app: Application = application().build()
     val appConfig: AppConfig = app.injector.instanceOf[AppConfig]

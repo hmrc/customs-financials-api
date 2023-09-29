@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import connectors.SecureMessageConnector
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
@@ -37,7 +38,8 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               jsonSchemaValidator: JSONSchemaValidator,
                                                               authorizationHeaderFilter: AuthorizationHeaderFilter,
                                                               mdgHeaderFilter: MdgHeaderFilter,
-                                                              cacheService: HistoricDocumentRequestSearchCacheService
+                                                              cacheService: HistoricDocumentRequestSearchCacheService,
+                                                              smc: SecureMessageConnector
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
@@ -113,21 +115,42 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-                                                              failureReasonCode: String,
-                                                              optHistDocReqSearchDoc: Option[
-                                                                HistoricDocumentRequestSearch]): Future[Option[Unit]] =
+    failureReasonCode: String,
+    optHistDocReqSearchDoc: Option[
+      HistoricDocumentRequestSearch]): Future[Option[Unit]] =
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
     } yield {
       updatedHistDoc.map {
         histDoc => {
-          if (!(histDoc.resultsFound == SearchResultStatus.yes))
-            cacheService.updateResultsFoundStatusToNoIfEligible(histDoc)
-          else ()
+          histDoc.resultsFound match {
+            case SearchResultStatus.inProcess => updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+            case _ => logger.info("Document status in not inProcess hence no further processing required")
+          }
         }
       }
     }
+
+  /**
+   * Updates the resultsFound status to no if eligible and sends secure message
+   */
+  private def updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Unit] = {
+    cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
+      case Some(updatedDoc) =>
+        if (updatedDoc.resultsFound == SearchResultStatus.no) {
+          smc.sendSecureMessage(updatedDoc).recover {
+            case exception =>
+              logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
+          }
+          logger.info("secure message has been triggered")
+        } else {
+          logger.info("Not eligible to send secure message")
+        }
+      case _ =>
+        logger.info("Not eligible to send secure message")
+    }
+  }
 
   /**
    * Updates the SearchRequest for given statementRequestID

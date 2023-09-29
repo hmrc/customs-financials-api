@@ -107,6 +107,19 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           status(result) mustBe NO_CONTENT
         }
       }
+
+      "delegate to the service and auditEditAuthority" in new Setup {
+
+        val editAuth = grantAuthorityRequest.copy(editRequest = true)
+
+        when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
+          .thenReturn(Future.successful(true))
+
+        running(app) {
+          val result = route(app, grantRequest(editAuth)).value
+          status(result) mustBe NO_CONTENT
+        }
+      }
     }
 
     "request is valid but API call fails" should {

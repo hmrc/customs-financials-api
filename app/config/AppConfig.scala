@@ -85,6 +85,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
   lazy val dbTimeToLiveInSeconds: Int = configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
 
+  lazy val secureMessageEndpoint: String = baseUrl("secureMessage") + getConfString("secureMessage.context-base", "/") + "/v4/message"
+  lazy val secureMessageHostHeader: Option[String] = configuration.getOptional[String]("microservice.services.secureMessage.host-header")
+  lazy val secureMessageBearerToken: String = getConfString("secureMessage.bearer-token", "test")
+
   lazy val ssfnBearerToken: String = getConfString("ssfn.bearer-token", "test")
   lazy val ssfnForwardedHost: Option[String] = configuration.getOptional[String]("microservice.services.ssfn.forwarded-host")
 

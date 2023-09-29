@@ -198,7 +198,23 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         actual mustBe expected
       }
 
+      "given a unknown notification" in {
+        val unknownNotification = Notification(
+          someEORI, FileRole("Unknown"), someFilename, someFileSize, None, Map(
+            "statementRequestID" -> "someID",
+            "Something" -> "Random"
+          )
+        )
 
+        val expected = Some(EmailRequest(List(
+          EmailAddress("test@test.com")), "customs_financials_new_statement_notification",
+          Map("Name" -> "test"), force = false, Some("someEORI"), None, None))
+
+        val actual = EmailTemplate.fromNotification(
+          EmailAddress("test@test.com"), unknownNotification).map(_.toEmailRequest)
+
+        actual mustBe expected
+      }
     }
   }
 
@@ -220,7 +236,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         val defermentStatementType = "Excise"
 
         val expectedDate = "28 Feb 2018"
-        val actualDate= EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
+        val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
         actualDate mustBe expectedDate
       }
 

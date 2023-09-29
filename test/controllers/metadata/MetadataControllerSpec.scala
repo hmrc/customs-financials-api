@@ -20,6 +20,7 @@ import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import controllers.CustomAuthConnector
 import models._
 import models.requests.EmailRequest
+import models.{EORI, EmailAddress}
 import org.mockito.ArgumentMatchers.{eq => is}
 import org.mockito.{ArgumentMatchers, Mockito}
 import play.api.http.Status.BAD_REQUEST

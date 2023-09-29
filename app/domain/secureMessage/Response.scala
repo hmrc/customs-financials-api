@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+package domain.secureMessage
 
-import java.util.UUID
+import play.api.libs.json._
 
-class RandomUUIDGenerator {
-  def generateUuid: String = UUID.randomUUID().toString
+case class Response(id: String)
+
+object Response {
+  implicit val format: OFormat[Response] = Json.format[Response]
 }

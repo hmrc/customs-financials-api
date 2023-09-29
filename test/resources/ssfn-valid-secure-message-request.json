@@ -1,0 +1,39 @@
+{
+  "externalRef": {
+    "id": "abcd12345",
+    "source": "mdtp"
+  },
+  "recipient": {
+    "regime": "cds",
+    "taxIdentifier": {
+      "name": "HMRC-CUS-ORG",
+      "value": "GB333186811543"
+    },
+    "params": {
+      "startMonth": "01",
+      "startYear": "2022",
+      "endMonth": "01",
+      "endYear": "2023",
+      "documentType": "Financials"
+    },
+    "email": "test@test.com"
+  },
+  "tags": {
+    "notificationType": "CDS Financials"
+  },
+  "content": [
+    {
+      "lang": "en",
+      "subject": "Test CDS Financials",
+      "body": "Message content - 4254101384174917141"
+    },
+    {
+      "lang": "cy",
+      "subject": "Nodyn atgoffa i ffeilio ffurflen Hunanasesiad",
+      "body": "Cynnwys - 4254101384174917141"
+    }
+  ],
+  "messageType": "newMessageAlert",
+  "validFrom": "2023-09-08",
+  "alertQueue": "DEFAULT"
+}

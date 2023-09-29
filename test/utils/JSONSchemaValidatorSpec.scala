@@ -23,11 +23,13 @@ import play.api.test.Helpers.running
 class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReader {
   val ssfnRequestSchemaPath = "/schemas/statement-search-failure-notification-request-schema.json"
   val ssfnErrorResponseSchemaPath = "/schemas/statement-search-failure-notification-error-response-schema.json"
+  val ssfnSecrureMessageRequestSchemaPath = "/schemas/secure-message-request-schema.json"
   val ssfnValidRequestJsonFilePath = "/ssfn-valid-request.json"
   val ssfnInvalidRequestJsonFilePath = "/ssfn-invalid-request.json"
   val ssfnValidErrorResponseJsonFilePath = "/ssfn-valid-error-response.json"
   val ssfnInvalidErrorResponseJsonFilePath = "/ssfn-invalid-error-response.json"
   val ssfnInvalidMultipleErrorsErrorResponseJsonFilePath = "/ssfn-invalid-multiple-errors-error-response.json"
+  val ssfnValidSecureMessageRequestJsonFilePath = "/ssfn-valid-secure-message-request.json"
 
   "ssfnRequestSchema" should {
     "return correct value for the schema path" in new Setup {
@@ -41,6 +43,14 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "return correct value for the schema path" in new Setup {
       running(app) {
         jsonPayloadSchemaValidator.ssfnErrorResponseSchema mustBe ssfnErrorResponseSchemaPath
+      }
+    }
+  }
+
+  "ssfnSecrureMessageResponseSchema" should {
+    "return correct value for the schema path" in new Setup {
+      running(app) {
+        jsonPayloadSchemaValidator.ssfnSecureMessageRequestSchema mustBe ssfnSecrureMessageRequestSchemaPath
       }
     }
   }
@@ -92,10 +102,20 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
         result.failure.exception.getMessage must include("/errorDetail/errorCode")
       }
     }
+
+    "validate the ssfn secure message request" in new Setup {
+      running(app) {
+        val result = jsonPayloadSchemaValidator.validatePayload(
+          readJsonFromFile(ssfnValidSecureMessageRequestJsonFilePath), ssfnSecrureMessageRequestSchemaPath)
+
+        result.success.value mustBe()
+      }
+    }
   }
 
   trait Setup {
     val app: Application = application().build()
     val jsonPayloadSchemaValidator: JSONSchemaValidator = app.injector.instanceOf[JSONSchemaValidator]
   }
+
 }
