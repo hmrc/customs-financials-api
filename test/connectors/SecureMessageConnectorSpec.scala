@@ -30,6 +30,7 @@ import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -56,13 +57,13 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
-
         when[Future[domain.secureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
           .thenReturn(Future.successful(response))
 
         running(app) {
-          val result = await(connector.sendSecureMessage(histDoc = doc))
-          result mustBe Response(eori.value)
+          connector.sendSecureMessage(histDoc = doc).map {
+            result => result mustBe Right(Response(eori.value))
+          }
         }
       }
 

@@ -23,7 +23,7 @@ import play.api.test.Helpers.running
 class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReader {
   val ssfnRequestSchemaPath = "/schemas/statement-search-failure-notification-request-schema.json"
   val ssfnErrorResponseSchemaPath = "/schemas/statement-search-failure-notification-error-response-schema.json"
-  val ssfnSecrureMessageRequestSchemaPath = "/schemas/secure-Message-Request-Schema.json"
+  val ssfnSecrureMessageRequestSchemaPath = "/schemas/secure-message-request-schema.json"
   val ssfnValidRequestJsonFilePath = "/ssfn-valid-request.json"
   val ssfnInvalidRequestJsonFilePath = "/ssfn-invalid-request.json"
   val ssfnValidErrorResponseJsonFilePath = "/ssfn-valid-error-response.json"

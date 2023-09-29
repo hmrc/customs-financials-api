@@ -24,12 +24,6 @@ import domain.secureMessage.SecureMessage._
 import play.api.{Logger, LoggerLike}
 import utils.Utils.encodeToUTF8Charsets
 
-case class SecureMessageRequest(secureMessageRequest: Request)
-
-object SecureMessageRequest {
-  implicit val format: OFormat[SecureMessageRequest] = Json.format[SecureMessageRequest]
-}
-
 case class Request(
   externalRef: ExternalReference,
   recipient: Recipient,
