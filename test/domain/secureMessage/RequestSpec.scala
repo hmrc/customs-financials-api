@@ -63,8 +63,8 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
-      expectedRequest.content(0).subject mustBe dutyStatement
-      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(DutyDefermentBody)
+      expectedRequest.content.head.subject mustBe dutyStatement
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(DutyDefermentBody)
     }
 
     "return C79Certificate" in new Setup {
@@ -72,8 +72,8 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
-      expectedRequest.content(0).subject mustBe c79cert
-      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(C79CertificateBody)
+      expectedRequest.content.head.subject mustBe c79cert
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(C79CertificateBody)
     }
 
     "return SecurityStatement" in new Setup {
@@ -81,8 +81,8 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
-      expectedRequest.content(0).subject mustBe sercStatement
-      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(SecurityBody)
+      expectedRequest.content.head.subject mustBe sercStatement
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(SecurityBody)
     }
 
     "return PostponedVATStatement" in new Setup {
@@ -90,8 +90,8 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
 
-      expectedRequest.content(0).subject mustBe PostPonedVATStatement
-      expectedRequest.content(0).body mustBe encodeToUTF8Charsets(PostponedVATBody)
+      expectedRequest.content.head.subject mustBe PostPonedVATStatement
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(PostponedVATBody)
     }
 
     "return eng and cy in list" in new Setup {
