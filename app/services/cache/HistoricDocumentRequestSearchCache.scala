@@ -68,6 +68,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
   private val  resultsFoundFieldKey = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
+  private val searchFailureReasonCodeKey = "searchFailureReasonCode"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
     val expireAtTS = DateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
@@ -149,6 +150,19 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       Updates.set(searchRequestsFieldKey, searchRequests),
       Updates.set(resultsFoundFieldKey, updatedStatus.toString),
       Updates.set(searchStatusUpdateDateFieldKey, Utils.dateTimeAsIso8601(LocalDateTime.now))
+    )
+
+    updateDocumentForQueryFilter(queryFiler, updates)
+  }
+
+  def updateSearchRequestRetryCount(searchID: String,
+                                    searchRequests: Set[SearchRequest],
+                                    failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
+    val queryFiler = Filters.equal(searchIDFieldKey, searchID)
+
+    val updates = Updates.combine(
+      Updates.set(searchRequestsFieldKey, searchRequests),
+      Updates.set(searchFailureReasonCodeKey, failureReason)
     )
 
     updateDocumentForQueryFilter(queryFiler, updates)

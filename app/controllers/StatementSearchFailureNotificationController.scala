@@ -170,6 +170,10 @@ class StatementSearchFailureNotificationController @Inject()(
     else
       Future(None)
 
+  private def updateRetryCountAndSendRequest() = {
+
+  }
+
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch],
                                          statementRequestID: String) =
     optHistDocReqSearchDoc.fold(false)(
