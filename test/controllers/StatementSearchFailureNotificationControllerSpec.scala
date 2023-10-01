@@ -29,6 +29,7 @@ import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, route, running, status}
 import play.api.{Application, inject}
+import services.HistoricDocumentService
 import services.cache.HistoricDocumentRequestSearchCacheService
 import utils.Utils.emptyString
 import utils.{JSONSchemaValidator, SpecBase, Utils}
@@ -118,9 +119,6 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     }
 
     "return 204 when request is valid and reason is not NoDocumentsFound" in new Setup {
-
-      val searchDateTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
-
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
           "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
@@ -142,13 +140,26 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
       )
 
+      when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
+      )
+
+      when(mockHistDocService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
+
       running(app) {
         val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
         status(response) mustBe NO_CONTENT
       }
+
+      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+        .retrieveHistDocRequestSearchDocForStatementReqId(any)
+      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+        .updateSearchRequestRetryCount(any, any, any, any)
+      verify(mockHistDocService, Mockito.times(1))
+        .sendHistoricDocumentRequest(any)(any)
     }
 
-    "return 500 when request is valid and reason is not NoDocumentsFound and " +
+    "return 500 and valid error response when request is valid and reason is not NoDocumentsFound and " +
       "failureRetryCount already has 5 as value" in new Setup {
 
       val searchRequestsWithMaximumRetryCount: Set[SearchRequest] = Set(
@@ -168,7 +179,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       running(app) {
         val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
         status(response) mustBe INTERNAL_SERVER_ERROR
+
+        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
+          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId)))
       }
+
+      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+        .retrieveHistDocRequestSearchDocForStatementReqId(any)
     }
 
     "send error response when the request is not valid" in new Setup {
@@ -254,11 +271,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       mock[HistoricDocumentRequestSearchCacheService]
 
     val mockSecureMessageConnector: SecureMessageConnector = mock[SecureMessageConnector]
+    val mockHistDocService: HistoricDocumentService = mock[HistoricDocumentService]
 
     val app: Application = application().overrides(
       inject.bind[JSONSchemaValidator].toInstance(schemaValidator),
       inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService),
-      inject.bind[SecureMessageConnector].toInstance(mockSecureMessageConnector)
+      inject.bind[SecureMessageConnector].toInstance(mockSecureMessageConnector),
+      inject.bind[HistoricDocumentService].toInstance(mockHistDocService)
     ).build()
 
     val historicDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {

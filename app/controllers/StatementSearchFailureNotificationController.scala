@@ -117,16 +117,14 @@ class StatementSearchFailureNotificationController @Inject()(
       if (failureReasonCode != "NoDocumentsFound")
         Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
       else
-        updateHistoricDocumentRequestSearchForStatReqId(
-          correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
+        updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReq.get)
     }
   }
 
-  private def updateHistoricDocumentRequestSearchForStatReqId(correlationId: String,
-                                                              statementRequestID: String,
+  private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
                                                               failureReasonCode: String,
-                                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch)(
-                                                               implicit hc: HeaderCarrier): Future[Result] = {
+                                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch
+                                                             ): Future[Result] = {
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
@@ -202,7 +200,8 @@ class StatementSearchFailureNotificationController @Inject()(
           histDocReqSearchDoc.searchRequests)
       } yield {
         histDocumentService.sendHistoricDocumentRequest(
-          HistoricDocumentRequest(statementRequestID, optHistDoc.get))
+          HistoricDocumentRequest(statementRequestID, optHistDoc.getOrElse(
+            throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved"))))
       }
       NoContent
     }
