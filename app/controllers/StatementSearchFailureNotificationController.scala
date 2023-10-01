@@ -79,25 +79,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  private def buildErrorResponse(errors: Option[Throwable] = None,
-                                 errorCode: String = ErrorCode.code400,
-                                 correlationId: String,
-                                 statementReqId: Option[String] = None) = {
-    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, errorCode, correlationId, statementReqId)
-
-    jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
-      case Success(_) => errorResponse
-      case _ =>
-        StatementSearchFailureNotificationErrorResponse(ErrorDetail(
-          currentDateTimeAsRFC7231(LocalDateTime.now()),
-          correlationId,
-          ErrorCode.code400,
-          ErrorMessage.badRequestReceived,
-          ErrorSource.cdsFinancials,
-          SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
-    }
-  }
-
   /**
    * Checks whether request's statementRequestID is present in the DB
    * Process statementRequestId if found in the DB
@@ -208,7 +189,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                              statementRequestID: String,
                                              failureReasonCode: String,
                                              histDocReqSearchDoc: HistoricDocumentRequestSearch
-                                            )(implicit hc: HeaderCarrier) = {
+                                            )(implicit hc: HeaderCarrier): Result = {
     val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests.find(
       sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < 5)
 
@@ -228,13 +209,6 @@ class StatementSearchFailureNotificationController @Inject()(
     else InternalServerError(buildInternalServerErrorResponse(correlationId, statementRequestID))
   }
 
-  private def buildInternalServerErrorResponse(correlationId: String,
-                                               statementRequestID: String) =
-    buildErrorResponse(
-      errorCode = ErrorCode.code500,
-      correlationId = correlationId,
-      statementReqId = Some(statementRequestID))
-
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
                                          statementRequestID: String): Boolean =
     optHistDocReqSearchDoc.searchRequests.find(
@@ -252,6 +226,32 @@ class StatementSearchFailureNotificationController @Inject()(
     } else {
       updatedDoc
     }
+
+  private def buildInternalServerErrorResponse(correlationId: String,
+                                               statementRequestID: String) =
+    buildErrorResponse(
+      errorCode = ErrorCode.code500,
+      correlationId = correlationId,
+      statementReqId = Some(statementRequestID))
+
+  private def buildErrorResponse(errors: Option[Throwable] = None,
+                                 errorCode: String = ErrorCode.code400,
+                                 correlationId: String,
+                                 statementReqId: Option[String] = None) = {
+    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, errorCode, correlationId, statementReqId)
+
+    jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
+      case Success(_) => errorResponse
+      case _ =>
+        StatementSearchFailureNotificationErrorResponse(ErrorDetail(
+          currentDateTimeAsRFC7231(LocalDateTime.now()),
+          correlationId,
+          ErrorCode.code400,
+          ErrorMessage.badRequestReceived,
+          ErrorSource.cdsFinancials,
+          SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
+    }
+  }
 
   private def requestBody(request: Request[AnyContent]): JsValue =
     request.body.asJson.getOrElse(Json.toJson(emptyString))
