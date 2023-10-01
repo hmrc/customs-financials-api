@@ -29,6 +29,7 @@ object StatementSearchFailureNotificationErrorResponse {
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
   def apply(errors: Option[Throwable] = None,
+            errorCode: String = ErrorCode.code400,
             correlationId: String,
             statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
 
@@ -40,11 +41,15 @@ object StatementSearchFailureNotificationErrorResponse {
     val errorDetail = ErrorDetail(
       timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
       correlationId = correlationId,
-      errorCode = ErrorCode.code400,
-      errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ => ErrorMessage.invalidStatementReqId),
+      errorCode = errorCode,
+      errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ =>
+        if (errorCode == ErrorCode.code500) ErrorMessage.technicalError else ErrorMessage.invalidStatementReqId),
       source = ErrorSource.cdsFinancials,
       sourceFaultDetail = SourceFaultDetail(
-        statementRequestID.fold(errorMsgList)(stReqId => Seq(ErrorMessage.invalidStatementReqIdDetail(stReqId))))
+        statementRequestID.fold(errorMsgList)(stReqId => Seq(
+          if (errorCode == ErrorCode.code500)
+            ErrorMessage.technicalErrorDetail(stReqId)
+          else ErrorMessage.invalidStatementReqIdDetail(stReqId))))
     )
 
     StatementSearchFailureNotificationErrorResponse(errorDetail)
@@ -97,8 +102,12 @@ object ErrorMessage {
   val badRequestReceived = "Bad request received"
   val missingReqProps = "missing required properties"
   val invalidStatementReqId = "Invalid statementRequestId"
+  val technicalError = "Technical error"
   def invalidStatementReqIdDetail: String => String =
     statementReqId =>  s"statementRequestId : $statementReqId is not recognised"
+
+  def technicalErrorDetail: String => String =
+    statementReqId => s"Technical error occurred while processing the statementRequestId : $statementReqId"
 }
 
 object ErrorSource {

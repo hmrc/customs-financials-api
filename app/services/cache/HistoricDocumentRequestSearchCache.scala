@@ -155,16 +155,4 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  def updateSearchRequestRetryCount(searchID: String,
-                                    searchRequests: Set[SearchRequest],
-                                    failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
-    val queryFiler = Filters.equal(searchIDFieldKey, searchID)
-
-    val updates = Updates.combine(
-      Updates.set(searchRequestsFieldKey, searchRequests),
-      Updates.set(searchFailureReasonCodeKey, failureReason)
-    )
-
-    updateDocumentForQueryFilter(queryFiler, updates)
-  }
 }

@@ -20,7 +20,7 @@ import connectors.SecureMessageConnector
 import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
-import models.responses.StatementSearchFailureNotificationErrorResponse
+import models.responses.{ErrorCode, StatementSearchFailureNotificationErrorResponse}
 import org.mockito.Mockito
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
@@ -50,7 +50,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         status(response) mustBe BAD_REQUEST
 
         contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, correlationId, Option(incomingStatementReqId)))
+          None, ErrorCode.code400, correlationId, Option(incomingStatementReqId)))
       }
     }
 

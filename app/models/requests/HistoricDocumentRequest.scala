@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models.{EORI, FileRole}
+import models.{EORI, FileRole, HistoricDocumentRequestSearch, SearchRequest}
 import play.api.libs.json._
 
 import java.util.UUID
@@ -34,4 +34,24 @@ case class HistoricDocumentRequest(
 
 object HistoricDocumentRequest {
   implicit val historicDocumentRequestFormat: OFormat[HistoricDocumentRequest] = Json.format[HistoricDocumentRequest]
+
+  def apply(statementRequestID: String,
+            histDocRequestSearch: HistoricDocumentRequestSearch): HistoricDocumentRequest = {
+
+    val searchReqForStatReqId: SearchRequest =
+      histDocRequestSearch.searchRequests.find(
+        sr => sr.statementRequestId == statementRequestID).getOrElse(
+        throw new RuntimeException(s"SearchRequest is not found for statementRequestId :: $statementRequestID"))
+
+    val params = histDocRequestSearch.params
+
+    HistoricDocumentRequest(eori = EORI(searchReqForStatReqId.eoriNumber),
+      documentType = FileRole(params.accountType),
+      periodStartYear = params.periodStartYear.toInt,
+      periodStartMonth = params.periodStartMonth.toInt,
+      periodEndYear = params.periodEndYear.toInt,
+      periodEndMonth = params.periodEndMonth.toInt,
+      dan = if (params.dan.isEmpty) None else Some(params.dan),
+      statementRequestID = UUID.fromString(statementRequestID))
+  }
 }

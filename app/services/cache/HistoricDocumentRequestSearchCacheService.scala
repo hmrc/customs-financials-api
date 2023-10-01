@@ -106,6 +106,10 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
       SearchResultStatus.yes)
   }
 
+  /**
+   * Updates the searchRequest's searchFailureReasonCode and increment failureRetryCount by one
+   * for the provided statementRequestID
+   */
   def updateSearchRequestRetryCount(statementRequestID: String,
                                     failureReason: String,
                                     searchId: String,
@@ -118,10 +122,9 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
         else sr
     }
 
-    historicDocRequestCache.updateSearchRequestRetryCount(
-      searchId,
+    historicDocRequestCache.updateSearchRequestForStatementRequestId(
       updatedSearchRequests,
-      failureReason)
+      searchId)
   }
 
 }

@@ -16,14 +16,17 @@
 
 package controllers
 
-import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
 import connectors.SecureMessageConnector
+import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import models.requests.HistoricDocumentRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
+import services.HistoricDocumentService
 import services.cache.HistoricDocumentRequestSearchCacheService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
 import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
@@ -39,6 +42,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               authorizationHeaderFilter: AuthorizationHeaderFilter,
                                                               mdgHeaderFilter: MdgHeaderFilter,
                                                               cacheService: HistoricDocumentRequestSearchCacheService,
+                                                              histDocumentService: HistoricDocumentService,
                                                               smc: SecureMessageConnector
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
@@ -49,16 +53,16 @@ class StatementSearchFailureNotificationController @Inject()(
     request =>
       jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
         case Success(_) =>
-          processStatementReqId(requestBody(request), correlationId(request))
+          processStatementReqId(requestBody(request), correlationId(request))(hc(request))
 
         case Failure(errors) =>
           import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
-          Future(BadRequest(buildErrorResponse(Option(errors), correlationId(request))))
+          Future(BadRequest(buildErrorResponse(Option(errors), ErrorCode.code400, correlationId(request))))
       }
   }
 
   private def processStatementReqId(request: JsValue,
-                                    correlationId: String): Future[Result] = {
+                                    correlationId: String)(implicit hc: HeaderCarrier): Future[Result] = {
     Json.fromJson(request) match {
       case JsSuccess(value, _) =>
         val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
@@ -76,9 +80,10 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def buildErrorResponse(errors: Option[Throwable] = None,
+                                 errorCode: String = ErrorCode.code400,
                                  correlationId: String,
                                  statementReqId: Option[String] = None) = {
-    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, correlationId, statementReqId)
+    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, errorCode, correlationId, statementReqId)
 
     jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
       case Success(_) => errorResponse
@@ -100,24 +105,27 @@ class StatementSearchFailureNotificationController @Inject()(
    */
   private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
                                             correlationId: String,
-                                            failureReasonCode: String): Future[Result] = {
+                                            failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
     cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID).map {
       case None => BadRequest(buildErrorResponse(
         errors = None,
+        errorCode = ErrorCode.code400,
         correlationId = correlationId,
         Option(statementRequestID)))
 
       case optHistDocReqSearchDoc =>
         updateHistoricDocumentRequestSearchForStatReqId(
-          statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
+          correlationId, statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
         NoContent
     }
   }
 
-  private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-    failureReasonCode: String,
-    optHistDocReqSearchDoc: Option[
-      HistoricDocumentRequestSearch]): Future[Option[Unit]] =
+  private def updateHistoricDocumentRequestSearchForStatReqId(correlationId: String,
+                                                              statementRequestID: String,
+                                                              failureReasonCode: String,
+                                                              optHistDocReqSearchDoc: Option[
+                                                                HistoricDocumentRequestSearch])(
+    implicit hc: HeaderCarrier): Future[Option[Unit]] =
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
@@ -125,7 +133,14 @@ class StatementSearchFailureNotificationController @Inject()(
       updatedHistDoc.map {
         histDoc => {
           histDoc.resultsFound match {
-            case SearchResultStatus.inProcess => updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+            case SearchResultStatus.inProcess => {
+              if(failureReasonCode != "NoDocumentsFound")
+                updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, histDoc)
+              else {
+                updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+                //NoContent
+              }
+            }
             case _ => logger.info("Document status in not inProcess hence no further processing required")
           }
         }
@@ -161,18 +176,45 @@ class StatementSearchFailureNotificationController @Inject()(
                                              optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch])
   : Future[Option[HistoricDocumentRequestSearch]] =
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID))
-      cacheService.updateSearchRequestForStatementRequestId(
-        optHistDocReqSearchDoc.get,
-        statementRequestID,
-        failureReasonCode).map {
-        updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
-      }
-    else
+        cacheService.updateSearchRequestForStatementRequestId(
+          optHistDocReqSearchDoc.get,
+          statementRequestID,
+          failureReasonCode).map {
+          updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
+        }
+        else
       Future(None)
 
-  private def updateRetryCountAndSendRequest() = {
+  private def updateRetryCountAndSendRequest(correlationId: String,
+                                             statementRequestID: String,
+                                             failureReasonCode: String,
+                                             histDocReqSearchDoc: HistoricDocumentRequestSearch
+                                            )(implicit hc: HeaderCarrier) = {
+    val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests.find(
+      sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < 5)
 
+    if (isReqRetryCountBelowMax) {
+      for {
+        optHistDoc <- cacheService.updateSearchRequestRetryCount(
+          statementRequestID,
+          failureReasonCode,
+          histDocReqSearchDoc.searchID.toString,
+          histDocReqSearchDoc.searchRequests)
+      } yield {
+        histDocumentService.sendHistoricDocumentRequest(
+          HistoricDocumentRequest(statementRequestID, optHistDoc.get))
+      }
+      Future(NoContent)
+    }
+    else Future(InternalServerError(buildInternalServerErrorResponse(correlationId, statementRequestID)))
   }
+
+  private def buildInternalServerErrorResponse(correlationId: String,
+                                              statementRequestID: String) =
+   buildErrorResponse(
+      errorCode = ErrorCode.code500,
+      correlationId = correlationId,
+      statementReqId = Some(statementRequestID))
 
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch],
                                          statementRequestID: String) =
