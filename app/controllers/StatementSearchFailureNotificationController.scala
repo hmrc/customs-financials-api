@@ -18,6 +18,8 @@ package controllers
 
 import connectors.SecureMessageConnector
 import controllers.actions.{AuthorizationHeaderFilter, MdgHeaderFilter}
+import models.FailureReason.NO_DOCUMENTS_FOUND
+import models.FailureRetryCount.FINAL_RETRY
 import models.requests.HistoricDocumentRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses._
@@ -114,7 +116,7 @@ class StatementSearchFailureNotificationController @Inject()(
         correlationId = correlationId,
         Option(statementRequestID))))
     } else {
-      if (failureReasonCode != "NoDocumentsFound")
+      if (failureReasonCode != NO_DOCUMENTS_FOUND)
         Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
       else
         updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReq.get)
@@ -189,7 +191,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                              histDocReqSearchDoc: HistoricDocumentRequestSearch
                                             )(implicit hc: HeaderCarrier): Result = {
     val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests.find(
-      sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < 5)
+      sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < FINAL_RETRY)
 
     if (isReqRetryCountBelowMax) {
       for {
