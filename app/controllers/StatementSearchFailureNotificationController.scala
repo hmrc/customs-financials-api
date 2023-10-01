@@ -104,48 +104,52 @@ class StatementSearchFailureNotificationController @Inject()(
    * otherwise reply with BAD_REQUEST error response
    */
   private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
-                                            correlationId: String,
-                                            failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
-    cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID).map {
-      case None => BadRequest(buildErrorResponse(
-        errors = None,
-        errorCode = ErrorCode.code400,
-        correlationId = correlationId,
-        Option(statementRequestID)))
-
-      case optHistDocReqSearchDoc =>
-        updateHistoricDocumentRequestSearchForStatReqId(
-          correlationId, statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
-        NoContent
+                                                correlationId: String,
+                                                failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
+    for {
+      optHistDocReq <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
+      result: Result <- if (optHistDocReq.isEmpty) {
+        Future(BadRequest(buildErrorResponse(
+          errors = None,
+          errorCode = ErrorCode.code400,
+          correlationId = correlationId,
+          Option(statementRequestID))))
+      } else {
+        if (failureReasonCode != "NoDocumentsFound")
+          Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
+        else
+          updateHistoricDocumentRequestSearchForStatReqId(
+            correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
+      }
+    } yield {
+      result
     }
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(correlationId: String,
                                                               statementRequestID: String,
                                                               failureReasonCode: String,
-                                                              optHistDocReqSearchDoc: Option[
-                                                                HistoricDocumentRequestSearch])(
-    implicit hc: HeaderCarrier): Future[Option[Unit]] =
+                                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch)(
+                                                               implicit hc: HeaderCarrier): Future[Result] = {
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
         failureReasonCode, optHistDocReqSearchDoc)
     } yield {
-      updatedHistDoc.map {
-        histDoc => {
+      updatedHistDoc match {
+        case Some(histDoc) =>
           histDoc.resultsFound match {
             case SearchResultStatus.inProcess => {
-              if(failureReasonCode != "NoDocumentsFound")
-                updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, histDoc)
-              else {
-                updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
-                //NoContent
-              }
+              updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+              NoContent
             }
-            case _ => logger.info("Document status in not inProcess hence no further processing required")
+            case _ =>
+              logger.info("Document status in not inProcess hence no further processing required")
+              NoContent
           }
-        }
+        case _ => NoContent
       }
     }
+  }
 
   /**
    * Updates the resultsFound status to no if eligible and sends secure message
@@ -173,16 +177,16 @@ class StatementSearchFailureNotificationController @Inject()(
    */
   private def updateSearchRequestIfInProcess(statementRequestID: String,
                                              failureReasonCode: String,
-                                             optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch])
+                                             optHistDocReqSearchDoc: HistoricDocumentRequestSearch)
   : Future[Option[HistoricDocumentRequestSearch]] =
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID))
-        cacheService.updateSearchRequestForStatementRequestId(
-          optHistDocReqSearchDoc.get,
-          statementRequestID,
-          failureReasonCode).map {
-          updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
-        }
-        else
+      cacheService.updateSearchRequestForStatementRequestId(
+        optHistDocReqSearchDoc,
+        statementRequestID,
+        failureReasonCode).map {
+        updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
+      }
+    else
       Future(None)
 
   private def updateRetryCountAndSendRequest(correlationId: String,
@@ -204,24 +208,23 @@ class StatementSearchFailureNotificationController @Inject()(
         histDocumentService.sendHistoricDocumentRequest(
           HistoricDocumentRequest(statementRequestID, optHistDoc.get))
       }
-      Future(NoContent)
+      NoContent
     }
-    else Future(InternalServerError(buildInternalServerErrorResponse(correlationId, statementRequestID)))
+    else InternalServerError(buildInternalServerErrorResponse(correlationId, statementRequestID))
   }
 
   private def buildInternalServerErrorResponse(correlationId: String,
-                                              statementRequestID: String) =
-   buildErrorResponse(
+                                               statementRequestID: String) =
+    buildErrorResponse(
       errorCode = ErrorCode.code500,
       correlationId = correlationId,
       statementReqId = Some(statementRequestID))
 
-  private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: Option[HistoricDocumentRequestSearch],
-                                         statementRequestID: String) =
-    optHistDocReqSearchDoc.fold(false)(
-      histReqSearchDoc => histReqSearchDoc.searchRequests.find(
-        sr => sr.statementRequestId == statementRequestID).fold(false)(
-        serReq => serReq.searchSuccessful == SearchResultStatus.inProcess))
+  private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
+                                         statementRequestID: String): Boolean =
+    optHistDocReqSearchDoc.searchRequests.find(
+      sr => sr.statementRequestId == statementRequestID).fold(false)(
+      serReq => serReq.searchSuccessful == SearchResultStatus.inProcess)
 
   private def logErrorMessageIfUpdateFails(statementRequestID: String,
                                            failureReasonCode: String,

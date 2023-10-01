@@ -37,7 +37,6 @@ object HistoricDocumentRequest {
 
   def apply(statementRequestID: String,
             histDocRequestSearch: HistoricDocumentRequestSearch): HistoricDocumentRequest = {
-
     val searchReqForStatReqId: SearchRequest =
       histDocRequestSearch.searchRequests.find(
         sr => sr.statementRequestId == statementRequestID).getOrElse(
