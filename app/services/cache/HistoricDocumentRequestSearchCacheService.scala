@@ -113,7 +113,8 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
   def updateSearchRequestRetryCount(statementRequestID: String,
                                     failureReason: String,
                                     searchId: String,
-                                    searchRequests: Set[SearchRequest]): Future[Option[HistoricDocumentRequestSearch]] = {
+                                    searchRequests: Set[SearchRequest]
+                                   ): Future[Option[HistoricDocumentRequestSearch]] = {
     val updatedSearchRequests = searchRequests.map {
       sr =>
         if (sr.statementRequestId == statementRequestID &&
