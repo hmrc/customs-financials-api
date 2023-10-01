@@ -108,21 +108,36 @@ class StatementSearchFailureNotificationController @Inject()(
                                                 failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
     for {
       optHistDocReq <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
-      result: Result <- if (optHistDocReq.isEmpty) {
-        Future(BadRequest(buildErrorResponse(
-          errors = None,
-          errorCode = ErrorCode.code400,
-          correlationId = correlationId,
-          Option(statementRequestID))))
-      } else {
-        if (failureReasonCode != "NoDocumentsFound")
-          Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
-        else
-          updateHistoricDocumentRequestSearchForStatReqId(
-            correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
-      }
+      result: Result <- processStatReqIdOrSendErrorResponseIfReqIdNotPresent(
+        statementRequestID, correlationId, failureReasonCode, optHistDocReq)
     } yield {
       result
+    }
+  }
+
+  /**
+   * Raises the ErrorResponse if statementRequestID is not present in the DB
+   * If statementRequestID is present, process the statementRequestID as below
+   *     If failureReasonCode is other than NoDocumentsFound, updates the failureRetryCount
+   *     if failureReasonCode is NoDocumentsFound, updates the searchRequest and resultsFound status accordingly
+   */
+  private def processStatReqIdOrSendErrorResponseIfReqIdNotPresent(statementRequestID: String,
+                                                                   correlationId: String,
+                                                                   failureReasonCode: String,
+                                                                   optHistDocReq: Option[HistoricDocumentRequestSearch]
+                                                                  )(implicit hc: HeaderCarrier): Future[Result] = {
+    if (optHistDocReq.isEmpty) {
+      Future(BadRequest(buildErrorResponse(
+        errors = None,
+        errorCode = ErrorCode.code400,
+        correlationId = correlationId,
+        Option(statementRequestID))))
+    } else {
+      if (failureReasonCode != "NoDocumentsFound")
+        Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
+      else
+        updateHistoricDocumentRequestSearchForStatReqId(
+          correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
     }
   }
 
