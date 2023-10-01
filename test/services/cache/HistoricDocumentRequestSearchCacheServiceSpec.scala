@@ -120,10 +120,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
             searchFailureReasonCode = searchFailureReasonCode) else sr
       }
 
-      when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(
-        updatedSearchRequests,
-        searchID.toString)).thenReturn(Future.successful(
-        Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
+      when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
