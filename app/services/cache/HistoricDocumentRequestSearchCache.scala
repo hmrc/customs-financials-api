@@ -68,7 +68,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
   private val  resultsFoundFieldKey = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
-  private val searchFailureReasonCodeKey = "searchFailureReasonCode"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
     val expireAtTS = DateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
