@@ -272,7 +272,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
     "return correct output" in {
       val statementReqId = "test_id"
       ErrorMessage.failureRetryCountErrorDetail(statementReqId) mustBe
-        s"Failure retry count has reached its max value for statementRequestId : $statementReqId"
+        s"Failure retry count has reached its maximum permitted value for statementRequestId : $statementReqId"
     }
   }
 
