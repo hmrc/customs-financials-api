@@ -31,7 +31,8 @@ object StatementSearchFailureNotificationErrorResponse {
   def apply(errors: Option[Throwable] = None,
             errorCode: String = ErrorCode.code400,
             correlationId: String,
-            statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
+            statementRequestID: Option[String] = None,
+            errorDetailMsg: String = emptyString): StatementSearchFailureNotificationErrorResponse = {
 
     val aggregateErrorMsg = errors.fold[Throwable](
       new BadRequestException(ErrorMessage.badRequestReceived))(identity).getMessage
@@ -46,13 +47,22 @@ object StatementSearchFailureNotificationErrorResponse {
         if (errorCode == ErrorCode.code500) ErrorMessage.technicalError else ErrorMessage.invalidStatementReqId),
       source = ErrorSource.cdsFinancials,
       sourceFaultDetail = SourceFaultDetail(
-        statementRequestID.fold(errorMsgList)(stReqId => Seq(
-          if (errorCode == ErrorCode.code500)
-            ErrorMessage.technicalErrorDetail(stReqId)
-          else ErrorMessage.invalidStatementReqIdDetail(stReqId))))
+        retrieveErrorMsgList(errorCode, statementRequestID, errorDetailMsg, errorMsgList))
     )
 
     StatementSearchFailureNotificationErrorResponse(errorDetail)
+  }
+
+  private def retrieveErrorMsgList(errorCode: String,
+                                   statementRequestID: Option[String],
+                                   errorDetailMsg: String,
+                                   errorMsgList: Seq[String]): Seq[String] = {
+    statementRequestID.fold(errorMsgList)(stReqId => Seq(
+      if (errorCode == ErrorCode.code500)
+        if (errorDetailMsg.isEmpty) ErrorMessage.technicalErrorDetail(stReqId)
+        else errorDetailMsg
+      else ErrorMessage.invalidStatementReqIdDetail(stReqId))
+    )
   }
 
   /**
@@ -108,6 +118,9 @@ object ErrorMessage {
 
   def technicalErrorDetail: String => String =
     statementReqId => s"Technical error occurred while processing the statementRequestId : $statementReqId"
+
+  def failureRetryCountErrorDetail: String => String =
+    statementReqId => s"Failure retry count has reached its max value for statementRequestId : $statementReqId"
 }
 
 object ErrorSource {

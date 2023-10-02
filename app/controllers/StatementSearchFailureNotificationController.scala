@@ -207,7 +207,8 @@ class StatementSearchFailureNotificationController @Inject()(
       }
       NoContent
     }
-    else InternalServerError(buildInternalServerErrorResponse(correlationId, statementRequestID))
+    else InternalServerError(buildInternalServerErrorResponse(
+      correlationId, statementRequestID, ErrorMessage.failureRetryCountErrorDetail(statementRequestID)))
   }
 
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
@@ -229,17 +230,25 @@ class StatementSearchFailureNotificationController @Inject()(
     }
 
   private def buildInternalServerErrorResponse(correlationId: String,
-                                               statementRequestID: String) =
+                                               statementRequestID: String,
+                                               errorDetailMessage: String = emptyString) =
     buildErrorResponse(
       errorCode = ErrorCode.code500,
       correlationId = correlationId,
-      statementReqId = Some(statementRequestID))
+      statementReqId = Some(statementRequestID),
+      errorDetailMsg = errorDetailMessage)
 
   private def buildErrorResponse(errors: Option[Throwable] = None,
                                  errorCode: String = ErrorCode.code400,
                                  correlationId: String,
-                                 statementReqId: Option[String] = None) = {
-    val errorResponse = StatementSearchFailureNotificationErrorResponse(errors, errorCode, correlationId, statementReqId)
+                                 statementReqId: Option[String] = None,
+                                 errorDetailMsg: String = emptyString) = {
+    val errorResponse = StatementSearchFailureNotificationErrorResponse(
+      errors,
+      errorCode,
+      correlationId,
+      statementReqId,
+      errorDetailMsg)
 
     jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
       case Success(_) => errorResponse

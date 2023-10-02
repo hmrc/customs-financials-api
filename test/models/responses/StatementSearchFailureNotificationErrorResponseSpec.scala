@@ -220,6 +220,44 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
         expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
     }
+
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
+      "for technical error when statementRequestId and errorDetailMsg are present " in new Setup {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
+
+      val sourceFaultDetail: SourceFaultDetail =
+        SourceFaultDetail(Seq(ErrorMessage.failureRetryCountErrorDetail(statementReqId)))
+
+      val errorDetail: ErrorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        errorCode = ErrorCode.code500,
+        errorMessage = ErrorMessage.technicalError,
+        source = ErrorSource.cdsFinancials,
+        sourceFaultDetail = sourceFaultDetail)
+
+      val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
+        StatementSearchFailureNotificationErrorResponse(errorDetail)
+
+      val schemaErrorMsg = ""
+
+      val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
+        Option(new BadRequestException(schemaErrorMsg)),
+        ErrorCode.code500,
+        correlationId,
+        Option(statementReqId),
+        ErrorMessage.failureRetryCountErrorDetail(statementReqId))
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+
+      actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
+    }
   }
 
   "ErrorMessage.technicalErrorDetail" should {
@@ -227,6 +265,14 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val statementReqId = "test_id"
       ErrorMessage.technicalErrorDetail(statementReqId) mustBe
         s"Technical error occurred while processing the statementRequestId : $statementReqId"
+    }
+  }
+
+  "ErrorMessage.failureRetryCountErrorDetail" should {
+    "return correct output" in {
+      val statementReqId = "test_id"
+      ErrorMessage.failureRetryCountErrorDetail(statementReqId) mustBe
+        s"Failure retry count has reached its max value for statementRequestId : $statementReqId"
     }
   }
 

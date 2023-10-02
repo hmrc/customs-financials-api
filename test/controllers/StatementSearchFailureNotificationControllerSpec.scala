@@ -20,7 +20,7 @@ import connectors.SecureMessageConnector
 import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
-import models.responses.{ErrorCode, StatementSearchFailureNotificationErrorResponse}
+import models.responses.{ErrorCode, ErrorMessage, StatementSearchFailureNotificationErrorResponse}
 import org.mockito.Mockito
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
@@ -181,7 +181,8 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         status(response) mustBe INTERNAL_SERVER_ERROR
 
         contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId)))
+          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId),
+          ErrorMessage.failureRetryCountErrorDetail(incomingStatementReqId)))
       }
 
       verify(mockHistDocReqSearchCacheService, Mockito.times(1))
