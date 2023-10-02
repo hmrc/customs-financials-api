@@ -120,7 +120,7 @@ object ErrorMessage {
     statementReqId => s"Technical error occurred while processing the statementRequestId : $statementReqId"
 
   def failureRetryCountErrorDetail: String => String =
-    statementReqId => s"Failure retry count has reached its max value for statementRequestId : $statementReqId"
+    statementReqId => s"Failure retry count has reached its maximum value for statementRequestId : $statementReqId"
 }
 
 object ErrorSource {
