@@ -29,8 +29,10 @@ object StatementSearchFailureNotificationErrorResponse {
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
   def apply(errors: Option[Throwable] = None,
+            errorCode: String = ErrorCode.code400,
             correlationId: String,
-            statementRequestID: Option[String] = None): StatementSearchFailureNotificationErrorResponse = {
+            statementRequestID: Option[String] = None,
+            errorDetailMsg: String = emptyString): StatementSearchFailureNotificationErrorResponse = {
 
     val aggregateErrorMsg = errors.fold[Throwable](
       new BadRequestException(ErrorMessage.badRequestReceived))(identity).getMessage
@@ -40,14 +42,27 @@ object StatementSearchFailureNotificationErrorResponse {
     val errorDetail = ErrorDetail(
       timestamp = currentDateTimeAsRFC7231(LocalDateTime.now()),
       correlationId = correlationId,
-      errorCode = ErrorCode.code400,
-      errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ => ErrorMessage.invalidStatementReqId),
+      errorCode = errorCode,
+      errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ =>
+        if (errorCode == ErrorCode.code500) ErrorMessage.technicalError else ErrorMessage.invalidStatementReqId),
       source = ErrorSource.cdsFinancials,
       sourceFaultDetail = SourceFaultDetail(
-        statementRequestID.fold(errorMsgList)(stReqId => Seq(ErrorMessage.invalidStatementReqIdDetail(stReqId))))
+        retrieveErrorMsgList(errorCode, statementRequestID, errorDetailMsg, errorMsgList))
     )
 
     StatementSearchFailureNotificationErrorResponse(errorDetail)
+  }
+
+  private def retrieveErrorMsgList(errorCode: String,
+                                   statementRequestID: Option[String],
+                                   errorDetailMsg: String,
+                                   errorMsgList: Seq[String]): Seq[String] = {
+    statementRequestID.fold(errorMsgList)(stReqId => Seq(
+      if (errorCode == ErrorCode.code500)
+        if (errorDetailMsg.isEmpty) ErrorMessage.technicalErrorDetail(stReqId)
+        else errorDetailMsg
+      else ErrorMessage.invalidStatementReqIdDetail(stReqId))
+    )
   }
 
   /**
@@ -97,8 +112,16 @@ object ErrorMessage {
   val badRequestReceived = "Bad request received"
   val missingReqProps = "missing required properties"
   val invalidStatementReqId = "Invalid statementRequestId"
+  val technicalError = "Technical error"
   def invalidStatementReqIdDetail: String => String =
     statementReqId =>  s"statementRequestId : $statementReqId is not recognised"
+
+  def technicalErrorDetail: String => String =
+    statementReqId => s"Technical error occurred while processing the statementRequestId : $statementReqId"
+
+  def failureRetryCountErrorDetail: String => String =
+    statementReqId =>
+      s"Failure retry count has reached its maximum permitted value for statementRequestId : $statementReqId"
 }
 
 object ErrorSource {

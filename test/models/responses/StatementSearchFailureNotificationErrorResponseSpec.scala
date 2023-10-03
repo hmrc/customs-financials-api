@@ -50,7 +50,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val schemaErrorMsg = "(: object has missing required properties ([\"StatementSearchFailureNotificationMetadata\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        Option(new BadRequestException(schemaErrorMsg)), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -79,7 +79,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata:" +
         " object has missing required properties ([\"reason\",\"statementRequestID\"]))"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        Option(new BadRequestException(schemaErrorMsg)), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -109,7 +109,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = "(/StatementSearchFailureNotificationMetadata/statementRequestID:" +
         " ECMA 262 regex \"^[A-Fa-f0-9-]{36}$\" does not match input string \"1641bd46\")"
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        Option(new BadRequestException(schemaErrorMsg)), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -147,7 +147,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
         "\"AWSUnreachable\",\"AWSException\",\"BadRequestReceived\",\"CDDMInternalError\"]))"
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        Option(new BadRequestException(schemaErrorMsg)), correlationId)
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId)
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -158,7 +158,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
     }
 
     "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
-      "when statementRequestID is present in the " in new Setup {
+      "when statementRequestID is present" in new Setup {
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
 
@@ -176,7 +176,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val schemaErrorMsg = ""
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
-        Option(new BadRequestException(schemaErrorMsg)), correlationId, Option(statementReqId))
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId, Option(statementReqId))
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
       actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
@@ -187,6 +187,100 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
         expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
+    }
+
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
+      "for technical error and statementRequestId is present " in new Setup {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
+
+      val sourceFaultDetail = SourceFaultDetail(Seq(ErrorMessage.technicalErrorDetail(statementReqId)))
+
+      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        errorCode = ErrorCode.code500,
+        errorMessage = ErrorMessage.technicalError,
+        source = ErrorSource.cdsFinancials,
+        sourceFaultDetail = sourceFaultDetail)
+
+      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+
+      val schemaErrorMsg = ""
+
+      val actualOb = StatementSearchFailureNotificationErrorResponse(
+        Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code500, correlationId, Option(statementReqId))
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+
+      actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
+    }
+
+    "create the object correctly with errorCode, errorMessage, source and sourceFaultDetail " +
+      "for technical error when statementRequestId and errorDetailMsg are present " in new Setup {
+      val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
+      val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
+
+      val sourceFaultDetail: SourceFaultDetail =
+        SourceFaultDetail(Seq(ErrorMessage.failureRetryCountErrorDetail(statementReqId)))
+
+      val errorDetail: ErrorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+        correlationId,
+        errorCode = ErrorCode.code500,
+        errorMessage = ErrorMessage.technicalError,
+        source = ErrorSource.cdsFinancials,
+        sourceFaultDetail = sourceFaultDetail)
+
+      val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
+        StatementSearchFailureNotificationErrorResponse(errorDetail)
+
+      val schemaErrorMsg = ""
+
+      val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
+        Option(new BadRequestException(schemaErrorMsg)),
+        ErrorCode.code500,
+        correlationId,
+        Option(statementReqId),
+        ErrorMessage.failureRetryCountErrorDetail(statementReqId))
+
+      actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
+      actualOb.errorDetail.correlationId mustBe expectedSSFNErrorResOb.errorDetail.correlationId
+      actualOb.errorDetail.source mustBe expectedSSFNErrorResOb.errorDetail.source
+      actualOb.errorDetail.errorMessage mustBe expectedSSFNErrorResOb.errorDetail.errorMessage
+      actualOb.errorDetail.sourceFaultDetail.detail.size mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.size
+
+      actualOb.errorDetail.sourceFaultDetail.detail.head mustBe
+        expectedSSFNErrorResOb.errorDetail.sourceFaultDetail.detail.head
+    }
+  }
+
+  "ErrorMessage.technicalErrorDetail" should {
+    "return correct output" in {
+      val statementReqId = "test_id"
+      ErrorMessage.technicalErrorDetail(statementReqId) mustBe
+        s"Technical error occurred while processing the statementRequestId : $statementReqId"
+    }
+  }
+
+  "ErrorMessage.failureRetryCountErrorDetail" should {
+    "return correct output" in {
+      val statementReqId = "test_id"
+      ErrorMessage.failureRetryCountErrorDetail(statementReqId) mustBe
+        s"Failure retry count has reached its maximum permitted value for statementRequestId : $statementReqId"
+    }
+  }
+
+  "ErrorMessage.invalidStatementReqIdDetail" should {
+    "return correct output" in {
+      val statementReqId = "test_id"
+      ErrorMessage.invalidStatementReqIdDetail(statementReqId) mustBe
+        s"statementRequestId : $statementReqId is not recognised"
     }
   }
 

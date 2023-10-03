@@ -106,4 +106,26 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
       SearchResultStatus.yes)
   }
 
+  /**
+   * Updates the searchRequest's searchFailureReasonCode and increment failureRetryCount by one
+   * for the provided statementRequestID
+   */
+  def updateSearchRequestRetryCount(statementRequestID: String,
+                                    failureReason: String,
+                                    searchId: String,
+                                    searchRequests: Set[SearchRequest]
+                                   ): Future[Option[HistoricDocumentRequestSearch]] = {
+    val updatedSearchRequests = searchRequests.map {
+      sr =>
+        if (sr.statementRequestId == statementRequestID &&
+          sr.searchSuccessful == SearchResultStatus.inProcess)
+          sr.copy(searchFailureReasonCode = failureReason, failureRetryCount = sr.failureRetryCount + 1)
+        else sr
+    }
+
+    historicDocRequestCache.updateSearchRequestForStatementRequestId(
+      updatedSearchRequests,
+      searchId)
+  }
+
 }

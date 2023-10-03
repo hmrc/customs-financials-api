@@ -120,10 +120,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
             searchFailureReasonCode = searchFailureReasonCode) else sr
       }
 
-      when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(
-        updatedSearchRequests,
-        searchID.toString)).thenReturn(Future.successful(
-        Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
+      when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(any, any)).thenReturn(
+        Future.successful(Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
 
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
@@ -262,6 +260,50 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
         searchID.toString,
         updatedSearchRequests,
         SearchResultStatus.yes)
+    }
+  }
+
+  "updateSearchRequestRetryCount" should {
+    "update the doc correctly" in new Setup {
+
+      val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
+      val searchFailureReasonCode = "AWSUnreachable"
+      //val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
+
+      val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
+        sr =>
+          if (sr.statementRequestId.equals(statReqId)) sr.copy(
+            searchFailureReasonCode = searchFailureReasonCode,
+            failureRetryCount = sr.failureRetryCount + 1) else sr
+      }
+
+      when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(
+        updatedSearchRequests,
+        searchID.toString)).thenReturn(Future.successful(
+        Option(histDocRequestSearch.copy(searchRequests = updatedSearchRequests))))
+
+      val service: HistoricDocumentRequestSearchCacheService =
+        app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
+
+      service.updateSearchRequestRetryCount(
+        statReqId,
+        searchFailureReasonCode,
+        searchID.toString,
+        histDocRequestSearch.searchRequests
+        ).map {
+        optDoc => {
+          val doc = optDoc.get
+          val updatedSR = doc.searchRequests.find(x => x.statementRequestId == statReqId).get
+
+          doc.searchID.toString mustBe searchID.toString
+          updatedSR.searchFailureReasonCode mustBe searchFailureReasonCode
+          updatedSR.searchSuccessful mustBe SearchResultStatus.inProcess
+          updatedSR.failureRetryCount mustBe 1
+        }
+      }
+
+      verify(mockHistDocReqSearchCache, times(1)).updateSearchRequestForStatementRequestId(
+        updatedSearchRequests, searchID.toString)
     }
   }
 
