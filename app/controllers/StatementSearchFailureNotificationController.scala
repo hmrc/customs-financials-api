@@ -193,11 +193,8 @@ class StatementSearchFailureNotificationController @Inject()(
     cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
       case Some(updatedDoc) =>
         if (updatedDoc.resultsFound == SearchResultStatus.no) {
-          smc.sendSecureMessage(updatedDoc).recover {
-            case exception =>
-              logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
-              throw exception
-          }
+          smc.sendSecureMessage(updatedDoc)
+
           logger.info("secure message has been triggered")
         } else {
           logger.info("Not eligible to send secure message")
