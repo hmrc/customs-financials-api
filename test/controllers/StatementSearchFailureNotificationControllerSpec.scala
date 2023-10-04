@@ -231,7 +231,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         .retrieveHistDocRequestSearchDocForStatementReqId(any)
       }
 
-    "return 500 with correct error response when exception occurs while sending the ACC24 request " +
+    "return 204 when exception occurs while sending the ACC24 request " +
       "after updating the retry count" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
@@ -263,16 +263,57 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
       running(app) {
         val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
-        status(response) mustBe INTERNAL_SERVER_ERROR
-
-        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId)))
+        status(response) mustBe NO_CONTENT
       }
 
       verify(mockHistDocReqSearchCacheService, Mockito.times(1))
         .retrieveHistDocRequestSearchDocForStatementReqId(any)
       verify(mockHistDocReqSearchCacheService, Mockito.times(1))
         .updateSearchRequestRetryCount(any, any, any, any)
+    }
+
+    "return 204 when exception occurs while sending secure message" in new Setup {
+      val searchRequestsInProcess: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
+          emptyString, emptyString, 0)
+      )
+
+      val updatedSearchRequests: Set[SearchRequest] = Set(
+        SearchRequest(
+          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, noDocumentsFound, 0),
+        SearchRequest(
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
+          emptyString, emptyString, 0)
+      )
+
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
+        incomingStatementReqId)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
+      )
+
+      when(mockHistDocReqSearchCacheService.updateSearchRequestForStatementRequestId(any, any, any)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
+      )
+
+      when(mockHistDocReqSearchCacheService.updateResultsFoundStatusToNoIfEligible(any)).thenReturn(
+        Future.successful(Option(historicDocumentRequestSearchDoc.copy(resultsFound = SearchResultStatus.no)))
+      )
+
+      when(mockSecureMessageConnector.sendSecureMessage(any)).thenThrow(
+        new RuntimeException("Technical error occurred"))
+
+      running(app) {
+        val response = route(app, validRequest).value
+        status(response) mustBe NO_CONTENT
+      }
+
+      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+        .retrieveHistDocRequestSearchDocForStatementReqId(any)
+      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+        .updateResultsFoundStatusToNoIfEligible(any)
     }
   }
 

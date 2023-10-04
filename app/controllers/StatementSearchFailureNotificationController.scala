@@ -193,8 +193,11 @@ class StatementSearchFailureNotificationController @Inject()(
     cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
       case Some(updatedDoc) =>
         if (updatedDoc.resultsFound == SearchResultStatus.no) {
-          smc.sendSecureMessage(updatedDoc)
-
+          smc.sendSecureMessage(updatedDoc).recover {
+            case exception =>
+              logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
+              throw exception
+          }
           logger.info("secure message has been triggered")
         } else {
           logger.info("Not eligible to send secure message")
@@ -245,7 +248,7 @@ class StatementSearchFailureNotificationController @Inject()(
       sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < FINAL_RETRY)
 
     if (isReqRetryCountBelowMax) {
-      val result = for {
+      for {
         optHistDoc <- cacheService.updateSearchRequestRetryCount(
           statementRequestID,
           failureReasonCode,
@@ -255,11 +258,12 @@ class StatementSearchFailureNotificationController @Inject()(
         histDocumentService.sendHistoricDocumentRequest(
           HistoricDocumentRequest(statementRequestID, optHistDoc.getOrElse(
             throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved")))).map {
-          case true => NoContent
-          case _ => throw new RuntimeException("Exception occurred while sending ACC24 request")
+          case true => logger.info("ACC24 request got 204 response")
+          case _ => logger.error("ACC24 request did not get 204 response")
         }
       }
-      result.flatten
+
+      Future(NoContent)
     }
     else Future(InternalServerError(buildInternalServerErrorResponse(
       correlationId, statementRequestID, ErrorMessage.failureRetryCountErrorDetail(statementRequestID))))
