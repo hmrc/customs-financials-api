@@ -78,20 +78,10 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   }
 
   def retrieveDocumentsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
-    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture() recover {
-      case exception =>
-        logger.error(s"Failed to retrieve the document for currentEori ::: $currentEori " +
-          s"and error is ::: ${exception.getMessage}")
-        Seq()
-    }
+    collection.find(equal(currentEoriFieldKey, currentEori)).toFuture()
 
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
-    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption().recover {
-      case exception =>
-        logger.error(s"Failed to retrieve the document for $statementRequestID " +
-          s"and error is ::: ${exception.getMessage}")
-        None
-    }
+    collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption()
 
   /**
    * Updates the matching document (as per queryFilter) with the provided updates
@@ -101,11 +91,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     collection.findOneAndUpdate(
       filter = queryFilter,
       update = updates,
-      new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption().recover {
-      case exception =>
-        logger.error(s"Failed to update the document and error is ::: ${exception.getMessage}")
-        None
-    }
+      new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption()
 
   /**
    * Retrieves the document using SearchId and
