@@ -32,11 +32,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
 import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
+import ErrorMessage.technicalErrorDetail
 
 import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class StatementSearchFailureNotificationController @Inject()(
                                                               cc: ControllerComponents,
@@ -73,11 +74,41 @@ class StatementSearchFailureNotificationController @Inject()(
         logger.info(s"Request has been successfully validated for statementRequestID" +
           s" ::: $statementRequestID with reason :: $failureReasonCode")
 
-        checkStatementReqIdInDBAndProcess(statementRequestID, correlationId, failureReasonCode)
+        handleExceptionAndProcessStatementRequestId(correlationId, statementRequestID, failureReasonCode)
 
       case JsError(_) =>
         logger.error("Request is not properly formed and failing in parsing")
         Future(BadRequest)
+    }
+  }
+
+  /**
+   * Process the statementRequestID and creates InternalServerError
+   * response in case of exception
+   */
+  private def handleExceptionAndProcessStatementRequestId(correlationId: String,
+                                                          statementRequestID: String,
+                                                          failureReasonCode: String
+                                                         )(implicit hc: HeaderCarrier): Future[Result] = {
+    Try {
+      checkStatementReqIdInDBAndProcess(statementRequestID, correlationId, failureReasonCode).recoverWith {
+        case exception: Exception =>
+          logger.error(
+            s"Technical error occurred while processing statementRequestID " +
+              s"::: $statementRequestID and error is :: ${exception.getMessage}")
+
+          Future(InternalServerError(buildInternalServerErrorResponse(
+            correlationId, statementRequestID, technicalErrorDetail(statementRequestID))))
+      }
+    } match {
+      case Success(value) => value
+      case Failure(exception) =>
+        logger.error(
+          s"Technical error occurred while processing statementRequestID " +
+            s"::: $statementRequestID and error is :: ${exception.getMessage}")
+
+        Future(InternalServerError(buildInternalServerErrorResponse(
+          correlationId, statementRequestID, technicalErrorDetail(statementRequestID))))
     }
   }
 
@@ -116,11 +147,28 @@ class StatementSearchFailureNotificationController @Inject()(
         correlationId = correlationId,
         Option(statementRequestID))))
     } else {
-      if (failureReasonCode != NO_DOCUMENTS_FOUND)
-        Future(updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get))
-      else
-        updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReq.get)
+      checkFailureReasonAndProcessRequestId(
+        statementRequestID,
+        correlationId,
+        failureReasonCode,
+        optHistDocReq)
     }
+  }
+
+  /**
+   * Checks the failureReasonCode and proceeds as below
+   *   If failureReasonCode is NoDocumentsFound, update the retry count
+   *   else process the RequestId and update the HistoricDocumentRequestSearch document
+   */
+  private def checkFailureReasonAndProcessRequestId(statementRequestID: String,
+                                                    correlationId: String,
+                                                    failureReasonCode: String,
+                                                    optHistDocReq: Option[HistoricDocumentRequestSearch]
+                                                   )(implicit hc: HeaderCarrier): Future[Result] = {
+    if (failureReasonCode != NO_DOCUMENTS_FOUND)
+      updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
+    else
+      updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReq.get)
   }
 
   private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
@@ -128,20 +176,11 @@ class StatementSearchFailureNotificationController @Inject()(
                                                               optHistDocReqSearchDoc: HistoricDocumentRequestSearch
                                                              ): Future[Result] = {
     for {
-      updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID,
-        failureReasonCode, optHistDocReqSearchDoc)
+      updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
     } yield {
       updatedHistDoc match {
         case Some(histDoc) =>
-          histDoc.resultsFound match {
-            case SearchResultStatus.inProcess => {
-              updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
-              NoContent
-            }
-            case _ =>
-              logger.info("Document status in not inProcess hence no further processing required")
-              NoContent
-          }
+          updateDocumentStatusIfInProcess(histDoc)
         case _ => NoContent
       }
     }
@@ -157,6 +196,7 @@ class StatementSearchFailureNotificationController @Inject()(
           smc.sendSecureMessage(updatedDoc).recover {
             case exception =>
               logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
+              throw exception
           }
           logger.info("secure message has been triggered")
         } else {
@@ -165,6 +205,20 @@ class StatementSearchFailureNotificationController @Inject()(
       case _ =>
         logger.info("Not eligible to send secure message")
     }
+  }
+
+  /**
+   * Proceeds to update if the HistoricDocumentRequestSearch is in "inProcess"
+   * otherwise no further processing
+   */
+  private def updateDocumentStatusIfInProcess(histDoc: HistoricDocumentRequestSearch): Result = {
+    histDoc.resultsFound match {
+      case SearchResultStatus.inProcess =>
+        updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
+      case _ =>
+        logger.info("Document status in not inProcess hence no further processing required")
+    }
+    NoContent
   }
 
   /**
@@ -189,7 +243,7 @@ class StatementSearchFailureNotificationController @Inject()(
                                              statementRequestID: String,
                                              failureReasonCode: String,
                                              histDocReqSearchDoc: HistoricDocumentRequestSearch
-                                            )(implicit hc: HeaderCarrier): Result = {
+                                            )(implicit hc: HeaderCarrier): Future[Result] = {
     val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests.find(
       sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < FINAL_RETRY)
 
@@ -203,12 +257,16 @@ class StatementSearchFailureNotificationController @Inject()(
       } yield {
         histDocumentService.sendHistoricDocumentRequest(
           HistoricDocumentRequest(statementRequestID, optHistDoc.getOrElse(
-            throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved"))))
+            throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved")))).map {
+          case true => logger.info("ACC24 request got 204 response")
+          case _ => logger.error("ACC24 request did not get 204 response")
+        }
       }
-      NoContent
+
+      Future(NoContent)
     }
-    else InternalServerError(buildInternalServerErrorResponse(
-      correlationId, statementRequestID, ErrorMessage.failureRetryCountErrorDetail(statementRequestID)))
+    else Future(InternalServerError(buildInternalServerErrorResponse(
+      correlationId, statementRequestID, ErrorMessage.failureRetryCountErrorDetail(statementRequestID))))
   }
 
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
