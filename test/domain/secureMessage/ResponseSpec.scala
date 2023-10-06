@@ -37,7 +37,6 @@ class ResponseSpec extends SpecBase {
     "generate correct output using the Reads" in new Setup {
       import domain.secureMessage.Recipient.recipientFormat
       Json.fromJson(Json.parse(recipientJsValue)) mustBe JsSuccess(recipientObject)
-
     }
 
     "generate correct output using the Writes" in new Setup {
@@ -53,17 +52,6 @@ class ResponseSpec extends SpecBase {
 
     "generate correct output using the Writes" in new Setup {
       Json.toJson(taxIdentifierObject) mustBe Json.parse(taxIdentifierJsValue)
-    }
-  }
-
-  "Params" should {
-    "generate correct output using the Reads" in new Setup {
-      import domain.secureMessage.Params.paramsFormat
-      Json.fromJson(Json.parse(paramsJsValue)) mustBe JsSuccess(paramsObject)
-    }
-
-    "generate correct output using the Writes" in new Setup {
-      Json.toJson(paramsObject) mustBe Json.parse(paramsJsValue)
     }
   }
 
@@ -96,20 +84,11 @@ class ResponseSpec extends SpecBase {
     val taxIdentifierJsValue: String = """{"name": "name","value": "value"}""".stripMargin
     val taxIdentifierObject: TaxIdentifier = TaxIdentifier(name = "name", value = "value")
 
-    val paramsJsValue: String =
-      """{"startMonth": "01", "startYear": "2022",
-        |"endMonth": "01", "endYear": "2023",
-        |"documentType": "CDS"}""".stripMargin
-    val paramsObject: Params = Params(startMonth = "01", startYear = "2022",
-      endMonth = "01", endYear = "2023", documentType = "CDS")
-
     val recipientJsValue: String =
       """{"regime": "regime", "taxIdentifier":{"name": "name","value": "value"},
-        | "params": {"startMonth": "01", "startYear": "2022",
-        |"endMonth": "01", "endYear": "2023",
-        |"documentType": "CDS"}, "email": "email"}""".stripMargin
+        | "fullName": "Company Name", "email": "email"}""".stripMargin
     val recipientObject: Recipient = Recipient(regime = "regime",
-      taxIdentifier = taxIdentifierObject, params = paramsObject, email = "email")
+      taxIdentifier = taxIdentifierObject, fullName = "Company Name", email = "email")
 
     val tagsJsValue: String = """{"notificationType": "cds fin"}""".stripMargin
     val tagsObject: Tags = Tags(notificationType = "cds fin")

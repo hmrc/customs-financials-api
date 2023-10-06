@@ -18,28 +18,34 @@ package connectors
 
 import config.AppConfig
 import domain.secureMessage.{Request, Response}
-import models.HistoricDocumentRequestSearch
+import models.{HistoricDocumentRequestSearch, EORI, EmailAddress}
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.JSONSchemaValidator
-
+import connectors.DataStoreConnector
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class SecureMessageConnector @Inject()(
-  httpClient: HttpClient,
-  appConfig: AppConfig,
-  jsonSchemaValidator: JSONSchemaValidator,
-  mdgHeaders: MdgHeaders
-)(implicit executionContext: ExecutionContext) {
+                                        httpClient: HttpClient,
+                                        appConfig: AppConfig,
+                                        jsonSchemaValidator: JSONSchemaValidator,
+                                        mdgHeaders: MdgHeaders,
+                                        dataStore: DataStoreConnector
+                                      )(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
 
     val log: LoggerLike = Logger(this.getClass)
-    val request: Request = Request(histDoc)
+
+    //TODO - Update these values with dataStore.getCompanyName & dataStore.getVerifiedEmail
+    val companyName = "corp"
+    val emailAddress = EmailAddress("addy@address.com")
+
+    val request: Request = Request(histDoc, emailAddress, companyName)
 
     jsonSchemaValidator.validatePayload(requestBody(request),
       jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {

@@ -40,14 +40,8 @@ class SecureMessageBodySpec extends SpecBase {
 
     "Receipient" in new Setup {
       val tax = TaxIdentifier("name", "value")
-      val params = Params("01", "2022", "01", "2023", "Financials")
-      val recip = Recipient("regime", tax, params, "test@test.com")
+      val recip = Recipient("regime", tax, "Company Name", "test@test.com")
       recip mustBe TestRecip
-    }
-
-    "Params" in new Setup {
-      val params = Params("01", "2022", "01", "2023", "Financials")
-      params mustBe TestParams
     }
 
     "Tags" in new Setup {
@@ -89,8 +83,7 @@ class SecureMessageBodySpec extends SpecBase {
     val TestBody = Body("eori")
     val TestRef = ExternalReference("id", "source")
     val TestTax = TaxIdentifier("name", "value")
-    val TestParams = Params("01", "2022", "01", "2023", "Financials")
-    val TestRecip = Recipient("regime", TestTax, TestParams, "test@test.com")
+    val TestRecip = Recipient("regime", TestTax, "Company Name", "test@test.com")
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", AccountType("accountType"), "body")
 

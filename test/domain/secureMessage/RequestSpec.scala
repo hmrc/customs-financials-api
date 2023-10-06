@@ -34,12 +34,7 @@ class RequestSpec extends SpecBase {
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
+          fullName = "Company Name",
           email = "test@test.com"),
         tags = Tags("CDS Financials"),
         content = TestContents,
@@ -47,7 +42,8 @@ class RequestSpec extends SpecBase {
         validFrom = LocalDate.now().toString,
         alertQueue = "DEFAULT")
 
-      val actualRequestOb: Request = Request(histDocRequestSearch)
+      val actualRequestOb: Request = Request(histDocRequestSearch,
+        EmailAddress("test@test.com"), "Company Name")
 
       actualRequestOb.recipient mustBe expectedRequest.recipient
       actualRequestOb.tags mustBe expectedRequest.tags
@@ -61,7 +57,7 @@ class RequestSpec extends SpecBase {
     "return DutyDefermentStatement" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
       val modifiedDoc = histDocRequestSearch.copy(params = params)
-      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
+      val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe dutyStatement
       expectedRequest.content.head.body mustBe encodeToUTF8Charsets(DutyDefermentBody)
@@ -70,7 +66,7 @@ class RequestSpec extends SpecBase {
     "return C79Certificate" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
       val modifiedDoc = histDocRequestSearch.copy(params = params)
-      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
+      val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe c79cert
       expectedRequest.content.head.body mustBe encodeToUTF8Charsets(C79CertificateBody)
@@ -79,7 +75,7 @@ class RequestSpec extends SpecBase {
     "return SecurityStatement" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
       val modifiedDoc = histDocRequestSearch.copy(params = params)
-      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
+      val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe sercStatement
       expectedRequest.content.head.body mustBe encodeToUTF8Charsets(SecurityBody)
@@ -88,7 +84,7 @@ class RequestSpec extends SpecBase {
     "return PostponedVATStatement" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
       val modifiedDoc = histDocRequestSearch.copy(params = params)
-      val expectedRequest: Request = Request.apply(histDoc = modifiedDoc)
+      val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe PostPonedVATStatement
       expectedRequest.content.head.body mustBe encodeToUTF8Charsets(PostponedVATBody)
@@ -104,12 +100,7 @@ class RequestSpec extends SpecBase {
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          params = domain.secureMessage.Params(
-            params.periodStartMonth,
-            params.periodStartYear,
-            params.periodEndMonth,
-            params.periodEndYear,
-            "Financials"),
+          fullName = "Company Name",
           email = "test@test.com"),
         tags = Tags("CDS Financials"),
         content = contents,
@@ -139,8 +130,7 @@ trait Setup {
 
   val TestContents = {
     List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
-      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))
-  }
+      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))}
 
   val dutyStatement = AccountType("DutyDefermentStatement")
   val c79cert = AccountType("C79Certificate")

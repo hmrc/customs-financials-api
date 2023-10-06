@@ -28,7 +28,7 @@ object ExternalReference {
 }
 
 case class Recipient(regime: String, taxIdentifier: TaxIdentifier,
-  params: Params, email: String)
+                     fullName: String, email: String)
 
 object Recipient {
   implicit val recipientFormat: OFormat[Recipient] = Json.format[Recipient]
@@ -38,13 +38,6 @@ case class TaxIdentifier(name: String, value: String)
 
 object TaxIdentifier {
   implicit val taxFormat: OFormat[TaxIdentifier] = Json.format[TaxIdentifier]
-}
-
-case class Params(startMonth: String, startYear: String,
-  endMonth: String, endYear: String, documentType: String)
-
-object Params {
-  implicit val paramsFormat: OFormat[Params] = Json.format[Params]
 }
 
 case class Tags(notificationType: String)

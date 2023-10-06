@@ -17,7 +17,7 @@
 package connectors
 
 import config.AppConfig
-import models.{EORI, EmailAddress}
+import models.{EORI, EmailAddress, CompanyInformation}
 import play.api.libs.json._
 import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
@@ -50,6 +50,19 @@ class DataStoreConnector @Inject()(http: HttpClient,
         .map(response => response.eoriHistory.map(_.eori))
     }.recover {
       case _ => Seq.empty
+    }
+  }
+
+  def getCompanyName(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+    val dataStoreEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/company-information"
+    http.GET[CompanyInformation](dataStoreEndpoint).map(response => {
+      response.consent match {
+        case "1" => Some(response.name)
+        case _ => None
+      }
+    }).recover { case e =>
+      log.error(s"Call to data stored failed for getCompanyName exception=$e")
+      None
     }
   }
 }

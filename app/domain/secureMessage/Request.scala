@@ -16,40 +16,34 @@
 
 package domain.secureMessage
 
-import models.{AccountType, HistoricDocumentRequestSearch}
+import models.{AccountType, HistoricDocumentRequestSearch, EmailAddress}
 import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
-
 import domain.secureMessage.SecureMessage._
 import play.api.{Logger, LoggerLike}
 import utils.Utils.encodeToUTF8Charsets
 
 case class Request(
-  externalRef: ExternalReference,
-  recipient: Recipient,
-  tags: Tags,
-  content: List[Content],
-  messageType: String,
-  validFrom: String,
-  alertQueue: String
-)
+                    externalRef: ExternalReference,
+                    recipient: Recipient,
+                    tags: Tags,
+                    content: List[Content],
+                    messageType: String,
+                    validFrom: String,
+                    alertQueue: String
+                  )
 
 object Request {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def apply(histDoc: HistoricDocumentRequestSearch): Request = {
+  def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request = {
     Request(externalRef = ExternalReference(histDoc.searchID.toString, "mdtp"),
       recipient = Recipient(
         regime = "cds",
         taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori),
-        params = Params(
-          histDoc.params.periodStartMonth,
-          histDoc.params.periodStartYear,
-          histDoc.params.periodEndMonth,
-          histDoc.params.periodEndYear,
-          "Financials"),
-        email = "test@test.com"),
+        fullName = company,
+        email = email.value),
       tags = Tags("CDS Financials"),
       content = contents(histDoc.params.accountType),
       messageType = "newMessageAlert",
