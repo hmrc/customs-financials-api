@@ -57,24 +57,62 @@ class SecureMessageBodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      DutyDefermentBody mustBe TestDutyDefermentBody
+      DutyDefermentBody("Apples & Pears Ltd") mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      C79CertificateBody mustBe TestC79CertificateBody
+      C79CertificateBody("Apples & Pears Ltd") mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      SecurityBody mustBe TestSecurityBody
+      SecurityBody("Apples & Pears Ltd") mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      PostponedVATBody mustBe TestPostponedVATBody
+      PostponedVATBody("Apples & Pears Ltd") mustBe TestPostponedVATBody
     }
 
     "should encode correctly" in new Setup {
       val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBody)
       res mustBe encodedDutyDeferementBody
+    }
+
+    "short text - from the customs" in new Setup {
+      val result = "From the Customs Declaration Service"
+      result mustBe SignOff
+    }
+
+    "short text - There are 2 possible" in new Setup {
+      val result = "There are 2 possible reasons for this:<br/><br/>" +
+        "Statements are only created for the periods in which you imported goods." +
+        " Check that you imported goods during the dates you requested.<br/><br/>"
+      result mustBe TwoReasons
+    }
+
+    "short text - made using Customs" in new Setup {
+      val result = "made using Customs Handling of Import and Export Freight (CHIEF) " +
+        "cannot be requested using the Customs Declaration Service."
+      result mustBe MadeUsingCustoms
+    }
+
+    "short text - were not found" in new Setup {
+      val result = " were not found.<br/><br/>"
+      result mustBe WereNotFound
+    }
+
+    "short text - Check if your" in new Setup {
+      val result = " Check if your declarations were made using CHIEF and contact"
+      result mustBe CheckIfYourDeclartions
+    }
+
+    "short text - Import VAT Certs" in new Setup {
+      val result = "Import VAT certificates for declarations"
+      result mustBe ImportVATCerts
+    }
+
+    "short text - Request Chief" in new Setup {
+      val result = " request CHIEF statements.<br/><br/>"
+      result mustBe RequestChief
     }
   }
 

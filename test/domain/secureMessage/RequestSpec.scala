@@ -60,7 +60,7 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe dutyStatement
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(DutyDefermentBody)
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(DutyDefermentBody("Company Name"))
     }
 
     "return C79Certificate" in new Setup {
@@ -69,7 +69,7 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe c79cert
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(C79CertificateBody)
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(C79CertificateBody("Company Name"))
     }
 
     "return SecurityStatement" in new Setup {
@@ -78,7 +78,7 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe sercStatement
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(SecurityBody)
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(SecurityBody("Company Name"))
     }
 
     "return PostponedVATStatement" in new Setup {
@@ -87,14 +87,14 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request.apply(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe PostPonedVATStatement
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(PostponedVATBody)
+      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(PostponedVATBody("Company Name"))
     }
 
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
-        Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
-        Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))
+        Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")),
+        Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -129,8 +129,8 @@ trait Setup {
       SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
   val TestContents = {
-    List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody),
-      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody))}
+    List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")),
+      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")))}
 
   val dutyStatement = AccountType("DutyDefermentStatement")
   val c79cert = AccountType("C79Certificate")

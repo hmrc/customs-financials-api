@@ -45,29 +45,29 @@ object Request {
         fullName = company,
         email = email.value),
       tags = Tags("CDS Financials"),
-      content = contents(histDoc.params.accountType),
+      content = contents(histDoc.params.accountType, company),
       messageType = "newMessageAlert",
       validFrom = LocalDate.now().toString,
       alertQueue = "DEFAULT")
   }
 
-  private def contents(accountType: String): List[Content] = {
+  private def contents(accountType: String, company: String): List[Content] = {
     accountType match {
       case "DutyDefermentStatement" => {
-        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)),
-          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)))
+        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))),
+          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))))
       }
       case "C79Certificate" => {
-        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)),
-          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)))
+        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))),
+          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))))
       }
       case "SecurityStatement" => {
-        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)),
-          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)))
+        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))),
+          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))))
       }
       case "PostponedVATStatement" => {
-        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)),
-          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)))
+        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))),
+          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))))
       }
     }
   }
