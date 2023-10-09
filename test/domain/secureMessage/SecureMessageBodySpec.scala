@@ -114,6 +114,11 @@ class SecureMessageBodySpec extends SpecBase {
       val result = " request CHIEF statements.<br/><br/>"
       result mustBe RequestChief
     }
+
+    "short text = you requested for" in new Setup {
+      val result = "you requested for"
+      result mustBe YouRequestedFor
+    }
   }
 
   trait Setup {

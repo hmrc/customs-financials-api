@@ -29,7 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DataStoreConnector @Inject()(http: HttpClient,
-                                   metricsReporter: MetricsReporterService)(implicit appConfig: AppConfig, ec: ExecutionContext) {
+                                   metricsReporter: MetricsReporterService)(
+                                    implicit appConfig: AppConfig, ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -38,39 +39,41 @@ class DataStoreConnector @Inject()(http: HttpClient,
       val dataStoreEmailEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/verified-email"
       http.GET[EmailResponse](dataStoreEmailEndpoint)
         .map(_.address)
-        .recover {
-          case _ => None
+        .recover { case e =>
+          log.error(s"Call to data stored failed for getVerifiedEmail exception=$e")
+          None
         }
     }
 
   def getEoriHistory(eori: EORI)(implicit hc: HeaderCarrier): Future[Seq[EORI]] = {
-    val dataStoreEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/eori-history"
+    val dataStoreHistoryEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/eori-history"
     metricsReporter.withResponseTimeLogging("customs-data-store.get.eori-history") {
-      http.GET[EoriHistoryResponse](dataStoreEndpoint)
+      http.GET[EoriHistoryResponse](dataStoreHistoryEndpoint)
         .map(response => response.eoriHistory.map(_.eori))
-    }.recover {
-      case _ => Seq.empty
+    }.recover { case e =>
+      log.error(s"Call to data stored failed for getEoriHistory exception=$e")
+      Seq.empty
     }
   }
 
-  def getCompanyName(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[String]] = {
-    val dataStoreEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/company-information"
-    http.GET[CompanyInformation](dataStoreEndpoint).map(response => {
-      response.consent match {
-        case "1" => Some(response.name)
-        case _ => None
+  def getCompanyName(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[String]] =
+    metricsReporter.withResponseTimeLogging("customs-data-store.get.company-name") {
+      val dataStoreCorpEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/company-information"
+      http.GET[CompanyInformation](dataStoreCorpEndpoint).map(response => {
+        response.consent match {
+          case "1" => Some(response.name)
+          case _ => None
+        }
+      }).recover { case e =>
+        log.error(s"Call to data stored failed for getCompanyName exception=$e")
+        None
       }
-    }).recover { case e =>
-      log.error(s"Call to data stored failed for getCompanyName exception=$e")
-      None
     }
-  }
 }
 
-case class EoriPeriod(
-                       eori: EORI,
-                       validFrom: Option[String],
-                       validUntil: Option[String])
+case class EoriPeriod(eori: EORI,
+                      validFrom: Option[String],
+                      validUntil: Option[String])
 
 object EoriPeriod {
   implicit val format: OFormat[EoriPeriod] = Json.format[EoriPeriod]
@@ -80,6 +83,12 @@ case class EoriHistoryResponse(eoriHistory: Seq[EoriPeriod])
 
 object EoriHistoryResponse {
   implicit val format: OFormat[EoriHistoryResponse] = Json.format[EoriHistoryResponse]
+}
+
+case class CompanyInformationResponse(companyInfo: CompanyInformation)
+
+object CompanyInformationResponse {
+  implicit val format: OFormat[CompanyInformationResponse] = Json.format[CompanyInformationResponse]
 }
 
 case class EmailResponse(address: Option[EmailAddress], timestamp: Option[String])

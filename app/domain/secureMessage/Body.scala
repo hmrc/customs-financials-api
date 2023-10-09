@@ -67,27 +67,29 @@ object SecureMessage {
   val MadeUsingCustoms = "made using Customs Handling of Import and Export Freight (CHIEF) " +
     "cannot be requested using the Customs Declaration Service."
 
+  val YouRequestedFor = "you requested for"
+
   def DutyDefermentBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
-    s"The duty deferment statements you requested for September 2022 to October 2022" +
+    s"The duty deferment statements ${YouRequestedFor} September 2022 to October 2022" +
     s"${WereNotFound}${TwoReasons}" +
     s"${ImportVATCerts} ${MadeUsingCustoms}" +
     " You can get duty deferment statements for declarations made using CHIEF" +
     s" from Duty Deferment Electronic Statements (DDES).<br/><br/>${SignOff}"
 
   def C79CertificateBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
-    s"The import VAT certificates you requested for January 2022 to April 2022" +
+    s"The import VAT certificates ${YouRequestedFor} January 2022 to April 2022" +
     s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
     s"${CheckIfYourDeclartions} cbc-c79requests@hmrc.gov.uk to" +
     s"${RequestChief}${SignOff}"
 
   def SecurityBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
-    s"The notification of adjustment statements you requested for March 2021 to May 2021" +
+    s"The notification of adjustment statements ${YouRequestedFor} March 2021 to May 2021" +
     s"${WereNotFound}${TwoReasons}" +
     s"Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
     s" (Insert guidance on how to get CHIEF NOA statements).<br/><br/>${SignOff}"
 
   def PostponedVATBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
-    s"The postponed import VAT statements you requested for February 2022 to March 2022" +
+    s"The postponed import VAT statements ${YouRequestedFor} February 2022 to March 2022" +
     s"${WereNotFound}${TwoReasons}" +
     s"Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
     s"${CheckIfYourDeclartions} pvaenquiries@hmrc.gov.uk to" +

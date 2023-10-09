@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{EORI, EmailAddress}
+import models.{EORI, EmailAddress, CompanyInformation}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -71,12 +71,35 @@ class DataStoreConnectorSpec extends SpecBase {
     }
   }
 
+  "getCompanyName" should {
+    "return companyName on a successful response from the data-store" in new Setup {
+      when[Future[String]](mockHttpClient.GET(any, any, any)(any, any, any))
+        .thenReturn(Future.successful(companyNameResponse))
+
+      running(app) {
+        val result = await(connector.getCompanyName(EORI("someEori")))
+        result mustBe "Company Name"
+      }
+    }
+
+    "return None when an unknown exception happens from the data-store" in new Setup {
+      when[Future[CompanyInformation]](mockHttpClient.GET(any, any, any)(any, any, any))
+        .thenReturn(Future.failed(new NotFoundException("error")))
+
+      running(app) {
+        val result = await(connector.getCompanyName(EORI("someEori")))
+        result mustBe None
+      }
+    }
+  }
+
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
     val emailResponse: EmailResponse = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI("someEori"), None, None)))
+    val companyNameResponse: String = "Company Name"
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
