@@ -40,33 +40,37 @@ class SecureMessageConnector @Inject()(
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
 
     val log: LoggerLike = Logger(this.getClass)
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    //TODO - Update these values with dataStore.getCompanyName & dataStore.getVerifiedEmail
-    val companyName = "corp"
-    val emailAddress = EmailAddress("addy@address.com")
+    for {
+      companyName <- dataStore.getCompanyName(EORI(histDoc.currentEori))
+      emailAddress <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
+    } yield {
 
-    val request: Request = Request(histDoc, emailAddress, companyName)
+      val request: Request = Request(histDoc,
+        emailAddress.getOrElse(EmailAddress("")), companyName.getOrElse(""))
 
-    jsonSchemaValidator.validatePayload(requestBody(request),
-      jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
-      case Success(_) =>
-        val result: Future[Response] = httpClient.POST[Request, Response](
-          appConfig.secureMessageEndpoint,
-          request,
-          headers = mdgHeaders.headers(
-            appConfig.secureMessageBearerToken,
-            appConfig.secureMessageHostHeader)
-        )(implicitly, implicitly, HeaderCarrier(), implicitly).recover {
-          case exception =>
-            log.error(exception.getMessage)
-            log.error(s"error occurred for " +
-              s"message id ${request.externalRef.id} while sending secure message")
-            Response(id = s"Secure Message API Error for :::${request.externalRef.id}")
-        }
-        result.map(res => Right(res))
-      case Failure(exception) =>
-        log.error(s"Json Schema Failed Validation for sendSecureMessage")
-        Future(Left(exception.getMessage))
+      jsonSchemaValidator.validatePayload(requestBody(request),
+        jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
+        case Success(_) =>
+          val result: Future[Response] = httpClient.POST[Request, Response](
+            appConfig.secureMessageEndpoint,
+            request,
+            headers = mdgHeaders.headers(
+              appConfig.secureMessageBearerToken,
+              appConfig.secureMessageHostHeader)
+          )(implicitly, implicitly, HeaderCarrier(), implicitly).recover {
+            case exception =>
+              log.error(exception.getMessage)
+              log.error(s"error occurred for " +
+                s"message id ${request.externalRef.id} while sending secure message")
+              Response(id = s"Secure Message API Error for :::${request.externalRef.id}")
+          }
+          result.map(res => Right(res))
+        case Failure(exception) =>
+          log.error(s"Json Schema Failed Validation for sendSecureMessage")
+          Future(Left(exception.getMessage))
+      }
     }
   }
 

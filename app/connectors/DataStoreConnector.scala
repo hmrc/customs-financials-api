@@ -85,12 +85,6 @@ object EoriHistoryResponse {
   implicit val format: OFormat[EoriHistoryResponse] = Json.format[EoriHistoryResponse]
 }
 
-case class CompanyInformationResponse(companyInfo: CompanyInformation)
-
-object CompanyInformationResponse {
-  implicit val format: OFormat[CompanyInformationResponse] = Json.format[CompanyInformationResponse]
-}
-
 case class EmailResponse(address: Option[EmailAddress], timestamp: Option[String])
 
 object EmailResponse {
