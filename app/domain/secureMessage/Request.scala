@@ -38,6 +38,7 @@ object Request {
   val log: LoggerLike = Logger(this.getClass)
 
   def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request = {
+
     Request(externalRef = ExternalReference(histDoc.searchID.toString, "mdtp"),
       recipient = Recipient(
         regime = "cds",
@@ -46,9 +47,19 @@ object Request {
         email = email.value),
       tags = Tags("CDS Financials"),
       content = contents(histDoc.params.accountType, company),
-      messageType = "newMessageAlert",
+      messageType = MessageTemplate(histDoc.params.accountType),
       validFrom = LocalDate.now().toString,
       alertQueue = "DEFAULT")
+  }
+
+  private def MessageTemplate(id: String): String = {
+    id match {
+      case "DutyDefermentStatement" => DutyDefermentTemplate
+      case "C79Certificate" => C79CertificateTemplate
+      case "SecurityStatement" => SecurityTemplate
+      case "PostponedVATStatement" => PostponedVATemplate
+      case _ => "Unknown Template"
+    }
   }
 
   private def contents(accountType: String, company: String): List[Content] = {

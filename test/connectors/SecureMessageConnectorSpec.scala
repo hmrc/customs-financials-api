@@ -21,8 +21,8 @@ import java.util.UUID
 
 import domain.secureMessage
 import domain.secureMessage._
-import models.{AccountType, EORI, HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
-import play.api.Application
+import models._
+import play.api.{Application, inject}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
 import scala.concurrent.ExecutionContext.Implicits.global
+import connectors.DataStoreConnector
 
 import scala.concurrent.Future
 
@@ -57,8 +58,11 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
-        when[Future[domain.secureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(response))
+        when(mockDataStoreService.getCompanyName(any)(any))
+          .thenReturn(Future.successful(Option("test")))
+        
+        when(mockDataStoreService.getVerifiedEmail(any)(any))
+          .thenReturn(Future.successful(Option(EmailAddress("email"))))
 
         running(app) {
           connector.sendSecureMessage(histDoc = doc).map {
@@ -79,6 +83,15 @@ class SecureMessageConnectorSpec extends SpecBase {
     val eori: EORI = EORI("GB333186811543")
     val id: String = "abcd12345"
 
+    val address: AddressInformation = AddressInformation(
+      streetAndNumber = "street&Number",
+      city = "london",
+      postalCode = Option("Post"),
+      countryCode = "GB")
+
+    val corp: CompanyInformation = CompanyInformation(
+      name = "Company Name", consent = "Yes", address = address)
+
     val searchID: UUID = UUID.randomUUID()
     val params: Params = Params("01", "2022", "01", "2023", "DutyDefermentStatement", "abcd12345")
 
@@ -92,8 +105,9 @@ class SecureMessageConnectorSpec extends SpecBase {
       SearchResultStatus.no, "", eori.value, params, searchRequests)
 
     val TestContents = {
-      List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), "Message content - 4254101384174917141"),
-        secureMessage.Content("cy", AccountType("DutyDefermentStatement"), "Cynnwys - 4254101384174917141"))
+      List(secureMessage.Content("en", AccountType("DutyDefermentStatement"),
+        "Message content - 4254101384174917141"), secureMessage.Content(
+        "cy", AccountType("DutyDefermentStatement"), "Cynnwys - 4254101384174917141"))
     }
 
     val compareRequest = secureMessage.Request(
@@ -106,8 +120,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       content = TestContents,
       messageType = "newMessageAlert",
       validFrom = LocalDate.now().toString,
-      alertQueue = "DEFAULT"
-    )
+      alertQueue = "DEFAULT")
 
     val jsValue: String =
       s"""{"externalRef": {
@@ -144,9 +157,11 @@ class SecureMessageConnectorSpec extends SpecBase {
          |}""".stripMargin
 
     val response: secureMessage.Response = secureMessage.Response("GB333186811543")
+    val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClient].toInstance(mockHttpClient),
+      inject.bind[DataStoreConnector].toInstance(mockDataStoreService)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

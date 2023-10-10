@@ -29,27 +29,27 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class SecureMessageConnector @Inject()(
-                                        httpClient: HttpClient,
-                                        appConfig: AppConfig,
-                                        jsonSchemaValidator: JSONSchemaValidator,
-                                        mdgHeaders: MdgHeaders,
-                                        dataStore: DataStoreConnector
+class SecureMessageConnector @Inject()(httpClient: HttpClient,
+                                       appConfig: AppConfig,
+                                       jsonSchemaValidator: JSONSchemaValidator,
+                                       mdgHeaders: MdgHeaders,
+                                       dataStore: DataStoreConnector
                                       )(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
-
     val log: LoggerLike = Logger(this.getClass)
     implicit val hc: HeaderCarrier = HeaderCarrier()
-
-    for {
-      companyName <- dataStore.getCompanyName(EORI(histDoc.currentEori))
-      emailAddress <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
+    val companyNameResult: Future[Option[String]] = dataStore.getCompanyName(EORI(histDoc.currentEori)).recoverWith {
+      case exc: Exception =>
+        log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
+        Future(Some(""))
+    }
+    val result = for {
+      companyName: Option[String] <- companyNameResult
+      emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
     } yield {
-
       val request: Request = Request(histDoc,
         emailAddress.getOrElse(EmailAddress("")), companyName.getOrElse(""))
-
       jsonSchemaValidator.validatePayload(requestBody(request),
         jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
         case Success(_) =>
@@ -71,7 +71,11 @@ class SecureMessageConnector @Inject()(
           log.error(s"Json Schema Failed Validation for sendSecureMessage")
           Future(Left(exception.getMessage))
       }
+    }.recoverWith {
+      case exception: Exception =>
+        Future(Left(exception.getMessage))
     }
+    result.flatten
   }
 
   private def requestBody(request: Request): JsValue = Json.toJson(request)

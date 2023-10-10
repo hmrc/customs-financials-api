@@ -121,6 +121,24 @@ class SecureMessageBodySpec extends SpecBase {
     }
   }
 
+  "messageType" should {
+    "match for DutyDefermentTemplate" in new Setup {
+      TestDutyDefermentTemplate mustBe DutyDefermentTemplate
+    }
+
+    "match for C79CertificateTemplate" in new Setup {
+      TestC79CertificateTemplate mustBe C79CertificateTemplate
+    }
+
+    "match for SecurityTemplate" in new Setup {
+      TestSecurityTemplate mustBe SecurityTemplate
+    }
+
+    "match for TestPostponedVATBody" in new Setup {
+      TestPostponedVATTemplate mustBe PostponedVATemplate
+    }
+  }
+
   trait Setup {
 
     val TestBody = Body("eori")
@@ -129,6 +147,11 @@ class SecureMessageBodySpec extends SpecBase {
     val TestRecip = Recipient("regime", TestTax, "Company Name", "test@test.com")
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", AccountType("accountType"), "body")
+
+    val TestDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+    val TestC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+    val TestSecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+    val TestPostponedVATTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 
     val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +

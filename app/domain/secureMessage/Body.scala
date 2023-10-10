@@ -94,6 +94,11 @@ object SecureMessage {
     s"Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
     s"${CheckIfYourDeclartions} pvaenquiries@hmrc.gov.uk to" +
     s"${RequestChief}${SignOff}"
+
+  val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+  val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+  val SecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+  val PostponedVATemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 }
 
 object SecureMessageResponse
