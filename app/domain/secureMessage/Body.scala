@@ -56,7 +56,7 @@ object SecureMessage {
 
   val SignOff = "From the Customs Declaration Service"
   val WereNotFound = " were not found.<br/><br/>"
-  val CheckIfYourDeclartions = " Check if your declarations were made using CHIEF and contact"
+  val CheckIfYourDeclarations = " Check if your declarations were made using CHIEF and contact"
   val ImportVATCerts = "Import VAT certificates for declarations"
   val RequestChief = " request CHIEF statements.<br/><br/>"
 
@@ -79,7 +79,7 @@ object SecureMessage {
   def C79CertificateBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
     s"The import VAT certificates ${YouRequestedFor} January 2022 to April 2022" +
     s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
-    s"${CheckIfYourDeclartions} cbc-c79requests@hmrc.gov.uk to" +
+    s"${CheckIfYourDeclarations} cbc-c79requests@hmrc.gov.uk to" +
     s"${RequestChief}${SignOff}"
 
   def SecurityBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
@@ -92,7 +92,7 @@ object SecureMessage {
     s"The postponed import VAT statements ${YouRequestedFor} February 2022 to March 2022" +
     s"${WereNotFound}${TwoReasons}" +
     s"Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
-    s"${CheckIfYourDeclartions} pvaenquiries@hmrc.gov.uk to" +
+    s"${CheckIfYourDeclarations} pvaenquiries@hmrc.gov.uk to" +
     s"${RequestChief}${SignOff}"
 
   val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"

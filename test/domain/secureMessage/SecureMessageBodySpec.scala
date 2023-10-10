@@ -102,7 +102,7 @@ class SecureMessageBodySpec extends SpecBase {
 
     "short text - Check if your" in new Setup {
       val result = " Check if your declarations were made using CHIEF and contact"
-      result mustBe CheckIfYourDeclartions
+      result mustBe CheckIfYourDeclarations
     }
 
     "short text - Import VAT Certs" in new Setup {

@@ -37,19 +37,24 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
                                       )(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
+
     val log: LoggerLike = Logger(this.getClass)
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val companyNameResult: Future[Option[String]] = dataStore.getCompanyName(EORI(histDoc.currentEori)).recoverWith {
+
+    val companyNameResult: Future[Option[String]] = dataStore.getCompanyName(
+      EORI(histDoc.currentEori)).recoverWith {
       case exc: Exception =>
         log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
         Future(Some(""))
     }
+
     val result = for {
       companyName: Option[String] <- companyNameResult
       emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
     } yield {
       val request: Request = Request(histDoc,
         emailAddress.getOrElse(EmailAddress("")), companyName.getOrElse(""))
+
       jsonSchemaValidator.validatePayload(requestBody(request),
         jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
         case Success(_) =>

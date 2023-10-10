@@ -17,7 +17,9 @@
 package models
 
 import models.CompanyInformation
+import models.CompanyInformation.format
 import utils.SpecBase
+import play.api.libs.json.{Json, JsSuccess}
 
 class CompanyInformationSpec extends SpecBase {
   "CompanyInformation" should {
@@ -33,6 +35,14 @@ class CompanyInformationSpec extends SpecBase {
         name = "Company Name", consent = "Yes", address = address)
 
       result mustBe expectedResult
+    }
+
+    "generate correct output using the Reads" in new Setup {
+      Json.fromJson(Json.parse(companyInfoJsValue)) mustBe JsSuccess(companyInfoObject)
+    }
+
+    "generate correct output using the Writes" in new Setup {
+      Json.toJson(companyInfoObject) mustBe Json.parse(companyInfoJsValue)
     }
   }
 
@@ -50,6 +60,13 @@ class CompanyInformationSpec extends SpecBase {
 
     val name: String = "Company Name"
     val consent: String = "Yes"
+
+    val companyInfoJsValue: String = """{"name": "name",
+        |"consent": "consent","address": {"streetAndNumber": "street&Number",
+        |"city": "london", "postalCode": "Post", "countryCode": "GB"}}""".stripMargin
+
+    val companyInfoObject: CompanyInformation = CompanyInformation(name = "name",
+      consent = "consent", address = testAddress)
 
     val expectedResult: CompanyInformation = CompanyInformation(
       name = name, consent = consent, address = testAddress)

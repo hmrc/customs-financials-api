@@ -58,9 +58,14 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
+
+      //TODO Update this to work and uncomment
+      /*when[Future[domain.secureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.successful(response))*/
+
         when(mockDataStoreService.getCompanyName(any)(any))
           .thenReturn(Future.successful(Option("test")))
-        
+
         when(mockDataStoreService.getVerifiedEmail(any)(any))
           .thenReturn(Future.successful(Option(EmailAddress("email"))))
 
