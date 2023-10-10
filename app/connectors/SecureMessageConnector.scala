@@ -28,6 +28,7 @@ import connectors.DataStoreConnector
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import utils.Utils.emptyString
 
 class SecureMessageConnector @Inject()(httpClient: HttpClient,
                                        appConfig: AppConfig,
@@ -45,15 +46,17 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
       EORI(histDoc.currentEori)).recoverWith {
       case exc: Exception =>
         log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
-        Future(Some(""))
+        Future(Some(emptyString))
     }
 
     val result = for {
       companyName: Option[String] <- companyNameResult
       emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
     } yield {
+
       val request: Request = Request(histDoc,
-        emailAddress.getOrElse(EmailAddress("")), companyName.getOrElse(""))
+        emailAddress.getOrElse(EmailAddress(emptyString)),
+        companyName.getOrElse(emptyString))
 
       jsonSchemaValidator.validatePayload(requestBody(request),
         jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
