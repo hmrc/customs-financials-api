@@ -60,8 +60,8 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
       expectedRequest.content.head.subject mustBe dutyStatement
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(
-        DutyDefermentBody("Company Name", dateRange.copy(message = "February 2021 to April 2021")))
+      expectedRequest.content.head.body mustBe
+        encodeToUTF8Charsets(DutyDefermentBody("Company Name", dateRange))
     }
 
     "return C79Certificate for English language" in new Setup {
@@ -71,8 +71,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe c79cert
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(C79CertificateBody(
-          "Company Name", dateRange.copy(message = "February 2021 to April 2021")))
+        encodeToUTF8Charsets(C79CertificateBody("Company Name", dateRange))
     }
 
     "return SecurityStatement for English language" in new Setup {
@@ -82,8 +81,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe securityStatement
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(SecurityBody(
-          "Company Name", dateRange.copy(message = "February 2021 to April 2021")))
+        encodeToUTF8Charsets(SecurityBody("Company Name", dateRange))
     }
 
     "return PostponedVATStatement for English language" in new Setup {
@@ -93,8 +91,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe postPonedVATStatement
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(PostponedVATBody(
-          "Company Name", dateRange.copy(message = "February 2021 to April 2021")))
+        encodeToUTF8Charsets(PostponedVATBody("Company Name", dateRange))
     }
 
     "return DutyDefermentStatement for Welsh language" in new Setup {
@@ -104,8 +101,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe dutyStatement
       expectedRequest.content.head.body mustBe encodeToUTF8Charsets(
-        DutyDefermentBody("Company Name",
-          dateRangeForWelsh.copy(message = "February 2021 to April 2021")))
+        DutyDefermentBody("Company Name", dateRangeForWelsh))
     }
 
     "return C79Certificate for Welsh language" in new Setup {
@@ -116,7 +112,7 @@ class RequestSpec extends SpecBase {
       expectedRequest.content.head.subject mustBe c79cert
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(C79CertificateBody(
-          "Company Name", dateRangeForWelsh.copy(message = "February 2021 to April 2021")))
+          "Company Name", dateRangeForWelsh))
     }
 
     "return SecurityStatement for Welsh language" in new Setup {
@@ -127,7 +123,7 @@ class RequestSpec extends SpecBase {
       expectedRequest.content.head.subject mustBe securityStatement
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(SecurityBody(
-          "Company Name", dateRangeForWelsh.copy(message = "February 2021 to April 2021")))
+          "Company Name", dateRangeForWelsh))
     }
 
     "return PostponedVATStatement for Welsh language" in new Setup {
@@ -138,7 +134,7 @@ class RequestSpec extends SpecBase {
       expectedRequest.content.head.subject mustBe postPonedVATStatement
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(PostponedVATBody(
-          "Company Name", dateRangeForWelsh.copy(message = "February 2021 to April 2021")))
+          "Company Name", dateRangeForWelsh))
     }
 
     "return eng and cy in list" in new Setup {
@@ -202,8 +198,9 @@ trait Setup {
   val searchStatusUpdateDate: String = emptyString
   val currentEori: String = "GB123456789012"
   val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
-  val dateRange: DateRange = DateRange(emptyString, englishLangKey)
-  val dateRangeForWelsh: DateRange = DateRange(emptyString, welshLangKey)
+  val dataRangeParam: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+  val dateRange: DateRange = DateRange(dataRangeParam, englishLangKey)
+  val dateRangeForWelsh: DateRange = DateRange(dataRangeParam, welshLangKey)
 
   val searchRequests: Set[SearchRequest] = Set(
     SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",

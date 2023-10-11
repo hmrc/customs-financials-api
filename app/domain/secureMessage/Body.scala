@@ -53,7 +53,7 @@ object Content {
   implicit val contentFormat: OFormat[Content] = Json.format[Content]
 }
 
-case class DateRange(message: String, lang: String)
+case class DateRange(message: String)
 
 //TODO: Welsh translation for to need to be updated once available
 object DateRange {
@@ -67,7 +67,7 @@ object DateRange {
     val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${
       if(lang == welshLangKey) "to" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
 
-    DateRange(dateRangeMsg, englishLangKey)
+    DateRange(dateRangeMsg)
   }
 
   implicit val dateRangeFormat: OFormat[DateRange] = Json.format[DateRange]

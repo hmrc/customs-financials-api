@@ -58,8 +58,6 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
         emailAddress.getOrElse(EmailAddress(emptyString)),
         companyName.getOrElse(emptyString))
 
-      println(s"========== The body is ======== ${request.content.head.body}")
-
       jsonSchemaValidator.validatePayload(requestBody(request),
         jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
         case Success(_) =>
