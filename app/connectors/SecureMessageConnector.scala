@@ -18,17 +18,17 @@ package connectors
 
 import config.AppConfig
 import domain.secureMessage.{Request, Response}
-import models.{HistoricDocumentRequestSearch, EORI, EmailAddress}
+import models.{EORI, EmailAddress, HistoricDocumentRequestSearch}
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.JSONSchemaValidator
-import connectors.DataStoreConnector
+import utils.Utils.emptyString
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import utils.Utils.emptyString
 
 class SecureMessageConnector @Inject()(httpClient: HttpClient,
                                        appConfig: AppConfig,
@@ -57,6 +57,8 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
       val request: Request = Request(histDoc,
         emailAddress.getOrElse(EmailAddress(emptyString)),
         companyName.getOrElse(emptyString))
+
+      println(s"========== The body is ======== ${request.content.head.body}")
 
       jsonSchemaValidator.validatePayload(requestBody(request),
         jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {

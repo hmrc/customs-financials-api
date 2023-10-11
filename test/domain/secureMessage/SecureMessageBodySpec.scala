@@ -17,6 +17,7 @@
 package domain.secureMessage
 
 import domain.secureMessage.SecureMessage._
+import utils.Utils.englishLangKey
 import utils.{SpecBase, Utils}
 
 class SecureMessageBodySpec extends SpecBase {
@@ -56,19 +57,23 @@ class SecureMessageBodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      DutyDefermentBody("Apples & Pears Ltd") mustBe TestDutyDefermentBody
+      val dateRange: DateRange = DateRange(message = "September 2022 to October 2022", lang = englishLangKey)
+      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      C79CertificateBody("Apples & Pears Ltd") mustBe TestC79CertificateBody
+      val dateRange: DateRange = DateRange(message = "January 2022 to April 2022", lang = englishLangKey)
+      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      SecurityBody("Apples & Pears Ltd") mustBe TestSecurityBody
+      val dateRange: DateRange = DateRange(message = "March 2021 to May 2021", lang = englishLangKey)
+      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      PostponedVATBody("Apples & Pears Ltd") mustBe TestPostponedVATBody
+      val dateRange: DateRange = DateRange(message = "February 2022 to March 2022", lang = englishLangKey)
+      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody
     }
 
     "should encode correctly" in new Setup {

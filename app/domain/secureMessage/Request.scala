@@ -16,12 +16,13 @@
 
 package domain.secureMessage
 
-import models.{AccountType, HistoricDocumentRequestSearch, EmailAddress}
-import play.api.libs.json.{Json, OFormat}
-import java.time.LocalDate
 import domain.secureMessage.SecureMessage._
+import models.{EmailAddress, HistoricDocumentRequestSearch, Params}
+import play.api.libs.json.{Json, OFormat}
 import play.api.{Logger, LoggerLike}
-import utils.Utils.encodeToUTF8Charsets
+import utils.Utils.{encodeToUTF8Charsets, englishLangKey, welshLangKey}
+
+import java.time.LocalDate
 
 case class Request(externalRef: ExternalReference,
                     recipient: Recipient,
@@ -44,7 +45,7 @@ object Request {
         fullName = company,
         email = email.value),
       tags = Tags("CDS Financials"),
-      content = contents(histDoc.params.accountType, company),
+      content = contents(histDoc.params, company),
       messageType = MessageTemplate(histDoc.params.accountType),
       validFrom = LocalDate.now().toString,
       alertQueue = "DEFAULT")
@@ -60,24 +61,41 @@ object Request {
     }
   }
 
-  private def contents(accountType: String, company: String): List[Content] = {
-    accountType match {
-      case "DutyDefermentStatement" => {
-        List(Content("en", SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(company))),
-          Content("cy", SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(company))))
-      }
-      case "C79Certificate" => {
-        List(Content("en", SubjectCert, encodeToUTF8Charsets(C79CertificateBody(company))),
-          Content("cy", SubjectCert, encodeToUTF8Charsets(C79CertificateBody(company))))
-      }
-      case "SecurityStatement" => {
-        List(Content("en", SubjectSecurity, encodeToUTF8Charsets(SecurityBody(company))),
-          Content("cy", SubjectSecurity, encodeToUTF8Charsets(SecurityBody(company))))
-      }
-      case "PostponedVATStatement" => {
-        List(Content("en", SubjectImport, encodeToUTF8Charsets(PostponedVATBody(company))),
-          Content("cy", SubjectImport, encodeToUTF8Charsets(PostponedVATBody(company))))
-      }
+  private def contents(params: Params, company: String): List[Content] = {
+    params.accountType match {
+      case "DutyDefermentStatement" =>
+        List(
+          Content(englishLangKey, SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(
+            company, DateRange(params, englishLangKey))
+          )),
+          Content(welshLangKey, SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(
+            company, DateRange(params, welshLangKey))))
+        )
+
+      case "C79Certificate" =>
+        List(
+          Content(englishLangKey, SubjectCert, encodeToUTF8Charsets(C79CertificateBody(
+            company, DateRange(params, englishLangKey)))
+          ),
+          Content(welshLangKey, SubjectCert, encodeToUTF8Charsets(C79CertificateBody(
+            company, DateRange(params, welshLangKey))))
+        )
+
+      case "SecurityStatement" =>
+        List(
+          Content(englishLangKey, SubjectSecurity, encodeToUTF8Charsets(SecurityBody(
+            company, DateRange(params, englishLangKey)))),
+          Content(welshLangKey, SubjectSecurity, encodeToUTF8Charsets(SecurityBody(
+            company, DateRange(params, welshLangKey))))
+        )
+
+      case "PostponedVATStatement" =>
+        List(
+          Content(englishLangKey, SubjectImport, encodeToUTF8Charsets(PostponedVATBody(
+            company, DateRange(params, englishLangKey)))),
+          Content(welshLangKey, SubjectImport, encodeToUTF8Charsets(PostponedVATBody(
+            company, DateRange(params, welshLangKey))))
+        )
     }
   }
 

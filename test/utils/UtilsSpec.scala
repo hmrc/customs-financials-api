@@ -97,5 +97,94 @@ class UtilsSpec extends SpecBase {
         threeColons mustBe ":::"
       }
     }
+
+    "englishLangKey" should {
+      "return correct value" in {
+        englishLangKey mustBe "en"
+      }
+    }
+
+    "welshLangKey" should {
+      "return correct value" in {
+        welshLangKey mustBe "cy"
+      }
+    }
+
+    "convertMonthIntegerToFullMonthName" should {
+      "return correct output for English" in {
+        convertMonthIntegerToFullMonthName("01") mustBe "January"
+        convertMonthIntegerToFullMonthName("02") mustBe "February"
+        convertMonthIntegerToFullMonthName("03") mustBe "March"
+        convertMonthIntegerToFullMonthName("04") mustBe "April"
+        convertMonthIntegerToFullMonthName("05") mustBe "May"
+        convertMonthIntegerToFullMonthName("06") mustBe "June"
+        convertMonthIntegerToFullMonthName("07") mustBe "July"
+        convertMonthIntegerToFullMonthName("08") mustBe "August"
+        convertMonthIntegerToFullMonthName("09") mustBe "September"
+        convertMonthIntegerToFullMonthName("10") mustBe "October"
+        convertMonthIntegerToFullMonthName("11") mustBe "November"
+        convertMonthIntegerToFullMonthName("12") mustBe "December"
+      }
+
+      "return correct output for Welsh" in {
+        convertMonthIntegerToFullMonthName("01", welshLangKey) mustBe "January"
+        convertMonthIntegerToFullMonthName("02", welshLangKey) mustBe "February"
+        convertMonthIntegerToFullMonthName("03", welshLangKey) mustBe "March"
+        convertMonthIntegerToFullMonthName("04", welshLangKey) mustBe "April"
+        convertMonthIntegerToFullMonthName("05", welshLangKey) mustBe "May"
+        convertMonthIntegerToFullMonthName("06", welshLangKey) mustBe "June"
+        convertMonthIntegerToFullMonthName("07", welshLangKey) mustBe "July"
+        convertMonthIntegerToFullMonthName("08", welshLangKey) mustBe "August"
+        convertMonthIntegerToFullMonthName("09", welshLangKey) mustBe "September"
+        convertMonthIntegerToFullMonthName("10", welshLangKey) mustBe "October"
+        convertMonthIntegerToFullMonthName("11", welshLangKey) mustBe "November"
+        convertMonthIntegerToFullMonthName("12", welshLangKey) mustBe "December"
+      }
+
+      "return return no value for invalid input" in {
+        convertMonthIntegerToFullMonthName("13") mustBe emptyString
+        convertMonthIntegerToFullMonthName("00") mustBe emptyString
+      }
+    }
+
+    "monthValueToNameMap" should {
+      "create the correct map for English" in {
+        monthValueToNameMap(englishLangKey) mustBe Map(
+          "01" -> "January",
+          "02" -> "February",
+          "03" -> "March",
+          "04" -> "April",
+          "05" -> "May",
+          "06" -> "June",
+          "07" -> "July",
+          "08" -> "August",
+          "09" -> "September",
+          "10" -> "October",
+          "11" -> "November",
+          "12" -> "December")
+      }
+
+      "create the correct map for Welsh" in {
+        monthValueToNameMap(welshLangKey) mustBe Map(
+          "01" -> "January",
+          "02" -> "February",
+          "03" -> "March",
+          "04" -> "April",
+          "05" -> "May",
+          "06" -> "June",
+          "07" -> "July",
+          "08" -> "August",
+          "09" -> "September",
+          "10" -> "October",
+          "11" -> "November",
+          "12" -> "December")
+      }
+
+      "singleSpace" should {
+        "return correct value" in {
+          singleSpace mustBe " "
+        }
+      }
+    }
   }
 }
