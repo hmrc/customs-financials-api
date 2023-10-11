@@ -16,7 +16,6 @@
 
 package models
 
-import models.AddressInformation
 import models.AddressInformation.format
 import utils.SpecBase
 import play.api.libs.json.{Json, JsSuccess}
@@ -57,4 +56,3 @@ class AddressInformationSpec extends SpecBase {
       city = "city", postalCode = Option("post"), countryCode = "GB")
   }
 }
-
