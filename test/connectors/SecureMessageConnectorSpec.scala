@@ -110,9 +110,9 @@ class SecureMessageConnectorSpec extends SpecBase {
       SearchResultStatus.no, "", eori.value, params, searchRequests)
 
     val TestContents = {
-      List(secureMessage.Content("en", AccountType("DutyDefermentStatement"),
+      List(secureMessage.Content("en", "DutyDefermentStatement",
         "Message content - 4254101384174917141"), secureMessage.Content(
-        "cy", AccountType("DutyDefermentStatement"), "Cynnwys - 4254101384174917141"))
+        "cy", "DutyDefermentStatement", "Cynnwys - 4254101384174917141"))
     }
 
     val compareRequest = secureMessage.Request(

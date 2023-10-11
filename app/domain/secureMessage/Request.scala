@@ -23,15 +23,13 @@ import domain.secureMessage.SecureMessage._
 import play.api.{Logger, LoggerLike}
 import utils.Utils.encodeToUTF8Charsets
 
-case class Request(
-                    externalRef: ExternalReference,
+case class Request(externalRef: ExternalReference,
                     recipient: Recipient,
                     tags: Tags,
                     content: List[Content],
                     messageType: String,
                     validFrom: String,
-                    alertQueue: String
-                  )
+                    alertQueue: String)
 
 object Request {
 
@@ -65,20 +63,20 @@ object Request {
   private def contents(accountType: String, company: String): List[Content] = {
     accountType match {
       case "DutyDefermentStatement" => {
-        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))),
-          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))))
+        List(Content("en", SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(company))),
+          Content("cy", SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(company))))
       }
       case "C79Certificate" => {
-        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))),
-          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))))
+        List(Content("en", SubjectCert, encodeToUTF8Charsets(C79CertificateBody(company))),
+          Content("cy", SubjectCert, encodeToUTF8Charsets(C79CertificateBody(company))))
       }
       case "SecurityStatement" => {
-        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))),
-          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))))
+        List(Content("en", SubjectSecurity, encodeToUTF8Charsets(SecurityBody(company))),
+          Content("cy", SubjectSecurity, encodeToUTF8Charsets(SecurityBody(company))))
       }
       case "PostponedVATStatement" => {
-        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))),
-          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))))
+        List(Content("en", SubjectImport, encodeToUTF8Charsets(PostponedVATBody(company))),
+          Content("cy", SubjectImport, encodeToUTF8Charsets(PostponedVATBody(company))))
       }
     }
   }

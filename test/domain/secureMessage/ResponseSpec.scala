@@ -16,7 +16,6 @@
 
 package domain.secureMessage
 
-import models.AccountType
 import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
@@ -94,6 +93,6 @@ class ResponseSpec extends SpecBase {
     val tagsObject: Tags = Tags(notificationType = "cds fin")
 
     val contentJsValue: String = """{"lang":"en", "subject":"AccountType", "body": "body"}""".stripMargin
-    val contentObject: Content = Content(lang = "en", subject = AccountType("AccountType"), body = "body")
+    val contentObject: Content = Content(lang = "en", subject = "AccountType", body = "body")
   }
 }

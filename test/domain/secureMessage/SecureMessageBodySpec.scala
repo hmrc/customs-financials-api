@@ -17,7 +17,6 @@
 package domain.secureMessage
 
 import domain.secureMessage.SecureMessage._
-import models.AccountType
 import utils.{SpecBase, Utils}
 
 class SecureMessageBodySpec extends SpecBase {
@@ -50,7 +49,7 @@ class SecureMessageBodySpec extends SpecBase {
     }
 
     "Content" in new Setup {
-      val content = Content("en", AccountType("accountType"), "body")
+      val content = Content("en", "accountType", "body")
       content mustBe TestContent
     }
   }
@@ -83,9 +82,9 @@ class SecureMessageBodySpec extends SpecBase {
     }
 
     "short text - There are 2 possible" in new Setup {
-      val result = "There are 2 possible reasons for this:<br/><br/>" +
-        "Statements are only created for the periods in which you imported goods." +
-        " Check that you imported goods during the dates you requested.<br/><br/>"
+      val result = "There are 2 possible reasons for this:<br/>" +
+        "<ol><li>Statements are only created for the periods in which you imported goods." +
+        " Check that you imported goods during the dates you requested.</li><br/>"
       result mustBe TwoReasons
     }
 
@@ -106,12 +105,12 @@ class SecureMessageBodySpec extends SpecBase {
     }
 
     "short text - Import VAT Certs" in new Setup {
-      val result = "Import VAT certificates for declarations"
+      val result = "<li>Import VAT certificates for declarations"
       result mustBe ImportVATCerts
     }
 
     "short text - Request Chief" in new Setup {
-      val result = " request CHIEF statements.<br/><br/>"
+      val result = " request CHIEF statements.<br/>"
       result mustBe RequestChief
     }
 
@@ -139,6 +138,24 @@ class SecureMessageBodySpec extends SpecBase {
     }
   }
 
+  "Subject" should {
+    "match for TestSubjectDutyDef" in new Setup {
+      TestSubjectDutyDef mustBe SubjectDutyDef
+    }
+
+    "match for TestSubjectCert" in new Setup {
+      TestSubjectCert mustBe SubjectCert
+    }
+
+    "match for TestSubjectSecurity" in new Setup {
+      TestSubjectSecurity mustBe SubjectSecurity
+    }
+
+    "match for TestSubjectImport" in new Setup {
+      TestSubjectImport mustBe SubjectImport
+    }
+  }
+
   trait Setup {
 
     val TestBody = Body("eori")
@@ -146,54 +163,67 @@ class SecureMessageBodySpec extends SpecBase {
     val TestTax = TaxIdentifier("name", "value")
     val TestRecip = Recipient("regime", TestTax, "Company Name", "test@test.com")
     val TestTags = Tags("NotificationType")
-    val TestContent = Content("en", AccountType("accountType"), "body")
+    val TestContent = Content("en", "accountType", "body")
 
     val TestDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
     val TestC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
     val TestSecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
     val TestPostponedVATTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 
+    val TestSubjectDutyDef = "Requested duty deferment statements"
+    val TestSubjectCert = "Requested import VAT certificates (C79)"
+    val TestSubjectSecurity: String = "Requested notification of adjustment statements"
+    val TestSubjectImport = "Requested postponed import VAT statements"
+
     val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in" +
-      " which you imported goods. Check that you imported goods during the dates you requested.<br/><br/>Import VAT " +
-      "certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be" +
-      " requested using the Customs Declaration Service. You can get duty deferment statements for declarations" +
-      " made using CHIEF from Duty Deferment Electronic Statements (DDES).<br/><br/>From the Customs Declaration Service"
+      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>" +
+      "Statements are only created for the periods in which you imported goods." +
+      " Check that you imported goods during the dates you requested.</li><br/>" +
+      "<li>Import VAT certificates for declarations made using Customs Handling " +
+      "of Import and Export Freight (CHIEF) cannot be requested using the Customs " +
+      "Declaration Service. You can get duty deferment statements for declarations" +
+      " made using CHIEF from Duty Deferment Electronic Statements (DDES).<br/>" +
+      "</li></ol>From the Customs Declaration Service"
 
     val TestC79CertificateBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The import VAT certificates you requested for January 2022 to April 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in" +
-      " which you imported goods. Check that you imported goods during the dates you requested.<br/><br/>Import VAT " +
-      "certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) cannot be " +
-      "requested using the Customs Declaration Service. Check if your declarations were made using CHIEF and " +
-      "contact cbc-c79requests@hmrc.gov.uk to request CHIEF statements.<br/><br/>From the Customs Declaration Service"
+      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created " +
+      "for the periods in which you imported goods. Check that you imported goods during" +
+      " the dates you requested.</li><br/><li>Import VAT certificates for declarations made" +
+      " using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using" +
+      " the Customs Declaration Service. Check if your declarations were made using CHIEF and" +
+      " contact cbc-c79requests@hmrc.gov.uk to request CHIEF statements.<br/></li></ol>" +
+      "From the Customs Declaration Service"
 
     val TestSecurityBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The notification of adjustment statements you requested for March 2021 to May 2021 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in" +
-      " which you imported goods. Check that you imported goods during the dates you requested.<br/><br/>Notification " +
-      "of adjustment statements for declarations made using Customs Handling of Import and Export Freight (CHIEF)" +
-      " cannot be requested using the Customs Declaration Service. (Insert guidance on how to get CHIEF NOA " +
-      "statements).<br/><br/>From the Customs Declaration Service"
+      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
+      "periods in which you imported goods. Check that you imported goods during the dates you requested." +
+      "</li><br/><li>Notification of adjustment statements for declarations made using Customs Handling " +
+      "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
+      " (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>From the Customs Declaration Service"
 
     val TestPostponedVATBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in" +
-      " which you imported goods. Check that you imported goods during the dates you requested.<br/><br/>Postponed " +
-      "import VAT statements for declarations made using Customs Handling of Import and Export Freight (CHIEF) " +
-      "cannot be requested using the Customs Declaration Service. Check if your declarations were made using " +
-      "CHIEF and contact pvaenquiries@hmrc.gov.uk to request CHIEF statements.<br/><br/>From the Customs Declaration Service"
+      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
+      "periods in which you imported goods. Check that you imported goods during the dates you requested." +
+      "</li><br/><li>Postponed import VAT statements for declarations made using Customs Handling of " +
+      "Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. " +
+      "Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to " +
+      "request CHIEF statements.<br/></li></ol>From the Customs Declaration Service"
 
-    val encodedDutyDeferementBody: String = "RGVhciBBcHBsZXMgJiBQZWFycyBMdGQ8YnIvPjxici8+VGhlIGR1dHkgZGVmZXJtZW50IHN0" +
-      "YXRlbWVudHMgeW91IHJlcXVlc3RlZCBmb3IgU2VwdGVtYmVyIDIwMjIgdG8gT2N0b2JlciAyMDIyIHdlcmUgbm90IGZvdW5kLjxici8+PGJyLz" +
-      "5UaGVyZSBhcmUgMiBwb3NzaWJsZSByZWFzb25zIGZvciB0aGlzOjxici8+PGJyLz5TdGF0ZW1lbnRzIGFyZSBvbmx5IGNyZWF0ZWQgZm9yIHRo" +
-      "ZSBwZXJpb2RzIGluIHdoaWNoIHlvdSBpbXBvcnRlZCBnb29kcy4gQ2hlY2sgdGhhdCB5b3UgaW1wb3J0ZWQgZ29vZHMgZHVyaW5nIHRoZSBkYX" +
-      "RlcyB5b3UgcmVxdWVzdGVkLjxici8+PGJyLz5JbXBvcnQgVkFUIGNlcnRpZmljYXRlcyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ3Vz" +
-      "dG9tcyBIYW5kbGluZyBvZiBJbXBvcnQgYW5kIEV4cG9ydCBGcmVpZ2h0IChDSElFRikgY2Fubm90IGJlIHJlcXVlc3RlZCB1c2luZyB0aGUgQ3" +
-      "VzdG9tcyBEZWNsYXJhdGlvbiBTZXJ2aWNlLiBZb3UgY2FuIGdldCBkdXR5IGRlZmVybWVudCBzdGF0ZW1lbnRzIGZvciBkZWNsYXJhdGlvbnMg" +
-      "bWFkZSB1c2luZyBDSElFRiBmcm9tIER1dHkgRGVmZXJtZW50IEVsZWN0cm9uaWMgU3RhdGVtZW50cyAoRERFUykuPGJyLz48YnIvPkZyb20gdG" +
-      "hlIEN1c3RvbXMgRGVjbGFyYXRpb24gU2VydmljZQ=="
+    val encodedDutyDeferementBody: String = "RGVhciBBcHBsZXMgJiBQZWFycyBMdGQ8YnIvPjxici8+" +
+      "VGhlIGR1dHkgZGVmZXJtZW50IHN0YXRlbWVudHMgeW91IHJlcXVlc3RlZCBmb3IgU2VwdGVtYmVyIDIwMjI" +
+      "gdG8gT2N0b2JlciAyMDIyIHdlcmUgbm90IGZvdW5kLjxici8+PGJyLz5UaGVyZSBhcmUgMiBwb3NzaWJsZS" +
+      "ByZWFzb25zIGZvciB0aGlzOjxici8+PG9sPjxsaT5TdGF0ZW1lbnRzIGFyZSBvbmx5IGNyZWF0ZWQgZm9yI" +
+      "HRoZSBwZXJpb2RzIGluIHdoaWNoIHlvdSBpbXBvcnRlZCBnb29kcy4gQ2hlY2sgdGhhdCB5b3UgaW1wb3J0" +
+      "ZWQgZ29vZHMgZHVyaW5nIHRoZSBkYXRlcyB5b3UgcmVxdWVzdGVkLjwvbGk+PGJyLz48bGk+SW1wb3J0IFZ" +
+      "BVCBjZXJ0aWZpY2F0ZXMgZm9yIGRlY2xhcmF0aW9ucyBtYWRlIHVzaW5nIEN1c3RvbXMgSGFuZGxpbmcgb2" +
+      "YgSW1wb3J0IGFuZCBFeHBvcnQgRnJlaWdodCAoQ0hJRUYpIGNhbm5vdCBiZSByZXF1ZXN0ZWQgdXNpbmcgd" +
+      "GhlIEN1c3RvbXMgRGVjbGFyYXRpb24gU2VydmljZS4gWW91IGNhbiBnZXQgZHV0eSBkZWZlcm1lbnQgc3Rh" +
+      "dGVtZW50cyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ0hJRUYgZnJvbSBEdXR5IERlZmVybWVudCB" +
+      "FbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpLjxici8+PC9saT48L29sPkZyb20gdGhlIEN1c3RvbXMgRG" +
+      "VjbGFyYXRpb24gU2VydmljZQ=="
   }
-
 }

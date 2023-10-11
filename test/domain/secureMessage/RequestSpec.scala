@@ -93,8 +93,8 @@ class RequestSpec extends SpecBase {
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
-        Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")),
-        Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")))
+        Content("en", "DutyDefermentStatement", DutyDefermentBody("Company Name")),
+        Content("cy", "DutyDefermentStatement", DutyDefermentBody("Company Name")))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -164,13 +164,13 @@ trait Setup {
   val PostponedVATTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 
   val TestContents = {
-    List(secureMessage.Content("en", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")),
-      secureMessage.Content("cy", AccountType("DutyDefermentStatement"), DutyDefermentBody("Company Name")))}
+    List(secureMessage.Content("en", "DutyDefermentStatement", DutyDefermentBody("Company Name")),
+      secureMessage.Content("cy", "DutyDefermentStatement", DutyDefermentBody("Company Name")))}
 
-  val dutyStatement = AccountType("DutyDefermentStatement")
-  val c79cert = AccountType("C79Certificate")
-  val sercStatement = AccountType("SecurityStatement")
-  val PostPonedVATStatement = AccountType("PostponedVATStatement")
+  val dutyStatement: String = "Requested duty deferment statements"
+  val c79cert: String = "Requested import VAT certificates (C79)"
+  val sercStatement: String = "Requested notification of adjustment statements"
+  val PostPonedVATStatement: String = "Requested postponed import VAT statements"
 
   val histDocRequestSearch: HistoricDocumentRequestSearch =
     HistoricDocumentRequestSearch(searchID,

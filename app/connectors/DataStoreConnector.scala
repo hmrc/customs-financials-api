@@ -59,16 +59,12 @@ class DataStoreConnector @Inject()(http: HttpClient,
   def getCompanyName(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[String]] =
     metricsReporter.withResponseTimeLogging("customs-data-store.get.company-name") {
       val dataStoreCorpEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/company-information"
-      http.GET[CompanyInformation](dataStoreCorpEndpoint).map(response => {
-        response.consent match {
-          case "1" => Some(response.name)
-          case _ => None
-        }
-      }).recover { case e =>
-        log.error(s"Call to data stored failed for getCompanyName exception=$e")
-        None
-      }
-    }
+      http.GET[CompanyInformation](dataStoreCorpEndpoint).map(response => Some(response.name))
+    }.recover { case e =>
+    log.error(s"Call to data stored failed for getCompanyName exception=$e")
+    None
+  }
+
 }
 
 case class EoriPeriod(eori: EORI,
