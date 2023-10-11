@@ -167,8 +167,8 @@ class SecureMessageBodySpec extends SpecBase {
 
     val TestDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
     val TestC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-    val TestSecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
-    val TestPostponedVATTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+    val TestSecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+    val TestPostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
     val TestSubjectDutyDef = "Requested duty deferment statements"
     val TestSubjectCert = "Requested import VAT certificates (C79)"

@@ -55,7 +55,7 @@ object SecureMessage {
 
   val SubjectDutyDef = "Requested duty deferment statements"
   val SubjectCert = "Requested import VAT certificates (C79)"
-  val SubjectSecurity: String = "Requested notification of adjustment statements"
+  val SubjectSecurity = "Requested notification of adjustment statements"
   val SubjectImport = "Requested postponed import VAT statements"
 
   val SignOff = "From the Customs Declaration Service"
@@ -101,8 +101,8 @@ object SecureMessage {
 
   val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
   val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-  val SecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
-  val PostponedVATemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+  val SecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+  val PostponedVATemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
 }
 
 object SecureMessageResponse
