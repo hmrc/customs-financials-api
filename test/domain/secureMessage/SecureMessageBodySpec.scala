@@ -40,14 +40,8 @@ class SecureMessageBodySpec extends SpecBase {
 
     "Receipient" in new Setup {
       val tax = TaxIdentifier("name", "value")
-      val params = Params("01", "2022", "01", "2023", "Financials")
-      val recip = Recipient("regime", tax, params, "test@test.com")
+      val recip = Recipient("regime", tax, "Company Name", "test@test.com")
       recip mustBe TestRecip
-    }
-
-    "Params" in new Setup {
-      val params = Params("01", "2022", "01", "2023", "Financials")
-      params mustBe TestParams
     }
 
     "Tags" in new Setup {
@@ -63,24 +57,85 @@ class SecureMessageBodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      DutyDefermentBody mustBe TestDutyDefermentBody
+      DutyDefermentBody("Apples & Pears Ltd") mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      C79CertificateBody mustBe TestC79CertificateBody
+      C79CertificateBody("Apples & Pears Ltd") mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      SecurityBody mustBe TestSecurityBody
+      SecurityBody("Apples & Pears Ltd") mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      PostponedVATBody mustBe TestPostponedVATBody
+      PostponedVATBody("Apples & Pears Ltd") mustBe TestPostponedVATBody
     }
 
     "should encode correctly" in new Setup {
       val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBody)
       res mustBe encodedDutyDeferementBody
+    }
+
+    "short text - from the customs" in new Setup {
+      val result = "From the Customs Declaration Service"
+      result mustBe SignOff
+    }
+
+    "short text - There are 2 possible" in new Setup {
+      val result = "There are 2 possible reasons for this:<br/><br/>" +
+        "Statements are only created for the periods in which you imported goods." +
+        " Check that you imported goods during the dates you requested.<br/><br/>"
+      result mustBe TwoReasons
+    }
+
+    "short text - made using Customs" in new Setup {
+      val result = "made using Customs Handling of Import and Export Freight (CHIEF) " +
+        "cannot be requested using the Customs Declaration Service."
+      result mustBe MadeUsingCustoms
+    }
+
+    "short text - were not found" in new Setup {
+      val result = " were not found.<br/><br/>"
+      result mustBe WereNotFound
+    }
+
+    "short text - Check if your" in new Setup {
+      val result = " Check if your declarations were made using CHIEF and contact"
+      result mustBe CheckIfYourDeclarations
+    }
+
+    "short text - Import VAT Certs" in new Setup {
+      val result = "Import VAT certificates for declarations"
+      result mustBe ImportVATCerts
+    }
+
+    "short text - Request Chief" in new Setup {
+      val result = " request CHIEF statements.<br/><br/>"
+      result mustBe RequestChief
+    }
+
+    "short text = you requested for" in new Setup {
+      val result = "you requested for"
+      result mustBe YouRequestedFor
+    }
+  }
+
+  "messageType" should {
+    "match for DutyDefermentTemplate" in new Setup {
+      TestDutyDefermentTemplate mustBe DutyDefermentTemplate
+    }
+
+    "match for C79CertificateTemplate" in new Setup {
+      TestC79CertificateTemplate mustBe C79CertificateTemplate
+    }
+
+    "match for SecurityTemplate" in new Setup {
+      TestSecurityTemplate mustBe SecurityTemplate
+    }
+
+    "match for TestPostponedVATBody" in new Setup {
+      TestPostponedVATTemplate mustBe PostponedVATemplate
     }
   }
 
@@ -89,10 +144,14 @@ class SecureMessageBodySpec extends SpecBase {
     val TestBody = Body("eori")
     val TestRef = ExternalReference("id", "source")
     val TestTax = TaxIdentifier("name", "value")
-    val TestParams = Params("01", "2022", "01", "2023", "Financials")
-    val TestRecip = Recipient("regime", TestTax, TestParams, "test@test.com")
+    val TestRecip = Recipient("regime", TestTax, "Company Name", "test@test.com")
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", AccountType("accountType"), "body")
+
+    val TestDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+    val TestC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+    val TestSecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+    val TestPostponedVATTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 
     val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +

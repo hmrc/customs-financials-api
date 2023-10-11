@@ -16,64 +16,69 @@
 
 package domain.secureMessage
 
-import models.{AccountType, HistoricDocumentRequestSearch}
+import models.{AccountType, HistoricDocumentRequestSearch, EmailAddress}
 import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
-
 import domain.secureMessage.SecureMessage._
 import play.api.{Logger, LoggerLike}
 import utils.Utils.encodeToUTF8Charsets
 
 case class Request(
-  externalRef: ExternalReference,
-  recipient: Recipient,
-  tags: Tags,
-  content: List[Content],
-  messageType: String,
-  validFrom: String,
-  alertQueue: String
-)
+                    externalRef: ExternalReference,
+                    recipient: Recipient,
+                    tags: Tags,
+                    content: List[Content],
+                    messageType: String,
+                    validFrom: String,
+                    alertQueue: String
+                  )
 
 object Request {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def apply(histDoc: HistoricDocumentRequestSearch): Request = {
+  def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request = {
+
     Request(externalRef = ExternalReference(histDoc.searchID.toString, "mdtp"),
       recipient = Recipient(
         regime = "cds",
         taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori),
-        params = Params(
-          histDoc.params.periodStartMonth,
-          histDoc.params.periodStartYear,
-          histDoc.params.periodEndMonth,
-          histDoc.params.periodEndYear,
-          "Financials"),
-        email = "test@test.com"),
+        fullName = company,
+        email = email.value),
       tags = Tags("CDS Financials"),
-      content = contents(histDoc.params.accountType),
-      messageType = "newMessageAlert",
+      content = contents(histDoc.params.accountType, company),
+      messageType = MessageTemplate(histDoc.params.accountType),
       validFrom = LocalDate.now().toString,
       alertQueue = "DEFAULT")
   }
 
-  private def contents(accountType: String): List[Content] = {
+  private def MessageTemplate(id: String): String = {
+    id match {
+      case "DutyDefermentStatement" => DutyDefermentTemplate
+      case "C79Certificate" => C79CertificateTemplate
+      case "SecurityStatement" => SecurityTemplate
+      case "PostponedVATStatement" => PostponedVATemplate
+      case _ => "Unknown Template"
+    }
+  }
+
+  private def contents(accountType: String, company: String): List[Content] = {
     accountType match {
       case "DutyDefermentStatement" => {
-        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)),
-          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody)))
+        List(Content("en", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))),
+          Content("cy", AccountType("DutyDefermentStatement"), encodeToUTF8Charsets(DutyDefermentBody(company))))
       }
       case "C79Certificate" => {
-        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)),
-          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody)))
+        List(Content("en", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))),
+          Content("cy", AccountType("C79Certificate"), encodeToUTF8Charsets(C79CertificateBody(company))))
       }
       case "SecurityStatement" => {
-        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)),
-          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody)))
+        List(Content("en", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))),
+          Content("cy", AccountType("SecurityStatement"), encodeToUTF8Charsets(SecurityBody(company))))
       }
       case "PostponedVATStatement" => {
-        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)),
-          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody)))
+        List(Content("en", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))),
+          Content("cy", AccountType("PostponedVATStatement"), encodeToUTF8Charsets(PostponedVATBody(company))))
       }
     }
   }

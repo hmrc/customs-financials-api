@@ -28,7 +28,7 @@ object ExternalReference {
 }
 
 case class Recipient(regime: String, taxIdentifier: TaxIdentifier,
-  params: Params, email: String)
+                     fullName: String, email: String)
 
 object Recipient {
   implicit val recipientFormat: OFormat[Recipient] = Json.format[Recipient]
@@ -38,13 +38,6 @@ case class TaxIdentifier(name: String, value: String)
 
 object TaxIdentifier {
   implicit val taxFormat: OFormat[TaxIdentifier] = Json.format[TaxIdentifier]
-}
-
-case class Params(startMonth: String, startYear: String,
-  endMonth: String, endYear: String, documentType: String)
-
-object Params {
-  implicit val paramsFormat: OFormat[Params] = Json.format[Params]
 }
 
 case class Tags(notificationType: String)
@@ -60,40 +53,52 @@ object Content {
 }
 
 object SecureMessage {
-  val DutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
-    "The duty deferment statements you requested for September 2022 to October 2022 were not found.<br/><br/>" +
-    "There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in which you imported goods." +
-    " Check that you imported goods during the dates you requested.<br/><br/>" +
-    "Import VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF) " +
-    "cannot be requested using the Customs Declaration Service." +
+
+  val SignOff = "From the Customs Declaration Service"
+  val WereNotFound = " were not found.<br/><br/>"
+  val CheckIfYourDeclarations = " Check if your declarations were made using CHIEF and contact"
+  val ImportVATCerts = "Import VAT certificates for declarations"
+  val RequestChief = " request CHIEF statements.<br/><br/>"
+
+  val TwoReasons = "There are 2 possible reasons for this:<br/><br/>" +
+    "Statements are only created for the periods in which you imported goods." +
+    " Check that you imported goods during the dates you requested.<br/><br/>"
+
+  val MadeUsingCustoms = "made using Customs Handling of Import and Export Freight (CHIEF) " +
+    "cannot be requested using the Customs Declaration Service."
+
+  val YouRequestedFor = "you requested for"
+
+  def DutyDefermentBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
+    s"The duty deferment statements ${YouRequestedFor} September 2022 to October 2022" +
+    s"${WereNotFound}${TwoReasons}" +
+    s"${ImportVATCerts} ${MadeUsingCustoms}" +
     " You can get duty deferment statements for declarations made using CHIEF" +
-    " from Duty Deferment Electronic Statements (DDES).<br/><br/>From the Customs Declaration Service"
+    s" from Duty Deferment Electronic Statements (DDES).<br/><br/>${SignOff}"
 
-  val C79CertificateBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
-    "The import VAT certificates you requested for January 2022 to April 2022 were not found.<br/><br/>" +
-    "There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in which you imported goods." +
-    " Check that you imported goods during the dates you requested.<br/><br/>" +
-    "Import VAT certificates for declarations made using Customs Handling of Import and Export Freight (CHIEF)" +
-    " cannot be requested using the Customs Declaration Service." +
-    " Check if your declarations were made using CHIEF and contact cbc-c79requests@hmrc.gov.uk to" +
-    " request CHIEF statements.<br/><br/>From the Customs Declaration Service"
+  def C79CertificateBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
+    s"The import VAT certificates ${YouRequestedFor} January 2022 to April 2022" +
+    s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
+    s"${CheckIfYourDeclarations} cbc-c79requests@hmrc.gov.uk to" +
+    s"${RequestChief}${SignOff}"
 
-  val SecurityBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
-    "The notification of adjustment statements you requested for March 2021 to May 2021 were not found.<br/><br/>" +
-    "There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in which you imported goods." +
-    " Check that you imported goods during the dates you requested.<br/><br/>" +
-    "Notification of adjustment statements for declarations made using Customs Handling of Import and Export Freight (CHIEF)" +
-    " cannot be requested using the Customs Declaration Service." +
-    " (Insert guidance on how to get CHIEF NOA statements).<br/><br/>From the Customs Declaration Service"
+  def SecurityBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
+    s"The notification of adjustment statements ${YouRequestedFor} March 2021 to May 2021" +
+    s"${WereNotFound}${TwoReasons}" +
+    s"Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
+    s" (Insert guidance on how to get CHIEF NOA statements).<br/><br/>${SignOff}"
 
-  val PostponedVATBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
-    "The postponed import VAT statements you requested for February 2022 to March 2022 were not found.<br/><br/>" +
-    "There are 2 possible reasons for this:<br/><br/>Statements are only created for the periods in which you imported goods." +
-    " Check that you imported goods during the dates you requested.<br/><br/>" +
-    "Postponed import VAT statements for declarations made using Customs Handling of Import and Export Freight (CHIEF)" +
-    " cannot be requested using the Customs Declaration Service." +
-    " Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to" +
-    " request CHIEF statements.<br/><br/>From the Customs Declaration Service"
+  def PostponedVATBody(companyName: String): String = s"Dear ${companyName}<br/><br/>" +
+    s"The postponed import VAT statements ${YouRequestedFor} February 2022 to March 2022" +
+    s"${WereNotFound}${TwoReasons}" +
+    s"Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
+    s"${CheckIfYourDeclarations} pvaenquiries@hmrc.gov.uk to" +
+    s"${RequestChief}${SignOff}"
+
+  val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+  val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+  val SecurityTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+  val PostponedVATemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
 }
 
 object SecureMessageResponse
