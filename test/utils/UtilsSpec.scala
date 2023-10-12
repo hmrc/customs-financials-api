@@ -110,40 +110,40 @@ class UtilsSpec extends SpecBase {
       }
     }
 
-    "convertMonthIntegerToFullMonthName" should {
+    "convertMonthValueToFullMonthName" should {
       "return correct output for English" in {
-        convertMonthIntegerToFullMonthName("01") mustBe "January"
-        convertMonthIntegerToFullMonthName("02") mustBe "February"
-        convertMonthIntegerToFullMonthName("03") mustBe "March"
-        convertMonthIntegerToFullMonthName("04") mustBe "April"
-        convertMonthIntegerToFullMonthName("05") mustBe "May"
-        convertMonthIntegerToFullMonthName("06") mustBe "June"
-        convertMonthIntegerToFullMonthName("07") mustBe "July"
-        convertMonthIntegerToFullMonthName("08") mustBe "August"
-        convertMonthIntegerToFullMonthName("09") mustBe "September"
-        convertMonthIntegerToFullMonthName("10") mustBe "October"
-        convertMonthIntegerToFullMonthName("11") mustBe "November"
-        convertMonthIntegerToFullMonthName("12") mustBe "December"
+        convertMonthValueToFullMonthName("01") mustBe "January"
+        convertMonthValueToFullMonthName("02") mustBe "February"
+        convertMonthValueToFullMonthName("03") mustBe "March"
+        convertMonthValueToFullMonthName("04") mustBe "April"
+        convertMonthValueToFullMonthName("05") mustBe "May"
+        convertMonthValueToFullMonthName("06") mustBe "June"
+        convertMonthValueToFullMonthName("07") mustBe "July"
+        convertMonthValueToFullMonthName("08") mustBe "August"
+        convertMonthValueToFullMonthName("09") mustBe "September"
+        convertMonthValueToFullMonthName("10") mustBe "October"
+        convertMonthValueToFullMonthName("11") mustBe "November"
+        convertMonthValueToFullMonthName("12") mustBe "December"
       }
 
       "return correct output for Welsh" in {
-        convertMonthIntegerToFullMonthName("01", welshLangKey) mustBe "January"
-        convertMonthIntegerToFullMonthName("02", welshLangKey) mustBe "February"
-        convertMonthIntegerToFullMonthName("03", welshLangKey) mustBe "March"
-        convertMonthIntegerToFullMonthName("04", welshLangKey) mustBe "April"
-        convertMonthIntegerToFullMonthName("05", welshLangKey) mustBe "May"
-        convertMonthIntegerToFullMonthName("06", welshLangKey) mustBe "June"
-        convertMonthIntegerToFullMonthName("07", welshLangKey) mustBe "July"
-        convertMonthIntegerToFullMonthName("08", welshLangKey) mustBe "August"
-        convertMonthIntegerToFullMonthName("09", welshLangKey) mustBe "September"
-        convertMonthIntegerToFullMonthName("10", welshLangKey) mustBe "October"
-        convertMonthIntegerToFullMonthName("11", welshLangKey) mustBe "November"
-        convertMonthIntegerToFullMonthName("12", welshLangKey) mustBe "December"
+        convertMonthValueToFullMonthName("01", welshLangKey) mustBe "January"
+        convertMonthValueToFullMonthName("02", welshLangKey) mustBe "February"
+        convertMonthValueToFullMonthName("03", welshLangKey) mustBe "March"
+        convertMonthValueToFullMonthName("04", welshLangKey) mustBe "April"
+        convertMonthValueToFullMonthName("05", welshLangKey) mustBe "May"
+        convertMonthValueToFullMonthName("06", welshLangKey) mustBe "June"
+        convertMonthValueToFullMonthName("07", welshLangKey) mustBe "July"
+        convertMonthValueToFullMonthName("08", welshLangKey) mustBe "August"
+        convertMonthValueToFullMonthName("09", welshLangKey) mustBe "September"
+        convertMonthValueToFullMonthName("10", welshLangKey) mustBe "October"
+        convertMonthValueToFullMonthName("11", welshLangKey) mustBe "November"
+        convertMonthValueToFullMonthName("12", welshLangKey) mustBe "December"
       }
 
       "return return no value for invalid input" in {
-        convertMonthIntegerToFullMonthName("13") mustBe emptyString
-        convertMonthIntegerToFullMonthName("00") mustBe emptyString
+        convertMonthValueToFullMonthName("13") mustBe emptyString
+        convertMonthValueToFullMonthName("00") mustBe emptyString
       }
     }
 

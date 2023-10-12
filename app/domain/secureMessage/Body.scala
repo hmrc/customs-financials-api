@@ -18,7 +18,7 @@ package domain.secureMessage
 
 import models.Params
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils.{convertMonthIntegerToFullMonthName, englishLangKey, singleSpace, welshLangKey}
+import utils.Utils.{convertMonthValueToFullMonthName, englishLangKey, singleSpace, welshLangKey}
 
 case class Body(eori: String)
 
@@ -59,9 +59,9 @@ case class DateRange(message: String)
 object DateRange {
   def apply(params: Params, lang: String = englishLangKey): DateRange = {
 
-    val startMonthFullName = convertMonthIntegerToFullMonthName(params.periodStartMonth, lang)
+    val startMonthFullName = convertMonthValueToFullMonthName(params.periodStartMonth, lang)
     val startYear = params.periodStartYear
-    val endMonthFullName = convertMonthIntegerToFullMonthName(params.periodEndMonth)
+    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth)
     val endYear = params.periodEndYear
 
     val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${

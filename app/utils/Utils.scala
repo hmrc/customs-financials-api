@@ -70,8 +70,8 @@ object Utils {
    * ex - input - 01
    *      output - January
    */
-  def convertMonthIntegerToFullMonthName(intPaddedValue: String,
-                                         lang: String = englishLangKey): String =
+  def convertMonthValueToFullMonthName(intPaddedValue: String,
+                                       lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
 
   //TODO: Welsh translation for the month name should be updated once available
