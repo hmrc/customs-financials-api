@@ -17,9 +17,11 @@
 package domain.secureMessage
 
 import domain.secureMessage.SecureMessage._
+import models.Params
+import play.api.libs.json.{JsSuccess, Json}
 import utils.{SpecBase, Utils}
 
-class SecureMessageBodySpec extends SpecBase {
+class BodySpec extends SpecBase {
 
   "Case Classes should be populated correctly" should {
     "ExternalReference" in new Setup {
@@ -56,19 +58,23 @@ class SecureMessageBodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      DutyDefermentBody("Apples & Pears Ltd") mustBe TestDutyDefermentBody
+      override val dateRange: DateRange = DateRange(message = "September 2022 to October 2022")
+      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      C79CertificateBody("Apples & Pears Ltd") mustBe TestC79CertificateBody
+      override val dateRange: DateRange = DateRange(message = "January 2022 to April 2022")
+      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      SecurityBody("Apples & Pears Ltd") mustBe TestSecurityBody
+      override val dateRange: DateRange = DateRange(message = "March 2021 to May 2021")
+      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      PostponedVATBody("Apples & Pears Ltd") mustBe TestPostponedVATBody
+      override val dateRange: DateRange = DateRange(message = "February 2022 to March 2022")
+      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody
     }
 
     "should encode correctly" in new Setup {
@@ -156,6 +162,30 @@ class SecureMessageBodySpec extends SpecBase {
     }
   }
 
+  "DateRange.apply" should {
+    "create the DateRange object with correct contents for English" in new Setup {
+      DateRange(params, Utils.englishLangKey).message mustBe "February 2021 to April 2021"
+    }
+
+    "create the DateRange object with correct contents for Welsh" in new Setup {
+      DateRange(params, Utils.welshLangKey).message mustBe "February 2021 to April 2021"
+    }
+  }
+
+  "DateRange Reads" should {
+    "generate the correct output" in new Setup {
+      import domain.secureMessage.DateRange.dateRangeFormat
+
+      Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(dateRange)
+    }
+  }
+
+  "DateRange Writes" should {
+    "generate the correct output" in new Setup {
+      Json.toJson(dateRange) mustBe Json.parse(jsValue)
+    }
+  }
+
   trait Setup {
 
     val TestBody = Body("eori")
@@ -225,5 +255,15 @@ class SecureMessageBodySpec extends SpecBase {
       "dGVtZW50cyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ0hJRUYgZnJvbSBEdXR5IERlZmVybWVudCB" +
       "FbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpLjxici8+PC9saT48L29sPkZyb20gdGhlIEN1c3RvbXMgRG" +
       "VjbGFyYXRpb24gU2VydmljZQ=="
+
+    val params: Params = Params(periodStartMonth = "02",
+      periodStartYear = "2021",
+      periodEndMonth = "04",
+      periodEndYear = "2021",
+      accountType = "PostponedVATStatement",
+      dan = "1234567")
+
+    val jsValue: String = """{"message":"test_msg"}""".stripMargin
+    val dateRange: DateRange = DateRange(message = "test_msg")
   }
 }
