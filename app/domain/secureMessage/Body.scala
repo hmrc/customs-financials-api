@@ -18,7 +18,7 @@ package domain.secureMessage
 
 import models.Params
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils.{convertMonthValueToFullMonthName, englishLangKey, singleSpace, welshLangKey}
+import utils.Utils._
 
 case class Body(eori: String)
 
@@ -96,19 +96,29 @@ object SecureMessage {
   val YouRequestedFor = "you requested for"
 
   def DutyDefermentBody(companyName: String,
-                        dateRange: DateRange): String = s"Dear ${companyName}<br/><br/>" +
-    s"The duty deferment statements ${YouRequestedFor} ${dateRange.message}" +
-    s"${WereNotFound}${TwoReasons}" +
-    s"${ImportVATCerts} ${MadeUsingCustoms}" +
-    " You can get duty deferment statements for declarations made using CHIEF" +
-    s" from Duty Deferment Electronic Statements (DDES).<br/></li></ol>${SignOff}"
+                        dateRange: DateRange): String = {
+    val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
+    val guidanceLink = "https://secure.hmce.gov.uk/ecom/login/index.html"
+
+    s"Dear ${companyName}<br/><br/>" +
+      s"The duty deferment statements ${YouRequestedFor} ${dateRange.message}" +
+      s"${WereNotFound}${TwoReasons}" +
+      s"${ImportVATCerts} ${MadeUsingCustoms}" +
+      " You can get duty deferment statements for declarations made using CHIEF" +
+      s" from ${createHyperLink(guidanceLinkText, guidanceLink)}.<br/></li></ol>${SignOff}"
+  }
 
   def C79CertificateBody(companyName: String,
-                         dateRange: DateRange): String = s"Dear ${companyName}<br/><br/>" +
-    s"The import VAT certificates ${YouRequestedFor} ${dateRange.message}" +
-    s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
-    s"${CheckIfYourDeclarations} cbc-c79requests@hmrc.gov.uk to" +
-    s"${RequestChief}</li></ol>${SignOff}"
+                         dateRange: DateRange): String = {
+    val guidanceLinkText = "cbc-c79requests@hmrc.gov.uk"
+    val guidanceLink = "mailto:cbc-c79requests@hmrc.gov.uk"
+
+    s"Dear ${companyName}<br/><br/>" +
+      s"The import VAT certificates ${YouRequestedFor} ${dateRange.message}" +
+      s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
+      s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+      s"${RequestChief}</li></ol>${SignOff}"
+  }
 
   def SecurityBody(companyName: String,
                    dateRange: DateRange): String = s"Dear ${companyName}<br/><br/>" +
@@ -118,12 +128,17 @@ object SecureMessage {
     s" (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>${SignOff}"
 
   def PostponedVATBody(companyName: String,
-                       dateRange: DateRange): String = s"Dear ${companyName}<br/><br/>" +
-    s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.message}" +
-    s"${WereNotFound}${TwoReasons}" +
-    s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
-    s"${CheckIfYourDeclarations} pvaenquiries@hmrc.gov.uk to" +
-    s"${RequestChief}</li></ol>${SignOff}"
+                       dateRange: DateRange): String = {
+    val guidanceLinkText = "pvaenquiries@hmrc.gov.uk"
+    val guidanceLink = "mailto:pvaenquiries@hmrc.gov.uk"
+
+    s"Dear ${companyName}<br/><br/>" +
+      s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.message}" +
+      s"${WereNotFound}${TwoReasons}" +
+      s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
+      s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+      s"${RequestChief}</li></ol>${SignOff}"
+  }
 
   val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
   val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"

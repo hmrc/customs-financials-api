@@ -91,4 +91,14 @@ object Utils {
       "12" -> (if (lang == welshLangKey) "December" else "December")
     )
 
+  /**
+   * Creates the inline html for hyperLink with given text, link and style class
+   */
+  def createHyperLink(text: String,
+                      link: String,
+                      styleClass: String = "govuk-link"): String = {
+    val doubleQuotes = "\""
+
+    s"<a class=$doubleQuotes$styleClass$doubleQuotes href=$doubleQuotes$link$doubleQuotes>$text</a>"
+  }
 }

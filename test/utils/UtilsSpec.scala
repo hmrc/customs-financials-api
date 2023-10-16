@@ -186,5 +186,18 @@ class UtilsSpec extends SpecBase {
         }
       }
     }
+
+    "createHyperLink" should {
+      "create the hyperLink with correct link, text and default style class" in {
+
+        createHyperLink("test_text", "test_link@test.com") mustBe
+          "<a class=\"govuk-link\" href=\"test_link@test.com\">test_text</a>"
+      }
+
+      "create the hyperLink with correct link, text and given style class" in {
+        createHyperLink("test_text", "test_link@test.com", "test_class") mustBe
+          "<a class=\"test_class\" href=\"test_link@test.com\">test_text</a>"
+      }
+    }
   }
 }
