@@ -30,9 +30,9 @@ import utils.Utils
 
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
+@Singleton
 class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
                                                    mongoComponent: MongoComponent)
                                                   (implicit val ec: ExecutionContext)
