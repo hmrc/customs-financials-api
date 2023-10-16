@@ -168,14 +168,13 @@ class BodySpec extends SpecBase {
     }
 
     "create the DateRange object with correct contents for Welsh" in new Setup {
-      DateRange(params, Utils.welshLangKey).message mustBe "February 2021 to April 2021"
+      DateRange(params, Utils.welshLangKey).message mustBe "February 2021 i April 2021"
     }
   }
 
   "DateRange Reads" should {
     "generate the correct output" in new Setup {
       import domain.secureMessage.DateRange.dateRangeFormat
-
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(dateRange)
     }
   }

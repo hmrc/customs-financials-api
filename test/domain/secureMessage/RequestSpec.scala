@@ -99,9 +99,9 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe dutyStatement
-      expectedRequest.content.head.body mustBe encodeToUTF8Charsets(
-        DutyDefermentBody("Company Name", dateRangeForWelsh))
+      expectedRequest.content(1).subject mustBe dutyStatementCy
+      expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
+        DutyDefermentBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return C79Certificate for Welsh language" in new Setup {
@@ -109,10 +109,10 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe c79cert
-      expectedRequest.content.head.body mustBe
+      expectedRequest.content(1).subject mustBe c79certCy
+      expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(C79CertificateBody(
-          "Company Name", dateRangeForWelsh))
+          "Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return SecurityStatement for Welsh language" in new Setup {
@@ -120,10 +120,9 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe securityStatement
-      expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(SecurityBody(
-          "Company Name", dateRangeForWelsh))
+      expectedRequest.content(1).subject mustBe securityStatementCy
+      expectedRequest.content(1).body mustBe
+        encodeToUTF8Charsets(SecurityBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return PostponedVATStatement for Welsh language" in new Setup {
@@ -131,17 +130,17 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe postPonedVATStatement
-      expectedRequest.content.head.body mustBe
+      expectedRequest.content(1).subject mustBe postPonedVATStatementCy
+      expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(PostponedVATBody(
-          "Company Name", dateRangeForWelsh))
+          "Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
         Content(englishLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange)),
-        Content(welshLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange)))
+        Content(welshLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange, welshLangKey)))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -214,17 +213,21 @@ trait Setup {
   val PostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
   val testContents: List[Content] = {
-    List(
-      secureMessage.Content(
-        englishLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange)),
-      secureMessage.Content(
-        welshLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange)))
+    List(secureMessage.Content(englishLangKey, "DutyDefermentStatement",
+      DutyDefermentBody("Company Name", dateRange, englishLangKey)),
+      secureMessage.Content(welshLangKey, "DutyDefermentStatement",
+        DutyDefermentBody("Company Name", dateRange, welshLangKey)))
   }
 
   val dutyStatement: String = "Requested duty deferment statements"
   val c79cert: String = "Requested import VAT certificates (C79)"
   val securityStatement: String = "Requested notification of adjustment statements"
   val postPonedVATStatement: String = "Requested postponed import VAT statements"
+
+  val dutyStatementCy = "Datganiadau gohirio tollau"
+  val c79certCy = "Tystysgrifau TAW mewnforio (C79)"
+  val securityStatementCy = "Hysbysiad o ddatganiadau addasu"
+  val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig"
 
   val histDocRequestSearch: HistoricDocumentRequestSearch =
     HistoricDocumentRequestSearch(searchID,
