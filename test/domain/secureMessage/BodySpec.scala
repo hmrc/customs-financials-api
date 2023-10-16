@@ -213,7 +213,8 @@ class BodySpec extends SpecBase {
       "<li>Import VAT certificates for declarations made using Customs Handling " +
       "of Import and Export Freight (CHIEF) cannot be requested using the Customs " +
       "Declaration Service. You can get duty deferment statements for declarations" +
-      " made using CHIEF from Duty Deferment Electronic Statements (DDES).<br/>" +
+      " made using CHIEF from <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
+      "Duty Deferment Electronic Statements (DDES)</a>.<br/>" +
       "</li></ol>From the Customs Declaration Service"
 
     val TestC79CertificateBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
@@ -223,7 +224,8 @@ class BodySpec extends SpecBase {
       " the dates you requested.</li><br/><li>Import VAT certificates for declarations made" +
       " using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using" +
       " the Customs Declaration Service. Check if your declarations were made using CHIEF and" +
-      " contact cbc-c79requests@hmrc.gov.uk to request CHIEF statements.<br/></li></ol>" +
+      " contact <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">" +
+      "cbc-c79requests@hmrc.gov.uk</a> to request CHIEF statements.<br/></li></ol>" +
       "From the Customs Declaration Service"
 
     val TestSecurityBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
@@ -240,21 +242,21 @@ class BodySpec extends SpecBase {
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
       "</li><br/><li>Postponed import VAT statements for declarations made using Customs Handling of " +
       "Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. " +
-      "Check if your declarations were made using CHIEF and contact pvaenquiries@hmrc.gov.uk to " +
+      "Check if your declarations were made using CHIEF and contact <a class=\"govuk-link\" href=" +
+      "\"mailto:pvaenquiries@hmrc.gov.uk\">pvaenquiries@hmrc.gov.uk</a> to " +
       "request CHIEF statements.<br/></li></ol>From the Customs Declaration Service"
 
-    val encodedDutyDeferementBody: String = "RGVhciBBcHBsZXMgJiBQZWFycyBMdGQ8YnIvPjxici8+" +
-      "VGhlIGR1dHkgZGVmZXJtZW50IHN0YXRlbWVudHMgeW91IHJlcXVlc3RlZCBmb3IgU2VwdGVtYmVyIDIwMjI" +
-      "gdG8gT2N0b2JlciAyMDIyIHdlcmUgbm90IGZvdW5kLjxici8+PGJyLz5UaGVyZSBhcmUgMiBwb3NzaWJsZS" +
-      "ByZWFzb25zIGZvciB0aGlzOjxici8+PG9sPjxsaT5TdGF0ZW1lbnRzIGFyZSBvbmx5IGNyZWF0ZWQgZm9yI" +
-      "HRoZSBwZXJpb2RzIGluIHdoaWNoIHlvdSBpbXBvcnRlZCBnb29kcy4gQ2hlY2sgdGhhdCB5b3UgaW1wb3J0" +
-      "ZWQgZ29vZHMgZHVyaW5nIHRoZSBkYXRlcyB5b3UgcmVxdWVzdGVkLjwvbGk+PGJyLz48bGk+SW1wb3J0IFZ" +
-      "BVCBjZXJ0aWZpY2F0ZXMgZm9yIGRlY2xhcmF0aW9ucyBtYWRlIHVzaW5nIEN1c3RvbXMgSGFuZGxpbmcgb2" +
-      "YgSW1wb3J0IGFuZCBFeHBvcnQgRnJlaWdodCAoQ0hJRUYpIGNhbm5vdCBiZSByZXF1ZXN0ZWQgdXNpbmcgd" +
-      "GhlIEN1c3RvbXMgRGVjbGFyYXRpb24gU2VydmljZS4gWW91IGNhbiBnZXQgZHV0eSBkZWZlcm1lbnQgc3Rh" +
-      "dGVtZW50cyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ0hJRUYgZnJvbSBEdXR5IERlZmVybWVudCB" +
-      "FbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpLjxici8+PC9saT48L29sPkZyb20gdGhlIEN1c3RvbXMgRG" +
-      "VjbGFyYXRpb24gU2VydmljZQ=="
+    val encodedDutyDeferementBody: String = "RGVhciBBcHBsZXMgJiBQZWFycyBMdGQ8YnIvPjxici8+VGhlIGR1dHkgZGVmZX" +
+      "JtZW50IHN0YXRlbWVudHMgeW91IHJlcXVlc3RlZCBmb3IgU2VwdGVtYmVyIDIwMjIgdG8gT2N0b2JlciAyMDIyIHdlcmUgbm90IGZ" +
+      "vdW5kLjxici8+PGJyLz5UaGVyZSBhcmUgMiBwb3NzaWJsZSByZWFzb25zIGZvciB0aGlzOjxici8+PG9sPjxsaT5TdGF0ZW1lbnRz" +
+      "IGFyZSBvbmx5IGNyZWF0ZWQgZm9yIHRoZSBwZXJpb2RzIGluIHdoaWNoIHlvdSBpbXBvcnRlZCBnb29kcy4gQ2hlY2sgdGhhdCB5b" +
+      "3UgaW1wb3J0ZWQgZ29vZHMgZHVyaW5nIHRoZSBkYXRlcyB5b3UgcmVxdWVzdGVkLjwvbGk+PGJyLz48bGk+SW1wb3J0IFZBVCBjZX" +
+      "J0aWZpY2F0ZXMgZm9yIGRlY2xhcmF0aW9ucyBtYWRlIHVzaW5nIEN1c3RvbXMgSGFuZGxpbmcgb2YgSW1wb3J0IGFuZCBFeHBvcnQg" +
+      "RnJlaWdodCAoQ0hJRUYpIGNhbm5vdCBiZSByZXF1ZXN0ZWQgdXNpbmcgdGhlIEN1c3RvbXMgRGVjbGFyYXRpb24gU2VydmljZS4gWW" +
+      "91IGNhbiBnZXQgZHV0eSBkZWZlcm1lbnQgc3RhdGVtZW50cyBmb3IgZGVjbGFyYXRpb25zIG1hZGUgdXNpbmcgQ0hJRUYgZnJvbSA8" +
+      "YSBjbGFzcz0iZ292dWstbGluayIgaHJlZj0iaHR0cHM6Ly9zZWN1cmUuaG1jZS5nb3YudWsvZWNvbS9sb2dpbi9pbmRleC5odG1sIj5" +
+      "EdXR5IERlZmVybWVudCBFbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpPC9hPi48YnIvPjwvbGk+PC9vbD5Gcm9tIHRoZSBDdXN0b21" +
+      "zIERlY2xhcmF0aW9uIFNlcnZpY2U="
 
     val params: Params = Params(periodStartMonth = "02",
       periodStartYear = "2021",
