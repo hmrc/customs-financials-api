@@ -64,8 +64,7 @@ object DateRange {
     val endYear = params.periodEndYear
 
     val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${
-      if (lang == welshLangKey) "i" else "to"
-    }$singleSpace$endMonthFullName$singleSpace$endYear"
+      if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
 
     DateRange(dateRangeMsg)
   }
@@ -168,7 +167,7 @@ object SecureMessage {
         s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.message}" +
         s"${WereNotFound}${TwoReasons}" +
         s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
-        s" (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>${SignOff}"
+        s"<br/></li></ol>${SignOff}"
     } else {
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
@@ -177,7 +176,7 @@ object SecureMessage {
         "Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         "<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o ddatganiadau " +
         "addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff " +
-        "eu Mewnforio a’u Hallforio (CHIEF). (Rhowch arweiniad ar sut i gael datganiadau CHIEF NOA)." +
+        "eu Mewnforio a’u Hallforio (CHIEF)." +
         "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
     }
   }
