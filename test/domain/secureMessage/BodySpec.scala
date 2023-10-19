@@ -233,7 +233,7 @@ class BodySpec extends SpecBase {
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
       "</li><br/><li>Notification of adjustment statements for declarations made using Customs Handling " +
       "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
-      " (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>From the Customs Declaration Service"
+      "<br/></li></ol>From the Customs Declaration Service"
 
     val TestPostponedVATBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
