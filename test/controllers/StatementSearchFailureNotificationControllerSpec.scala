@@ -367,7 +367,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val validRequest: FakeRequest[JsObject] = validRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
         "Content-Type" -> "application/json",
@@ -377,7 +377,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val validRequestWithReasonOtherThanNoDocuments: FakeRequest[JsObject] =
       validRequestWithReasonCodeOtherThanNoDocumentsWithoutHeaders.withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
         "Content-Type" -> "application/json",
@@ -387,7 +387,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val invalidRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "MD/TP",
         "Content-Type" -> "application/json",

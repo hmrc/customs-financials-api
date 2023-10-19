@@ -30,6 +30,7 @@ object Utils {
   val threeColons = ":::"
   val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
   val httpDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
+  val iso8601DateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 
   val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
   val englishLangKey = "en"

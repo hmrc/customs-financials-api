@@ -19,7 +19,7 @@ package controllers.actions
 import _root_.config.AppConfig
 import play.api.mvc.Results.{BadRequest, Unauthorized}
 import play.api.mvc._
-import utils.Utils.{emptyString, rfc7231DateTimePattern}
+import utils.Utils.{emptyString, iso8601DateFormatter, rfc7231DateTimePattern}
 
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -101,7 +101,7 @@ class MdgHeaderDefaultFilter @Inject()(
   }
 
   private def validateRequestDate[A](request: Request[A]): Either[Result, Request[A]] = {
-    Try(request.headers.get(dateHeader).map(httpDateFormatter.parse(_))).toOption.flatten match {
+    Try(request.headers.get(dateHeader).map(iso8601DateFormatter.parse(_))).toOption.flatten match {
       case Some(_) => Right(request)
       case None =>
         logger.error("Date header has invalid format")
