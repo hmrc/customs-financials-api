@@ -19,9 +19,8 @@ package controllers.actions
 import _root_.config.AppConfig
 import play.api.mvc.Results.{BadRequest, Unauthorized}
 import play.api.mvc._
-import utils.Utils.{emptyString, iso8601DateFormatter, rfc7231DateTimePattern}
+import utils.Utils.{emptyString, iso8601DateFormatter}
 
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -40,9 +39,6 @@ class MdgHeaderDefaultFilter @Inject()(
   private val contentTypeHeader = "Content-Type"
   private val acceptHeader = "Accept"
   private val authorizationHeader = "Authorization"
-
-  // HTTP Date format from https://tools.ietf.org/html/rfc7231#section-7.1.1.1
-  private val httpDateFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(
