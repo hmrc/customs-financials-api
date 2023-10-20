@@ -324,6 +324,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
       }
     }
 
+  "produce BAD REQUEST when the request's headers has invalid date format" in new Setup {
+    running(app) {
+      val response: Future[Result] = route(app, invalidDateHeaderRequest).value
+      status(response) mustBe BAD_REQUEST
+    }
+  }
+
   trait Setup {
     val docUnreachable = "DocumentumUnreachable"
     val noDocumentsFound = "NoDocumentsFound"
@@ -367,7 +374,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val validRequest: FakeRequest[JsObject] = validRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
         "Content-Type" -> "application/json",
@@ -377,7 +384,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val validRequestWithReasonOtherThanNoDocuments: FakeRequest[JsObject] =
       validRequestWithReasonCodeOtherThanNoDocumentsWithoutHeaders.withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
         "Content-Type" -> "application/json",
@@ -387,7 +394,17 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val invalidRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "Fri, 16 Aug 2019 18:15:41 GMT",
+        "Date" -> "2023-10-18T11:10:22Z",
+        "X-Correlation-ID" -> correlationId,
+        "X-Forwarded-Host" -> "MD/TP",
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json",
+        "Authorization" -> "Bearer test1234567"
+      )
+
+    val invalidDateHeaderRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
+      .withHeaders(
+        "Date" -> "Thu, 14 Sep 2023 16:30:30 GMT",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "MD/TP",
         "Content-Type" -> "application/json",

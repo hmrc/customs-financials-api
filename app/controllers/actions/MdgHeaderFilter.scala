@@ -19,9 +19,8 @@ package controllers.actions
 import _root_.config.AppConfig
 import play.api.mvc.Results.{BadRequest, Unauthorized}
 import play.api.mvc._
-import utils.Utils.{emptyString, rfc7231DateTimePattern}
+import utils.Utils.{emptyString, iso8601DateFormatter}
 
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -40,9 +39,6 @@ class MdgHeaderDefaultFilter @Inject()(
   private val contentTypeHeader = "Content-Type"
   private val acceptHeader = "Accept"
   private val authorizationHeader = "Authorization"
-
-  // HTTP Date format from https://tools.ietf.org/html/rfc7231#section-7.1.1.1
-  private val httpDateFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     Future.successful(
@@ -101,7 +97,7 @@ class MdgHeaderDefaultFilter @Inject()(
   }
 
   private def validateRequestDate[A](request: Request[A]): Either[Result, Request[A]] = {
-    Try(request.headers.get(dateHeader).map(httpDateFormatter.parse(_))).toOption.flatten match {
+    Try(request.headers.get(dateHeader).map(iso8601DateFormatter.parse(_))).toOption.flatten match {
       case Some(_) => Right(request)
       case None =>
         logger.error("Date header has invalid format")

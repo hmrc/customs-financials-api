@@ -199,5 +199,24 @@ class UtilsSpec extends SpecBase {
           "<a class=\"test_class\" href=\"test_link@test.com\">test_text</a>"
       }
     }
+
+    "iso8601DateFormatter" should {
+      "parse the ISO_DATE_TIME string correctly" in {
+        Option(iso8601DateFormatter.parse("2023-10-18T11:10:22Z")).nonEmpty mustBe true
+        Option(iso8601DateFormatter.parse("2021-12-18T13:10:22Z")).nonEmpty mustBe true
+        Option(iso8601DateFormatter.parse("2022-02-18T23:10:22Z")).nonEmpty mustBe true
+        Option(iso8601DateFormatter.parse("2020-01-05T00:00:22Z")).nonEmpty mustBe true
+      }
+
+      "throw exception for the invalid date string" in {
+        intercept[RuntimeException] {
+          iso8601DateFormatter.parse("2023-10-18 11:10:22Z")
+        }
+
+        intercept[RuntimeException] {
+          iso8601DateFormatter.parse("Thu, 14 Sep 2023 16:30:30 GMT")
+        }
+      }
+    }
   }
 }
