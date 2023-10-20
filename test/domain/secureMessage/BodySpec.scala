@@ -194,7 +194,7 @@ class BodySpec extends SpecBase {
     }
 
     "create the DateRange object with correct contents for Welsh" in new Setup {
-      DateRange(params, Utils.welshLangKey).message mustBe "February 2021 i April 2021"
+      DateRange(params, Utils.welshLangKey).message mustBe "Chwefror 2021 i Ebrill 2021"
     }
   }
 

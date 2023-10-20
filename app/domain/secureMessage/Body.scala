@@ -60,7 +60,7 @@ object DateRange {
 
     val startMonthFullName = convertMonthValueToFullMonthName(params.periodStartMonth, lang)
     val startYear = params.periodStartYear
-    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth)
+    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth, lang)
     val endYear = params.periodEndYear
 
     val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${
