@@ -73,8 +73,7 @@ object Utils {
   def convertMonthValueToFullMonthName(intPaddedValue: String,
                                        lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
-
-  //TODO: Welsh translation for the month name should be updated once available
+  
   def monthValueToNameMap(lang: String): Map[String, String] =
     Map(
       "01" -> (if (lang == welshLangKey) "Ionawr" else "January"),
