@@ -20,6 +20,7 @@ import domain.secureMessage.SecureMessage._
 import models.Params
 import play.api.libs.json.{JsSuccess, Json}
 import utils.{SpecBase, Utils}
+import utils.Utils._
 
 class BodySpec extends SpecBase {
 
@@ -80,6 +81,31 @@ class BodySpec extends SpecBase {
     "should encode correctly" in new Setup {
       val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBody)
       res mustBe encodedDutyDeferementBody
+    }
+
+    "display DutyDeferementBody correctly in welsh" in new Setup {
+      override val dateRange: DateRange = DateRange(message = "September 2022 to October 2022")
+      DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy
+    }
+
+    "display C79CertificateBody correctly in welsh" in new Setup {
+      override val dateRange: DateRange = DateRange(message = "January 2022 to April 2022")
+      C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestC79CertificateBodyCy
+    }
+
+    "display SecurityBody correctly in welsh" in new Setup {
+      override val dateRange: DateRange = DateRange(message = "March 2021 to May 2021")
+      SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestSecurityBodyCy
+    }
+
+    "display PostponedVATBody correctlyi in welsh" in new Setup {
+      override val dateRange: DateRange = DateRange(message = "February 2022 to March 2022")
+      PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestPostponedVATBodyCy
+    }
+
+    "should encode correctly in welsh" in new Setup {
+      val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy)
+      res mustBe encodedDutyDeferementBodyCy
     }
 
     "short text - from the customs" in new Setup {
@@ -168,14 +194,13 @@ class BodySpec extends SpecBase {
     }
 
     "create the DateRange object with correct contents for Welsh" in new Setup {
-      DateRange(params, Utils.welshLangKey).message mustBe "February 2021 to April 2021"
+      DateRange(params, Utils.welshLangKey).message mustBe "Chwefror 2021 i Ebrill 2021"
     }
   }
 
   "DateRange Reads" should {
     "generate the correct output" in new Setup {
       import domain.secureMessage.DateRange.dateRangeFormat
-
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(dateRange)
     }
   }
@@ -234,7 +259,7 @@ class BodySpec extends SpecBase {
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
       "</li><br/><li>Notification of adjustment statements for declarations made using Customs Handling " +
       "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
-      " (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>From the Customs Declaration Service"
+      "<br/></li></ol>From the Customs Declaration Service"
 
     val TestPostponedVATBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
@@ -257,6 +282,67 @@ class BodySpec extends SpecBase {
       "YSBjbGFzcz0iZ292dWstbGluayIgaHJlZj0iaHR0cHM6Ly9zZWN1cmUuaG1jZS5nb3YudWsvZWNvbS9sb2dpbi9pbmRleC5odG1sIj5" +
       "EdXR5IERlZmVybWVudCBFbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpPC9hPi48YnIvPjwvbGk+PC9vbD5Gcm9tIHRoZSBDdXN0b21" +
       "zIERlY2xhcmF0aW9uIFNlcnZpY2U="
+
+    val TestDutyDefermentBodyCy: String = "Annwyl Apples & Pears Ltd <br/><br/>Ni chafwyd hyd i’r" +
+      " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
+      " 2022.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
+      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
+      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
+      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u" +
+      " Hallforio (CHIEF). Gallwch ddefnyddio’r gwasanaeth" +
+      " <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
+      " Datganiadau Electronig i Ohirio Tollau (DDES)</a>i gael datganiadau gohirio " +
+      "tollau ar gyfer datganiadau a wnaed gan ddefnyddio’r gwasanaeth CHIEF." +
+      "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+
+    val TestC79CertificateBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
+      " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
+      " 2022.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
+      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
+      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
+      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio" +
+      " (CHIEF).Gwiriwch os cafodd eich datganiadau eu gwneud drwy ddefnyddio CHIEF a chysylltwch â" +
+      " <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">cbc-c79requests@hmrc.gov.uk</a>" +
+      " i wneud cais am ddatganiadau CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+
+    val TestSecurityBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
+      " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
+      " May 2021.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
+      " gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu.Gwiriwch eich bod wedi" +
+      " mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni" +
+      " ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o" +
+      " ddatganiadau addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar" +
+      " gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).</li></ol><br/>Oddi" +
+      " wrth y Gwasanaeth Datganiadau Tollau"
+
+    val TestPostponedVATBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd" +
+      " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
+      "February 2022 to March 2022Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
+      " ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau" +
+      " ’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau" +
+      " y gwnaethoch gais amdanynt.</li><br/>Ni ellir defnyddio’r Gwasanaeth Datganiadau" +
+      " Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio gohiriedig ar gyfer" +
+      " datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a" +
+      " Gaiff eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich datganiadau" +
+      " eu gwneud drwy ddefnyddio CHIEF a chysylltwch â <a class=\"govuk-link\" href=\"mailto:pvaenquiries@hmrc.gov.uk\">" +
+      "pvaenquiries@hmrc.gov.uk</a> i wneud cais am ddatganiadau CHIEF</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+
+    val encodedDutyDeferementBodyCy: String = "QW5ud3lsIEFwcGxlcyAmIFBlYXJzIEx0ZCA8YnIvPjxici8+TmkgY2hhZnd5ZCBoe" +
+      "WQgaeKAmXIgZGF0Z2FuaWFkYXUgZ29oaXJpbyB0b2xsYXUgeSBnd25hZXRob2NoIGdhaXMgYW1kYW55bnQgYXIgZ3lmZXIgbWlzIFNlcH" +
+      "RlbWJlciAyMDIyIHRvIE9jdG9iZXIgMjAyMi5NYWUgZGF1IHJlc3dtIHBvc2libCBhbSBoeW46PGJyLz48b2w+PGxpPkRpbSBvbmQgYXI" +
+      "gZ3lmZXIgeSBjeWZub2RhdSBsbGUgeSBnd25hZXRob2NoIGZld25mb3JpbyBud3lkZGF1IHkgbWFlIGRhdGdhbmlhZGF14oCZbiBjYWVs" +
+      "IGV1IGNyZXUuIEd3aXJpd2NoIGVpY2ggYm9kIHdlZGkgbWV3bmZvcmlvIG53eWRkYXUgeW4geXN0b2QgeSBkeWRkaWFkYXUgeSBnd25hZ" +
+      "XRob2NoIGdhaXMgYW1kYW55bnQuPC9saT48YnIvPjxsaT5OaSBlbGxpciBkZWZueWRkaW/igJlyIEd3YXNhbmFldGggRGF0Z2FuaWFkYX" +
+      "UgVG9sbGF1IChDRFMpIGkgd25ldWQgY2FpcyBhbSBkeXN0eXNncmlmYXUgVEFXIG1ld25mb3JpbyBhciBneWZlciBkYXRnYW5pYWRhdSB" +
+      "hIHduYWVkIGdhbiBkZGVmbnlkZGlvIHN5c3RlbSB5IFRvbGxhdSBhciBneWZlciBUcmluIE53eWRkYXUgYSBHYWlmZiBldSBNZXduZm9y" +
+      "aW8gYeKAmXUgSGFsbGZvcmlvIChDSElFRikuIEdhbGx3Y2ggZGRlZm55ZGRpb+KAmXIgZ3dhc2FuYWV0aCA8YSBjbGFzcz0iZ292dWstb" +
+      "GluayIgaHJlZj0iaHR0cHM6Ly9zZWN1cmUuaG1jZS5nb3YudWsvZWNvbS9sb2dpbi9pbmRleC5odG1sIj4gRGF0Z2FuaWFkYXUgRWxlY3" +
+      "Ryb25pZyBpIE9oaXJpbyBUb2xsYXUgKERERVMpPC9hPmkgZ2FlbCBkYXRnYW5pYWRhdSBnb2hpcmlvIHRvbGxhdSBhciBneWZlciBkYXR" +
+      "nYW5pYWRhdSBhIHduYWVkIGdhbiBkZGVmbnlkZGlv4oCZciBnd2FzYW5hZXRoIENISUVGLjwvbGk+PC9vbD48YnIvPk9kZGkgd3J0aCB5" +
+      "IEd3YXNhbmFldGggRGF0Z2FuaWFkYXUgVG9sbGF1"
+
 
     val params: Params = Params(periodStartMonth = "02",
       periodStartYear = "2021",

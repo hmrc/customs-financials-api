@@ -127,18 +127,18 @@ class UtilsSpec extends SpecBase {
       }
 
       "return correct output for Welsh" in {
-        convertMonthValueToFullMonthName("01", welshLangKey) mustBe "January"
-        convertMonthValueToFullMonthName("02", welshLangKey) mustBe "February"
-        convertMonthValueToFullMonthName("03", welshLangKey) mustBe "March"
-        convertMonthValueToFullMonthName("04", welshLangKey) mustBe "April"
-        convertMonthValueToFullMonthName("05", welshLangKey) mustBe "May"
-        convertMonthValueToFullMonthName("06", welshLangKey) mustBe "June"
-        convertMonthValueToFullMonthName("07", welshLangKey) mustBe "July"
-        convertMonthValueToFullMonthName("08", welshLangKey) mustBe "August"
-        convertMonthValueToFullMonthName("09", welshLangKey) mustBe "September"
-        convertMonthValueToFullMonthName("10", welshLangKey) mustBe "October"
-        convertMonthValueToFullMonthName("11", welshLangKey) mustBe "November"
-        convertMonthValueToFullMonthName("12", welshLangKey) mustBe "December"
+        convertMonthValueToFullMonthName("01", welshLangKey) mustBe "Ionawr"
+        convertMonthValueToFullMonthName("02", welshLangKey) mustBe "Chwefror"
+        convertMonthValueToFullMonthName("03", welshLangKey) mustBe "Mawrth"
+        convertMonthValueToFullMonthName("04", welshLangKey) mustBe "Ebrill"
+        convertMonthValueToFullMonthName("05", welshLangKey) mustBe "Mai"
+        convertMonthValueToFullMonthName("06", welshLangKey) mustBe "Mehefin"
+        convertMonthValueToFullMonthName("07", welshLangKey) mustBe "Gorffennaf"
+        convertMonthValueToFullMonthName("08", welshLangKey) mustBe "Awst"
+        convertMonthValueToFullMonthName("09", welshLangKey) mustBe "Medi"
+        convertMonthValueToFullMonthName("10", welshLangKey) mustBe "Hydref"
+        convertMonthValueToFullMonthName("11", welshLangKey) mustBe "Tachwedd"
+        convertMonthValueToFullMonthName("12", welshLangKey) mustBe "Rhagfyr"
       }
 
       "return return no value for invalid input" in {
@@ -166,18 +166,18 @@ class UtilsSpec extends SpecBase {
 
       "create the correct map for Welsh" in {
         monthValueToNameMap(welshLangKey) mustBe Map(
-          "01" -> "January",
-          "02" -> "February",
-          "03" -> "March",
-          "04" -> "April",
-          "05" -> "May",
-          "06" -> "June",
-          "07" -> "July",
-          "08" -> "August",
-          "09" -> "September",
-          "10" -> "October",
-          "11" -> "November",
-          "12" -> "December")
+          "01" -> "Ionawr",
+          "02" -> "Chwefror",
+          "03" -> "Mawrth",
+          "04" -> "Ebrill",
+          "05" -> "Mai",
+          "06" -> "Mehefin",
+          "07" -> "Gorffennaf",
+          "08" -> "Awst",
+          "09" -> "Medi",
+          "10" -> "Hydref",
+          "11" -> "Tachwedd",
+          "12" -> "Rhagfyr")
       }
 
       "singleSpace" should {

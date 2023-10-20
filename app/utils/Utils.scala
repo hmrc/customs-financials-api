@@ -74,22 +74,21 @@ object Utils {
   def convertMonthValueToFullMonthName(intPaddedValue: String,
                                        lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
-
-  //TODO: Welsh translation for the month name should be updated once available
+  
   def monthValueToNameMap(lang: String): Map[String, String] =
     Map(
-      "01" -> (if (lang == welshLangKey) "January" else "January"),
-      "02" -> (if (lang == welshLangKey) "February" else "February"),
-      "03" -> (if (lang == welshLangKey) "March" else "March"),
-      "04" -> (if (lang == welshLangKey) "April" else "April"),
-      "05" -> (if (lang == welshLangKey) "May" else "May"),
-      "06" -> (if (lang == welshLangKey) "June" else "June"),
-      "07" -> (if (lang == welshLangKey) "July" else "July"),
-      "08" -> (if (lang == welshLangKey) "August" else "August"),
-      "09" -> (if (lang == welshLangKey) "September" else "September"),
-      "10" -> (if (lang == welshLangKey) "October" else "October"),
-      "11" -> (if (lang == welshLangKey) "November" else "November"),
-      "12" -> (if (lang == welshLangKey) "December" else "December")
+      "01" -> (if (lang == welshLangKey) "Ionawr" else "January"),
+      "02" -> (if (lang == welshLangKey) "Chwefror" else "February"),
+      "03" -> (if (lang == welshLangKey) "Mawrth" else "March"),
+      "04" -> (if (lang == welshLangKey) "Ebrill" else "April"),
+      "05" -> (if (lang == welshLangKey) "Mai" else "May"),
+      "06" -> (if (lang == welshLangKey) "Mehefin" else "June"),
+      "07" -> (if (lang == welshLangKey) "Gorffennaf" else "July"),
+      "08" -> (if (lang == welshLangKey) "Awst" else "August"),
+      "09" -> (if (lang == welshLangKey) "Medi" else "September"),
+      "10" -> (if (lang == welshLangKey) "Hydref" else "October"),
+      "11" -> (if (lang == welshLangKey) "Tachwedd" else "November"),
+      "12" -> (if (lang == welshLangKey) "Rhagfyr" else "December")
     )
 
   /**

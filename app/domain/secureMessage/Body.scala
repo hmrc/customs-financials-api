@@ -55,17 +55,16 @@ object Content {
 
 case class DateRange(message: String)
 
-//TODO: Welsh translation for to need to be updated once available
 object DateRange {
   def apply(params: Params, lang: String = englishLangKey): DateRange = {
 
     val startMonthFullName = convertMonthValueToFullMonthName(params.periodStartMonth, lang)
     val startYear = params.periodStartYear
-    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth)
+    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth, lang)
     val endYear = params.periodEndYear
 
     val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${
-      if(lang == welshLangKey) "to" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
+      if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
 
     DateRange(dateRangeMsg)
   }
@@ -79,6 +78,11 @@ object SecureMessage {
   val SubjectCert = "Requested import VAT certificates (C79)"
   val SubjectSecurity = "Requested notification of adjustment statements"
   val SubjectImport = "Requested postponed import VAT statements"
+
+  val SubjectDutyDefCy = "Datganiadau gohirio tollau"
+  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79)"
+  val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu"
+  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig"
 
   val SignOff = "From the Customs Declaration Service"
   val WereNotFound = " were not found.<br/><br/>"
@@ -96,48 +100,112 @@ object SecureMessage {
   val YouRequestedFor = "you requested for"
 
   def DutyDefermentBody(companyName: String,
-                        dateRange: DateRange): String = {
-    val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
+                        dateRange: DateRange,
+                        lang: String = englishLangKey): String = {
     val guidanceLink = "https://secure.hmce.gov.uk/ecom/login/index.html"
 
-    s"Dear ${companyName}<br/><br/>" +
-      s"The duty deferment statements ${YouRequestedFor} ${dateRange.message}" +
-      s"${WereNotFound}${TwoReasons}" +
-      s"${ImportVATCerts} ${MadeUsingCustoms}" +
-      " You can get duty deferment statements for declarations made using CHIEF" +
-      s" from ${createHyperLink(guidanceLinkText, guidanceLink)}.<br/></li></ol>${SignOff}"
+    if (lang == englishLangKey) {
+      val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
+
+      s"Dear ${companyName}<br/><br/>" +
+        s"The duty deferment statements ${YouRequestedFor} ${dateRange.message}" +
+        s"${WereNotFound}${TwoReasons}" +
+        s"${ImportVATCerts} ${MadeUsingCustoms}" +
+        " You can get duty deferment statements for declarations made using CHIEF" +
+        s" from ${createHyperLink(guidanceLinkText, guidanceLink)}.<br/></li></ol>${SignOff}"
+    } else {
+      val guidanceLinkText = " Datganiadau Electronig i Ohirio Tollau (DDES)"
+
+      s"Annwyl ${companyName} <br/><br/>" +
+        s"Ni chafwyd hyd i’r datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.message}." +
+        s"Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae " +
+        s"datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y" +
+        s" gwnaethoch gais amdanynt.</li><br/>" +
+        s"<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau" +
+        s" TAW mewnforio ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin" +
+        s" Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF). " +
+        s"Gallwch ddefnyddio’r gwasanaeth ${createHyperLink(guidanceLinkText, guidanceLink)}" +
+        s"i gael datganiadau gohirio tollau ar gyfer datganiadau a wnaed" +
+        s" gan ddefnyddio’r gwasanaeth CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    }
   }
 
   def C79CertificateBody(companyName: String,
-                         dateRange: DateRange): String = {
+                         dateRange: DateRange,
+                         lang: String = englishLangKey): String = {
     val guidanceLinkText = "cbc-c79requests@hmrc.gov.uk"
     val guidanceLink = "mailto:cbc-c79requests@hmrc.gov.uk"
 
-    s"Dear ${companyName}<br/><br/>" +
-      s"The import VAT certificates ${YouRequestedFor} ${dateRange.message}" +
-      s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
-      s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
-      s"${RequestChief}</li></ol>${SignOff}"
+    if (lang == englishLangKey) {
+      s"Dear ${companyName}<br/><br/>" +
+        s"The import VAT certificates ${YouRequestedFor} ${dateRange.message}" +
+        s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
+        s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+        s"${RequestChief}</li></ol>${SignOff}"
+    } else {
+
+      s"Annwyl ${companyName}<br/><br/>" +
+        s"Ni chafwyd hyd i’r Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.message}." +
+        s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
+        s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
+        s"<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau " +
+        s"TAW mewnforio ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer" +
+        s" Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich " +
+        s"datganiadau eu gwneud drwy ddefnyddio CHIEF a chysylltwch â" +
+        s" ${createHyperLink(guidanceLinkText, guidanceLink)} i wneud cais am ddatganiadau CHIEF." +
+        s"</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+
+    }
   }
 
   def SecurityBody(companyName: String,
-                   dateRange: DateRange): String = s"Dear ${companyName}<br/><br/>" +
-    s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.message}" +
-    s"${WereNotFound}${TwoReasons}" +
-    s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
-    s" (Insert guidance on how to get CHIEF NOA statements).<br/></li></ol>${SignOff}"
+                   dateRange: DateRange,
+                   lang: String = englishLangKey): String = {
+    if (lang == englishLangKey) {
+      s"Dear ${companyName}<br/><br/>" +
+        s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.message}" +
+        s"${WereNotFound}${TwoReasons}" +
+        s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
+        s"<br/></li></ol>${SignOff}"
+    } else {
+      s"Annwyl ${companyName}<br/><br/>" +
+        s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
+        s"${dateRange.message}." + "Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        "Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
+        "Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
+        "<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o ddatganiadau " +
+        "addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff " +
+        "eu Mewnforio a’u Hallforio (CHIEF)." +
+        "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    }
+  }
 
   def PostponedVATBody(companyName: String,
-                       dateRange: DateRange): String = {
+                       dateRange: DateRange,
+                       lang: String = englishLangKey): String = {
     val guidanceLinkText = "pvaenquiries@hmrc.gov.uk"
     val guidanceLink = "mailto:pvaenquiries@hmrc.gov.uk"
 
-    s"Dear ${companyName}<br/><br/>" +
-      s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.message}" +
-      s"${WereNotFound}${TwoReasons}" +
-      s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
-      s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
-      s"${RequestChief}</li></ol>${SignOff}"
+    if (lang == englishLangKey) {
+      s"Dear ${companyName}<br/><br/>" +
+        s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.message}" +
+        s"${WereNotFound}${TwoReasons}" +
+        s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
+        s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+        s"${RequestChief}</li></ol>${SignOff}"
+    } else {
+      s"Annwyl ${companyName}<br/><br/>" +
+        s"Ni chafwyd hyd i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
+        s"${dateRange.message}" + s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau ’n cael eu creu." +
+        s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
+        s"Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio" +
+        s" gohiriedig ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff" +
+        s" eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich datganiadau eu gwneud drwy ddefnyddio CHIEF" +
+        s" a chysylltwch â ${createHyperLink(guidanceLinkText, guidanceLink)} i wneud cais am ddatganiadau CHIEF" +
+        s"</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    }
   }
 
   val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"

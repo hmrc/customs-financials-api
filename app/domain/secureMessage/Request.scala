@@ -25,12 +25,12 @@ import utils.Utils.{encodeToUTF8Charsets, englishLangKey, welshLangKey}
 import java.time.LocalDate
 
 case class Request(externalRef: ExternalReference,
-                    recipient: Recipient,
-                    tags: Tags,
-                    content: List[Content],
-                    messageType: String,
-                    validFrom: String,
-                    alertQueue: String)
+                   recipient: Recipient,
+                   tags: Tags,
+                   content: List[Content],
+                   messageType: String,
+                   validFrom: String,
+                   alertQueue: String)
 
 object Request {
 
@@ -65,37 +65,31 @@ object Request {
     params.accountType match {
       case "DutyDefermentStatement" =>
         List(
-          Content(englishLangKey, SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(
-            company, DateRange(params, englishLangKey))
-          )),
-          Content(welshLangKey, SubjectDutyDef, encodeToUTF8Charsets(DutyDefermentBody(
-            company, DateRange(params, welshLangKey))))
-        )
+          Content(englishLangKey, SubjectDutyDef,
+            encodeToUTF8Charsets(DutyDefermentBody(company, DateRange(params, englishLangKey), englishLangKey))),
+          Content(welshLangKey, SubjectDutyDefCy,
+            encodeToUTF8Charsets(DutyDefermentBody(company, DateRange(params, welshLangKey), welshLangKey))))
 
       case "C79Certificate" =>
         List(
-          Content(englishLangKey, SubjectCert, encodeToUTF8Charsets(C79CertificateBody(
-            company, DateRange(params, englishLangKey)))
-          ),
-          Content(welshLangKey, SubjectCert, encodeToUTF8Charsets(C79CertificateBody(
-            company, DateRange(params, welshLangKey))))
-        )
+          Content(englishLangKey, SubjectCert,
+            encodeToUTF8Charsets(C79CertificateBody(company, DateRange(params, englishLangKey), englishLangKey))),
+          Content(welshLangKey, SubjectCertCy,
+            encodeToUTF8Charsets(C79CertificateBody(company, DateRange(params, welshLangKey), welshLangKey))))
 
       case "SecurityStatement" =>
         List(
-          Content(englishLangKey, SubjectSecurity, encodeToUTF8Charsets(SecurityBody(
-            company, DateRange(params, englishLangKey)))),
-          Content(welshLangKey, SubjectSecurity, encodeToUTF8Charsets(SecurityBody(
-            company, DateRange(params, welshLangKey))))
-        )
+          Content(englishLangKey, SubjectSecurity,
+            encodeToUTF8Charsets(SecurityBody(company, DateRange(params, englishLangKey), englishLangKey))),
+          Content(welshLangKey, SubjectSecurityCy,
+            encodeToUTF8Charsets(SecurityBody(company, DateRange(params, welshLangKey), welshLangKey))))
 
       case "PostponedVATStatement" =>
         List(
-          Content(englishLangKey, SubjectImport, encodeToUTF8Charsets(PostponedVATBody(
-            company, DateRange(params, englishLangKey)))),
-          Content(welshLangKey, SubjectImport, encodeToUTF8Charsets(PostponedVATBody(
-            company, DateRange(params, welshLangKey))))
-        )
+          Content(englishLangKey, SubjectImport,
+            encodeToUTF8Charsets(PostponedVATBody(company, DateRange(params, englishLangKey), englishLangKey))),
+          Content(welshLangKey, SubjectImportCy,
+            encodeToUTF8Charsets(PostponedVATBody(company, DateRange(params, welshLangKey), welshLangKey))))
     }
   }
 
