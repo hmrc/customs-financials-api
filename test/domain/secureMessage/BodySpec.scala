@@ -343,7 +343,6 @@ class BodySpec extends SpecBase {
       "nYW5pYWRhdSBhIHduYWVkIGdhbiBkZGVmbnlkZGlv4oCZciBnd2FzYW5hZXRoIENISUVGLjwvbGk+PC9vbD48YnIvPk9kZGkgd3J0aCB5" +
       "IEd3YXNhbmFldGggRGF0Z2FuaWFkYXUgVG9sbGF1"
 
-
     val params: Params = Params(periodStartMonth = "02",
       periodStartYear = "2021",
       periodEndMonth = "04",
