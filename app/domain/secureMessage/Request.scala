@@ -62,34 +62,38 @@ object Request {
   }
 
   private def contents(params: Params, company: String): List[Content] = {
+
+    val en = DateRange(params, englishLangKey)
+    val cy = DateRange(params, welshLangKey)
+
     params.accountType match {
       case "DutyDefermentStatement" =>
         List(
-          Content(englishLangKey, SubjectDutyDef,
-            encodeToUTF8Charsets(DutyDefermentBody(company, DateRange(params, englishLangKey), englishLangKey))),
-          Content(welshLangKey, SubjectDutyDefCy,
-            encodeToUTF8Charsets(DutyDefermentBody(company, DateRange(params, welshLangKey), welshLangKey))))
+          Content(englishLangKey, s"${SubjectDutyDef}${en.dateAsNumber}",
+            encodeToUTF8Charsets(DutyDefermentBody(company, en, englishLangKey))),
+          Content(welshLangKey, s"${SubjectDutyDefCy}${cy.dateAsNumber}",
+            encodeToUTF8Charsets(DutyDefermentBody(company, cy, welshLangKey))))
 
       case "C79Certificate" =>
         List(
-          Content(englishLangKey, SubjectCert,
-            encodeToUTF8Charsets(C79CertificateBody(company, DateRange(params, englishLangKey), englishLangKey))),
-          Content(welshLangKey, SubjectCertCy,
-            encodeToUTF8Charsets(C79CertificateBody(company, DateRange(params, welshLangKey), welshLangKey))))
+          Content(englishLangKey, s"${SubjectCert}${en.dateAsNumber}",
+            encodeToUTF8Charsets(C79CertificateBody(company, en, englishLangKey))),
+          Content(welshLangKey, s"${SubjectCertCy}${cy.dateAsNumber}",
+            encodeToUTF8Charsets(C79CertificateBody(company, cy, welshLangKey))))
 
       case "SecurityStatement" =>
         List(
-          Content(englishLangKey, SubjectSecurity,
-            encodeToUTF8Charsets(SecurityBody(company, DateRange(params, englishLangKey), englishLangKey))),
-          Content(welshLangKey, SubjectSecurityCy,
-            encodeToUTF8Charsets(SecurityBody(company, DateRange(params, welshLangKey), welshLangKey))))
+          Content(englishLangKey, s"${SubjectSecurity}${en.dateAsNumber}",
+            encodeToUTF8Charsets(SecurityBody(company, en, englishLangKey))),
+          Content(welshLangKey, s"${SubjectSecurityCy}${cy.dateAsNumber}",
+            encodeToUTF8Charsets(SecurityBody(company, cy, welshLangKey))))
 
       case "PostponedVATStatement" =>
         List(
-          Content(englishLangKey, SubjectImport,
-            encodeToUTF8Charsets(PostponedVATBody(company, DateRange(params, englishLangKey), englishLangKey))),
-          Content(welshLangKey, SubjectImportCy,
-            encodeToUTF8Charsets(PostponedVATBody(company, DateRange(params, welshLangKey), welshLangKey))))
+          Content(englishLangKey, s"${SubjectImport}${en.dateAsNumber}",
+            encodeToUTF8Charsets(PostponedVATBody(company, en, englishLangKey))),
+          Content(welshLangKey, s"${SubjectImportCy}${cy.dateAsNumber}",
+            encodeToUTF8Charsets(PostponedVATBody(company, cy, welshLangKey))))
     }
   }
 

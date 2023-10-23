@@ -59,7 +59,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe dutyStatement
+      expectedRequest.content.head.subject mustBe s"${dutyStatement}${subjectDate}"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(DutyDefermentBody("Company Name", dateRange))
     }
@@ -69,7 +69,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe c79cert
+      expectedRequest.content.head.subject mustBe s"${c79cert}${subjectDate}"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(C79CertificateBody("Company Name", dateRange))
     }
@@ -79,7 +79,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe securityStatement
+      expectedRequest.content.head.subject mustBe s"${securityStatement}${subjectDate}"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(SecurityBody("Company Name", dateRange))
     }
@@ -89,7 +89,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe postPonedVATStatement
+      expectedRequest.content.head.subject mustBe s"${postPonedVATStatement}${subjectDate}"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(PostponedVATBody("Company Name", dateRange))
     }
@@ -99,7 +99,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe dutyStatementCy
+      expectedRequest.content(1).subject mustBe s"${dutyStatementCy}${subjectDateCy}"
       expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
         DutyDefermentBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
@@ -109,7 +109,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe c79certCy
+      expectedRequest.content(1).subject mustBe s"${c79certCy}${subjectDateCy}"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(C79CertificateBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
@@ -120,7 +120,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe securityStatementCy
+      expectedRequest.content(1).subject mustBe s"${securityStatementCy}${subjectDateCy}"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(SecurityBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
@@ -130,7 +130,7 @@ class RequestSpec extends SpecBase {
       val modifiedDoc = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe postPonedVATStatementCy
+      expectedRequest.content(1).subject mustBe s"${postPonedVATStatementCy}${subjectDateCy}"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(PostponedVATBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
@@ -199,6 +199,7 @@ trait Setup {
   val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
   val dataRangeParam: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
   val dateRange: DateRange = DateRange(dataRangeParam, englishLangKey)
+
   val dateRangeForWelsh: DateRange = DateRange(dataRangeParam, welshLangKey)
 
   val searchRequests: Set[SearchRequest] = Set(
@@ -219,15 +220,18 @@ trait Setup {
         DutyDefermentBody("Company Name", dateRange, welshLangKey)))
   }
 
-  val dutyStatement: String = "Requested duty deferment statements"
-  val c79cert: String = "Requested import VAT certificates (C79)"
-  val securityStatement: String = "Requested notification of adjustment statements"
-  val postPonedVATStatement: String = "Requested postponed import VAT statements"
+  val dutyStatement: String = "Requested duty deferment statements "
+  val c79cert: String = "Requested import VAT certificates (C79) "
+  val securityStatement: String = "Requested notification of adjustment statements "
+  val postPonedVATStatement: String = "Requested postponed import VAT statements "
 
-  val dutyStatementCy = "Datganiadau gohirio tollau"
-  val c79certCy = "Tystysgrifau TAW mewnforio (C79)"
-  val securityStatementCy = "Hysbysiad o ddatganiadau addasu"
-  val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig"
+  val dutyStatementCy = "Datganiadau gohirio tollau "
+  val c79certCy = "Tystysgrifau TAW mewnforio (C79) "
+  val securityStatementCy = "Hysbysiad o ddatganiadau addasu "
+  val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig "
+
+  val subjectDate = "02 2021 to 04 2021"
+  val subjectDateCy = "02 2021 i 04 2021"
 
   val histDocRequestSearch: HistoricDocumentRequestSearch =
     HistoricDocumentRequestSearch(searchID,
