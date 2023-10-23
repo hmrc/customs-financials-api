@@ -59,22 +59,22 @@ class BodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "September 2022 to October 2022")
+      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = "")
       DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "January 2022 to April 2022")
+      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = "")
       C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "March 2021 to May 2021")
+      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = "")
       SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "February 2022 to March 2022")
+      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = "")
       PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody
     }
 
@@ -84,22 +84,22 @@ class BodySpec extends SpecBase {
     }
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "September 2022 to October 2022")
+      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = "")
       DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "January 2022 to April 2022")
+      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = "")
       C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestC79CertificateBodyCy
     }
 
     "display SecurityBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "March 2021 to May 2021")
+      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = "")
       SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestSecurityBodyCy
     }
 
-    "display PostponedVATBody correctlyi in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(message = "February 2022 to March 2022")
+    "display PostponedVATBody correctly in welsh" in new Setup {
+      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = "")
       PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestPostponedVATBodyCy
     }
 
@@ -189,18 +189,28 @@ class BodySpec extends SpecBase {
   }
 
   "DateRange.apply" should {
-    "create the DateRange object with correct contents for English" in new Setup {
-      DateRange(params, Utils.englishLangKey).message mustBe "February 2021 to April 2021"
+    "create the DateRange.dateAsText object with correct contents for English" in new Setup {
+      DateRange(params, Utils.englishLangKey).dateAsText mustBe "February 2021 to April 2021"
     }
 
-    "create the DateRange object with correct contents for Welsh" in new Setup {
-      DateRange(params, Utils.welshLangKey).message mustBe "Chwefror 2021 i Ebrill 2021"
+    "create the DateRange.dateAsText object with correct contents for Welsh" in new Setup {
+      DateRange(params, Utils.welshLangKey).dateAsText mustBe "Chwefror 2021 i Ebrill 2021"
+    }
+
+    "create the DateRange.dateAsNumber object with correct contents for English" in new Setup {
+      DateRange(params, Utils.englishLangKey).dateAsNumber mustBe "02 2021 to 04 2021"
+    }
+
+    "create the DateRange.dateAsNumber object with correct contents for Welsh" in new Setup {
+      DateRange(params, Utils.welshLangKey).dateAsNumber mustBe "02 2021 i 04 2021"
     }
   }
 
   "DateRange Reads" should {
     "generate the correct output" in new Setup {
+
       import domain.secureMessage.DateRange.dateRangeFormat
+
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(dateRange)
     }
   }
@@ -225,10 +235,10 @@ class BodySpec extends SpecBase {
     val TestSecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
     val TestPostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
-    val TestSubjectDutyDef = "Requested duty deferment statements"
-    val TestSubjectCert = "Requested import VAT certificates (C79)"
-    val TestSubjectSecurity: String = "Requested notification of adjustment statements"
-    val TestSubjectImport = "Requested postponed import VAT statements"
+    val TestSubjectDutyDef = "Requested duty deferment statements "
+    val TestSubjectCert = "Requested import VAT certificates (C79) "
+    val TestSubjectSecurity: String = "Requested notification of adjustment statements "
+    val TestSubjectImport = "Requested postponed import VAT statements "
 
     val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +
@@ -350,7 +360,7 @@ class BodySpec extends SpecBase {
       accountType = "PostponedVATStatement",
       dan = "1234567")
 
-    val jsValue: String = """{"message":"test_msg"}""".stripMargin
-    val dateRange: DateRange = DateRange(message = "test_msg")
+    val jsValue: String = """{"dateAsText":"test_msg","dateAsNumber":"test_msg"}""".stripMargin
+    val dateRange: DateRange = DateRange(dateAsText = "test_msg", dateAsNumber = "test_msg")
   }
 }

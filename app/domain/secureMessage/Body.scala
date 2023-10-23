@@ -53,20 +53,26 @@ object Content {
   implicit val contentFormat: OFormat[Content] = Json.format[Content]
 }
 
-case class DateRange(message: String)
+case class DateRange(dateAsText: String, dateAsNumber: String)
 
 object DateRange {
   def apply(params: Params, lang: String = englishLangKey): DateRange = {
 
-    val startMonthFullName = convertMonthValueToFullMonthName(params.periodStartMonth, lang)
+    val startMonth = params.periodStartMonth
+    val endMonth = params.periodEndMonth
     val startYear = params.periodStartYear
-    val endMonthFullName = convertMonthValueToFullMonthName(params.periodEndMonth, lang)
     val endYear = params.periodEndYear
 
-    val dateRangeMsg = s"$startMonthFullName$singleSpace$startYear$singleSpace${
+    val startMonthFullName = convertMonthValueToFullMonthName(startMonth, lang)
+    val endMonthFullName = convertMonthValueToFullMonthName(endMonth, lang)
+
+    val dateRangeMsgText = s"$startMonthFullName$singleSpace$startYear$singleSpace${
       if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
 
-    DateRange(dateRangeMsg)
+    val dateRangeMsgNum = s"$startMonth$singleSpace$startYear$singleSpace${
+      if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonth$singleSpace$endYear"
+
+    DateRange(dateRangeMsgText, dateRangeMsgNum)
   }
 
   implicit val dateRangeFormat: OFormat[DateRange] = Json.format[DateRange]
@@ -74,15 +80,15 @@ object DateRange {
 
 object SecureMessage {
 
-  val SubjectDutyDef = "Requested duty deferment statements"
-  val SubjectCert = "Requested import VAT certificates (C79)"
-  val SubjectSecurity = "Requested notification of adjustment statements"
-  val SubjectImport = "Requested postponed import VAT statements"
+  val SubjectDutyDef = "Requested duty deferment statements "
+  val SubjectCert = "Requested import VAT certificates (C79) "
+  val SubjectSecurity = "Requested notification of adjustment statements "
+  val SubjectImport = "Requested postponed import VAT statements "
 
-  val SubjectDutyDefCy = "Datganiadau gohirio tollau"
-  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79)"
-  val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu"
-  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig"
+  val SubjectDutyDefCy = "Datganiadau gohirio tollau "
+  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) "
+  val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu "
+  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig "
 
   val SignOff = "From the Customs Declaration Service"
   val WereNotFound = " were not found.<br/><br/>"
@@ -108,7 +114,7 @@ object SecureMessage {
       val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
 
       s"Dear ${companyName}<br/><br/>" +
-        s"The duty deferment statements ${YouRequestedFor} ${dateRange.message}" +
+        s"The duty deferment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"${ImportVATCerts} ${MadeUsingCustoms}" +
         " You can get duty deferment statements for declarations made using CHIEF" +
@@ -117,7 +123,7 @@ object SecureMessage {
       val guidanceLinkText = " Datganiadau Electronig i Ohirio Tollau (DDES)"
 
       s"Annwyl ${companyName} <br/><br/>" +
-        s"Ni chafwyd hyd i’r datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.message}." +
+        s"Ni chafwyd hyd i’r datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
         s"Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae " +
         s"datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y" +
         s" gwnaethoch gais amdanynt.</li><br/>" +
@@ -138,14 +144,14 @@ object SecureMessage {
 
     if (lang == englishLangKey) {
       s"Dear ${companyName}<br/><br/>" +
-        s"The import VAT certificates ${YouRequestedFor} ${dateRange.message}" +
+        s"The import VAT certificates ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
         s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
         s"${RequestChief}</li></ol>${SignOff}"
     } else {
 
       s"Annwyl ${companyName}<br/><br/>" +
-        s"Ni chafwyd hyd i’r Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.message}." +
+        s"Ni chafwyd hyd i’r Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
         s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
         s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
@@ -164,14 +170,14 @@ object SecureMessage {
                    lang: String = englishLangKey): String = {
     if (lang == englishLangKey) {
       s"Dear ${companyName}<br/><br/>" +
-        s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.message}" +
+        s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
         s"<br/></li></ol>${SignOff}"
     } else {
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
-        s"${dateRange.message}." + "Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"${dateRange.dateAsText}." + "Mae dau reswm posibl am hyn:<br/><ol><li>" +
         "Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
         "Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         "<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o ddatganiadau " +
@@ -189,7 +195,7 @@ object SecureMessage {
 
     if (lang == englishLangKey) {
       s"Dear ${companyName}<br/><br/>" +
-        s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.message}" +
+        s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
         s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
@@ -197,7 +203,7 @@ object SecureMessage {
     } else {
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
-        s"${dateRange.message}" + s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"${dateRange.dateAsText}" + s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau ’n cael eu creu." +
         s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         s"Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio" +
