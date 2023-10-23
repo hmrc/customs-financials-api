@@ -33,18 +33,18 @@ sealed trait EmailTemplate {
 }
 
 object EmailTemplate {
-  def fromNotification(emailAddress: EmailAddress, notification: Notification): Option[EmailTemplate] = {
+  def fromNotification(emailAddress: EmailAddress, notification: Notification, companyName: String): Option[EmailTemplate] = {
     val isHistoricStatement = notification.metadata.contains("statementRequestID")
     notification.fileRole.value match {
-      case "DutyDefermentStatement" if isHistoricStatement => Some(HistoricDutyDefermentStatementEmail(emailAddress, notification.eori.value))
-      case "DutyDefermentStatement" => createDutyDefermentEmailRequestParams(notification.metadata).map { params => DutyDefermentStatementEmail(emailAddress, notification.eori.value, params) }
-      case "C79Certificate" if isHistoricStatement => Some(HistoricC79CertificateEmail(emailAddress, notification.eori.value))
-      case "C79Certificate" => Some(C79CertificateEmail(emailAddress, notification.eori.value))
-      case "SecurityStatement" if isHistoricStatement => Some(HistoricSecurityStatementEmail(emailAddress, notification.eori.value))
-      case "SecurityStatement" => Some(SecurityStatementEmail(emailAddress, notification.eori.value))
-      case "PostponedVATStatement" if isHistoricStatement => Some(HistoricPostponedVATStatementEmail(emailAddress, notification.eori.value))
-      case "PostponedVATStatement" => Some(PostponedVatEmail(emailAddress, notification.eori.value))
-      case "StandingAuthority" => Some(AuthoritiesStatementEmail(emailAddress, notification.eori.value))
+      case "DutyDefermentStatement" if isHistoricStatement => Some(HistoricDutyDefermentStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "DutyDefermentStatement" => createDutyDefermentEmailRequestParams(notification.metadata).map { params => DutyDefermentStatementEmail(emailAddress, notification.eori.value, params ++ Map("recipientName_line1"-> companyName)) }
+      case "C79Certificate" if isHistoricStatement => Some(HistoricC79CertificateEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "C79Certificate" => Some(C79CertificateEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "SecurityStatement" if isHistoricStatement => Some(HistoricSecurityStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "SecurityStatement" => Some(SecurityStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "PostponedVATStatement" if isHistoricStatement => Some(HistoricPostponedVATStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "PostponedVATStatement" => Some(PostponedVatEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
+      case "StandingAuthority" => Some(AuthoritiesStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
       case _ => Some(Unknown(emailAddress, notification.eori.value))
     }
   }
@@ -86,19 +86,19 @@ object EmailTemplate {
   }
 }
 
-case class HistoricDutyDefermentStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class HistoricDutyDefermentStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_duty_deferment_statement"
 }
 
-case class HistoricC79CertificateEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class HistoricC79CertificateEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_historic_c79_certificate"
 }
 
-case class HistoricPostponedVATStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class HistoricPostponedVATStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_postponed_vat_notification"
 }
 
-case class HistoricSecurityStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class HistoricSecurityStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_import_adjustment"
 }
 
@@ -106,15 +106,15 @@ case class DutyDefermentStatementEmail(email: EmailAddress, eori: String, overri
   override val templateId: String = "customs_financials_new_statement_notification"
 }
 
-case class C79CertificateEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class C79CertificateEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_new_c79_certificate"
 }
 
-case class SecurityStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class SecurityStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_new_import_adjustment"
 }
 
-case class PostponedVatEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class PostponedVatEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_new_postponed_vat_notification"
 }
 
@@ -123,7 +123,7 @@ case class Unknown(email: EmailAddress, eori: String) extends EmailTemplate {
   override val params: Map[String, String] = Map("Name" -> "test")
 }
 
-case class AuthoritiesStatementEmail(email: EmailAddress, eori: String) extends EmailTemplate {
+case class AuthoritiesStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_for_standing_authorities"
 }
 
