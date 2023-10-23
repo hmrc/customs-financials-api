@@ -21,6 +21,7 @@ import models.Params
 import play.api.libs.json.{JsSuccess, Json}
 import utils.{SpecBase, Utils}
 import utils.Utils._
+import utils.Utils.emptyString
 
 class BodySpec extends SpecBase {
 
@@ -59,22 +60,22 @@ class BodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
       DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
       C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody
     }
 
     "display SecurityBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
       SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
       PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody
     }
 
@@ -84,22 +85,22 @@ class BodySpec extends SpecBase {
     }
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
       DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
       C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestC79CertificateBodyCy
     }
 
     "display SecurityBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
       SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestSecurityBodyCy
     }
 
     "display PostponedVATBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = "")
+      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
       PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestPostponedVATBodyCy
     }
 
@@ -189,19 +190,19 @@ class BodySpec extends SpecBase {
   }
 
   "DateRange.apply" should {
-    "create the DateRange.dateAsText object with correct contents for English" in new Setup {
+    "create the DateRange object with correct contents for English as Text" in new Setup {
       DateRange(params, Utils.englishLangKey).dateAsText mustBe "February 2021 to April 2021"
     }
 
-    "create the DateRange.dateAsText object with correct contents for Welsh" in new Setup {
+    "create the DateRange object with correct contents for Welsh as Text" in new Setup {
       DateRange(params, Utils.welshLangKey).dateAsText mustBe "Chwefror 2021 i Ebrill 2021"
     }
 
-    "create the DateRange.dateAsNumber object with correct contents for English" in new Setup {
+    "create the DateRange object with correct contents for English as Numbers" in new Setup {
       DateRange(params, Utils.englishLangKey).dateAsNumber mustBe "02 2021 to 04 2021"
     }
 
-    "create the DateRange.dateAsNumber object with correct contents for Welsh" in new Setup {
+    "create the DateRange object with correct contents for Welsh as Numbers" in new Setup {
       DateRange(params, Utils.welshLangKey).dateAsNumber mustBe "02 2021 i 04 2021"
     }
   }

@@ -69,30 +69,30 @@ object Request {
     params.accountType match {
       case "DutyDefermentStatement" =>
         List(
-          Content(englishLangKey, SubjectDutyDef + en.dateAsNumber,
+          Content(englishLangKey, s"${SubjectDutyDef}${en.dateAsNumber}",
             encodeToUTF8Charsets(DutyDefermentBody(company, en, englishLangKey))),
-          Content(welshLangKey, SubjectDutyDefCy + cy.dateAsNumber,
+          Content(welshLangKey, s"${SubjectDutyDefCy}${cy.dateAsNumber}",
             encodeToUTF8Charsets(DutyDefermentBody(company, cy, welshLangKey))))
 
       case "C79Certificate" =>
         List(
-          Content(englishLangKey, SubjectCert + en.dateAsNumber,
+          Content(englishLangKey, s"${SubjectCert}${en.dateAsNumber}",
             encodeToUTF8Charsets(C79CertificateBody(company, en, englishLangKey))),
-          Content(welshLangKey, SubjectCertCy + cy.dateAsNumber,
+          Content(welshLangKey, s"${SubjectCerCyt}${cy.dateAsNumber}",
             encodeToUTF8Charsets(C79CertificateBody(company, cy, welshLangKey))))
 
       case "SecurityStatement" =>
         List(
-          Content(englishLangKey, SubjectSecurity + en.dateAsNumber,
+          Content(englishLangKey, s"${SubjectSecurity}${en.dateAsNumber}",
             encodeToUTF8Charsets(SecurityBody(company, en, englishLangKey))),
-          Content(welshLangKey, SubjectSecurityCy + cy.dateAsNumber,
+          Content(welshLangKey, s"${SubjectSecurityCy}${cy.dateAsNumber}",
             encodeToUTF8Charsets(SecurityBody(company, cy, welshLangKey))))
 
       case "PostponedVATStatement" =>
         List(
-          Content(englishLangKey, SubjectImport + en.dateAsNumber,
+          Content(englishLangKey, s"${SubjectImport}${en.dateAsNumber}",
             encodeToUTF8Charsets(PostponedVATBody(company, en, englishLangKey))),
-          Content(welshLangKey, SubjectImportCy + cy.dateAsNumber,
+          Content(welshLangKey, s"${SubjectImportCy}${cy.dateAsNumber}",
             encodeToUTF8Charsets(PostponedVATBody(company, cy, welshLangKey))))
     }
   }
