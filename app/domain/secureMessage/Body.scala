@@ -22,7 +22,6 @@ import utils.Utils._
 
 case class Body(eori: String)
 
-
 case class ExternalReference(id: String, source: String)
 
 object ExternalReference {

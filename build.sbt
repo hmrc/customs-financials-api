@@ -22,7 +22,6 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
   )
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
   .settings(parallelExecution in Test := false)
