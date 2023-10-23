@@ -78,7 +78,7 @@ object Request {
         List(
           Content(englishLangKey, s"${SubjectCert}${en.dateAsNumber}",
             encodeToUTF8Charsets(C79CertificateBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"${SubjectCerCyt}${cy.dateAsNumber}",
+          Content(welshLangKey, s"${SubjectCertCy}${cy.dateAsNumber}",
             encodeToUTF8Charsets(C79CertificateBody(company, cy, welshLangKey))))
 
       case "SecurityStatement" =>
