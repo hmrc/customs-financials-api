@@ -296,7 +296,7 @@ class BodySpec extends SpecBase {
 
     val TestDutyDefermentBodyCy: String = "Annwyl Apples & Pears Ltd <br/><br/>Ni chafwyd hyd i’r" +
       " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
-      " 2022.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+      " 2022.<br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
       " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
       " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
       " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
@@ -309,7 +309,7 @@ class BodySpec extends SpecBase {
 
     val TestC79CertificateBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
       " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
-      " 2022.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+      " 2022.<br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
       " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
       " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
       " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
@@ -320,7 +320,7 @@ class BodySpec extends SpecBase {
 
     val TestSecurityBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
       " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
-      " May 2021.Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
+      " May 2021.<br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
       " gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu.Gwiriwch eich bod wedi" +
       " mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni" +
       " ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o" +
@@ -330,7 +330,7 @@ class BodySpec extends SpecBase {
 
     val TestPostponedVATBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd" +
       " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
-      "February 2022 to March 2022Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
+      "February 2022 to March 2022.<br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
       " ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau" +
       " ’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau" +
       " y gwnaethoch gais amdanynt.</li><br/>Ni ellir defnyddio’r Gwasanaeth Datganiadau" +
@@ -340,19 +340,18 @@ class BodySpec extends SpecBase {
       " eu gwneud drwy ddefnyddio CHIEF a chysylltwch â <a class=\"govuk-link\" href=\"mailto:pvaenquiries@hmrc.gov.uk\">" +
       "pvaenquiries@hmrc.gov.uk</a> i wneud cais am ddatganiadau CHIEF</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
-    val encodedDutyDeferementBodyCy: String = "QW5ud3lsIEFwcGxlcyAmIFBlYXJzIEx0ZCA8YnIvPjxici8+TmkgY2hhZnd5ZCBoe" +
-      "WQgaeKAmXIgZGF0Z2FuaWFkYXUgZ29oaXJpbyB0b2xsYXUgeSBnd25hZXRob2NoIGdhaXMgYW1kYW55bnQgYXIgZ3lmZXIgbWlzIFNlcH" +
-      "RlbWJlciAyMDIyIHRvIE9jdG9iZXIgMjAyMi5NYWUgZGF1IHJlc3dtIHBvc2libCBhbSBoeW46PGJyLz48b2w+PGxpPkRpbSBvbmQgYXI" +
-      "gZ3lmZXIgeSBjeWZub2RhdSBsbGUgeSBnd25hZXRob2NoIGZld25mb3JpbyBud3lkZGF1IHkgbWFlIGRhdGdhbmlhZGF14oCZbiBjYWVs" +
-      "IGV1IGNyZXUuIEd3aXJpd2NoIGVpY2ggYm9kIHdlZGkgbWV3bmZvcmlvIG53eWRkYXUgeW4geXN0b2QgeSBkeWRkaWFkYXUgeSBnd25hZ" +
-      "XRob2NoIGdhaXMgYW1kYW55bnQuPC9saT48YnIvPjxsaT5OaSBlbGxpciBkZWZueWRkaW/igJlyIEd3YXNhbmFldGggRGF0Z2FuaWFkYX" +
-      "UgVG9sbGF1IChDRFMpIGkgd25ldWQgY2FpcyBhbSBkeXN0eXNncmlmYXUgVEFXIG1ld25mb3JpbyBhciBneWZlciBkYXRnYW5pYWRhdSB" +
-      "hIHduYWVkIGdhbiBkZGVmbnlkZGlvIHN5c3RlbSB5IFRvbGxhdSBhciBneWZlciBUcmluIE53eWRkYXUgYSBHYWlmZiBldSBNZXduZm9y" +
-      "aW8gYeKAmXUgSGFsbGZvcmlvIChDSElFRikuIEdhbGx3Y2ggZGRlZm55ZGRpb+KAmXIgZ3dhc2FuYWV0aCA8YSBjbGFzcz0iZ292dWstb" +
-      "GluayIgaHJlZj0iaHR0cHM6Ly9zZWN1cmUuaG1jZS5nb3YudWsvZWNvbS9sb2dpbi9pbmRleC5odG1sIj4gRGF0Z2FuaWFkYXUgRWxlY3" +
-      "Ryb25pZyBpIE9oaXJpbyBUb2xsYXUgKERERVMpPC9hPmkgZ2FlbCBkYXRnYW5pYWRhdSBnb2hpcmlvIHRvbGxhdSBhciBneWZlciBkYXR" +
-      "nYW5pYWRhdSBhIHduYWVkIGdhbiBkZGVmbnlkZGlv4oCZciBnd2FzYW5hZXRoIENISUVGLjwvbGk+PC9vbD48YnIvPk9kZGkgd3J0aCB5" +
-      "IEd3YXNhbmFldGggRGF0Z2FuaWFkYXUgVG9sbGF1"
+    val encodedDutyDeferementBodyCy: String = "QW5ud3lsIEFwcGxlcyAmIFBlYXJzIEx0ZCA8YnIvPjxici8+TmkgY2hhZnd5ZCBoeWQgaeK" +
+      "AmXIgZGF0Z2FuaWFkYXUgZ29oaXJpbyB0b2xsYXUgeSBnd25hZXRob2NoIGdhaXMgYW1kYW55bnQgYXIgZ3lmZXIgbWlzIFNlcHRlbWJlciAyMD" +
+      "IyIHRvIE9jdG9iZXIgMjAyMi48YnIvPk1hZSBkYXUgcmVzd20gcG9zaWJsIGFtIGh5bjo8YnIvPjxvbD48bGk+RGltIG9uZCBhciBneWZlciB5I" +
+      "GN5Zm5vZGF1IGxsZSB5IGd3bmFldGhvY2ggZmV3bmZvcmlvIG53eWRkYXUgeSBtYWUgZGF0Z2FuaWFkYXXigJluIGNhZWwgZXUgY3JldS4gR3dp" +
+      "cml3Y2ggZWljaCBib2Qgd2VkaSBtZXduZm9yaW8gbnd5ZGRhdSB5biB5c3RvZCB5IGR5ZGRpYWRhdSB5IGd3bmFldGhvY2ggZ2FpcyBhbWRhbnl" +
+      "udC48L2xpPjxici8+PGxpPk5pIGVsbGlyIGRlZm55ZGRpb+KAmXIgR3dhc2FuYWV0aCBEYXRnYW5pYWRhdSBUb2xsYXUgKENEUykgaSB3bmV1ZC" +
+      "BjYWlzIGFtIGR5c3R5c2dyaWZhdSBUQVcgbWV3bmZvcmlvIGFyIGd5ZmVyIGRhdGdhbmlhZGF1IGEgd25hZWQgZ2FuIGRkZWZueWRkaW8gc3lzd" +
+      "GVtIHkgVG9sbGF1IGFyIGd5ZmVyIFRyaW4gTnd5ZGRhdSBhIEdhaWZmIGV1IE1ld25mb3JpbyBh4oCZdSBIYWxsZm9yaW8gKENISUVGKS4gR2Fs" +
+      "bHdjaCBkZGVmbnlkZGlv4oCZciBnd2FzYW5hZXRoIDxhIGNsYXNzPSJnb3Z1ay1saW5rIiBocmVmPSJodHRwczovL3NlY3VyZS5obWNlLmdvdi5" +
+      "1ay9lY29tL2xvZ2luL2luZGV4Lmh0bWwiPiBEYXRnYW5pYWRhdSBFbGVjdHJvbmlnIGkgT2hpcmlvIFRvbGxhdSAoRERFUyk8L2E+aSBnYWVsIG" +
+      "RhdGdhbmlhZGF1IGdvaGlyaW8gdG9sbGF1IGFyIGd5ZmVyIGRhdGdhbmlhZGF1IGEgd25hZWQgZ2FuIGRkZWZueWRkaW/igJlyIGd3YXNhbmFld" +
+      "GggQ0hJRUYuPC9saT48L29sPjxici8+T2RkaSB3cnRoIHkgR3dhc2FuYWV0aCBEYXRnYW5pYWRhdSBUb2xsYXU="
 
     val params: Params = Params(periodStartMonth = "02",
       periodStartYear = "2021",
