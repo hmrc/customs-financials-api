@@ -86,7 +86,7 @@ object SecureMessage {
   val SubjectImport = "Requested postponed import VAT statements "
 
   val SubjectDutyDefCy = "Datganiadau gohirio tollau "
-  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) "
+  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
   val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu "
   val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig "
 

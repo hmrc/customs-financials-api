@@ -226,7 +226,7 @@ trait Setup {
   val postPonedVATStatement: String = "Requested postponed import VAT statements "
 
   val dutyStatementCy = "Datganiadau gohirio tollau "
-  val c79certCy = "Tystysgrifau TAW mewnforio (C79) "
+  val c79certCy = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
   val securityStatementCy = "Hysbysiad o ddatganiadau addasu "
   val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig "
 
