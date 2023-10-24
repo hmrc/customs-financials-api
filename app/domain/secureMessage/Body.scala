@@ -85,10 +85,10 @@ object SecureMessage {
   val SubjectSecurity = "Requested notification of adjustment statements "
   val SubjectImport = "Requested postponed import VAT statements "
 
-  val SubjectDutyDefCy = "Datganiadau gohirio tollau "
-  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) "
-  val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu "
-  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig "
+  val SubjectDutyDefCy = "Datganiadau gohirio tollau a wnaed cais amdanynt "
+  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
+  val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu a wnaed cais amdanynt"
+  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig a wnaed cais amdanynt "
 
   val SignOff = "From the Customs Declaration Service"
   val WereNotFound = " were not found.<br/><br/>"
@@ -124,7 +124,7 @@ object SecureMessage {
 
       s"Annwyl ${companyName} <br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
-        s"Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae " +
+        s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae " +
         s"datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y" +
         s" gwnaethoch gais amdanynt.</li><br/>" +
         s"<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau" +
@@ -152,7 +152,7 @@ object SecureMessage {
 
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
-        s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
         s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         s"<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau " +
@@ -177,7 +177,7 @@ object SecureMessage {
     } else {
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
-        s"${dateRange.dateAsText}." + "Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"${dateRange.dateAsText}." + "<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         "Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
         "Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         "<li>Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o ddatganiadau " +
@@ -203,7 +203,7 @@ object SecureMessage {
     } else {
       s"Annwyl ${companyName}<br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
-        s"${dateRange.dateAsText}" + s"Mae dau reswm posibl am hyn:<br/><ol><li>" +
+        s"${dateRange.dateAsText}." + s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau ’n cael eu creu." +
         s" Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/>" +
         s"Ni ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio" +

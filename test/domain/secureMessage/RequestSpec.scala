@@ -225,10 +225,10 @@ trait Setup {
   val securityStatement: String = "Requested notification of adjustment statements "
   val postPonedVATStatement: String = "Requested postponed import VAT statements "
 
-  val dutyStatementCy = "Datganiadau gohirio tollau "
-  val c79certCy = "Tystysgrifau TAW mewnforio (C79) "
-  val securityStatementCy = "Hysbysiad o ddatganiadau addasu "
-  val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig "
+  val dutyStatementCy = "Datganiadau gohirio tollau a wnaed cais amdanynt "
+  val c79certCy = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
+  val securityStatementCy = "Hysbysiad o ddatganiadau addasu a wnaed cais amdanynt"
+  val postPonedVATStatementCy = "Datganiadau TAW mewnforio ohiriedig a wnaed cais amdanynt "
 
   val subjectDate = "02 2021 to 04 2021"
   val subjectDateCy = "02 2021 i 04 2021"
