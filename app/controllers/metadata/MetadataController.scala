@@ -19,7 +19,7 @@ package controllers.metadata
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.SDESInputFormats._
 import domain.{Notification, NotificationsForEori}
-import models.{EORI, EmailTemplate, HistoricDocumentRequestSearch, SearchResultStatus}
+import models.{EmailTemplate, HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, LoggerLike}

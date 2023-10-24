@@ -104,6 +104,48 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+    "do not send email when companyName is not available " in new Setup {
+      val dd4emailRequest: JsValue = Json.parse(
+        """
+          |[
+          |    {
+          |        "eori":"testEORI-12345",
+          |		     "fileName": "vat-2018-05.pdf",
+          |        "fileSize": 75251,
+          |        "metadata": [
+          |            {"metadata": "PeriodStartYear", "value": "2017"},
+          |            {"metadata": "PeriodStartMonth", "value": "5"},
+          |            {"metadata": "PeriodStartDay", "value": "5"},
+          |            {"metadata": "PeriodEndYear", "value": "2018"},
+          |            {"metadata": "PeriodEndMonth", "value": "8"},
+          |            {"metadata": "PeriodEndDay", "value": "5"},
+          |            {"metadata": "PeriodIssueNumber", "value": "4"},
+          |            {"metadata": "FileType", "value": "PDF"},
+          |            {"metadata": "FileRole", "value": "DutyDefermentStatement"},
+          |            {"metadata": "DefermentStatementType", "value": "Weekly"},
+          |            {"metadata": "DutyOverLimit", "value": "Y"},
+          |            {"metadata": "DutyPaymentType", "value": "DirectDebit"}
+          |        ]
+          |    }
+          |]
+        """.stripMargin)
+
+      when(mockDataStore.getVerifiedEmail(any)(any))
+        .thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(EORI("testEORI")))(any))
+        .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(None))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
+        val result = route(app, req).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
     "send email when requested duty deferment statement is available" in new Setup {
       val newFileNotificationFromSDES: JsValue = Json.parse(
         """

@@ -37,7 +37,8 @@ object EmailTemplate {
     val isHistoricStatement = notification.metadata.contains("statementRequestID")
     notification.fileRole.value match {
       case "DutyDefermentStatement" if isHistoricStatement => Some(HistoricDutyDefermentStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
-      case "DutyDefermentStatement" => createDutyDefermentEmailRequestParams(notification.metadata).map { params => DutyDefermentStatementEmail(emailAddress, notification.eori.value, params ++ Map("recipientName_line1"-> companyName)) }
+      case "DutyDefermentStatement" => createDutyDefermentEmailRequestParams(notification.metadata).map { params => DutyDefermentStatementEmail(emailAddress, notification.eori.value,
+        params ++ Map("recipientName_line1"-> companyName)) }
       case "C79Certificate" if isHistoricStatement => Some(HistoricC79CertificateEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
       case "C79Certificate" => Some(C79CertificateEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
       case "SecurityStatement" if isHistoricStatement => Some(HistoricSecurityStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1"-> companyName)))
