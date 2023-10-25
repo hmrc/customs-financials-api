@@ -27,33 +27,33 @@ class BodySpec extends SpecBase {
 
   "Case Classes should be populated correctly" should {
     "ExternalReference" in new Setup {
-      val exRef = ExternalReference("id", "source")
+      val exRef: ExternalReference = ExternalReference("id", "source")
       exRef mustBe TestRef
     }
 
     "Body" in new Setup {
-      val body = Body("eori")
+      val body: Body = Body("eori")
       body mustBe TestBody
     }
 
     "Tax" in new Setup {
-      val tax = TaxIdentifier("name", "value")
+      val tax: TaxIdentifier = TaxIdentifier("name", "value")
       tax mustBe TestTax
     }
 
     "Receipient" in new Setup {
-      val tax = TaxIdentifier("name", "value")
-      val recip = Recipient("regime", tax, "Company Name", "test@test.com")
+      val tax: TaxIdentifier = TaxIdentifier("name", "value")
+      val recip: Recipient = Recipient("regime", tax, "Company Name", "test@test.com")
       recip mustBe TestRecip
     }
 
     "Tags" in new Setup {
-      val tags = Tags("NotificationType")
+      val tags: Tags = Tags("NotificationType")
       tags mustBe TestTags
     }
 
     "Content" in new Setup {
-      val content = Content("en", "accountType", "body")
+      val content: Content = Content("en", "accountType", "body")
       content mustBe TestContent
     }
   }
@@ -61,101 +61,111 @@ class BodySpec extends SpecBase {
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody
+      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody
+      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody
+      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody(applesAndPearsLtd)
     }
 
     "display PostponedVATBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody
+      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody(emptyString, dateRange) mustBe TestDutyDefermentBodyForEmptyCompanyName
+      DutyDefermentBody(emptyString, dateRange) mustBe TestDutyDefermentBody()
     }
 
     "display C79CertificateBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody(emptyString, dateRange) mustBe TestC79CertificateBodyForEmptyCompanyName
+      C79CertificateBody(emptyString, dateRange) mustBe TestC79CertificateBody()
     }
 
     "display SecurityBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange) mustBe TestSecurityBodyForEmptyCompanyName
+      SecurityBody(emptyString, dateRange) mustBe TestSecurityBody()
     }
 
     "display PostponedVATBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody(emptyString, dateRange) mustBe TestPostponedVATBodyForEmptyCompanyName
+      PostponedVATBody(emptyString, dateRange) mustBe TestPostponedVATBody()
     }
 
     "should encode correctly" in new Setup {
-      val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBody)
-      res mustBe encodedDutyDeferementBody
+      Utils.encodeToUTF8Charsets(TestDutyDefermentBody(applesAndPearsLtd)) mustBe encodedDutyDeferementBody
     }
 
     "should encode the body with empty company name correctly for English" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyForEmptyCompanyName) mustBe
+      Utils.encodeToUTF8Charsets(TestDutyDefermentBody()) mustBe
         encodedDutyDefermentBodyForEmptyCompanyName
     }
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy
+      DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        TestDutyDefermentBodyCy(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestC79CertificateBodyCy
+      C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        TestC79CertificateBodyCy(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestSecurityBodyCy
+      SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        TestSecurityBodyCy(applesAndPearsLtd)
     }
 
     "display PostponedVATBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe TestPostponedVATBodyCy
+      override val dateRange: DateRange = DateRange(
+        dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+
+      PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        TestPostponedVATBodyCy(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe TestDutyDefermentBodyCyWithEmptyCompanyName
+      override val dateRange: DateRange = DateRange(
+        dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
+      DutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy()
     }
 
     "display C79CertificateBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody(emptyString, dateRange, welshLangKey) mustBe TestC79CertificateBodyCyWithEmptyCompanyName
+      override val dateRange: DateRange = DateRange(
+        dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+
+      C79CertificateBody(emptyString, dateRange, welshLangKey) mustBe TestC79CertificateBodyCy()
     }
 
     "display SecurityBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange, welshLangKey) mustBe TestSecurityBodyCyWithEmptyCompanyName
+      SecurityBody(emptyString, dateRange, welshLangKey) mustBe TestSecurityBodyCy()
     }
 
     "display PostponedVATBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody(emptyString, dateRange, welshLangKey) mustBe TestPostponedVATBodyCyWithEmptyCompanyName
+      override val dateRange: DateRange = DateRange(
+        dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+
+      PostponedVATBody(emptyString, dateRange, welshLangKey) mustBe TestPostponedVATBodyCy()
     }
 
     "should encode correctly in welsh" in new Setup {
-      val res = Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy)
-      res mustBe encodedDutyDeferementBodyCy
+      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy(applesAndPearsLtd)) mustBe encodedDutyDeferementBodyCy
     }
 
     "should encode the body with empty company name correctly for Welsh" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCyWithEmptyCompanyName) mustBe
+      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy()) mustBe
         encodedDutyDeferementBodyCyForEmptyCompanyName
     }
 
@@ -291,7 +301,11 @@ class BodySpec extends SpecBase {
     val TestSubjectSecurity: String = "Requested notification of adjustment statements "
     val TestSubjectImport = "Requested postponed import VAT statements "
 
-    val TestDutyDefermentBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
+    val applesAndPearsLtd = "Apples & Pears Ltd"
+    val defaultCompanyName = "Customer"
+    val defaultCompanyNameCy = "Gwsmer"
+
+    def TestDutyDefermentBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>" +
       "Statements are only created for the periods in which you imported goods." +
@@ -303,19 +317,7 @@ class BodySpec extends SpecBase {
       "Duty Deferment Electronic Statements (DDES)</a>.<br/>" +
       "</li></ol>From the Customs Declaration Service"
 
-    val TestDutyDefermentBodyForEmptyCompanyName: String = "Dear Customer<br/><br/>" +
-      "The duty deferment statements you requested for September 2022 to October 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>" +
-      "Statements are only created for the periods in which you imported goods." +
-      " Check that you imported goods during the dates you requested.</li><br/>" +
-      "<li>Import VAT certificates for declarations made using Customs Handling " +
-      "of Import and Export Freight (CHIEF) cannot be requested using the Customs " +
-      "Declaration Service. You can get duty deferment statements for declarations" +
-      " made using CHIEF from <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
-      "Duty Deferment Electronic Statements (DDES)</a>.<br/>" +
-      "</li></ol>From the Customs Declaration Service"
-
-    val TestC79CertificateBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
+    def TestC79CertificateBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The import VAT certificates you requested for January 2022 to April 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created " +
       "for the periods in which you imported goods. Check that you imported goods during" +
@@ -326,18 +328,7 @@ class BodySpec extends SpecBase {
       "cbc-c79requests@hmrc.gov.uk</a> to request CHIEF statements.<br/></li></ol>" +
       "From the Customs Declaration Service"
 
-    val TestC79CertificateBodyForEmptyCompanyName: String = "Dear Customer<br/><br/>" +
-      "The import VAT certificates you requested for January 2022 to April 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created " +
-      "for the periods in which you imported goods. Check that you imported goods during" +
-      " the dates you requested.</li><br/><li>Import VAT certificates for declarations made" +
-      " using Customs Handling of Import and Export Freight (CHIEF) cannot be requested using" +
-      " the Customs Declaration Service. Check if your declarations were made using CHIEF and" +
-      " contact <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">" +
-      "cbc-c79requests@hmrc.gov.uk</a> to request CHIEF statements.<br/></li></ol>" +
-      "From the Customs Declaration Service"
-
-    val TestSecurityBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
+    def TestSecurityBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The notification of adjustment statements you requested for March 2021 to May 2021 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
@@ -345,25 +336,7 @@ class BodySpec extends SpecBase {
       "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
       "<br/></li></ol>From the Customs Declaration Service"
 
-    val TestSecurityBodyForEmptyCompanyName: String = "Dear Customer<br/><br/>" +
-      "The notification of adjustment statements you requested for March 2021 to May 2021 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
-      "periods in which you imported goods. Check that you imported goods during the dates you requested." +
-      "</li><br/><li>Notification of adjustment statements for declarations made using Customs Handling " +
-      "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
-      "<br/></li></ol>From the Customs Declaration Service"
-
-    val TestPostponedVATBody: String = "Dear Apples & Pears Ltd<br/><br/>" +
-      "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
-      "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
-      "periods in which you imported goods. Check that you imported goods during the dates you requested." +
-      "</li><br/><li>Postponed import VAT statements for declarations made using Customs Handling of " +
-      "Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service. " +
-      "Check if your declarations were made using CHIEF and contact <a class=\"govuk-link\" href=" +
-      "\"mailto:pvaenquiries@hmrc.gov.uk\">pvaenquiries@hmrc.gov.uk</a> to " +
-      "request CHIEF statements.<br/></li></ol>From the Customs Declaration Service"
-
-    val TestPostponedVATBodyForEmptyCompanyName: String = "Dear Customer<br/><br/>" +
+    def TestPostponedVATBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
@@ -398,97 +371,55 @@ class BodySpec extends SpecBase {
       "wiPkR1dHkgRGVmZXJtZW50IEVsZWN0cm9uaWMgU3RhdGVtZW50cyAoRERFUyk8L2E+Ljxici8+PC9saT48L29sPkZyb20gdGhlIEN1c3RvbXMg" +
       "RGVjbGFyYXRpb24gU2VydmljZQ=="
 
-    val TestDutyDefermentBodyCy: String = "Annwyl Apples & Pears Ltd <br/><br/>Ni chafwyd hyd i’r" +
-      " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
-      " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
-      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
-      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
-      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
-      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u" +
-      " Hallforio (CHIEF). Gallwch ddefnyddio’r gwasanaeth" +
-      " <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
-      " Datganiadau Electronig i Ohirio Tollau (DDES)</a>i gael datganiadau gohirio " +
-      "tollau ar gyfer datganiadau a wnaed gan ddefnyddio’r gwasanaeth CHIEF." +
-      "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    def TestDutyDefermentBodyCy(companyName: String = defaultCompanyNameCy): String =
+      s"Annwyl $companyName <br/><br/>Ni chafwyd hyd i’r" +
+        " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
+        " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+        " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
+        " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
+        " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
+        " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u" +
+        " Hallforio (CHIEF). Gallwch ddefnyddio’r gwasanaeth" +
+        " <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
+        " Datganiadau Electronig i Ohirio Tollau (DDES)</a>i gael datganiadau gohirio " +
+        "tollau ar gyfer datganiadau a wnaed gan ddefnyddio’r gwasanaeth CHIEF." +
+        "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
-    val TestDutyDefermentBodyCyWithEmptyCompanyName: String = "Annwyl Gwsmer <br/><br/>Ni chafwyd hyd i’r" +
-      " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
-      " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
-      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
-      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
-      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
-      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u" +
-      " Hallforio (CHIEF). Gallwch ddefnyddio’r gwasanaeth" +
-      " <a class=\"govuk-link\" href=\"https://secure.hmce.gov.uk/ecom/login/index.html\">" +
-      " Datganiadau Electronig i Ohirio Tollau (DDES)</a>i gael datganiadau gohirio " +
-      "tollau ar gyfer datganiadau a wnaed gan ddefnyddio’r gwasanaeth CHIEF." +
-      "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    def TestC79CertificateBodyCy(companyName: String = defaultCompanyNameCy): String =
+      s"Annwyl $companyName<br/><br/>Ni chafwyd hyd i’r" +
+        " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
+        " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
+        " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
+        " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
+        " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
+        " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio" +
+        " (CHIEF).Gwiriwch os cafodd eich datganiadau eu gwneud drwy ddefnyddio CHIEF a chysylltwch â" +
+        " <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">cbc-c79requests@hmrc.gov.uk</a>" +
+        " i wneud cais am ddatganiadau CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
-    val TestC79CertificateBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
-      " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
-      " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
-      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
-      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
-      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
-      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio" +
-      " (CHIEF).Gwiriwch os cafodd eich datganiadau eu gwneud drwy ddefnyddio CHIEF a chysylltwch â" +
-      " <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">cbc-c79requests@hmrc.gov.uk</a>" +
-      " i wneud cais am ddatganiadau CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    def TestSecurityBodyCy(companyName: String = defaultCompanyNameCy): String =
+      s"Annwyl $companyName<br/><br/>Ni chafwyd hyd i’r" +
+        " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
+        " May 2021.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
+        " gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu.Gwiriwch eich bod wedi" +
+        " mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni" +
+        " ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o" +
+        " ddatganiadau addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar" +
+        " gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).</li></ol><br/>Oddi" +
+        " wrth y Gwasanaeth Datganiadau Tollau"
 
-    val TestC79CertificateBodyCyWithEmptyCompanyName: String = "Annwyl Gwsmer<br/><br/>Ni chafwyd hyd i’r" +
-      " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
-      " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
-      " fewnforio nwyddau y mae datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau" +
-      " yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni ellir defnyddio’r Gwasanaeth" +
-      " Datganiadau Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio ar gyfer datganiadau a" +
-      " wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio" +
-      " (CHIEF).Gwiriwch os cafodd eich datganiadau eu gwneud drwy ddefnyddio CHIEF a chysylltwch â" +
-      " <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">cbc-c79requests@hmrc.gov.uk</a>" +
-      " i wneud cais am ddatganiadau CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
-
-    val TestSecurityBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd i’r" +
-      " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
-      " May 2021.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
-      " gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu.Gwiriwch eich bod wedi" +
-      " mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni" +
-      " ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o" +
-      " ddatganiadau addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar" +
-      " gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).</li></ol><br/>Oddi" +
-      " wrth y Gwasanaeth Datganiadau Tollau"
-
-    val TestSecurityBodyCyWithEmptyCompanyName: String = "Annwyl Gwsmer<br/><br/>Ni chafwyd hyd i’r" +
-      " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
-      " May 2021.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
-      " gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu.Gwiriwch eich bod wedi" +
-      " mewnforio nwyddau yn ystod y dyddiadau y gwnaethoch gais amdanynt.</li><br/><li>Ni" +
-      " ellir defnyddio’r Gwasanaeth Datganiadau Tollau (CDS) i wneud cais am hysbysiad o" +
-      " ddatganiadau addasu ar gyfer datganiadau a wnaed gan ddefnyddio system y Tollau ar" +
-      " gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).</li></ol><br/>Oddi" +
-      " wrth y Gwasanaeth Datganiadau Tollau"
-
-    val TestPostponedVATBodyCy: String = "Annwyl Apples & Pears Ltd<br/><br/>Ni chafwyd hyd" +
-      " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
-      "February 2022 to March 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
-      " ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau" +
-      " ’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau" +
-      " y gwnaethoch gais amdanynt.</li><br/>Ni ellir defnyddio’r Gwasanaeth Datganiadau" +
-      " Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio gohiriedig ar gyfer" +
-      " datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a" +
-      " Gaiff eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich datganiadau" +
-      " eu gwneud drwy ddefnyddio CHIEF a chysylltwch â <a class=\"govuk-link\" href=\"mailto:pvaenquiries@hmrc.gov.uk\">" +
-      "pvaenquiries@hmrc.gov.uk</a> i wneud cais am ddatganiadau CHIEF</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
-
-    val TestPostponedVATBodyCyWithEmptyCompanyName: String = "Annwyl Gwsmer<br/><br/>Ni chafwyd hyd" +
-      " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
-      "February 2022 to March 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
-      " ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau" +
-      " ’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau" +
-      " y gwnaethoch gais amdanynt.</li><br/>Ni ellir defnyddio’r Gwasanaeth Datganiadau" +
-      " Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio gohiriedig ar gyfer" +
-      " datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a" +
-      " Gaiff eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich datganiadau" +
-      " eu gwneud drwy ddefnyddio CHIEF a chysylltwch â <a class=\"govuk-link\" href=\"mailto:pvaenquiries@hmrc.gov.uk\">" +
-      "pvaenquiries@hmrc.gov.uk</a> i wneud cais am ddatganiadau CHIEF</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
+    def TestPostponedVATBodyCy(companyName: String = defaultCompanyNameCy): String =
+      s"Annwyl $companyName<br/><br/>Ni chafwyd hyd" +
+        " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
+        "February 2022 to March 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +
+        " ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau" +
+        " ’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau" +
+        " y gwnaethoch gais amdanynt.</li><br/>Ni ellir defnyddio’r Gwasanaeth Datganiadau" +
+        " Tollau (CDS) i wneud cais am dystysgrifau TAW mewnforio gohiriedig ar gyfer" +
+        " datganiadau a wnaed gan ddefnyddio system y Tollau ar gyfer Trin Nwyddau a" +
+        " Gaiff eu Mewnforio a’u Hallforio (CHIEF).Gwiriwch os cafodd eich datganiadau" +
+        " eu gwneud drwy ddefnyddio CHIEF a chysylltwch â <a class=\"govuk-link\" href=\"mailto:pvaenquiries@hmrc.gov.uk\">" +
+        "pvaenquiries@hmrc.gov.uk</a> i wneud cais am ddatganiadau CHIEF</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
     val encodedDutyDeferementBodyCy: String = "QW5ud3lsIEFwcGxlcyAmIFBlYXJzIEx0ZCA8YnIvPjxici8+TmkgY2hhZnd5ZCBoeW" +
       "QgaeKAmXIgZGF0Z2FuaWFkYXUgZ29oaXJpbyB0b2xsYXUgeSBnd25hZXRob2NoIGdhaXMgYW1kYW55bnQgYXIgZ3lmZXIgbWlzIFNlcHRl" +
