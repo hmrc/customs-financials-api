@@ -31,10 +31,34 @@ class SubscriptionServiceSpec extends SpecBase {
 
   "SubscriptionService" when {
 
-    "calling Sub09 get subscriptions" should {
-      "get SubscriptionDisplayResponse" in new Setup {
+    "get verifiedEmail" should {
+      "return verified email when there is contactInformation with timestamp" in new Setup {
+        when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"))).thenReturn(
+          Future.successful(subscriptionResponseWithTimestamp))
+
+        running(app) {
+          val result = service.getVerifiedEmail(EORI("Trader EORI"))
+          result.map {
+            ev => ev mustBe EmailVerifiedResponse(Option(EmailAddress(emailAddress)))
+          }
+        }
+      }
+
+      "return None when there is no contactInformation" in new Setup {
         when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"))).thenReturn(
           Future.successful(subscriptionResponse))
+
+        running(app) {
+          val result = service.getVerifiedEmail(EORI("Trader EORI"))
+          result.map {
+            ev => ev mustBe EmailVerifiedResponse(None)
+          }
+        }
+      }
+
+      "return None when there is no timestamp in contactInformation" in new Setup {
+        when(mockSub09Connector.getSubscriptions(EORI("Trader EORI"))).thenReturn(
+          Future.successful(subscriptionResponseWithContactInfo))
 
         running(app) {
           val result = service.getVerifiedEmail(EORI("Trader EORI"))
@@ -135,12 +159,20 @@ class SubscriptionServiceSpec extends SpecBase {
     val contactInfo: ContactInformation = ContactInformation(None, None, None, None, None, None, None, None,
       emailAddress = Some(EmailAddress(emailAddress)), None)
 
+    val contactInfoWithTimeStamp: ContactInformation = ContactInformation(None, None, None, None, None, None, None, None,
+      emailAddress = Some(EmailAddress(emailAddress)), Some("timestamp"))
+
     val responseDetailWithContactInfo: ResponseDetail = responseDetail.copy(contactInformation = Some(contactInfo))
+
+    val responseDetailWithTimestamp: ResponseDetail = responseDetail.copy(contactInformation = Some(contactInfoWithTimeStamp))
 
     val subscriptionResponse: SubscriptionResponse = SubscriptionResponse(
       SubscriptionDisplayResponse(responseCommon, responseDetail))
 
     val subscriptionResponseWithContactInfo: SubscriptionResponse = SubscriptionResponse(
       SubscriptionDisplayResponse(responseCommon, responseDetailWithContactInfo))
+
+    val subscriptionResponseWithTimestamp: SubscriptionResponse = SubscriptionResponse(
+      SubscriptionDisplayResponse(responseCommon, responseDetailWithTimestamp))
   }
 }

@@ -45,7 +45,8 @@ class MetadataControllerSpec extends SpecBase {
     "return 200" in new Setup {
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
-
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
@@ -88,6 +89,8 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
       when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(EORI("testEORI")))(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -95,9 +98,51 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
-        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly", "PeriodIssueNumber" -> "4", "date" -> "15 Sep 2018", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
+        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly", "PeriodIssueNumber" -> "4", "date" -> "15 Sep 2018", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after", "recipientName_line1" -> "companyName")
         val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
+      }
+    }
+
+    "do not send email when companyName is not available " in new Setup {
+      val dd4emailRequest: JsValue = Json.parse(
+        """
+          |[
+          |    {
+          |        "eori":"testEORI-12345",
+          |		     "fileName": "vat-2018-05.pdf",
+          |        "fileSize": 75251,
+          |        "metadata": [
+          |            {"metadata": "PeriodStartYear", "value": "2017"},
+          |            {"metadata": "PeriodStartMonth", "value": "5"},
+          |            {"metadata": "PeriodStartDay", "value": "5"},
+          |            {"metadata": "PeriodEndYear", "value": "2018"},
+          |            {"metadata": "PeriodEndMonth", "value": "8"},
+          |            {"metadata": "PeriodEndDay", "value": "5"},
+          |            {"metadata": "PeriodIssueNumber", "value": "4"},
+          |            {"metadata": "FileType", "value": "PDF"},
+          |            {"metadata": "FileRole", "value": "DutyDefermentStatement"},
+          |            {"metadata": "DefermentStatementType", "value": "Weekly"},
+          |            {"metadata": "DutyOverLimit", "value": "Y"},
+          |            {"metadata": "DutyPaymentType", "value": "DirectDebit"}
+          |        ]
+          |    }
+          |]
+        """.stripMargin)
+
+      when(mockDataStore.getVerifiedEmail(any)(any))
+        .thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(EORI("testEORI")))(any))
+        .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(None))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
+        val result = route(app, req).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
       }
     }
 
@@ -123,6 +168,8 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
       when(mockDataStore.getVerifiedEmail(is(EORI("testEORI")))(any))
         .thenReturn(Future.successful(Some(EmailAddress("foo@bar.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -137,7 +184,7 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         val expectedEmailRequest = EmailRequest(
-          List(EmailAddress("foo@bar.com")), "customs_financials_requested_duty_deferment_statement", Map.empty, force = false, Some("testEORI"), None, None)
+          List(EmailAddress("foo@bar.com")), "customs_financials_requested_duty_deferment_statement", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -164,6 +211,8 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
       when(mockDataStore.getVerifiedEmail(is(EORI("testEORI")))(any))
         .thenReturn(Future.successful(Some(EmailAddress("foo@bar.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -178,7 +227,7 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         val expectedEmailRequest = EmailRequest(
-          List(EmailAddress("foo@bar.com")), "customs_financials_requested_for_standing_authorities", Map.empty, force = false, Some("testEORI"), None, None)
+          List(EmailAddress("foo@bar.com")), "customs_financials_requested_for_standing_authorities", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -214,6 +263,8 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
       when(mockDataStore.getVerifiedEmail(is(EORI("testEORI")))(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
 
@@ -221,7 +272,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary", "date" -> "15 Sep 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
+        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary", "date" -> "15 Sep 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after", "recipientName_line1" -> "companyName")
         val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
@@ -258,6 +309,8 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
       when(mockDataStore.getVerifiedEmail(is(EORI("testEORI")))(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
 
@@ -265,7 +318,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val params: Map[String, String] = Map("DefermentStatementType" -> "excise", "date" -> "29 Aug 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total excise owed will be collected by direct debit on or before")
+        val params: Map[String, String] = Map("DefermentStatementType" -> "excise", "date" -> "29 Aug 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total excise owed will be collected by direct debit on or before", "recipientName_line1" -> "companyName")
         val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
@@ -296,6 +349,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
 
@@ -303,7 +358,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(c79emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_c79_certificate", Map.empty[String, String], force = false, Some("testEORI"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_c79_certificate", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -334,6 +389,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(is(eori))(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -347,7 +404,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(historicC79CertificateNotificationRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_historic_c79_certificate", Map.empty[String, String], force = false, Some("123456789"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_historic_c79_certificate", Map("recipientName_line1" -> "companyName"), force = false, Some("123456789"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -377,6 +434,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
 
@@ -384,7 +443,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(ssemailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_import_adjustment", Map.empty[String, String], force = false, Some("testEORI"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_import_adjustment", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -415,6 +474,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(is(eori))(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -428,7 +489,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedSecurityStatementNotificationRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_import_adjustment", Map.empty[String, String], force = false, Some("123456789"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_import_adjustment", Map("recipientName_line1" -> "companyName"), force = false, Some("123456789"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -458,6 +519,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
 
@@ -465,7 +528,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(pvatStatementRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_postponed_vat_notification", Map.empty[String, String], force = false, Some("testEORI"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_postponed_vat_notification", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -496,6 +559,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -509,7 +574,7 @@ class MetadataControllerSpec extends SpecBase {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map.empty[String, String], force = false, Some("testEORI"), None, None)
+        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -556,6 +621,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockDataStore.getVerifiedEmail(any)(any))
         .thenReturn(Future.successful(Some(EmailAddress("test@test.com"))))
+      when(mockDataStore.getCompanyName(any)(any))
+        .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
@@ -577,7 +644,7 @@ class MetadataControllerSpec extends SpecBase {
         val expectedEmailRequest = EmailRequest(
           List(EmailAddress("test@test.com")),
           "customs_financials_requested_postponed_vat_notification",
-          Map.empty[String, String],
+          Map("recipientName_line1" -> "companyName"),
           force = false,
           Some("testEORI"),
           None,

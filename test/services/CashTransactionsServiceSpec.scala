@@ -61,37 +61,57 @@ class CashTransactionsServiceSpec extends SpecBase {
         result mustBe Right(expectedResult)
       }
     }
+
+    "return Right with nil transactions on successful response with no responseDetail" in new Setup {
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
+        Future.successful(Right(None))
+      )
+      running(app) {
+        val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
+        val expectedResult = CashTransactions(Nil, Nil)
+        result mustBe Right(expectedResult)
+      }
+    }
   }
   "retrieveCashTransactionsDetail" should {
-    {
-      "return Left with an error if the api request failed" in new Setup {
-        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
-          Future.successful(Left(NoAssociatedDataException))
-        )
-        running(app) {
-          val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
-          result mustBe Left(NoAssociatedDataException)
-        }
+    "return Left with an error if the api request failed" in new Setup {
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
+        Future.successful(Left(NoAssociatedDataException))
+      )
+      running(app) {
+        val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
+        result mustBe Left(NoAssociatedDataException)
       }
+    }
 
-      "return Right with the Cash transactions on a successful response from the API" in new Setup {
-        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
-          Future.successful(Right(Some(cashTransactionsResponseDetail)))
-        )
-        running(app) {
-          val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
-          val expectedResult = CashTransactions(
-            List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
-            List(CashDailyStatement(
-              dateFrom.toString,
-              "10000",
-              "9000",
-              List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List(TaxGroup("something", "10000")))),
-              List(Transaction("10000", "A21", Some("Bank"))))
-            )
+    "return Right with the Cash transactions on a successful response from the API" in new Setup {
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
+        Future.successful(Right(Some(cashTransactionsResponseDetail)))
+      )
+      running(app) {
+        val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
+        val expectedResult = CashTransactions(
+          List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
+          List(CashDailyStatement(
+            dateFrom.toString,
+            "10000",
+            "9000",
+            List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List(TaxGroup("something", "10000")))),
+            List(Transaction("10000", "A21", Some("Bank"))))
           )
-          result mustBe Right(expectedResult)
-        }
+        )
+        result mustBe Right(expectedResult)
+      }
+    }
+
+    "return Right with nil transactions on successful response with no responseDetail" in new Setup {
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
+        Future.successful(Right(None))
+      )
+      running(app) {
+        val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
+        val expectedResult = CashTransactions(Nil, Nil)
+        result mustBe Right(expectedResult)
       }
     }
   }

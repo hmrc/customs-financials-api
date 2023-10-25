@@ -84,13 +84,27 @@ class MetadataController @Inject()(
   private def sendEmailIfVerified(notification: Notification)(implicit hc: HeaderCarrier): Future[Boolean] = {
     dataStore.getVerifiedEmail(notification.eori).flatMap {
       case Some(emailAddress) =>
-        val maybeEmailRequest = EmailTemplate.fromNotification(emailAddress, notification)
-        maybeEmailRequest match {
-          case Some(value) => emailThrottlerConnector.sendEmail(value.toEmailRequest)
+        val companyNameResult: Future[Option[String]] = dataStore.getCompanyName(notification.eori).recoverWith {
+          case exc: Exception =>
+            log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
+            Future(Some(emptyString))
+        }
+
+        companyNameResult.flatMap {
+          case Some(companyName) =>
+            val maybeEmailRequest = EmailTemplate.fromNotification(emailAddress, notification, companyName)
+            maybeEmailRequest match {
+              case Some(value) => emailThrottlerConnector.sendEmail(value.toEmailRequest)
+              case None =>
+                log.info("No end month/end year supplied from the metadata")
+                Future.successful(false)
+            }
+
           case None =>
-            log.info("No end month/end year supplied from the metadata")
+            log.info("Company name is not available.")
             Future.successful(false)
         }
+
       case None =>
         log.info(s"unable to obtain a verified email address for user: ${notification.eori}")
         Future.successful(false)
