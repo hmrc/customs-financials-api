@@ -220,7 +220,7 @@ object SecureMessage {
   }
 
   /**
-   * Return the company name if non empty
+   * Returns the company name if non empty
    * otherwise returns Customer for English or Gwsmer for Welsh
    */
   private def companyNameForMsg(companyName: String,
