@@ -105,6 +105,11 @@ object SecureMessage {
 
   val YouRequestedFor = "you requested for"
 
+  val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+  val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+  val SecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+  val PostponedVATemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+
   def DutyDefermentBody(companyName: String,
                         dateRange: DateRange,
                         lang: String = englishLangKey): String = {
@@ -113,7 +118,7 @@ object SecureMessage {
     if (lang == englishLangKey) {
       val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
 
-      s"Dear ${companyName}<br/><br/>" +
+      s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"The duty deferment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"${ImportVATCerts} ${MadeUsingCustoms}" +
@@ -122,7 +127,7 @@ object SecureMessage {
     } else {
       val guidanceLinkText = " Datganiadau Electronig i Ohirio Tollau (DDES)"
 
-      s"Annwyl ${companyName} <br/><br/>" +
+      s"Annwyl ${companyNameForMsg(companyName, lang)} <br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
         s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae " +
         s"datganiadau’n cael eu creu. Gwiriwch eich bod wedi mewnforio nwyddau yn ystod y dyddiadau y" +
@@ -143,14 +148,14 @@ object SecureMessage {
     val guidanceLink = "mailto:cbc-c79requests@hmrc.gov.uk"
 
     if (lang == englishLangKey) {
-      s"Dear ${companyName}<br/><br/>" +
+      s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"The import VAT certificates ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
         s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
         s"${RequestChief}</li></ol>${SignOff}"
     } else {
 
-      s"Annwyl ${companyName}<br/><br/>" +
+      s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"Ni chafwyd hyd i’r Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis ${dateRange.dateAsText}." +
         s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
@@ -169,13 +174,13 @@ object SecureMessage {
                    dateRange: DateRange,
                    lang: String = englishLangKey): String = {
     if (lang == englishLangKey) {
-      s"Dear ${companyName}<br/><br/>" +
+      s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
         s"<br/></li></ol>${SignOff}"
     } else {
-      s"Annwyl ${companyName}<br/><br/>" +
+      s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
         s"${dateRange.dateAsText}." + "<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         "Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau’n cael eu creu." +
@@ -194,14 +199,14 @@ object SecureMessage {
     val guidanceLink = "mailto:pvaenquiries@hmrc.gov.uk"
 
     if (lang == englishLangKey) {
-      s"Dear ${companyName}<br/><br/>" +
+      s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.dateAsText}" +
         s"${WereNotFound}${TwoReasons}" +
         s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
         s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
         s"${RequestChief}</li></ol>${SignOff}"
     } else {
-      s"Annwyl ${companyName}<br/><br/>" +
+      s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
         s"${dateRange.dateAsText}." + s"<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>" +
         s"Dim ond ar gyfer y cyfnodau lle y gwnaethoch fewnforio nwyddau y mae datganiadau ’n cael eu creu." +
@@ -214,10 +219,16 @@ object SecureMessage {
     }
   }
 
-  val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
-  val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-  val SecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
-  val PostponedVATemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+  /**
+   * Return the company name if non empty
+   * otherwise returns Customer for English or Gwsmer for Welsh
+   */
+  private def companyNameForMsg(companyName: String,
+                                lang: String): String = {
+    if (companyName.isEmpty) {
+      if (lang == englishLangKey) "Customer" else "Gwsmer"
+    } else companyName
+  }
 }
 
 object SecureMessageResponse
