@@ -56,84 +56,164 @@ class RequestSpec extends SpecBase {
   "getContents" should {
     "return DutyDefermentStatement for English language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe s"${dutyStatement}${subjectDate}"
+      expectedRequest.content.head.subject mustBe s"$dutyStatement$subjectDate"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(DutyDefermentBody("Company Name", dateRange))
     }
 
+    "return DutyDefermentStatement for English language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content.head.subject mustBe s"$dutyStatement$subjectDate"
+      expectedRequest.content.head.body mustBe
+        encodeToUTF8Charsets(DutyDefermentBody(emptyString, dateRange))
+    }
+
     "return C79Certificate for English language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe s"${c79cert}${subjectDate}"
+      expectedRequest.content.head.subject mustBe s"$c79cert$subjectDate"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(C79CertificateBody("Company Name", dateRange))
     }
 
+    "return C79Certificate for English language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content.head.subject mustBe s"$c79cert$subjectDate"
+      expectedRequest.content.head.body mustBe
+        encodeToUTF8Charsets(C79CertificateBody(emptyString, dateRange))
+    }
+
     "return SecurityStatement for English language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe s"${securityStatement}${subjectDate}"
+      expectedRequest.content.head.subject mustBe s"$securityStatement$subjectDate"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(SecurityBody("Company Name", dateRange))
     }
 
+    "return SecurityStatement for English language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content.head.subject mustBe s"$securityStatement$subjectDate"
+      expectedRequest.content.head.body mustBe
+        encodeToUTF8Charsets(SecurityBody(emptyString, dateRange))
+    }
+
     "return PostponedVATStatement for English language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content.head.subject mustBe s"${postPonedVATStatement}${subjectDate}"
+      expectedRequest.content.head.subject mustBe s"$postPonedVATStatement$subjectDate"
       expectedRequest.content.head.body mustBe
         encodeToUTF8Charsets(PostponedVATBody("Company Name", dateRange))
     }
 
+    "return PostponedVATStatement for English language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content.head.subject mustBe s"$postPonedVATStatement$subjectDate"
+      expectedRequest.content.head.body mustBe
+        encodeToUTF8Charsets(PostponedVATBody(emptyString, dateRange))
+    }
+
     "return DutyDefermentStatement for Welsh language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe s"${dutyStatementCy}${subjectDateCy}"
+      expectedRequest.content(1).subject mustBe s"$dutyStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
         DutyDefermentBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
+    "return DutyDefermentStatement for Welsh language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content(1).subject mustBe s"$dutyStatementCy$subjectDateCy"
+      expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
+        DutyDefermentBody(emptyString, dateRangeForWelsh, welshLangKey))
+    }
+
     "return C79Certificate for Welsh language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe s"${c79certCy}${subjectDateCy}"
+      expectedRequest.content(1).subject mustBe s"$c79certCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(C79CertificateBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
     }
 
+    "return C79Certificate for Welsh language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "C79Certificate", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content(1).subject mustBe s"$c79certCy$subjectDateCy"
+      expectedRequest.content(1).body mustBe
+        encodeToUTF8Charsets(C79CertificateBody(emptyString, dateRangeForWelsh, welshLangKey))
+    }
+
     "return SecurityStatement for Welsh language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe s"${securityStatementCy}${subjectDateCy}"
+      expectedRequest.content(1).subject mustBe s"$securityStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(SecurityBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
+    "return SecurityStatement for Welsh language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "SecurityStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content(1).subject mustBe s"$securityStatementCy$subjectDateCy"
+      expectedRequest.content(1).body mustBe
+        encodeToUTF8Charsets(SecurityBody(emptyString, dateRangeForWelsh, welshLangKey))
+    }
+
     "return PostponedVATStatement for Welsh language" in new Setup {
       override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
-      val modifiedDoc = histDocRequestSearch.copy(params = params)
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
       val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), "Company Name")
 
-      expectedRequest.content(1).subject mustBe s"${postPonedVATStatementCy}${subjectDateCy}"
+      expectedRequest.content(1).subject mustBe s"$postPonedVATStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
         encodeToUTF8Charsets(PostponedVATBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
+    }
+
+    "return PostponedVATStatement for Welsh language with empty company name" in new Setup {
+      override val params: Params = Params("02", "2021", "04", "2021", "PostponedVATStatement", "1234567")
+      val modifiedDoc: HistoricDocumentRequestSearch = histDocRequestSearch.copy(params = params)
+      val expectedRequest: Request = Request(modifiedDoc, EmailAddress("Email"), emptyString)
+
+      expectedRequest.content(1).subject mustBe s"$postPonedVATStatementCy$subjectDateCy"
+      expectedRequest.content(1).body mustBe
+        encodeToUTF8Charsets(PostponedVATBody(emptyString, dateRangeForWelsh, welshLangKey))
     }
 
     "return eng and cy in list" in new Setup {
@@ -241,7 +321,7 @@ trait Setup {
       params,
       searchRequests)
 
-  def requestJsValue =
+  def requestJsValue: String =
     s"""{
        |  "externalRef": {
        |    "id": "abcd12345",
