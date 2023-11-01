@@ -75,7 +75,7 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
 
   def searchType(searchID: EORI) = {
     searchID.value match {
-      case x if x.startsWith("GB") || x.startsWith("XI") => "0"
+      case searchEori if searchEori.startsWith("GB") || searchEori.startsWith("XI") => "0"
       case _ => "1"
     }
   }
