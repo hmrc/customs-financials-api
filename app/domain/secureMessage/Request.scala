@@ -42,7 +42,7 @@ object Request {
       recipient = Recipient(
         regime = "cds",
         taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori),
-        fullName = company,
+        name = Name(company),
         email = email.value),
       tags = Tags("CDS Financials"),
       content = contents(histDoc.params, company),

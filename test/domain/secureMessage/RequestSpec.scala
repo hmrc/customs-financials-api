@@ -34,7 +34,7 @@ class RequestSpec extends SpecBase {
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          fullName = "Company Name",
+          name = Name("Company Name"),
           email = "test@test.com"),
         tags = Tags("CDS Financials"),
         content = testContents,
@@ -226,7 +226,7 @@ class RequestSpec extends SpecBase {
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
-          fullName = "Company Name",
+          name = Name("Company Name"),
           email = "test@test.com"),
         tags = Tags("CDS Financials"),
         content = contents,

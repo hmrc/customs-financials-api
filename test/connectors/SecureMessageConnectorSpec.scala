@@ -31,7 +31,6 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
 import scala.concurrent.ExecutionContext.Implicits.global
-import connectors.DataStoreConnector
 
 import scala.concurrent.Future
 
@@ -44,7 +43,7 @@ class SecureMessageConnectorSpec extends SpecBase {
         externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient("cds",
           TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
-          fullName = "Company Name",
+          name = Name("Company Name"),
           email = "test@test.com"),
         tags = Tags("CDS Financials"),
         content = TestContents,
@@ -119,7 +118,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       externalRef = secureMessage.ExternalReference(searchID.toString, "mdtp"),
       recipient = secureMessage.Recipient("cds",
         secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
-        fullName = "Company Name",
+        name = Name("Company Name"),
         email = "test@test.com"),
       tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
@@ -138,7 +137,9 @@ class SecureMessageConnectorSpec extends SpecBase {
          |"name": "HMRC-CUS-ORG",
          |"value": "GB333186811543"
          |},
-         |"fullName": "Company Name",
+         |"name": {
+         |"line1": "Company Name"
+         |},
          |"email": "test@test.com"
          |},
          |"tags": {

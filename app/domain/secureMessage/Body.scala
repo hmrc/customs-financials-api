@@ -29,7 +29,13 @@ object ExternalReference {
 }
 
 case class Recipient(regime: String, taxIdentifier: TaxIdentifier,
-                     fullName: String, email: String)
+                     name: Name, email: String)
+
+case class Name(line1: String)
+
+object Name {
+  implicit val nameFormat: OFormat[Name] = Json.format[Name]
+}
 
 object Recipient {
   implicit val recipientFormat: OFormat[Recipient] = Json.format[Recipient]

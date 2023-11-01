@@ -43,7 +43,7 @@ class BodySpec extends SpecBase {
 
     "Receipient" in new Setup {
       val tax: TaxIdentifier = TaxIdentifier("name", "value")
-      val recip: Recipient = Recipient("regime", tax, "Company Name", "test@test.com")
+      val recip: Recipient = Recipient("regime", tax, Name("Company Name"), "test@test.com")
       recip mustBe TestRecip
     }
 
@@ -287,7 +287,7 @@ class BodySpec extends SpecBase {
     val TestBody = Body("eori")
     val TestRef = ExternalReference("id", "source")
     val TestTax = TaxIdentifier("name", "value")
-    val TestRecip = Recipient("regime", TestTax, "Company Name", "test@test.com")
+    val TestRecip = Recipient("regime", TestTax, Name("Company Name"), "test@test.com")
     val TestTags = Tags("NotificationType")
     val TestContent = Content("en", "accountType", "body")
 

@@ -85,9 +85,9 @@ class ResponseSpec extends SpecBase {
 
     val recipientJsValue: String =
       """{"regime": "regime", "taxIdentifier":{"name": "name","value": "value"},
-        | "fullName": "Company Name", "email": "email"}""".stripMargin
+        | "name": {"line1": "Company Name"}, "email": "email"}""".stripMargin
     val recipientObject: Recipient = Recipient(regime = "regime",
-      taxIdentifier = taxIdentifierObject, fullName = "Company Name", email = "email")
+      taxIdentifier = taxIdentifierObject, name = Name("Company Name"), email = "email")
 
     val tagsJsValue: String = """{"notificationType": "cds fin"}""".stripMargin
     val tagsObject: Tags = Tags(notificationType = "cds fin")
