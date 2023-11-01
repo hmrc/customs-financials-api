@@ -61,9 +61,16 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "search type value" should {
-      "return 0 for EORI searchID" in new Setup {
+      "return 0 for GB EORI searchID" in new Setup {
         running(app) {
           val searchTypeValue = connector.searchType(EORI("GB123456789012"))
+          searchTypeValue mustBe ("0")
+        }
+      }
+
+      "return 0 for XI EORI searchID" in new Setup {
+        running(app) {
+          val searchTypeValue = connector.searchType(EORI("XI123456789012"))
           searchTypeValue mustBe ("0")
         }
       }
