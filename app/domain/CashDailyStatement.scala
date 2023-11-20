@@ -28,6 +28,7 @@ case class CashDailyStatement(date: String,
                               otherTransactions: Seq[Transaction])
 
 case class Declaration(movementReferenceNumber: String,
+                       importerEori: Option[EORI],
                        declarantEori: EORI,
                        declarantReference: Option[String],
                        date: String,
