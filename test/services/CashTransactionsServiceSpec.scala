@@ -49,12 +49,14 @@ class CashTransactionsServiceSpec extends SpecBase {
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(
-          List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
+          List(Declaration("someId", Some(EORI("someImporterEORI")),
+            EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
           List(CashDailyStatement(
             dateFrom.toString,
             "10000",
             "9000",
-            List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
+            List(Declaration("someId", Some(EORI("someImporterEORI")),
+              EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
             List(Transaction("10000", "A21", Some("Bank"))))
           )
         )
@@ -91,12 +93,13 @@ class CashTransactionsServiceSpec extends SpecBase {
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(
-          List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
+          List(Declaration("someId", Some(EORI("someImporterEORI")), EORI("someEori"),
+            Some("reference"), dateTo.toString, "10000", List.empty)),
           List(CashDailyStatement(
             dateFrom.toString,
             "10000",
             "9000",
-            List(Declaration("someId", EORI("someEori"), Some("reference"), dateTo.toString, "10000", List(TaxGroup("something", "10000")))),
+            List(Declaration("someId", Some(EORI("someImporterEORI")), EORI("someEori"), Some("reference"), dateTo.toString, "10000", List(TaxGroup("something", "10000")))),
             List(Transaction("10000", "A21", Some("Bank"))))
           )
         )
@@ -132,6 +135,7 @@ class CashTransactionsServiceSpec extends SpecBase {
         Some(Seq(DeclarationContainer(
           DeclarationDetail(
             "someId",
+            Some(EORI("someImporterEORI")),
             EORI("someEori"),
             Some("reference"),
             dateTo.toString,
@@ -151,6 +155,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       Seq(DeclarationContainer(
         DeclarationDetail(
           "someId",
+          Some(EORI("someImporterEORI")),
           EORI("someEori"),
           Some("reference"),
           dateTo.toString,

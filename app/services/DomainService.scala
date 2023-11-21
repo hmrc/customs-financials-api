@@ -35,7 +35,8 @@ class DomainService {
   }
 
   private def toDomain(declaration: DeclarationDetail): domain.Declaration = {
-    Declaration(declaration.declarationID, declaration.declarantEORINumber, declaration.declarantReference, declaration.postingDate, declaration.amount, Nil)
+    Declaration(declaration.declarationID, declaration.importerEORINumber, declaration.declarantEORINumber,
+      declaration.declarantReference, declaration.postingDate, declaration.amount, Nil)
   }
 
   def toDomainDetail(cashTransactionsResponseDetail: CashTransactionsResponseDetail): domain.CashTransactions = {
@@ -63,7 +64,8 @@ class DomainService {
 
 
   def toDomainDetail(declaration: DeclarationDetail): domain.Declaration = {
-    Declaration(declaration.declarationID, declaration.declarantEORINumber, declaration.declarantReference, declaration.postingDate, declaration.amount,
+    Declaration(declaration.declarationID, declaration.importerEORINumber, declaration.declarantEORINumber,
+      declaration.declarantReference, declaration.postingDate, declaration.amount,
       declaration.taxGroups.map(container => toDomain(container.taxGroup)))
   }
 

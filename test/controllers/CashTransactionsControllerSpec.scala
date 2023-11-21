@@ -36,11 +36,13 @@ class CashTransactionsControllerSpec extends SpecBase {
   "CashTransactionControllerSpec.getSummary" should {
     "delegate to the service and return a list of cash daily statements with a 200 status code" in new Setup {
       val aListOfCashDailyStatements = Seq(CashDailyStatement("date", "openingBalance", "closingBalance",
-        Seq(Declaration("mrn", EORI("declarantEori"), Some("declarantReference"), "postingDate", "amount", Nil)),
+        Seq(Declaration("mrn", Some(EORI("importerEORI")), EORI("declarantEori"),
+          Some("declarantReference"), "postingDate", "amount", Nil)),
         Seq(Transaction("12.34", "Payment", None),
           Transaction("12.34", "Withdrawal", Some("77665544")))))
 
-      val aListOfPendingTransactions = Seq(Declaration("pendingDeclarationID", EORI("pendingDeclarantEORINumber"), Some("pendingDeclarantReference"), "pendingPostingDate", "pendingAmount", Nil))
+      val aListOfPendingTransactions = Seq(Declaration("pendingDeclarationID", Some(EORI("pendingImporterEORI")),
+        EORI("pendingDeclarantEORINumber"), Some("pendingDeclarantReference"), "pendingPostingDate", "pendingAmount", Nil))
       val expectedCashTransactions: CashTransactions = CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
 
       when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate)))
@@ -71,11 +73,13 @@ class CashTransactionsControllerSpec extends SpecBase {
         TaxGroup("Excise", "-789.01")
       )
       val aListOfCashDailyStatements = Seq(CashDailyStatement("date", "openingBalance", "closingBalance",
-        Seq(Declaration("mrn", EORI("declarantEori"), Some("declarantReference"), "postingDate", "amount", expectedTaxGroups)),
+        Seq(Declaration("mrn", Some(EORI("importerEORI")), EORI("declarantEori"),
+          Some("declarantReference"), "postingDate", "amount", expectedTaxGroups)),
         Seq(Transaction("12.34", "Payment", None),
           Transaction("12.34", "Withdrawal", Some("77665544")))))
 
-      val aListOfPendingTransactions = Seq(Declaration("pendingDeclarationID", EORI("pendingDeclarantEORINumber"), Some("pendingDeclarantReference"), "pendingPostingDate", "pendingAmount", Nil))
+      val aListOfPendingTransactions = Seq(Declaration("pendingDeclarationID", Some(EORI("pendingImporterEORI")),
+        EORI("pendingDeclarantEORINumber"), Some("pendingDeclarantReference"), "pendingPostingDate", "pendingAmount", Nil))
 
       val expectedCashTransactions: CashTransactions = CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
 

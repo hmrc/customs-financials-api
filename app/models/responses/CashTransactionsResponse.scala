@@ -40,6 +40,7 @@ case class DeclarationContainer(declaration: DeclarationDetail)
 case class PendingTransactions(declarations: Seq[DeclarationContainer])
 
 case class DeclarationDetail(declarationID: String,
+                             importerEORINumber: Option[EORI],
                              declarantEORINumber: EORI,
                              declarantReference: Option[String],
                              postingDate: String,
