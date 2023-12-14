@@ -21,7 +21,7 @@ import models.requests.manageAuthorities._
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json._
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.{Application, inject}
@@ -83,6 +83,22 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         running(app) {
           val result = route(app, getRequest).value
           status(result) mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
+    "return 200 (OK)" when {
+      "get account authorities call fails with BAD_REQUEST and contains " +
+        "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
+
+        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(
+          Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, 400)))
+
+        running(app) {
+          val result: Future[Result] = route(app, getRequest).value
+
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
         }
       }
     }
@@ -248,7 +264,20 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   trait Setup {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
-    val getRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
+    val getRequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
+
+    val noAccountsForEoriMsg: String =
+      """returned 400.
+        | Response body: '{
+        | "errorDetail":{
+        | "timestamp":"2023-12-12",
+        | "correlationId":"4abceddb-f7a0-4dce-a005-b68f4960fcf6",
+        | "errorCode":"400",
+        | "errorMessage":"Validation Error - Invalid Message",
+        | "source":"Backend",
+        | "sourceFaultDetail":{
+        | "detail":["Bad Request : could not find accounts related to eori XI333186811548"]}}}""".stripMargin
 
     def grantRequest(request: GrantAuthorityRequest): FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant(traderEORI).url)
