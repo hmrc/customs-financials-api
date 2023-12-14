@@ -87,7 +87,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       }
     }
 
-    "return 200 (OK)" when {
+    "return 200 (OK) and return empty AccountWithAuthorities" when {
       "get account authorities call fails with BAD_REQUEST and contains " +
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 

@@ -73,6 +73,10 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
     }
   }
 
+  /**
+   * Looks for the mentioned strings in the exception message
+   * This is only being used for the scenario where accounts are not found at backend
+   */
   private def checkBadRequestErrorCodeAndNoAccountsMsg(exceptionMsg: String): Boolean =
     exceptionMsg.contains("returned 400") &&
       exceptionMsg.contains("could not find accounts related to eori")
