@@ -23,6 +23,7 @@ import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.AccountAuthorityService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -31,28 +32,35 @@ import scala.util.control.NonFatal
 
 class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
                                              authorisedRequest: AuthorisedRequest,
-                                             cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                             cc: ControllerComponents)(
+                                              implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val log: Logger = Logger(this.getClass)
 
-  def get(eori: EORI): Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
-    service.getAccountAuthorities(eori)
-      .map { accountWithAuthorities: Seq[AccountWithAuthorities] =>
-        Ok(Json.toJson(accountWithAuthorities))
-      }
-      .recover {
-        case ex if ex.getMessage.contains("JSON validation") =>
-          log.error(s"getAccountAuthorities failed: ${ex.getMessage}")
-          InternalServerError("JSON Validation Error")
+  def get(eori: EORI): Action[AnyContent] = authorisedRequest async {
+    implicit request: RequestWithEori[AnyContent] =>
 
-        case ex if checkBadRequestErrorCodeAndNoAccountsMsg(ex.getMessage) =>
-          log.error(s"Bad Request as no accounts found related to ${eori.value}")
-          Ok(Json.toJson(Seq.empty[AccountWithAuthorities]))
+      service.getAccountAuthorities(eori)
+        .map { accountWithAuthorities: Seq[AccountWithAuthorities] =>
+          Ok(Json.toJson(accountWithAuthorities))
+        }
+        .recover {
+          case UpstreamErrorResponse(msg, INTERNAL_SERVER_ERROR, _, _) if msg.contains("JSON validation") =>
+            log.error(s"getAccountAuthorities failed: $msg")
+            InternalServerError("JSON Validation Error")
 
-        case NonFatal(error) =>
-          log.error(s"getAccountAuthorities failed: ${error.getMessage}")
-          ServiceUnavailable
-      }
+          case UpstreamErrorResponse(msg, BAD_REQUEST, _, _) if noAccountsMsg(msg) =>
+            log.error(s"Bad Request as no accounts found related to ${eori.value}")
+            Ok(Json.toJson(Seq.empty[AccountWithAuthorities]))
+
+          case UpstreamErrorResponse(msg, status_code, _, _) =>
+            log.error(s"getAccountAuthorities failed with status code: $status_code and error is : $msg")
+            ServiceUnavailable
+
+          case NonFatal(error) =>
+            log.error(s"getAccountAuthorities failed: ${error.getMessage}")
+            ServiceUnavailable
+        }
   }
 
   def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
@@ -73,11 +81,6 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
     }
   }
 
-  /**
-   * Looks for the mentioned strings in the exception message
-   * This is only being used for the scenario where accounts are not found at backend
-   */
-  private def checkBadRequestErrorCodeAndNoAccountsMsg(exceptionMsg: String): Boolean =
-    exceptionMsg.contains("returned 400") &&
-      exceptionMsg.contains("could not find accounts related to eori")
+  private def noAccountsMsg(exceptionMsg: String): Boolean =
+    exceptionMsg.contains("could not find accounts related to eori")
 }
