@@ -49,7 +49,7 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
             log.error(s"getAccountAuthorities failed: $msg")
             InternalServerError("JSON Validation Error")
 
-          case UpstreamErrorResponse(msg, BAD_REQUEST, _, _) if noAccountsMsg(msg) =>
+          case UpstreamErrorResponse(msg, BAD_REQUEST, _, _) if hasNoAccountsForEoriMsg(msg) =>
             log.error(s"Bad Request as no accounts found related to ${eori.value}")
             Ok(Json.toJson(Seq.empty[AccountWithAuthorities]))
 
@@ -81,6 +81,6 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
     }
   }
 
-  private def noAccountsMsg(exceptionMsg: String): Boolean =
+  private def hasNoAccountsForEoriMsg(exceptionMsg: String): Boolean =
     exceptionMsg.contains("could not find accounts related to eori")
 }
