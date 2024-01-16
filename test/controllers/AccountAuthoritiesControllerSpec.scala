@@ -33,13 +33,19 @@ import utils.SpecBase
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountAuthoritiesControllerSpec extends SpecBase {
+
   "AccountAuthoritiesController.get" should {
+
     "delegate to the service and return a list of account authorities with a 200 status code" in new Setup {
-      val accountWithAuthorities = Seq(AccountWithAuthorities(AccountType("CDSCash"), AccountNumber("12345"), AccountStatus("Open"), Seq.empty))
-      when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI))).thenReturn(Future.successful(accountWithAuthorities))
+      val accountWithAuthorities: Seq[AccountWithAuthorities] =
+        Seq(AccountWithAuthorities(AccountType("CDSCash"), AccountNumber("12345"), AccountStatus("Open"), Seq.empty))
+
+      when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
+        .thenReturn(Future.successful(accountWithAuthorities))
 
       running(app) {
         val result = route(app, getRequest).value
+
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.toJson(accountWithAuthorities)
       }
@@ -51,6 +57,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
       running(app) {
         val result = route(app, getRequest).value
+
         status(result) mustBe FORBIDDEN
         contentAsString(result) mustBe "Enrolment Identifier EORINumber not found"
       }
@@ -58,36 +65,44 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "return 503 (service unavailable)" when {
       "get account authorities call fails with BadRequestException (4xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
+        when(mockAccountAuthorityService.getAccountAuthorities(any))
+          .thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
 
         running(app) {
           val result = route(app, getRequest).value
+
           status(result) mustBe SERVICE_UNAVAILABLE
         }
       }
 
       "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+        when(mockAccountAuthorityService.getAccountAuthorities(any))
+          .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
 
         running(app) {
           val result = route(app, getRequest).value
+
           status(result) mustBe SERVICE_UNAVAILABLE
         }
       }
     }
 
     "return 500 (InternalServerError)" when {
-      "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", 500)))
+      "get account authorities call fails with InternalServerException (5xx) and error message contains" +
+        " 'JSON validation'" in new Setup {
+        when(mockAccountAuthorityService.getAccountAuthorities(any))
+          .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", 500)))
 
         running(app) {
           val result = route(app, getRequest).value
+
           status(result) mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
 
     "return 200 (OK) and return empty AccountWithAuthorities" when {
+
       "get account authorities call fails with BAD_REQUEST and contains " +
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 
@@ -170,6 +185,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
         running(app) {
           val result = route(app, grantRequest(grantAuthorityRequest)).value
+
           status(result) mustBe FORBIDDEN
           contentAsString(result) mustBe "Enrolment Identifier EORINumber not found"
         }
@@ -196,7 +212,8 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         }
 
         "revoking for a guarantee account" in new Setup {
-          val revokeGuaranteeRequest: RevokeAuthorityRequest = revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
+          val revokeGuaranteeRequest: RevokeAuthorityRequest =
+            revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
 
           when(mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any))
             .thenReturn(Future.successful(true))
@@ -208,7 +225,8 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         }
 
         "revoking for a deferment account" in new Setup {
-          val revokeDefermentRequest: RevokeAuthorityRequest = revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
+          val revokeDefermentRequest: RevokeAuthorityRequest =
+            revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
 
           when(mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any))
             .thenReturn(Future.successful(true))
@@ -263,7 +281,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
   trait Setup {
     val traderEORI: EORI = EORI("testEORI")
-    val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
+    val enrolments: Enrolments =
+      Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
+
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
 
@@ -279,6 +299,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         | "sourceFaultDetail":{
         | "detail":["Bad Request : could not find accounts related to eori XI333186811548"]}}}""".stripMargin
 
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
     def grantRequest(request: GrantAuthorityRequest): FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant(traderEORI).url)
         .withJsonBody(Json.toJson(request))
@@ -287,12 +310,10 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke(traderEORI).url)
         .withJsonBody(Json.toJson(request))
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
     val mockAccountAuthorityService: AccountAuthorityService = mock[AccountAuthorityService]
+
+    when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
