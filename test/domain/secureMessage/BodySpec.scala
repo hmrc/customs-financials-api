@@ -61,42 +61,42 @@ class BodySpec extends SpecBase {
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody(applesAndPearsLtd)
+      dutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody(applesAndPearsLtd)
+      c79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody(applesAndPearsLtd)
+      securityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody(applesAndPearsLtd)
     }
 
     "display PostponedVATBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody(applesAndPearsLtd)
+      postponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody(emptyString, dateRange) mustBe TestDutyDefermentBody()
+      dutyDefermentBody(emptyString, dateRange) mustBe TestDutyDefermentBody()
     }
 
     "display C79CertificateBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody(emptyString, dateRange) mustBe TestC79CertificateBody()
+      c79CertificateBody(emptyString, dateRange) mustBe TestC79CertificateBody()
     }
 
     "display SecurityBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange) mustBe TestSecurityBody()
+      securityBody(emptyString, dateRange) mustBe TestSecurityBody()
     }
 
     "display PostponedVATBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody(emptyString, dateRange) mustBe TestPostponedVATBody()
+      postponedVATBody(emptyString, dateRange) mustBe TestPostponedVATBody()
     }
 
     "should encode correctly" in new Setup {
@@ -110,19 +110,19 @@ class BodySpec extends SpecBase {
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+      dutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         TestDutyDefermentBodyCy(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+      c79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         TestC79CertificateBodyCy(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+      securityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         TestSecurityBodyCy(applesAndPearsLtd)
     }
 
@@ -130,7 +130,7 @@ class BodySpec extends SpecBase {
       override val dateRange: DateRange = DateRange(
         dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
-      PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+      postponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         TestPostponedVATBodyCy(applesAndPearsLtd)
     }
 
@@ -138,26 +138,26 @@ class BodySpec extends SpecBase {
       override val dateRange: DateRange = DateRange(
         dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
 
-      DutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy()
+      dutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy()
     }
 
     "display C79CertificateBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
 
-      C79CertificateBody(emptyString, dateRange, welshLangKey) mustBe TestC79CertificateBodyCy()
+      c79CertificateBody(emptyString, dateRange, welshLangKey) mustBe TestC79CertificateBodyCy()
     }
 
     "display SecurityBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange, welshLangKey) mustBe TestSecurityBodyCy()
+      securityBody(emptyString, dateRange, welshLangKey) mustBe TestSecurityBodyCy()
     }
 
     "display PostponedVATBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
-      PostponedVATBody(emptyString, dateRange, welshLangKey) mustBe TestPostponedVATBodyCy()
+      postponedVATBody(emptyString, dateRange, welshLangKey) mustBe TestPostponedVATBodyCy()
     }
 
     "should encode correctly in welsh" in new Setup {

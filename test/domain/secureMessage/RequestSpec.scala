@@ -61,7 +61,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$dutyStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(DutyDefermentBody("Company Name", dateRange))
+        encodeToUTF8Charsets(dutyDefermentBody("Company Name", dateRange))
     }
 
     "return DutyDefermentStatement for English language with empty company name" in new Setup {
@@ -71,7 +71,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$dutyStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(DutyDefermentBody(emptyString, dateRange))
+        encodeToUTF8Charsets(dutyDefermentBody(emptyString, dateRange))
     }
 
     "return C79Certificate for English language" in new Setup {
@@ -81,7 +81,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$c79cert$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(C79CertificateBody("Company Name", dateRange))
+        encodeToUTF8Charsets(c79CertificateBody("Company Name", dateRange))
     }
 
     "return C79Certificate for English language with empty company name" in new Setup {
@@ -91,7 +91,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$c79cert$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(C79CertificateBody(emptyString, dateRange))
+        encodeToUTF8Charsets(c79CertificateBody(emptyString, dateRange))
     }
 
     "return SecurityStatement for English language" in new Setup {
@@ -101,7 +101,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$securityStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(SecurityBody("Company Name", dateRange))
+        encodeToUTF8Charsets(securityBody("Company Name", dateRange))
     }
 
     "return SecurityStatement for English language with empty company name" in new Setup {
@@ -111,7 +111,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$securityStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(SecurityBody(emptyString, dateRange))
+        encodeToUTF8Charsets(securityBody(emptyString, dateRange))
     }
 
     "return PostponedVATStatement for English language" in new Setup {
@@ -121,7 +121,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$postPonedVATStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(PostponedVATBody("Company Name", dateRange))
+        encodeToUTF8Charsets(postponedVATBody("Company Name", dateRange))
     }
 
     "return PostponedVATStatement for English language with empty company name" in new Setup {
@@ -131,7 +131,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content.head.subject mustBe s"$postPonedVATStatement$subjectDate"
       expectedRequest.content.head.body mustBe
-        encodeToUTF8Charsets(PostponedVATBody(emptyString, dateRange))
+        encodeToUTF8Charsets(postponedVATBody(emptyString, dateRange))
     }
 
     "return DutyDefermentStatement for Welsh language" in new Setup {
@@ -141,7 +141,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$dutyStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
-        DutyDefermentBody("Company Name", dateRangeForWelsh, welshLangKey))
+        dutyDefermentBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return DutyDefermentStatement for Welsh language with empty company name" in new Setup {
@@ -151,7 +151,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$dutyStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe encodeToUTF8Charsets(
-        DutyDefermentBody(emptyString, dateRangeForWelsh, welshLangKey))
+        dutyDefermentBody(emptyString, dateRangeForWelsh, welshLangKey))
     }
 
     "return C79Certificate for Welsh language" in new Setup {
@@ -161,7 +161,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$c79certCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(C79CertificateBody(
+        encodeToUTF8Charsets(c79CertificateBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
     }
 
@@ -172,7 +172,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$c79certCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(C79CertificateBody(emptyString, dateRangeForWelsh, welshLangKey))
+        encodeToUTF8Charsets(c79CertificateBody(emptyString, dateRangeForWelsh, welshLangKey))
     }
 
     "return SecurityStatement for Welsh language" in new Setup {
@@ -182,7 +182,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$securityStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(SecurityBody("Company Name", dateRangeForWelsh, welshLangKey))
+        encodeToUTF8Charsets(securityBody("Company Name", dateRangeForWelsh, welshLangKey))
     }
 
     "return SecurityStatement for Welsh language with empty company name" in new Setup {
@@ -192,7 +192,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$securityStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(SecurityBody(emptyString, dateRangeForWelsh, welshLangKey))
+        encodeToUTF8Charsets(securityBody(emptyString, dateRangeForWelsh, welshLangKey))
     }
 
     "return PostponedVATStatement for Welsh language" in new Setup {
@@ -202,7 +202,7 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$postPonedVATStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(PostponedVATBody(
+        encodeToUTF8Charsets(postponedVATBody(
           "Company Name", dateRangeForWelsh, welshLangKey))
     }
 
@@ -213,14 +213,14 @@ class RequestSpec extends SpecBase {
 
       expectedRequest.content(1).subject mustBe s"$postPonedVATStatementCy$subjectDateCy"
       expectedRequest.content(1).body mustBe
-        encodeToUTF8Charsets(PostponedVATBody(emptyString, dateRangeForWelsh, welshLangKey))
+        encodeToUTF8Charsets(postponedVATBody(emptyString, dateRangeForWelsh, welshLangKey))
     }
 
     "return eng and cy in list" in new Setup {
 
       val contents: List[Content] = List(
-        Content(englishLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange)),
-        Content(welshLangKey, "DutyDefermentStatement", DutyDefermentBody("Company Name", dateRange, welshLangKey)))
+        Content(englishLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange)),
+        Content(welshLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange, welshLangKey)))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
         recipient = Recipient(
@@ -295,9 +295,9 @@ trait Setup {
 
   val testContents: List[Content] = {
     List(secureMessage.Content(englishLangKey, "DutyDefermentStatement",
-      DutyDefermentBody("Company Name", dateRange, englishLangKey)),
+      dutyDefermentBody("Company Name", dateRange, englishLangKey)),
       secureMessage.Content(welshLangKey, "DutyDefermentStatement",
-        DutyDefermentBody("Company Name", dateRange, welshLangKey)))
+        dutyDefermentBody("Company Name", dateRange, welshLangKey)))
   }
 
   val dutyStatement: String = "Requested duty deferment statements "

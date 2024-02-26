@@ -17,16 +17,16 @@
 package domain.sub09
 
 import models.EmailAddress
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class EmailVerifiedResponse(verifiedEmail: Option[EmailAddress])
 
 object EmailVerifiedResponse {
-  implicit val format = Json.format[EmailVerifiedResponse]
+  implicit val format: OFormat[EmailVerifiedResponse] = Json.format[EmailVerifiedResponse]
 }
 
 case class EmailUnverifiedResponse(unVerifiedEmail: Option[EmailAddress])
 
 object EmailUnverifiedResponse {
-  implicit val format = Json.format[EmailUnverifiedResponse]
+  implicit val format: OFormat[EmailUnverifiedResponse] = Json.format[EmailUnverifiedResponse]
 }

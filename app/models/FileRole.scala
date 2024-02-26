@@ -27,7 +27,7 @@ object FileRole {
 
   implicit def pathBinder(implicit stringBinder: PathBindable[String]): PathBindable[FileRole] = new PathBindable[FileRole] {
     override def bind(key: String, value: String): Either[String, FileRole] = {
-      stringBinder.bind(key, value).right.map(FileRole(_))
+      stringBinder.bind(key, value).map(FileRole(_))
     }
 
     override def unbind(key: String, fileRole: FileRole): String =
