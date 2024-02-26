@@ -78,7 +78,9 @@ class MetadataController @Inject()(
         updateHistReqSearchDocumentAndSendMail(notification, statementRequestID, optHisDocReq)
       }
       result.flatten
-    } else sendEmailIfVerified(notification)
+    } else {
+      sendEmailIfVerified(notification)
+    }
   }
 
   private def sendEmailIfVerified(notification: Notification)(implicit hc: HeaderCarrier): Future[Boolean] = {
@@ -133,7 +135,9 @@ class MetadataController @Inject()(
             sendEmailIfVerified(notification)
           }
           emailSentResult
-        } else Future(false)
+        } else {
+          Future(false)
+        }
 
       case _ => Future(false)
     }

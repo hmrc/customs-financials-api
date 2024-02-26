@@ -29,8 +29,13 @@ import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
-  extends ActionBuilder[RequestWithEori, AnyContent] with ActionRefiner[Request, RequestWithEori] with AuthorisedFunctions with Results {
+class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnector,
+                                  cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+  extends ActionBuilder[RequestWithEori, AnyContent]
+    with ActionRefiner[Request, RequestWithEori]
+    with AuthorisedFunctions
+    with Results {
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, RequestWithEori[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
@@ -62,6 +67,11 @@ class CustomAuthConnector @Inject()(appConfig: AppConfig,
 trait ControllerChecks extends Results {
   def matchingEoriNumber(eori: EORI)(fn: EORI => Future[Result])(implicit request: RequestWithEori[_]): Future[Result] = {
     val eoriRetrievedFromAuth = request.eori.value
-    if (eoriRetrievedFromAuth == eori.value) fn(eori) else successful(Forbidden(s"Enrolment Identifier EORINumber $eoriRetrievedFromAuth not matched with ${eori.value}"))
+
+    if (eoriRetrievedFromAuth == eori.value) {
+      fn(eori)
+    } else {
+      successful(Forbidden(s"Enrolment Identifier EORINumber $eoriRetrievedFromAuth not matched with ${eori.value}"))
+    }
   }
 }

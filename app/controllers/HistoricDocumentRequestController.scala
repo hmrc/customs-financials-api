@@ -50,9 +50,11 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
           result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
         } yield {
           log.info(s"Historic Documents requested ${allEoris.size}")
-          if (result.contains(false))
+          if (result.contains(false)) {
             ServiceUnavailable
-          else saveHistoricDocRequestsAndReturnNoContent(request, historicDocumentRequests)
+          } else {
+            saveHistoricDocRequestsAndReturnNoContent(request, historicDocumentRequests)
+          }
         }
       }
   }

@@ -42,39 +42,26 @@ object Utils {
 
   def isDateTimeStringInIso8601(isoDate: String): Boolean = isoDate.trim.matches(iso8601DateTimeRegEx)
 
-  /**
-   * Returns the value with zero padding
-   * ex - input - 2  returns 02
-   * input  - 10 returns 10
-   */
   def zeroPad(value: Int): String = "%02d".format(value)
 
-  /**
-   * Returns dateTime string in "Thu, 14 Sep 2023 16:30:30 GMT" format
-   */
   def currentDateTimeAsRFC7231(dateTime: LocalDateTime): String = httpDateFormatter.format(dateTime)
 
-  /** Returns base64 encoded string or string on failure */
   def encodeToUTF8Charsets(msg: String): String =
-    if (msg.nonEmpty)
+    if (msg.nonEmpty) {
       BaseEncoding.base64().encode(msg.trim.getBytes(Charsets.UTF_8))
-    else
+    } else {
       msg
+    }
 
   implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
     implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))
     Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
   }
 
-  /**
-   * Converts the month integer value to Full month name string
-   * ex - input - 01
-   *      output - January
-   */
   def convertMonthValueToFullMonthName(intPaddedValue: String,
                                        lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
-  
+
   def monthValueToNameMap(lang: String): Map[String, String] =
     Map(
       "01" -> (if (lang == welshLangKey) "Ionawr" else "January"),
@@ -91,9 +78,6 @@ object Utils {
       "12" -> (if (lang == welshLangKey) "Rhagfyr" else "December")
     )
 
-  /**
-   * Creates the inline html for hyperLink with given text, link and style class
-   */
   def createHyperLink(text: String,
                       link: String,
                       styleClass: String = "govuk-link"): String = {

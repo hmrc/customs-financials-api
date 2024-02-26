@@ -19,14 +19,11 @@ package domain.acc40
 import domain.AuthoritiesFound
 import play.api.libs.json.{Json, OFormat}
 
-//Could potentially have custom reads for optional values
-case class ResponseDetail(
-                           errorMessage: Option[String],
-                           numberOfAuthorities: Option[String],
-                           dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
-                           generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
-                           cdsCashAccounts: Option[Seq[CashAccount]]
-                         ) {
+case class ResponseDetail(errorMessage: Option[String],
+                          numberOfAuthorities: Option[String],
+                          dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
+                          generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
+                          cdsCashAccounts: Option[Seq[CashAccount]]) {
   def toAuthoritiesFound: AuthoritiesFound =
     AuthoritiesFound(
       numberOfAuthorities,
@@ -39,4 +36,3 @@ case class ResponseDetail(
 object ResponseDetail {
   implicit val format: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 }
-

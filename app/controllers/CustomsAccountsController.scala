@@ -29,14 +29,13 @@ class CustomsAccountsController @Inject()(acc27Connector: Acc27Connector,
                                          (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def getCustomsAccountsDod09: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    if (eoriPresent())
+    if (eoriPresent()) {
       acc27Connector.getAccounts(request.body).map(Ok(_))
-    else
+    } else {
       Future.successful(BadRequest)
+    }
   }
 
   private def eoriPresent()(implicit request: Request[JsValue]): Boolean =
     (request.body \\ "EORINo").headOption.nonEmpty
 }
-
-

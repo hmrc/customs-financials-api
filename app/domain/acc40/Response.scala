@@ -24,7 +24,9 @@ object SearchAuthoritiesResponse {
   implicit val format: OFormat[SearchAuthoritiesResponse] = Json.format[SearchAuthoritiesResponse]
 }
 
-case class Response(requestCommon: RequestCommon, requestDetail: RequestDetail, responseDetail: ResponseDetail)
+case class Response(requestCommon: RequestCommon,
+                    requestDetail: RequestDetail,
+                    responseDetail: ResponseDetail)
 
 object Response {
   implicit val format: OFormat[Response] = Json.format[Response]

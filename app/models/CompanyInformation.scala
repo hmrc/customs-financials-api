@@ -18,8 +18,10 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CompanyInformation(name: String, consent: String, address: AddressInformation) {
-  def formattedAddress = s"${address.streetAndNumber}," +
+case class CompanyInformation(name: String,
+                              consent: String,
+                              address: AddressInformation) {
+  def formattedAddress: String = s"${address.streetAndNumber}," +
     s" ${address.city}, ${address.postalCode.getOrElse("")}, ${address.countryCode}"
 }
 
