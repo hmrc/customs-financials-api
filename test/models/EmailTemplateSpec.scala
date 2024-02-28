@@ -1,0 +1,181 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package models
+
+import domain.Notification
+import utils.SpecBase
+
+import java.time.LocalDate
+import scala.collection.immutable.{HashMap, Map}
+
+class EmailTemplateSpec extends SpecBase {
+
+  "fromNotification" should {
+
+    "return correct email template" when {
+
+      "file role is DutyDefermentStatement" in new Setup {
+
+        val expectedParams: Map[String, String] = HashMap(
+          "recipientName_line1" -> companyName,
+          "DefermentStatementType" -> "weekly",
+          "PeriodIssueNumber" -> "4",
+          "date" -> "15 Sep 2018",
+          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
+
+        val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
+          Some(
+            DutyDefermentStatementEmail(emailAddress,
+              eoriNumber,
+              expectedParams ++ Map("recipientName_line1" -> companyName))
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotification, companyName) mustBe
+          expectedDDEmailTemplate
+      }
+
+      "file role is DutyDefermentStatement and its historic" in new Setup {
+        val expectedEmailTemplate: Option[HistoricDutyDefermentStatementEmail] =
+          Some(HistoricDutyDefermentStatementEmail(
+            emailAddress,
+            eoriNumber,
+            Map("recipientName_line1" -> companyName))
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotificationHistoric, companyName) mustBe expectedEmailTemplate
+      }
+
+      "file role is C79Certificate" in new Setup {
+        val expectedEmailTemplate: Option[C79CertificateEmail] =
+          Some(C79CertificateEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+
+        EmailTemplate.fromNotification(
+          emailAddress,
+          c79CertificateNotification,
+          companyName) mustBe expectedEmailTemplate
+      }
+
+      "file role is C79Certificate and its historic" in new Setup {
+        val expectedEmailTemplate: Option[HistoricSecurityStatementEmail] =
+          Some(HistoricSecurityStatementEmail(
+            emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+
+        EmailTemplate.fromNotification(
+          emailAddress,
+          c79CertificateNotificationHistoric,
+          companyName) mustBe expectedEmailTemplate
+      }
+
+      "file role is SecurityStatement" in {
+
+      }
+
+      "file role is SecurityStatement and its historic" in {
+
+      }
+
+      "file role is PostponedVATStatement" in {
+
+      }
+
+      "file role is PostponedVATStatement and its historic" in {
+
+      }
+
+      "file role is StandingAuthority" in {
+
+      }
+
+      "file role is Unknown" in {
+
+      }
+    }
+  }
+
+  trait Setup {
+
+    val emailAddress: EmailAddress = EmailAddress("test_mail@test.com")
+    val eoriNumber = "test_eori"
+
+    val fileRoleDDStatement = "DutyDefermentStatement"
+    val fileRoleC79Certificate = "C79Certificate"
+    val fileRoleSecurityStatement = "SecurityStatement"
+    val fileRolePostponedVATStatement = "PostponedVATStatement"
+    val fileRoleStandingAuthority = "StandingAuthority"
+
+    val fileNameValue = "test_file"
+    val fileSizeValue = 999L
+
+    val statementRequestIDKey = "statementRequestID"
+    val statementRequestIDValue = "1abcdeff2-a2b1-abcd-abcd-0123456789"
+
+    val companyName: String = "test_company"
+
+    val year = 2024
+    val monthOfTheYear = 2
+    val dayOfMonth = 26
+    val date: LocalDate = LocalDate.of(year, monthOfTheYear, dayOfMonth)
+
+    val params: Map[String, String] = Map("PeriodStartYear" -> "2017",
+      "PeriodStartMonth" -> "5",
+      "PeriodEndYear" -> "2018",
+      "PeriodEndMonth" -> "8",
+      "PeriodIssueNumber" -> "4",
+      "DefermentStatementType" -> "Weekly",
+      "Something" -> "Random")
+
+    val ddNotification: Notification = Notification(
+      eori = EORI(eoriNumber),
+      fileRole = FileRole(fileRoleDDStatement),
+      fileName = fileNameValue,
+      fileSize = fileSizeValue,
+      created = Some(date),
+      metadata = params)
+
+    val ddNotificationHistoric: Notification = Notification(
+      eori = EORI(eoriNumber),
+      fileRole = FileRole(fileRoleDDStatement),
+      fileName = fileNameValue,
+      fileSize = fileSizeValue,
+      created = Some(date),
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+
+    val ddEmailTemplateHistoric: Option[HistoricDutyDefermentStatementEmail] =
+      Some(
+        HistoricDutyDefermentStatementEmail(emailAddress,
+          eoriNumber,
+          Map("recipientName_line1" -> companyName)
+        )
+    )
+
+    val c79CertificateNotification: Notification = Notification(
+      eori = EORI(eoriNumber),
+      fileRole = FileRole(fileRoleC79Certificate),
+      fileName = fileNameValue,
+      fileSize = fileSizeValue,
+      created = Some(date),
+      metadata = params)
+
+    val c79CertificateNotificationHistoric: Notification = Notification(
+      eori = EORI(eoriNumber),
+      fileRole = FileRole(fileRoleC79Certificate),
+      fileName = fileNameValue,
+      fileSize = fileSizeValue,
+      created = Some(date),
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+  }
+}

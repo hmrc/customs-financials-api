@@ -50,7 +50,6 @@ class MetadataControllerSpec extends SpecBase {
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val result = route(app, addRequest).value
         status(result) mustBe OK
@@ -98,8 +97,24 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
-        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly", "PeriodIssueNumber" -> "4", "date" -> "15 Sep 2018", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after", "recipientName_line1" -> "companyName")
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
+        val params: Map[String, String] =
+          Map("DefermentStatementType" -> "weekly",
+            "PeriodIssueNumber" -> "4",
+            "date" -> "15 Sep 2018",
+            "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
+            "recipientName_line1" -> "companyName")
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(
+              EmailAddress("test@test.com")),
+            "customs_financials_new_statement_notification",
+            params,
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -180,11 +195,21 @@ class MetadataControllerSpec extends SpecBase {
       )
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url).withJsonBody(newFileNotificationFromSDES)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url)
+            .withJsonBody(newFileNotificationFromSDES)
         val result = route(app, req).value
         status(result) mustBe OK
+
         val expectedEmailRequest = EmailRequest(
-          List(EmailAddress("foo@bar.com")), "customs_financials_requested_duty_deferment_statement", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+          List(EmailAddress("foo@bar.com")),
+          "customs_financials_requested_duty_deferment_statement",
+          Map("recipientName_line1" -> "companyName"),
+          force = false,
+          Some("testEORI"),
+          None,
+          None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -223,11 +248,22 @@ class MetadataControllerSpec extends SpecBase {
       )
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url).withJsonBody(newFileNotificationFromSDES)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, controllers.metadata.routes.MetadataController.addNotifications().url)
+            .withJsonBody(newFileNotificationFromSDES)
+
         val result = route(app, req).value
         status(result) mustBe OK
+
         val expectedEmailRequest = EmailRequest(
-          List(EmailAddress("foo@bar.com")), "customs_financials_requested_for_standing_authorities", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+          List(EmailAddress("foo@bar.com")),
+          "customs_financials_requested_for_standing_authorities",
+          Map("recipientName_line1" -> "companyName"),
+          force = false,
+          Some("testEORI"),
+          None,
+          None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -267,13 +303,26 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary", "date" -> "15 Sep 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after", "recipientName_line1" -> "companyName")
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
+        val params: Map[String, String] =
+          Map("DefermentStatementType" -> "supplementary",
+            "date" -> "15 Sep 2018", "PeriodIssueNumber" -> "1",
+            "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
+            "recipientName_line1" -> "companyName")
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_new_statement_notification",
+            params,
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -313,13 +362,27 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val params: Map[String, String] = Map("DefermentStatementType" -> "excise", "date" -> "29 Aug 2018", "PeriodIssueNumber" -> "1", "DutyText" -> "The total excise owed will be collected by direct debit on or before", "recipientName_line1" -> "companyName")
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", params, force = false, Some("testEORI"), None, None)
+        val params: Map[String, String] =
+          Map("DefermentStatementType" -> "excise",
+            "date" -> "29 Aug 2018",
+            "PeriodIssueNumber" -> "1",
+            "DutyText" -> "The total excise owed will be collected by direct debit on or before",
+            "recipientName_line1" -> "companyName")
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_new_statement_notification",
+            params,
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -353,12 +416,21 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(c79emailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_c79_certificate", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_new_c79_certificate",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -401,10 +473,22 @@ class MetadataControllerSpec extends SpecBase {
       )
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(historicC79CertificateNotificationRequest)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(historicC79CertificateNotificationRequest)
+
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_historic_c79_certificate", Map("recipientName_line1" -> "companyName"), force = false, Some("123456789"), None, None)
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_historic_c79_certificate",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("123456789"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -438,12 +522,21 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(ssemailRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_import_adjustment", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_new_import_adjustment",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -486,10 +579,22 @@ class MetadataControllerSpec extends SpecBase {
       )
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedSecurityStatementNotificationRequest)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(requestedSecurityStatementNotificationRequest)
+
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_import_adjustment", Map("recipientName_line1" -> "companyName"), force = false, Some("123456789"), None, None)
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_requested_import_adjustment",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("123456789"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -523,12 +628,20 @@ class MetadataControllerSpec extends SpecBase {
         .thenReturn(Future.successful(Some("companyName")))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(pvatStatementRequest)
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_postponed_vat_notification", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_new_postponed_vat_notification",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -536,24 +649,24 @@ class MetadataControllerSpec extends SpecBase {
     "send email when a requested PVAT statement is available" in new Setup {
       val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
         s"""
-          |[
-          |    {
-          |        "eori":"testEORI",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
-          |            {"metadata": "PeriodStartYear", "value": "2017"},
-          |            {"metadata": "PeriodStartMonth", "value": "5"},
-          |            {"metadata": "PeriodStartDay", "value": "5"},
-          |            {"metadata": "PeriodEndYear", "value": "2018"},
-          |            {"metadata": "PeriodEndMonth", "value": "8"},
-          |            {"metadata": "PeriodEndDay", "value": "5"},
-          |            {"metadata": "FileType", "value": "PDF"},
-          |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
-          |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
-          |        ]
-          |    }
-          |]
+           |[
+           |    {
+           |        "eori":"testEORI",
+           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileSize": 75251,
+           |        "metadata": [
+           |            {"metadata": "PeriodStartYear", "value": "2017"},
+           |            {"metadata": "PeriodStartMonth", "value": "5"},
+           |            {"metadata": "PeriodStartDay", "value": "5"},
+           |            {"metadata": "PeriodEndYear", "value": "2018"},
+           |            {"metadata": "PeriodEndMonth", "value": "8"},
+           |            {"metadata": "PeriodEndDay", "value": "5"},
+           |            {"metadata": "FileType", "value": "PDF"},
+           |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
+           |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
+           |        ]
+           |    }
+           |]
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
@@ -571,10 +684,22 @@ class MetadataControllerSpec extends SpecBase {
       )
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
+
         val result = route(app, req).value
         status(result) mustBe OK
-        val expectedEmailRequest = EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map("recipientName_line1" -> "companyName"), force = false, Some("testEORI"), None, None)
+
+        val expectedEmailRequest =
+          EmailRequest(
+            List(EmailAddress("test@test.com")),
+            "customs_financials_requested_postponed_vat_notification",
+            Map("recipientName_line1" -> "companyName"),
+            force = false,
+            Some("testEORI"),
+            None,
+            None)
+
         verify(mockEmailThrottler).sendEmail(is(expectedEmailRequest))(any)
       }
     }
@@ -668,7 +793,9 @@ class MetadataControllerSpec extends SpecBase {
       val requestWithInvalidNotification: JsArray = Json.arr(Json.obj("invalidField" -> 1))
 
       running(app) {
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(requestWithInvalidNotification)
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(requestWithInvalidNotification)
+
         val result = route(app, req).value
         status(result) mustBe BAD_REQUEST
       }
@@ -681,8 +808,10 @@ class MetadataControllerSpec extends SpecBase {
     val mockEmailThrottler: EmailThrottlerConnector = mock[EmailThrottlerConnector]
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockDataStore: DataStoreConnector = mock[DataStoreConnector]
-    val mockHistDocReqCacheService = mock[HistoricDocumentRequestSearchCacheService]
-    val mockHistDocReqCache = mock[HistoricDocumentRequestSearchCache]
+    val mockHistDocReqCacheService: HistoricDocumentRequestSearchCacheService =
+      mock[HistoricDocumentRequestSearchCacheService]
+
+    val mockHistDocReqCache: HistoricDocumentRequestSearchCache = mock[HistoricDocumentRequestSearchCache]
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
@@ -750,6 +879,7 @@ class MetadataControllerSpec extends SpecBase {
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789",
         SearchResultStatus.inProcess, emptyString, emptyString, 0),

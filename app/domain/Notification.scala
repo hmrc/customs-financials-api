@@ -29,7 +29,7 @@ case class Notification (
                           metadata: Map[String, String]) {
 
 
-  val metadataObfuscated = metadata.map { case (k,v) => if(k.toUpperCase == "DAN") (k,"xxxxxx") else (k,v) }
+  private val metadataObfuscated = metadata.map { case (k,v) => if(k.toUpperCase == "DAN") (k,"xxxxxx") else (k,v) }
   override def toString: String = s"Notification(xxxxxxxx, $fileRole, $fileName, $fileSize, $created, $metadataObfuscated"
 }
 

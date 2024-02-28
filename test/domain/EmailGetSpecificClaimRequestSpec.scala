@@ -29,7 +29,6 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
   val someFilename: String = "whatever.csv"
   val companyName: String = "companyName"
 
-
   "EmailTemplate.fromNotification" should {
     "construct an email request" when {
 
@@ -51,11 +50,22 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber" -> "4",
           "date" -> "15 Sep 2018",
-          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after"
-        )
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", expectedParams, force = false, Some("someEORI"), None, None))
+          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), dd4Notification, companyName).map(_.toEmailRequest)
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_statement_notification",
+              expectedParams,
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
+
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), dd4Notification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
@@ -78,11 +88,22 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber" -> "4",
           "date" -> "15 Sep 2018",
-          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after"
-        )
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", expectedParams, force = false, Some("someEORI"), None, None))
+          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), supplementaryDDNotification, companyName).map(_.toEmailRequest)
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_statement_notification",
+              expectedParams,
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
+
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), supplementaryDDNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
@@ -105,11 +126,22 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "DefermentStatementType" -> "excise",
           "PeriodIssueNumber" -> "4",
           "date" -> "29 Aug 2018",
-          "DutyText" -> "The total excise owed will be collected by direct debit on or before"
-        )
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_statement_notification", expectedParams, force = false, Some("someEORI"), None, None))
+          "DutyText" -> "The total excise owed will be collected by direct debit on or before")
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), exciseNotification, companyName).map(_.toEmailRequest)
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_statement_notification",
+              expectedParams,
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
+
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), exciseNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
@@ -123,19 +155,47 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           )
         )
 
-        val expected = Some(EmailRequest(List(EmailAddress("foo@bar.com")), "customs_financials_requested_duty_deferment_statement", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("foo@bar.com")),
+              "customs_financials_requested_duty_deferment_statement",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("foo@bar.com"), ddRequestedNotification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("foo@bar.com"), ddRequestedNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a new C79 certificate notification" in {
-        val c79Notification = Notification(someEORI, FileRole("C79Certificate"), someFilename, someFileSize, None, Map("Something" -> "Random"))
+        val c79Notification =
+          Notification(someEORI,
+            FileRole("C79Certificate"),
+            someFilename,
+            someFileSize,
+            None,
+            Map("Something" -> "Random"))
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_c79_certificate", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_c79_certificate",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), c79Notification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), c79Notification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
@@ -148,66 +208,147 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           )
         )
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_historic_c79_certificate", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_historic_c79_certificate",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), requestedC79Notification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), requestedC79Notification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a new security statement notification" in {
-        val securityStatementNotification = Notification(someEORI, FileRole("SecurityStatement"), someFilename, someFileSize, None, Map("Something" -> "Random"))
+        val securityStatementNotification =
+          Notification(someEORI,
+            FileRole("SecurityStatement"),
+            someFilename,
+            someFileSize,
+            None,
+            Map("Something" -> "Random"))
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_import_adjustment", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_import_adjustment",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), securityStatementNotification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), securityStatementNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a requested import adjustment notification" in {
         val requestedSecurityStatementNotification = Notification(
-          someEORI, FileRole("SecurityStatement"), someFilename, someFileSize, None, Map(
+          someEORI,
+          FileRole("SecurityStatement"),
+          someFilename,
+          someFileSize,
+          None, Map(
             "statementRequestID" -> "someID",
             "Something" -> "Random"
           )
         )
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_import_adjustment", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_requested_import_adjustment",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), requestedSecurityStatementNotification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), requestedSecurityStatementNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a new postponed VAT statement notification" in {
-        val pvatStatementNotification = Notification(someEORI, FileRole("PostponedVATStatement"), someFilename, someFileSize, None, Map("Something" -> "Random"))
+        val pvatStatementNotification =
+          Notification(
+            someEORI,
+            FileRole("PostponedVATStatement"),
+            someFilename,
+            someFileSize,
+            None,
+            Map("Something" -> "Random"))
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_new_postponed_vat_notification", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_new_postponed_vat_notification",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), pvatStatementNotification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), pvatStatementNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a requested postponed VAT statement notification" in {
         val requestedPVatNotification = Notification(
-          someEORI, FileRole("PostponedVATStatement"), someFilename, someFileSize, None, Map(
+          someEORI,
+          FileRole("PostponedVATStatement"),
+          someFilename,
+          someFileSize,
+          None, Map(
             "statementRequestID" -> "someID",
             "Something" -> "Random"
           )
         )
 
-        val expected = Some(EmailRequest(List(EmailAddress("test@test.com")), "customs_financials_requested_postponed_vat_notification", Map("recipientName_line1" -> companyName), force = false, Some("someEORI"), None, None))
+        val expected =
+          Some(
+            EmailRequest(
+              List(EmailAddress("test@test.com")),
+              "customs_financials_requested_postponed_vat_notification",
+              Map("recipientName_line1" -> companyName),
+              force = false,
+              Some("someEORI"),
+              None,
+              None))
 
-        val actual = EmailTemplate.fromNotification(EmailAddress("test@test.com"), requestedPVatNotification, companyName).map(_.toEmailRequest)
+        val actual =
+          EmailTemplate.fromNotification(
+            EmailAddress("test@test.com"), requestedPVatNotification, companyName).map(_.toEmailRequest)
 
         actual mustBe expected
       }
 
       "given a unknown notification" in {
         val unknownNotification = Notification(
-          someEORI, FileRole("Unknown"), someFilename, someFileSize, None, Map(
+          someEORI,
+          FileRole("Unknown"),
+          someFilename,
+          someFileSize,
+          None,
+          Map(
             "statementRequestID" -> "someID",
             "Something" -> "Random"
           )
@@ -226,6 +367,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
   }
 
   "createDutyDefermentDueDate" should {
+
     "calculate the correct payment due date" when {
       "statement type is Excise, due date is 29th of the current month" in {
         val periodEndYear = 2020
@@ -234,6 +376,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
 
         val expectedDate = "29 Feb 2020"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
+
         actualDate mustBe expectedDate
       }
 
@@ -244,6 +387,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
 
         val expectedDate = "28 Feb 2018"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
+
         actualDate mustBe expectedDate
       }
 
@@ -254,6 +398,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
 
         val expectedDate = "15 Oct 2018"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
+
         actualDate mustBe expectedDate
       }
 
@@ -264,6 +409,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
 
         val expectedDate = "15 Jan 2019"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
+
         actualDate mustBe expectedDate
       }
     }
