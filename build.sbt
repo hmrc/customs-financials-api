@@ -6,6 +6,7 @@ val appName = "customs-financials-api"
 
 val scala2_13_8 = "2.13.8"
 val bootstrapVersion = "7.22.0"
+val silencerVersion = "1.17.13"
 
 val testDirectory = "test"
 val scalaStyleConfigFile = "scalastyle-config.xml"
@@ -30,6 +31,10 @@ lazy val microservice = Project(appName, file("."))
   .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+    ),
     ScoverageKeys.coverageExcludedPackages := List("<empty>"
       , ".*Reverse.*"
       , ".*services.dec64.Dec64Headers.*"
