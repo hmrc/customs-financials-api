@@ -38,7 +38,6 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
   val log: Logger = Logger(this.getClass)
 
   def get(eori: EORI): Action[AnyContent] = authorisedRequest async {
-    implicit request: RequestWithEori[AnyContent] =>
 
       service.getAccountAuthorities(eori)
         .map { accountWithAuthorities: Seq[AccountWithAuthorities] =>
@@ -63,7 +62,9 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
         }
   }
 
-  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
+    implicit request: RequestWithEori[JsValue] =>
+
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
       service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
         case true => NoContent
@@ -72,7 +73,9 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
     }
   }
 
-  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
+    implicit request: RequestWithEori[JsValue] =>
+
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
       service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
         case true => NoContent

@@ -35,6 +35,7 @@ class SearchAuthoritiesController @Inject()(
         case Left(NoAuthoritiesFound) => NoContent
         case Left(ErrorResponse) => InternalServerError
         case Right(value) => Ok(Json.toJson(value))
+        case _ => InternalServerError
       }
   }
 }

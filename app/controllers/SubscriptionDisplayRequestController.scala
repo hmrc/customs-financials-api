@@ -27,18 +27,21 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class SubscriptionDisplayRequestController @Inject()(connector: Sub09Connector,
-                                                     cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                     cc: ControllerComponents)(implicit ec: ExecutionContext)
+  extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 
   def validateEORI(eori: EORI): Action[AnyContent] = Action.async {
+
     connector.getSubscriptions(eori).map(subscriptionDisplay => {
-      subscriptionDisplay.subscriptionDisplayResponse.responseCommon.statusText.isEmpty match {
-        case false => Ok
+      if (subscriptionDisplay.subscriptionDisplayResponse.responseCommon.statusText.isDefined) {
+        Ok
+      } else {
+        NotFound
       }
     }).recover {
       case UpstreamErrorResponse(_, NOT_FOUND, _, _) => NotFound
     }
   }
 }
-

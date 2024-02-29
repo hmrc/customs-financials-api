@@ -27,7 +27,7 @@ object EORI {
 
   implicit def pathBinder(implicit stringBinder: PathBindable[String]): PathBindable[EORI] = new PathBindable[EORI] {
     override def bind(key: String, value: String): Either[String, EORI] = {
-      stringBinder.bind(key, value).right.map(EORI(_))
+      stringBinder.bind(key, value).map(EORI(_))
     }
 
     override def unbind(key: String, eori: EORI): String =

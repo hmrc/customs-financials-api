@@ -23,6 +23,7 @@ import models.EORI
 import services.{AuditingService, DateTimeService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,7 +53,8 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
       requestDetail
     ))
 
-    val result: Future[StandingAuthoritiesForEORIResponse] = httpClient.POST[acc41.StandingAuthoritiesForEORIRequest, acc41.StandingAuthoritiesForEORIResponse](
+    val result: Future[StandingAuthoritiesForEORIResponse] =
+      httpClient.POST[acc41.StandingAuthoritiesForEORIRequest, acc41.StandingAuthoritiesForEORIResponse](
       appConfig.acc41AuthoritiesCsvGenerationEndpoint,
       request,
       headers = mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader)
@@ -61,11 +63,12 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     result.map {
       res => res.standingAuthoritiesForEORIResponse.responseDetail match {
         case ResponseDetail(Some(_), None) => Left(Acc41ErrorResponse)
-        case v@ResponseDetail(None, Some(_)) => {
-          auditingService.auditRequestAuthCSVStatementRequest(v,
-            res.standingAuthoritiesForEORIResponse.requestDetail)
+
+        case v@ResponseDetail(None, Some(_)) =>
+          auditingService.auditRequestAuthCSVStatementRequest(v, res.standingAuthoritiesForEORIResponse.requestDetail)
           Right(v.toAuthoritiesCsvGeneration)
-        }
+
+        case ResponseDetail(_, _) => Left(Acc41ErrorResponse)
       }
     }.recover {
       case _ => Left(Acc41ErrorResponse)

@@ -32,6 +32,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 @Singleton
 class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
                                                    mongoComponent: MongoComponent)
@@ -60,13 +61,11 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
     )
   ) {
-  private val logger = play.api.Logger(getClass)
-
   private val searchIDFieldKey = "searchID"
   private val searchRequestsFieldKey = "searchRequests"
   private val currentEoriFieldKey = "currentEori"
   private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
-  private val  resultsFoundFieldKey = "resultsFound"
+  private val resultsFoundFieldKey = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
@@ -111,7 +110,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
    * for the given searchID
    */
   def updateResultsFoundStatus(searchID: String,
-                               updatedStatus: SearchResultStatus.Value):Future[Option[HistoricDocumentRequestSearch]] = {
+                               updatedStatus: SearchResultStatus.Value): Future[Option[HistoricDocumentRequestSearch]] = {
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
 
     val updates = Updates.combine(

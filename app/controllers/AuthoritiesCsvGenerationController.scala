@@ -32,10 +32,12 @@ class AuthoritiesCsvGenerationController @Inject()(
 
   def initiateAuthoritiesCsvGeneration: Action[InitiateAuthoritiesCsvGenerationRequest] = Action.async(
     parse.json[InitiateAuthoritiesCsvGenerationRequest]) {
+
     implicit request =>
       acc41Connector.initiateAuthoritiesCSV(request.body.requestingEori, request.body.alternateEORI).map {
         case Left(Acc41ErrorResponse) => InternalServerError
         case Right(value) => Ok(Json.toJson(value))
+        case _ => InternalServerError
       }
   }
 }

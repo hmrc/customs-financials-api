@@ -24,6 +24,7 @@ import services.{AuditingService, DateTimeService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 class Acc40Connector @Inject()(httpClient: HttpClient,
                                auditingService: AuditingService,
@@ -31,8 +32,8 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def searchAuthorities(requestingEORI: EORI, searchID: EORI)
-    (implicit hc: HeaderCarrier): Future[Either[Acc40Response, AuthoritiesFound]] = {
+  def searchAuthorities(requestingEORI: EORI,
+                        searchID: EORI)(implicit hc: HeaderCarrier): Future[Either[Acc40Response, AuthoritiesFound]] = {
 
     val commonRequest = acc40.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -59,15 +60,15 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
 
     result.map {
-      res => res.searchAuthoritiesResponse.responseDetail match {
-        case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
-        case ResponseDetail(None, Some("0"), _, _, _) => Left(NoAuthoritiesFound)
-        case v@ResponseDetail(_, _, _, _, _) => {
-          auditingService.auditRequestAuthStatementRequest(v,
-            res.searchAuthoritiesResponse.requestDetail)
-          Right(v.toAuthoritiesFound)
+      res =>
+        res.searchAuthoritiesResponse.responseDetail match {
+          case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
+          case ResponseDetail(None, Some("0"), _, _, _) => Left(NoAuthoritiesFound)
+
+          case v@ResponseDetail(_, _, _, _, _) =>
+            auditingService.auditRequestAuthStatementRequest(v, res.searchAuthoritiesResponse.requestDetail)
+            Right(v.toAuthoritiesFound)
         }
-      }
     }.recover {
       case _ => Left(ErrorResponse)
     }

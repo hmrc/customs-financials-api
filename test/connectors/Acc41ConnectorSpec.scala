@@ -31,8 +31,10 @@ import scala.concurrent.Future
 class Acc41ConnectorSpec extends SpecBase {
 
   "initiateAuthoritiesCSV" should {
+
     "return Left Acc41ErrorResponse when request returns error message" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
+        mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
 
       running(app) {
@@ -42,7 +44,8 @@ class Acc41ConnectorSpec extends SpecBase {
     }
 
     "return Right AuthoritiesCsvGeneration when no alternateEORI" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
+        mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
@@ -53,7 +56,8 @@ class Acc41ConnectorSpec extends SpecBase {
 
 
     "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
+        mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
@@ -61,16 +65,25 @@ class Acc41ConnectorSpec extends SpecBase {
         result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
       }
     }
-  }
 
+    "return Left Acc41ErrorResponse when request returns error message" in new Setup {
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
+        mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
+
+      running(app) {
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
+        result mustBe Left(Acc41ErrorResponse)
+      }
+    }
+  }
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
     def response(error: Option[String],
-                 requestAcceptedDate: Option[String]
-                ): domain.acc41.Response = domain.acc41.Response(
+                 requestAcceptedDate: Option[String]): domain.acc41.Response = domain.acc41.Response(
       RequestCommon("date", "MDTP", "reference", "CDS"),
       RequestDetail(EORI("someEORI"),Some(EORI("someAltEori"))),
       ResponseDetail(

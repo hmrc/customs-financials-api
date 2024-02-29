@@ -45,6 +45,7 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-P:silencer:pathFilters=routes",
+      "-P:silencer:pathFilters=target/.*",
       "-Wunused:imports",
       "-Wunused:params",
       "-Wunused:patvars",

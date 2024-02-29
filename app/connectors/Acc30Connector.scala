@@ -67,7 +67,7 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
           case Status.NO_CONTENT => true
           case _ => false
         }
-      }.recover { case ex: Throwable => false }
+      }.recover { case _: Throwable => false }
     }
   }
 }

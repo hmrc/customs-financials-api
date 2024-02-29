@@ -123,17 +123,21 @@ class MetadataController @Inject()(
                                                       implicit hc: HeaderCarrier): Future[Boolean] =
     optHisDocReq match {
       case Some(histDocReq) =>
+
         if (histDocReq.resultsFound == SearchResultStatus.inProcess) {
-          val emailSentResult = {
-            histDocReqSearchCacheService.processSDESNotificationForStatReqId(histDocReq,
-              statementRequestID).recover {
+
+          val emailSentResult: Future[Boolean] = {
+            histDocReqSearchCacheService.processSDESNotificationForStatReqId(
+              histDocReq, statementRequestID).recover {
               case err =>
                 log.error(s"update failed for historic request search document and" +
                   s" error is ::: ${err.getMessage}")
             }
+
             log.info(s"sending email for statementRequestID ::: $statementRequestID")
             sendEmailIfVerified(notification)
           }
+
           emailSentResult
         } else {
           Future(false)

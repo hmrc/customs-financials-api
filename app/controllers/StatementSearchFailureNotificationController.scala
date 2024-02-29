@@ -155,11 +155,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Checks the failureReasonCode and proceeds as below
-   * If failureReasonCode is NoDocumentsFound, update the retry count
-   * else process the RequestId and update the HistoricDocumentRequestSearch document
-   */
   private def checkFailureReasonAndProcessRequestId(statementRequestID: String,
                                                     correlationId: String,
                                                     failureReasonCode: String,
@@ -187,9 +182,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Updates the resultsFound status to no if eligible and sends secure message
-   */
   private def updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Unit] = {
     cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
       case Some(updatedDoc) =>
@@ -208,10 +200,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Proceeds to update if the HistoricDocumentRequestSearch is in "inProcess"
-   * otherwise no further processing
-   */
   private def updateDocumentStatusIfInProcess(histDoc: HistoricDocumentRequestSearch): Result = {
     histDoc.resultsFound match {
       case SearchResultStatus.inProcess =>
@@ -222,10 +210,6 @@ class StatementSearchFailureNotificationController @Inject()(
     NoContent
   }
 
-  /**
-   * Updates the SearchRequest for given statementRequestID
-   * if it is inProcess (searchRequests.statementRequestID field in the Mongo document)
-   */
   private def updateSearchRequestIfInProcess(statementRequestID: String,
                                              failureReasonCode: String,
                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch)
@@ -293,7 +277,7 @@ class StatementSearchFailureNotificationController @Inject()(
 
   private def buildInternalServerErrorResponse(correlationId: String,
                                                statementRequestID: String,
-                                               errorDetailMessage: String = emptyString) =
+                                               errorDetailMessage: String) =
     buildErrorResponse(
       errorCode = ErrorCode.code500,
       correlationId = correlationId,
@@ -301,7 +285,7 @@ class StatementSearchFailureNotificationController @Inject()(
       errorDetailMsg = errorDetailMessage)
 
   private def buildErrorResponse(errors: Option[Throwable] = None,
-                                 errorCode: String = ErrorCode.code400,
+                                 errorCode: String,
                                  correlationId: String,
                                  statementReqId: Option[String] = None,
                                  errorDetailMsg: String = emptyString) = {
