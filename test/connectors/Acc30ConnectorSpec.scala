@@ -25,6 +25,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -34,7 +35,7 @@ class Acc30ConnectorSpec extends SpecBase {
   "grantAccountAuthorities" should {
     "return true when the api responds with 204" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
       running(app) {
         val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
@@ -43,7 +44,7 @@ class Acc30ConnectorSpec extends SpecBase {
     }
     "return false when the api responds with a successful response that isn't 204" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(OK, "")))
+        .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
       running(app) {
         val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
@@ -64,7 +65,7 @@ class Acc30ConnectorSpec extends SpecBase {
   "revokeAccountAuthorities" should {
     "return true when the api responds with 204" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
       running(app) {
         val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
@@ -73,7 +74,7 @@ class Acc30ConnectorSpec extends SpecBase {
     }
     "return false when the api responds with a successful response that isn't 204" in new Setup {
       when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(OK, "")))
+        .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
       running(app) {
         val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))

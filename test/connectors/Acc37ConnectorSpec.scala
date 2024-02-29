@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
@@ -51,7 +52,7 @@ class Acc37ConnectorSpec extends SpecBase {
         ResponseCommon(
           "OK",
           None,
-          "",
+          emptyString,
           None
         )
       )

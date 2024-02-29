@@ -25,6 +25,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
@@ -49,7 +50,7 @@ class Acc41ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI(""))))
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI(emptyString))))
         result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
       }
     }

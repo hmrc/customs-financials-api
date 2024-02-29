@@ -32,6 +32,7 @@ import scala.concurrent._
 class CashTransactionsServiceSpec extends SpecBase {
 
   "retrieveCashTransactionsSummary" should {
+
     "return Left with an error if the api request failed" in new Setup {
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Left(NoAssociatedDataException))
@@ -43,9 +44,9 @@ class CashTransactionsServiceSpec extends SpecBase {
     }
 
     "return Right with the Cash transactions on a successful response from the API" in new Setup {
-      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
-        Future.successful(Right(Some(cashTransactionsResponseDetail)))
-      )
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
+        .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail))))
+
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(
@@ -71,11 +72,13 @@ class CashTransactionsServiceSpec extends SpecBase {
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(Nil, Nil)
+
         result mustBe Right(expectedResult)
       }
     }
   }
   "retrieveCashTransactionsDetail" should {
+
     "return Left with an error if the api request failed" in new Setup {
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Left(NoAssociatedDataException))
@@ -92,6 +95,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       )
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
+
         val expectedResult = CashTransactions(
           List(Declaration("someId", Some(EORI("someImporterEORI")), EORI("someEori"),
             Some("reference"), dateTo.toString, "10000", List.empty)),
@@ -99,10 +103,17 @@ class CashTransactionsServiceSpec extends SpecBase {
             dateFrom.toString,
             "10000",
             "9000",
-            List(Declaration("someId", Some(EORI("someImporterEORI")), EORI("someEori"), Some("reference"), dateTo.toString, "10000", List(TaxGroup("something", "10000")))),
+            List(Declaration("someId",
+              Some(EORI("someImporterEORI")),
+              EORI("someEori"),
+              Some("reference"),
+              dateTo.toString,
+              "10000",
+              List(TaxGroup("something", "10000")))),
             List(Transaction("10000", "A21", Some("Bank"))))
           )
         )
+
         result mustBe Right(expectedResult)
       }
     }
@@ -169,8 +180,7 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
       Some(Seq(dailyStatement)),
-      Some(pending)
-    )
+      Some(pending))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc31Connector].toInstance(mockAcc31Connector)
@@ -182,5 +192,4 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val service: CashTransactionsService = app.injector.instanceOf[CashTransactionsService]
   }
-
 }

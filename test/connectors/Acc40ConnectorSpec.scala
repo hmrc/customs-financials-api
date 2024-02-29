@@ -30,6 +30,7 @@ import scala.concurrent.Future
 class Acc40ConnectorSpec extends SpecBase {
 
   "searchAuthorities" should {
+
     "return Left no authorities when no authorities returned in the response" in new Setup {
       when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
@@ -52,11 +53,24 @@ class Acc40ConnectorSpec extends SpecBase {
 
     "return Right if a valid response with authorities returned" in new Setup {
       when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(None, Some("1"), Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))), None, None)))
+        .thenReturn(
+          Future.successful(
+            response(None,
+              Some("1"),
+              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
+              None,
+              None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
-        result mustBe Right(AuthoritiesFound(Some("1"), None, None, Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0"))))))
+        result mustBe
+          Right(
+            AuthoritiesFound(Some("1"),
+              None,
+              None,
+              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"),
+                Some("10.0"))))
+            ))
       }
     }
 
@@ -84,7 +98,6 @@ class Acc40ConnectorSpec extends SpecBase {
     }
   }
 
-
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
@@ -93,20 +106,22 @@ class Acc40ConnectorSpec extends SpecBase {
                  numberOfAuthorities: Option[String],
                  cashAccount: Option[Seq[CashAccount]],
                  dutyDefermentAccount: Option[Seq[DutyDefermentAccount]],
-                 generalGuaranteeAccount: Option[Seq[GeneralGuaranteeAccount]]
-                ): SearchAuthoritiesResponse = SearchAuthoritiesResponse(domain.acc40.Response(
-      RequestCommon("date", "MDTP", "reference", "CDS"),
-      RequestDetail(EORI("someEORI"), "1", EORI("someOtherEORI")),
-      ResponseDetail(
-        errorMessage = error,
-        numberOfAuthorities = numberOfAuthorities,
-        dutyDefermentAccounts = dutyDefermentAccount,
-        generalGuaranteeAccounts = generalGuaranteeAccount,
-        cdsCashAccounts = cashAccount
-      )
-    )
-    )
+                 generalGuaranteeAccount: Option[Seq[GeneralGuaranteeAccount]]): SearchAuthoritiesResponse = {
 
+      SearchAuthoritiesResponse(
+        domain.acc40.Response(
+          RequestCommon("date", "MDTP", "reference", "CDS"),
+          RequestDetail(EORI("someEORI"), "1", EORI("someOtherEORI")),
+          ResponseDetail(
+            errorMessage = error,
+            numberOfAuthorities = numberOfAuthorities,
+            dutyDefermentAccounts = dutyDefermentAccount,
+            generalGuaranteeAccounts = generalGuaranteeAccount,
+            cdsCashAccounts = cashAccount
+          )
+        )
+      )
+    }
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
@@ -118,5 +133,4 @@ class Acc40ConnectorSpec extends SpecBase {
 
     val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
   }
-
 }

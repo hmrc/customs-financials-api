@@ -18,6 +18,7 @@ package models.requests
 
 import models._
 import utils.SpecBase
+import utils.TestData.{MONTH_2, MONTH_4, YEAR_2021}
 import utils.Utils.emptyString
 
 import java.util.UUID
@@ -30,10 +31,10 @@ class HistoricDocumentRequestSpec extends SpecBase {
         HistoricDocumentRequest(
           eori = EORI(eoriNumber),
           documentType = FileRole(accountType),
-          periodStartMonth = 2,
-          periodStartYear = 2021,
-          periodEndMonth = 4,
-          periodEndYear = 2021,
+          periodStartMonth = MONTH_2,
+          periodStartYear = YEAR_2021,
+          periodEndMonth = MONTH_4,
+          periodEndYear = YEAR_2021,
           dan = Some(dan),
           statementRequestID = UUID.fromString(incomingStatementReqId)
         )

@@ -30,14 +30,29 @@ import utils.SpecBase
 import scala.concurrent.Future
 
 class GuaranteeTransactionControllerSpec extends SpecBase {
+
   "GuaranteeTransactionsController" should {
+
     "delegate to the service and return a list of open guarantee transactions with a 200 status code" in new Setup {
-      val guaranteeTransaction = Seq(GuaranteeTransaction("someDate", "mrn", Some("100.00"), Some("UCR"), EORI("Declarant EORI"), EORI("Consignee EORI"), "200.00", Some("300.00"), None, None, Nil))
+      val guaranteeTransaction: Seq[GuaranteeTransaction] =
+        Seq(GuaranteeTransaction("someDate",
+          "mrn",
+          Some("100.00"),
+          Some("UCR"),
+          EORI("Declarant EORI"),
+          EORI("Consignee EORI"),
+          "200.00",
+          Some("300.00"),
+          None,
+          None,
+          Nil))
+
       when(mockService.retrieveGuaranteeTransactionsSummary(any))
         .thenReturn(Future.successful(Right(guaranteeTransaction)))
 
       running(app) {
         val result = route(app, summaryRequest).value
+
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.toJson(guaranteeTransaction)
       }
@@ -53,7 +68,9 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
     running(app) {
       val result = route(app, request).value
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+      contentAsString(result) mustBe
+        "Invalid GuaranteeAccountTransactionsRequest payload:" +
+          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
@@ -85,13 +102,27 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
     import domain._
 
-    val amountTaxType: Amounts = Amounts(openAmount = Some("600.00"), totalAmount = "800.00", clearedAmount = Some("200.00"), updateDate = "2020-08-01")
-    val taxType: TaxType = TaxType(taxType = "taxType1", amounts = amountTaxType)
-    val amountTaxTypeGroup: Amounts = Amounts(openAmount = Some("400.00"), totalAmount = "700.00", clearedAmount = Some("300.00"), updateDate = "2020-08-02")
-    val taxTypeGroup: TaxTypeGroup = TaxTypeGroup(taxTypeGroup = "B", amountTaxTypeGroup, taxType = taxType)
-    val amountsDueDates: Amounts = Amounts(openAmount = Some("450.00"), totalAmount = "600.00", clearedAmount = Some("150.00"), updateDate = "2020-08-03")
+    val amountTaxType: Amounts = Amounts(openAmount = Some("600.00"),
+      totalAmount = "800.00",
+      clearedAmount = Some("200.00"),
+      updateDate = "2020-08-01")
 
-    val guaranteeTransactionDetail = Seq(GuaranteeTransaction(
+    val taxType: TaxType = TaxType(taxType = "taxType1", amounts = amountTaxType)
+
+    val amountTaxTypeGroup: Amounts = Amounts(
+      openAmount = Some("400.00"),
+      totalAmount = "700.00",
+      clearedAmount = Some("300.00"),
+      updateDate = "2020-08-02")
+
+    val taxTypeGroup: TaxTypeGroup = TaxTypeGroup(taxTypeGroup = "B", amountTaxTypeGroup, taxType = taxType)
+
+    val amountsDueDates: Amounts = Amounts(openAmount = Some("450.00"),
+      totalAmount = "600.00",
+      clearedAmount = Some("150.00"),
+      updateDate = "2020-08-03")
+
+    val guaranteeTransactionDetail: Seq[GuaranteeTransaction] = Seq(GuaranteeTransaction(
       date = "someDate2",
       movementReferenceNumber = "mrn",
       balance = Some("balance 1"),
@@ -102,9 +133,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       dischargedAmount = Some("5.12"),
       interestCharge = Some("interest rate 1"),
       c18Reference = Some("C18-Ref1"),
-      dueDates = Seq(
-        DueDate("dueDate", Some("reason1"), amountsDueDates, Seq(taxTypeGroup))
-      )
+      dueDates = Seq(DueDate("dueDate", Some("reason1"), amountsDueDates, Seq(taxTypeGroup)))
     ))
 
     when(mockService.retrieveGuaranteeTransactionsDetail(any))
@@ -138,13 +167,17 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   }
 
   "return an error from retrieveOpenGuaranteeTransactionsDetail when no gan found in request" in new Setup {
-    val request: FakeRequest[AnyContentAsJson] = FakeRequest(POST, controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
-      .withJsonBody(Json.parse("""{"invalid":"invalid"}"""))
+    val request: FakeRequest[AnyContentAsJson] =
+      FakeRequest(POST, controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
+        .withJsonBody(Json.parse("""{"invalid":"invalid"}"""))
 
     running(app) {
       val result = route(app, request).value
+
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe "Invalid GuaranteeAccountTransactionsRequest payload: List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+      contentAsString(result) mustBe
+        "Invalid GuaranteeAccountTransactionsRequest payload:" +
+          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
@@ -153,11 +186,13 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
     val mockService: GuaranteeTransactionsService = mock[GuaranteeTransactionsService]
 
     val detailRequest: FakeRequest[AnyContentAsJson] =
-      FakeRequest("POST", controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
+      FakeRequest("POST",
+        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
         .withJsonBody(Json.parse("""{"gan":"gan1"}"""))
 
     val summaryRequest: FakeRequest[AnyContentAsJson] =
-      FakeRequest("POST", controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
+      FakeRequest("POST",
+        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
         .withJsonBody(Json.parse("""{"gan":"gan1"}"""))
 
     val app: Application = GuiceApplicationBuilder().overrides(

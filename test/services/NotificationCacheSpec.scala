@@ -23,8 +23,8 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import utils.SpecBase
+import utils.TestData.{CSV_FILE_NAME, CURRENT_LOCAL_DATE, FILE_ROLE_C79_CERTIFICATE, FILE_SIZE_1000L}
 
-import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationCacheSpec extends SpecBase {
@@ -75,10 +75,10 @@ class NotificationCacheSpec extends SpecBase {
       val requestedStatement: Notification =
         Notification(
           Eori1,
-          FileRole("C79Certificate"),
-          "abc.csv",
-          1000,
-          Some(LocalDate.now),
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
+          Some(CURRENT_LOCAL_DATE),
           Map("periodStartYear" -> "2019",
             "periodStartMonth" -> "4",
             "fileType" -> "csv",
@@ -88,10 +88,10 @@ class NotificationCacheSpec extends SpecBase {
       val nonRequestedStatement: Notification =
         Notification(
           Eori1,
-          FileRole("C79Certificate"),
-          "abc.csv",
-          1000,
-          Some(LocalDate.now),
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
+          Some(CURRENT_LOCAL_DATE),
           Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv")
         )
 
@@ -99,7 +99,7 @@ class NotificationCacheSpec extends SpecBase {
         val result = await(for {
           _ <- cache.putNotifications(
             NotificationsForEori(Eori1, Seq(requestedStatement, nonRequestedStatement), lastUpdated))
-          _ <- cache.removeByFileRole(Eori1, FileRole("C79Certificate"))
+          _ <- cache.removeByFileRole(Eori1, FILE_ROLE_C79_CERTIFICATE)
           notifications <- cache.getNotifications(Eori1)
         } yield notifications)
 
@@ -111,10 +111,10 @@ class NotificationCacheSpec extends SpecBase {
       val requestedStatement1: Notification =
         Notification(
           Eori1,
-          FileRole("C79Certificate"),
+          FILE_ROLE_C79_CERTIFICATE,
           "abc23.csv",
-          1000,
-          Some(LocalDate.now),
+          FILE_SIZE_1000L,
+          Some(CURRENT_LOCAL_DATE),
           Map("periodStartYear" -> "2018",
             "periodStartMonth" -> "4",
             "fileType" -> "csv",
@@ -123,10 +123,10 @@ class NotificationCacheSpec extends SpecBase {
       val requestedStatement2: Notification =
         Notification(
           Eori1,
-          FileRole("C79Certificate"),
-          "abc.csv",
-          1000,
-          Some(LocalDate.now),
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
+          Some(CURRENT_LOCAL_DATE),
           Map("periodStartYear" -> "2019",
             "periodStartMonth" -> "4",
             "fileType" -> "csv",
@@ -136,10 +136,10 @@ class NotificationCacheSpec extends SpecBase {
       val nonRequestedStatement: Notification =
         Notification(
           Eori1,
-          FileRole("C79Certificate"),
-          "abc.csv",
-          1000,
-          Some(LocalDate.now),
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
+          Some(CURRENT_LOCAL_DATE),
           Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv")
         )
 
@@ -147,7 +147,7 @@ class NotificationCacheSpec extends SpecBase {
         val result = await(for {
           _ <- cache.putNotifications(NotificationsForEori(
             Eori1, Seq(requestedStatement1, requestedStatement2, nonRequestedStatement), lastUpdated))
-          _ <- cache.removeRequestedByFileRole(Eori1, FileRole("C79Certificate"))
+          _ <- cache.removeRequestedByFileRole(Eori1, FILE_ROLE_C79_CERTIFICATE)
           notifications <- cache.getNotifications(Eori1)
         } yield notifications)
 
@@ -164,105 +164,105 @@ class NotificationCacheSpec extends SpecBase {
     val securityStmtNotification1: Notification =
       Notification(Eori1,
         FileRole("SecurityStatement"),
-        "abc.csv",
-        1000,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "1", "fileType" -> "csv"))
 
     val securityStmtNotification2: Notification =
       Notification(Eori1,
         FileRole("SecurityStatement"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "2", "fileType" -> "csv"))
 
     val securityStmtNotification3: Notification =
       Notification(Eori1,
         FileRole("SecurityStatement"),
-        "abc.csv",
-        1000,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "3", "fileType" -> "csv"))
 
     val securityStmtNotification4: Notification =
       Notification(Eori1,
         FileRole("SecurityStatement"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv"))
 
     val c79CertNotification1: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "1", "fileType" -> "csv"))
 
     val c79CertNotification2: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "2", "fileType" -> "csv"))
 
     val c79CertNotification3: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "3", "fileType" -> "csv"))
 
     val c79CertNotification4: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv"))
 
     val pvatStmtNotification1: Notification =
       Notification(Eori1,
         FileRole("PostponedVat"),
-        "abc.csv",
-        1000,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "1", "fileType" -> "csv"))
 
     val pvatStmtNotification2: Notification =
       Notification(Eori1,
         FileRole("PostponedVat"),
-        "abc.csv",
-        1000,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "2", "fileType" -> "csv"))
 
     val pvatStmtNotification3: Notification =
       Notification(Eori1,
         FileRole("PostponedVat"),
-        "abc.csv",
-        1000,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
         None,
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "3", "fileType" -> "csv"))
 
     val pvatStmtNotification4: Notification =
       Notification(Eori1,
         FileRole("PostponedVat"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv"))
 
     val c79StatementRequest1: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now.minusDays(2)),
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE.minusDays(2)),
         Map("periodStartYear" -> "2019",
           "periodStartMonth" -> "4",
           "fileType" -> "csv",
@@ -271,10 +271,10 @@ class NotificationCacheSpec extends SpecBase {
 
     val c79StatementRequest2: Notification =
       Notification(Eori1,
-        FileRole("C79Certificate"),
-        "abc.csv",
-        1000,
-        Some(LocalDate.now),
+        FILE_ROLE_C79_CERTIFICATE,
+        CSV_FILE_NAME,
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         Map("periodStartYear" -> "2019",
           "periodStartMonth" -> "4",
           "fileType" -> "csv",

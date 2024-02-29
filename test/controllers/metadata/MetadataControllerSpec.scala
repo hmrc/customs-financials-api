@@ -62,23 +62,23 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
-          |            {"metadata": "PeriodStartYear", "value": "2017"},
-          |            {"metadata": "PeriodStartMonth", "value": "5"},
-          |            {"metadata": "PeriodStartDay", "value": "5"},
-          |            {"metadata": "PeriodEndYear", "value": "2018"},
-          |            {"metadata": "PeriodEndMonth", "value": "8"},
-          |            {"metadata": "PeriodEndDay", "value": "5"},
-          |            {"metadata": "PeriodIssueNumber", "value": "4"},
-          |            {"metadata": "FileType", "value": "PDF"},
-          |            {"metadata": "FileRole", "value": "DutyDefermentStatement"},
-          |            {"metadata": "DefermentStatementType", "value": "Weekly"},
-          |            {"metadata": "DutyOverLimit", "value": "Y"},
-          |            {"metadata": "DutyPaymentType", "value": "DirectDebit"}
-          |        ]
+          |       "eori":"testEORI-12345",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
+          |           {"metadata": "PeriodStartYear", "value": "2017"},
+          |           {"metadata": "PeriodStartMonth", "value": "5"},
+          |           {"metadata": "PeriodStartDay", "value": "5"},
+          |           {"metadata": "PeriodEndYear", "value": "2018"},
+          |           {"metadata": "PeriodEndMonth", "value": "8"},
+          |           {"metadata": "PeriodEndDay", "value": "5"},
+          |           {"metadata": "PeriodIssueNumber", "value": "4"},
+          |           {"metadata": "FileType", "value": "PDF"},
+          |           {"metadata": "FileRole", "value": "DutyDefermentStatement"},
+          |           {"metadata": "DefermentStatementType", "value": "Weekly"},
+          |           {"metadata": "DutyOverLimit", "value": "Y"},
+          |           {"metadata": "DutyPaymentType", "value": "DirectDebit"}
+          |       ]
           |    }
           |]
         """.stripMargin)
@@ -124,10 +124,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI-12345",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -166,10 +166,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "whatever.pdf",
-          |        "fileSize": 999,
-          |        "metadata": [
+          |       "eori":"testEORI-12345",
+          |       "fileName": "whatever.pdf",
+          |       "fileSize": 999,
+          |       "metadata": [
           |            {"metadata": "FileRole", "value": "DutyDefermentStatement"},
           |            {"metadata": "Other", "value": "Stuff"},
           |            {"metadata": "statementRequestID", "value": "1abcdeff2-a2b1-abcd-abcd-0123456789"}
@@ -219,10 +219,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-23456",
-          |		     "fileName": "whatever.pdf",
-          |        "fileSize": 999,
-          |        "metadata": [
+          |       "eori":"testEORI-23456",
+          |       "fileName": "whatever.pdf",
+          |       "fileSize": 999,
+          |       "metadata": [
           |            {"metadata": "FileRole", "value": "StandingAuthority"},
           |            {"metadata": "Other", "value": "Stuff"},
           |            {"metadata": "statementRequestID", "value": "1abcdeff2-a2b1-abcd-abcd-0123456789"}
@@ -273,10 +273,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI-12345",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -332,10 +332,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI-12345",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -392,10 +392,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -441,7 +441,7 @@ class MetadataControllerSpec extends SpecBase {
            |[
            |    {
            |        "eori":"${eori.value}",
-           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileName": "vat-2018-05.pdf",
            |        "fileSize": 75251,
            |        "metadata": [
            |            {"metadata": "PeriodStartYear", "value": "2017"},
@@ -498,10 +498,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -547,7 +547,7 @@ class MetadataControllerSpec extends SpecBase {
            |[
            |    {
            |        "eori":"${eori.value}",
-           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileName": "vat-2018-05.pdf",
            |        "fileSize": 75251,
            |        "metadata": [
            |            {"metadata": "PeriodStartYear", "value": "2017"},
@@ -604,10 +604,10 @@ class MetadataControllerSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI",
-          |		     "fileName": "vat-2018-05.pdf",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
           |            {"metadata": "PeriodStartMonth", "value": "5"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
@@ -652,7 +652,7 @@ class MetadataControllerSpec extends SpecBase {
            |[
            |    {
            |        "eori":"testEORI",
-           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileName": "vat-2018-05.pdf",
            |        "fileSize": 75251,
            |        "metadata": [
            |            {"metadata": "PeriodStartYear", "value": "2017"},
@@ -710,7 +710,7 @@ class MetadataControllerSpec extends SpecBase {
            |[
            |    {
            |        "eori":"testEORI",
-           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileName": "vat-2018-05.pdf",
            |        "fileSize": 75251,
            |        "metadata": [
            |            {"metadata": "PeriodStartYear", "value": "2017"},
@@ -726,7 +726,7 @@ class MetadataControllerSpec extends SpecBase {
            |    },
            |    {
            |        "eori":"testEORI",
-           |		     "fileName": "vat-2018-05.pdf",
+           |        "fileName": "vat-2018-05.pdf",
            |        "fileSize": 75251,
            |        "metadata": [
            |            {"metadata": "PeriodStartYear", "value": "2017"},
@@ -830,10 +830,10 @@ class MetadataControllerSpec extends SpecBase {
       """
         |[
         |    {
-        |        "eori":"testEORI",
-        |		     "fileName": "vat-2018-05.pdf",
-        |        "fileSize": 75251,
-        |        "metadata": [
+        |       "eori":"testEORI",
+        |       "fileName": "vat-2018-05.pdf",
+        |       "fileSize": 75251,
+        |       "metadata": [
         |            {"metadata": "PeriodStartYear", "value": "2018"},
         |            {"metadata": "PeriodStartMonth", "value": "5"},
         |            {"metadata": "FileType", "value": "PDF"},
@@ -841,10 +841,10 @@ class MetadataControllerSpec extends SpecBase {
         |        ]
         |    },
         |    {
-        |        "eori":"testEORI-12345",
-        |		     "fileName": "vat-2018-05.csv",
-        |        "fileSize": 12345,
-        |        "metadata": [
+        |       "eori":"testEORI-12345",
+        |       "fileName": "vat-2018-05.csv",
+        |       "fileSize": 12345,
+        |       "metadata": [
         |            {"metadata": "PeriodStartYear", "value": "2018"},
         |            {"metadata": "PeriodStartMonth", "value": "5"},
         |            {"metadata": "FileType", "value": "CSV"},
