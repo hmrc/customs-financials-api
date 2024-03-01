@@ -119,19 +119,19 @@ class MetadataController @Inject()(
 
   private def updateHistReqSearchDocumentAndSendMail(notification: Notification,
                                                      statementRequestID: String,
-                                                     optHisDocReq: Option[HistoricDocumentRequestSearch])(
-                                                      implicit hc: HeaderCarrier): Future[Boolean] =
+                                                     optHisDocReq: Option[HistoricDocumentRequestSearch])
+                                                    (implicit hc: HeaderCarrier): Future[Boolean] = {
     optHisDocReq match {
       case Some(histDocReq) =>
 
         if (histDocReq.resultsFound == SearchResultStatus.inProcess) {
 
           val emailSentResult: Future[Boolean] = {
-            histDocReqSearchCacheService.processSDESNotificationForStatReqId(
-              histDocReq, statementRequestID).recover {
+            histDocReqSearchCacheService.processSDESNotificationForStatReqId(histDocReq, statementRequestID).recover {
               case err =>
                 log.error(s"update failed for historic request search document and" +
                   s" error is ::: ${err.getMessage}")
+                histDocReq
             }
 
             log.info(s"sending email for statementRequestID ::: $statementRequestID")
@@ -145,4 +145,6 @@ class MetadataController @Inject()(
 
       case _ => Future(false)
     }
+  }
+  
 }
