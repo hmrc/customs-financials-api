@@ -17,9 +17,9 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.REGIME_CDS
 import models.requests._
-import models.responses.{GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse,
-  ResponseCommon}
+import models.responses.{GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
@@ -43,7 +43,7 @@ class Acc28Connector @Inject()(httpClient: HttpClient,
     val requestCommon: RequestCommon = RequestCommon(
       dateTimeService.currentDateTimeAsIso8601,
       mdgHeaders.acknowledgementReference,
-      RequestParameters("REGIME", "CDS"))
+      RequestParameters("REGIME", REGIME_CDS))
 
     val guaranteeTransactionsRequest = GuaranteeTransactionsRequest(
       GGATransactionListing(requestCommon, request.toRequestDetail()(appConfig)))

@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.acc40._
 import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
 import models.EORI
@@ -25,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+
 import scala.concurrent.Future
 
 class Acc40ConnectorSpec extends SpecBase {
@@ -110,7 +112,7 @@ class Acc40ConnectorSpec extends SpecBase {
 
       SearchAuthoritiesResponse(
         domain.acc40.Response(
-          RequestCommon("date", "MDTP", "reference", "CDS"),
+          RequestCommon("date", MDTP, "reference", REGIME_CDS),
           RequestDetail(EORI("someEORI"), "1", EORI("someOtherEORI")),
           ResponseDetail(
             errorMessage = error,

@@ -20,5 +20,9 @@ object MetaConfig {
 
   object Platform {
     val MDTP = "MDTP"
+    val REGIME_CDS = "CDS"
+    val DIGITAL = "Digital"
+
+    val SOURCE_MDTP = "mdtp"
   }
 }

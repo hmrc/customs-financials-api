@@ -16,9 +16,10 @@
 
 package connectors
 
+import config.MetaConfig.Platform.SOURCE_MDTP
+
 import java.time.LocalDate
 import java.util.UUID
-
 import domain.secureMessage
 import domain.secureMessage._
 import models._
@@ -30,8 +31,8 @@ import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.Utils.emptyString
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SecureMessageConnectorSpec extends SpecBase {
@@ -40,7 +41,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     "Populate Request" in new Setup {
 
       val request = Request(
-        externalRef = ExternalReference(searchID.toString, "mdtp"),
+        externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient("cds",
           TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
           name = Name("Company Name"),
@@ -115,7 +116,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     }
 
     val compareRequest = secureMessage.Request(
-      externalRef = secureMessage.ExternalReference(searchID.toString, "mdtp"),
+      externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
       recipient = secureMessage.Recipient("cds",
         secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
         name = Name("Company Name"),

@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.MetaConfig.Platform.MDTP
 import play.api.{Logger, LoggerLike}
 import services.DateTimeService
 
@@ -47,7 +48,7 @@ class MdgHeaders @Inject()(dateTimeService: DateTimeService) {
   def headers(authorization: String, maybeHostHeader: Option[String]): Seq[(String, String)] = {
 
     val mandatoryHeaders = Seq(
-      "X-Forwarded-Host" -> "MDTP",
+      "X-Forwarded-Host" -> MDTP,
       "Authorization" -> s"Bearer $authorization",
       "Content-Type" -> "application/json",
       "Accept" -> "application/json",

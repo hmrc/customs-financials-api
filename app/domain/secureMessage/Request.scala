@@ -16,6 +16,7 @@
 
 package domain.secureMessage
 
+import config.MetaConfig.Platform.SOURCE_MDTP
 import domain.secureMessage.SecureMessage._
 import models.{EmailAddress, HistoricDocumentRequestSearch, Params}
 import play.api.libs.json.{Json, OFormat}
@@ -38,7 +39,7 @@ object Request {
 
   def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request = {
 
-    Request(externalRef = ExternalReference(histDoc.searchID.toString, "mdtp"),
+    Request(externalRef = ExternalReference(histDoc.searchID.toString, SOURCE_MDTP),
       recipient = Recipient(
         regime = "cds",
         taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori),

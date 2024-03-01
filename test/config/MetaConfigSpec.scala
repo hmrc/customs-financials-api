@@ -20,9 +20,22 @@ import config.MetaConfig.Platform
 import utils.SpecBase
 
 class MetaConfigSpec extends SpecBase {
+
   "Platform.MDTP" should {
     "return correct value for MDTP" in {
       Platform.MDTP mustBe "MDTP"
+    }
+  }
+
+  "Platform.REGIME_CDS" should {
+    "return correct value for MDTP" in {
+      Platform.REGIME_CDS mustBe "CDS"
+    }
+  }
+
+  "Platform.DIGITAL" should {
+    "return correct value for MDTP" in {
+      Platform.DIGITAL mustBe "Digital"
     }
   }
 }

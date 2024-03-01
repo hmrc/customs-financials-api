@@ -17,11 +17,13 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain._
 import domain.acc40.{ResponseDetail, SearchAuthoritiesRequest, SearchAuthoritiesResponse}
 import models.EORI
 import services.{AuditingService, DateTimeService}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -38,8 +40,8 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
     val commonRequest = acc40.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      originatingSystem = "MDTP",
-      regime = "CDS"
+      originatingSystem = MDTP,
+      regime = REGIME_CDS
     )
 
     val requestDetail = acc40.RequestDetail(

@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.{Acc41ErrorResponse, AuthoritiesCsvGenerationResponse}
 import domain.acc41._
 import models.EORI
@@ -85,7 +86,7 @@ class Acc41ConnectorSpec extends SpecBase {
 
     def response(error: Option[String],
                  requestAcceptedDate: Option[String]): domain.acc41.Response = domain.acc41.Response(
-      RequestCommon("date", "MDTP", "reference", "CDS"),
+      RequestCommon("date", MDTP, "reference", REGIME_CDS),
       RequestDetail(EORI("someEORI"),Some(EORI("someAltEori"))),
       ResponseDetail(
         errorMessage = error,

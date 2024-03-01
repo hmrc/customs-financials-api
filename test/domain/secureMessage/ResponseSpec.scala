@@ -16,6 +16,7 @@
 
 package domain.secureMessage
 
+import config.MetaConfig.Platform.SOURCE_MDTP
 import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
@@ -78,7 +79,7 @@ class ResponseSpec extends SpecBase {
 
   trait Setup {
     val externalRefJsValue: String = """{"id": "abcd12345","source": "mdtp"}""".stripMargin
-    val externalRefObject: ExternalReference = ExternalReference(id = "abcd12345", source = "mdtp")
+    val externalRefObject: ExternalReference = ExternalReference(id = "abcd12345", source = SOURCE_MDTP)
 
     val taxIdentifierJsValue: String = """{"name": "name","value": "value"}""".stripMargin
     val taxIdentifierObject: TaxIdentifier = TaxIdentifier(name = "name", value = "value")

@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.DIGITAL
 import domain.acc38
 import domain.acc38.GetCorrespondenceAddressRequest
 import models.{AccountNumber, AccountType, EORI}
@@ -37,7 +38,7 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
     val commonRequest = acc38.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      originatingSystem = "Digital"
+      originatingSystem = DIGITAL
     )
 
     val request = acc38.Request(

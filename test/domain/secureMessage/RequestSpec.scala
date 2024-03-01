@@ -16,6 +16,7 @@
 
 package domain.secureMessage
 
+import config.MetaConfig.Platform.SOURCE_MDTP
 import domain.secureMessage
 import domain.secureMessage.SecureMessage._
 import models._
@@ -30,7 +31,7 @@ class RequestSpec extends SpecBase {
     "create the object correctly" in new Setup {
 
       val expectedRequest: Request = Request(
-        externalRef = ExternalReference(searchID.toString, "mdtp"),
+        externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
@@ -222,7 +223,7 @@ class RequestSpec extends SpecBase {
         Content(englishLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange)),
         Content(welshLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange, welshLangKey)))
 
-      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, "mdtp"),
+      val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
           regime = "cds",
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
