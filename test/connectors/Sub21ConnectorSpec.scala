@@ -46,8 +46,10 @@ class Sub21ConnectorSpec extends SpecBase {
     val mockHttpClient: HttpClient = mock[HttpClient]
     val responseCommon: EORIHistoryResponseCommon = EORIHistoryResponseCommon("OK", "")
     val eoriHistory: EORIHistory = EORIHistory(EORI("1212"), Some("1211"), Some("12121"))
-    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory))
-    val response: HistoricEoriResponse = HistoricEoriResponse(GetEORIHistoryResponse(responseCommon, eoriHistoryResponseDetail))
+    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory).toIndexedSeq)
+
+    val response: HistoricEoriResponse =
+      HistoricEoriResponse(GetEORIHistoryResponse(responseCommon, eoriHistoryResponseDetail))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
