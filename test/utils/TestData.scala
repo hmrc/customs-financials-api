@@ -21,10 +21,13 @@ import models.FileRole
 import java.time.LocalDate
 
 object TestData {
-
   val EORI_VALUE = "testEORI"
+  val TEST_EMAIL = "test@test.com"
+  val TEST_COMPANY = "companyName"
+
   val FILE_SIZE_1000L = 1000L
   val CURRENT_LOCAL_DATE: LocalDate = LocalDate.now
+
   val CSV_FILE_NAME = "abc.csv"
   val FILE_ROLE_C79_CERTIFICATE: FileRole = FileRole("C79Certificate")
 
@@ -37,10 +40,12 @@ object TestData {
   val MONTH_2 = 2
   val MONTH_3 = 3
   val MONTH_4 = 4
+  val MONTH_6 = 6
   val MONTH_9 = 9
   val MONTH_10 = 10
   val MONTH_12 = 12
 
+  val DAY_1 = 1
   val DAY_11 = 11
   val DAY_14 = 14
   val DAY_15 = 15

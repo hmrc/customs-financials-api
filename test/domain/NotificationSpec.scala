@@ -32,10 +32,10 @@ class NotificationSpec extends SpecBase {
     """
       |[
       |    {
-      |        "eori":"testEORI",
-      |		     "fileName": "vat-2018-05.pdf",
-      |        "fileSize": 75251,
-      |        "metadata": [
+      |       "eori":"testEORI",
+      |       "fileName": "vat-2018-05.pdf",
+      |       "fileSize": 75251,
+      |       "metadata": [
       |            {"metadata": "PeriodStartYear", "value": "2018"},
       |            {"metadata": "PeriodStartMonth", "value": "5"},
       |            {"metadata": "FileType", "value": "PDF"},
@@ -98,10 +98,10 @@ class NotificationSpec extends SpecBase {
         """
           |[
           |    {
-          |        "eori":"testEORI-12345",
-          |		     "fileName": "filename",
-          |        "fileSize": 75251,
-          |        "metadata": [
+          |       "eori":"testEORI-12345",
+          |       "fileName": "filename",
+          |       "fileSize": 75251,
+          |       "metadata": [
           |            {"metadata": "FileRole", "value": "DutyDeferment"}
           |        ]
           |    }

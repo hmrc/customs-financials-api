@@ -21,6 +21,7 @@ import utils.SpecBase
 import utils.Utils.emptyString
 
 class SearchRequestSpec extends SpecBase {
+
   "object should be created" should {
     "for correct parameter values" in {
       val srOb = SearchRequest("GB123456789012",
@@ -36,13 +37,15 @@ class SearchRequestSpec extends SpecBase {
 
   "Exception must be thrown" should {
     "for incorrect parameter values" in {
+      val failureRetryCount = 6
+
       intercept[RuntimeException] {
         SearchRequest("GB123456789012",
           "5b89895-f0da-4472-af5a-d84d340e7mn5",
           SearchResultStatus.inProcess,
           emptyString,
           emptyString,
-          6)
+          failureRetryCount)
       }.getMessage.contains("invalid value for failureRetryCount, valid values are 0,1,2,3,4,5")
     }
   }

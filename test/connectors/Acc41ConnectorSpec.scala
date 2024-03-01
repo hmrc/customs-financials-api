@@ -67,7 +67,7 @@ class Acc41ConnectorSpec extends SpecBase {
       }
     }
 
-    "return Left Acc41ErrorResponse when request returns error message" in new Setup {
+    "return Left Acc41ErrorResponse when request returns error message TBD" in new Setup {
       when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
         mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
@@ -92,7 +92,6 @@ class Acc41ConnectorSpec extends SpecBase {
         requestAcceptedDate = requestAcceptedDate
       )
     )
-
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)

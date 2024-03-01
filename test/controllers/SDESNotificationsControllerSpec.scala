@@ -18,7 +18,7 @@ package controllers
 
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.{Notification, NotificationsForEori}
-import models.{EORI, FileRole}
+import models.EORI
 import org.joda.time.DateTime
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -30,6 +30,7 @@ import play.api.{Application, inject}
 import services.{DateTimeService, NotificationCache}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
+import utils.TestData.{CSV_FILE_NAME, FILE_ROLE_C79_CERTIFICATE, FILE_SIZE_1000L}
 
 import scala.concurrent.Future
 
@@ -53,16 +54,16 @@ class SDESNotificationsControllerSpec extends SpecBase {
       val notification: NotificationsForEori = NotificationsForEori(eori, Seq(
         Notification(
           eori,
-          FileRole("C79Certificate"),
-          "abc.csv",
-          1000,
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
           None,
           Map(
             "periodStartYear" -> "2019",
             "periodStartMonth" -> "1",
             "fileType" -> "csv",
             "fileRole" -> "C79Certificate",
-            "fileName" -> "abc.csv",
+            "fileName" -> CSV_FILE_NAME,
             "downloadURL" -> "http://localhost/abc.csv",
             "fileSize" -> "1000")
         )

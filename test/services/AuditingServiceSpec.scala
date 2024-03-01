@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.LocalDate
 import domain.{Notification, StandingAuthority, acc41}
 import models._
 import models.requests.HistoricDocumentRequest
@@ -31,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.SpecBase
-import utils.TestData.{FILE_ROLE_C79_CERTIFICATE, MONTH_1, MONTH_12, MONTH_3, MONTH_4, YEAR_2019, YEAR_2020}
+import utils.TestData._
 import utils.Utils.emptyString
 
 import scala.concurrent._
@@ -354,8 +353,8 @@ class AuditingServiceSpec extends SpecBase {
         EORI("GB123456789"),
         FileRole("fileRole"),
         "file name",
-        12,
-        Some(LocalDate.now()),
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         display)
 
       val fileType: FileType = FileType("CSV")
