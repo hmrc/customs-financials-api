@@ -41,9 +41,7 @@ class MdgHeaders @Inject()(dateTimeService: DateTimeService) {
 
   private val httpDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'")
 
-  private def currentDateTimeAsRFC7231: String = {
-    httpDateFormatter.format(dateTimeService.now())
-  }
+  private def currentDateTimeAsRFC7231: String = httpDateFormatter.format(dateTimeService.now())
 
   def headers(authorization: String, maybeHostHeader: Option[String]): Seq[(String, String)] = {
 
@@ -53,13 +51,10 @@ class MdgHeaders @Inject()(dateTimeService: DateTimeService) {
       "Content-Type" -> "application/json",
       "Accept" -> "application/json",
       "Date" -> currentDateTimeAsRFC7231,
-      "X-Correlation-ID" -> mdgCompliantCorrelationId
-    )
+      "X-Correlation-ID" -> mdgCompliantCorrelationId)
 
     maybeHostHeader match {
-      case Some(hostHeader) => {
-        mandatoryHeaders :+ ("Host" -> hostHeader)
-      }
+      case Some(hostHeader) => mandatoryHeaders :+ ("Host" -> hostHeader)
       case _ => mandatoryHeaders
     }
   }

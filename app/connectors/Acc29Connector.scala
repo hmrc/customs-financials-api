@@ -42,7 +42,8 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
       MDTP)
 
-    val standingAuthoritiesRequest = StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
+    val standingAuthoritiesRequest =
+      StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-standing-authority-details") {
       httpClient.POST[StandingAuthoritiesRequest, StandingAuthoritiesResponse](

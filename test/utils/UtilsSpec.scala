@@ -99,6 +99,12 @@ class UtilsSpec extends SpecBase {
       }
     }
 
+    "comma" should {
+      "return correct value" in {
+        comma mustBe ","
+      }
+    }
+
     "englishLangKey" should {
       "return correct value" in {
         englishLangKey mustBe "en"

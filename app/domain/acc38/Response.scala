@@ -19,7 +19,7 @@ package domain.acc38
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
 import play.api.libs.json._
 
-case class Response(getCorrespondenceAddressResponse: GetCorrespondenceAddressResponse){
+case class Response(getCorrespondenceAddressResponse: GetCorrespondenceAddressResponse) {
   val mdtpError: Boolean = getCorrespondenceAddressResponse
     .responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
@@ -80,7 +80,6 @@ object ContactDetails {
   implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails]
 }
 
-
 case class ErrorResponse(errorDetail: ErrorDetail)
 
 object ErrorResponse {
@@ -103,5 +102,3 @@ case class SourceFaultDetail(detail: Array[String])
 object SourceFaultDetail {
   implicit val format: OFormat[SourceFaultDetail] = Json.format[SourceFaultDetail]
 }
-
-

@@ -27,7 +27,8 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class GuaranteeTransactionsController @Inject()(service: GuaranteeTransactionsService,
-                                                cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                cc: ControllerComponents)
+                                               (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def retrieveOpenGuaranteeTransactionsSummary(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     withJsonBody[GuaranteeAccountTransactionsRequest] { guaranteeAccountTransactionsRequest =>
@@ -55,5 +56,3 @@ class GuaranteeTransactionsController @Inject()(service: GuaranteeTransactionsSe
     case _ => ServiceUnavailable
   }
 }
-
-

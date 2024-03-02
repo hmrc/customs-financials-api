@@ -32,7 +32,9 @@ import scala.concurrent.ExecutionContext
 class SDESNotificationsController @Inject()(notificationCache: NotificationCache,
                                             authorisedRequest: AuthorisedRequest,
                                             dateTimeService: DateTimeService,
-                                            cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) with ControllerChecks {
+                                            cc: ControllerComponents)
+                                           (implicit ec: ExecutionContext)
+  extends BackendController(cc) with ControllerChecks {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -45,14 +47,16 @@ class SDESNotificationsController @Inject()(notificationCache: NotificationCache
   }
 
 
-  def deleteRequestedNotifications(eori: EORI, fileRole: FileRole): Action[AnyContent] = authorisedRequest async { implicit req =>
+  def deleteRequestedNotifications(eori: EORI,
+                                   fileRole: FileRole): Action[AnyContent] = authorisedRequest async { implicit req =>
     matchingEoriNumber(eori) { verifiedEori =>
       notificationCache.removeRequestedByFileRole(verifiedEori, fileRole)
         .map(_ => Ok(Json.obj("Status" -> "Ok")))
     }
   }
 
-  def deleteNonRequestedNotifications(eori: EORI, fileRole: FileRole): Action[AnyContent] = authorisedRequest async { implicit req =>
+  def deleteNonRequestedNotifications(eori: EORI,
+                                      fileRole: FileRole): Action[AnyContent] = authorisedRequest async { implicit req =>
     matchingEoriNumber(eori) { verifiedEori =>
       notificationCache.removeByFileRole(verifiedEori, fileRole)
         .map(_ => Ok(Json.obj("Status" -> "Ok")))

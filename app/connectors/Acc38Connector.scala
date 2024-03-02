@@ -58,5 +58,4 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
       headers = mdgHeaders.headers(appConfig.acc38BearerToken, appConfig.acc38HostHeader)
     )(implicitly, implicitly, HeaderCarrier(), implicitly)
   }
-
 }

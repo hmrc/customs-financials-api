@@ -28,8 +28,10 @@ object ExternalReference {
   implicit val extRefFormat: OFormat[ExternalReference] = Json.format[ExternalReference]
 }
 
-case class Recipient(regime: String, taxIdentifier: TaxIdentifier,
-                     name: Name, email: String)
+case class Recipient(regime: String,
+                     taxIdentifier: TaxIdentifier,
+                     name: Name,
+                     email: String)
 
 case class Name(line1: String)
 
@@ -236,5 +238,3 @@ object SecureMessage {
     }
   }
 }
-
-object SecureMessageResponse

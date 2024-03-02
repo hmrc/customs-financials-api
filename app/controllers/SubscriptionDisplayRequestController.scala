@@ -27,8 +27,8 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class SubscriptionDisplayRequestController @Inject()(connector: Sub09Connector,
-                                                     cc: ControllerComponents)(implicit ec: ExecutionContext)
-  extends BackendController(cc) {
+                                                     cc: ControllerComponents
+                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 

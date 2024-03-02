@@ -39,14 +39,13 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-class StatementSearchFailureNotificationController @Inject()(
-                                                              cc: ControllerComponents,
-                                                              jsonSchemaValidator: JSONSchemaValidator,
-                                                              authorizationHeaderFilter: AuthorizationHeaderFilter,
-                                                              mdgHeaderFilter: MdgHeaderFilter,
-                                                              cacheService: HistoricDocumentRequestSearchCacheService,
-                                                              histDocumentService: HistoricDocumentService,
-                                                              smc: SecureMessageConnector
+class StatementSearchFailureNotificationController @Inject()(cc: ControllerComponents,
+                                                             jsonSchemaValidator: JSONSchemaValidator,
+                                                             authorizationHeaderFilter: AuthorizationHeaderFilter,
+                                                             mdgHeaderFilter: MdgHeaderFilter,
+                                                             cacheService: HistoricDocumentRequestSearchCacheService,
+                                                             histDocumentService: HistoricDocumentService,
+                                                             smc: SecureMessageConnector
                                                             )(implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
@@ -82,10 +81,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Process the statementRequestID and creates InternalServerError
-   * response in case of exception
-   */
   private def handleExceptionAndProcessStatementRequestId(correlationId: String,
                                                           statementRequestID: String,
                                                           failureReasonCode: String
@@ -112,11 +107,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Checks whether request's statementRequestID is present in the DB
-   * Process statementRequestId if found in the DB
-   * otherwise reply with BAD_REQUEST error response
-   */
   private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
                                                 correlationId: String,
                                                 failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
@@ -129,12 +119,6 @@ class StatementSearchFailureNotificationController @Inject()(
     }
   }
 
-  /**
-   * Raises the ErrorResponse if statementRequestID is not present in the DB
-   * If statementRequestID is present, process the statementRequestID as below
-   * If failureReasonCode is other than NoDocumentsFound, updates the failureRetryCount
-   * if failureReasonCode is NoDocumentsFound, updates the searchRequest and resultsFound status accordingly
-   */
   private def processStatReqIdOrSendErrorResponseIfReqIdNotPresent(statementRequestID: String,
                                                                    correlationId: String,
                                                                    failureReasonCode: String,
@@ -213,7 +197,7 @@ class StatementSearchFailureNotificationController @Inject()(
   private def updateSearchRequestIfInProcess(statementRequestID: String,
                                              failureReasonCode: String,
                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch)
-  : Future[Option[HistoricDocumentRequestSearch]] =
+  : Future[Option[HistoricDocumentRequestSearch]] = {
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID)) {
       cacheService.updateSearchRequestForStatementRequestId(
         optHistDocReqSearchDoc,
@@ -224,6 +208,7 @@ class StatementSearchFailureNotificationController @Inject()(
     } else {
       Future(None)
     }
+  }
 
   private def updateRetryCountAndSendRequest(correlationId: String,
                                              statementRequestID: String,
@@ -258,15 +243,16 @@ class StatementSearchFailureNotificationController @Inject()(
   }
 
   private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
-                                         statementRequestID: String): Boolean =
+                                         statementRequestID: String): Boolean = {
     optHistDocReqSearchDoc.searchRequests.find(
       sr => sr.statementRequestId == statementRequestID).fold(false)(
       serReq => serReq.searchSuccessful == SearchResultStatus.inProcess)
+  }
 
   private def logErrorMessageIfUpdateFails(statementRequestID: String,
                                            failureReasonCode: String,
                                            updatedDoc: Option[HistoricDocumentRequestSearch]):
-  Option[HistoricDocumentRequestSearch] =
+  Option[HistoricDocumentRequestSearch] = {
     if (updatedDoc.isEmpty) {
       logger.error(s"update failed for statementRequestID :: $statementRequestID" +
         s" and reasonCode :: $failureReasonCode")
@@ -274,15 +260,17 @@ class StatementSearchFailureNotificationController @Inject()(
     } else {
       updatedDoc
     }
+  }
 
   private def buildInternalServerErrorResponse(correlationId: String,
                                                statementRequestID: String,
-                                               errorDetailMessage: String) =
+                                               errorDetailMessage: String) = {
     buildErrorResponse(
       errorCode = ErrorCode.code500,
       correlationId = correlationId,
       statementReqId = Some(statementRequestID),
       errorDetailMsg = errorDetailMessage)
+  }
 
   private def buildErrorResponse(errors: Option[Throwable] = None,
                                  errorCode: String,

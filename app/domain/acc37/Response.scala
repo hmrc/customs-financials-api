@@ -18,7 +18,7 @@ package domain.acc37
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Response(amendCorrespondenceAddressResponse: AmendCorrespondenceAddressResponse){
+case class Response(amendCorrespondenceAddressResponse: AmendCorrespondenceAddressResponse) {
   val mdtpError: Boolean = amendCorrespondenceAddressResponse
     .responseCommon
     .returnParameters.exists(_.exists(_.paramName == "POSITION"))
@@ -42,7 +42,8 @@ object ResponseCommon {
 }
 
 object AmendCorrespondenceAddressResponse {
-  implicit val updateResponseFormat: OFormat[AmendCorrespondenceAddressResponse] = Json.format[AmendCorrespondenceAddressResponse]
+  implicit val updateResponseFormat: OFormat[AmendCorrespondenceAddressResponse] =
+    Json.format[AmendCorrespondenceAddressResponse]
 }
 
 object Response {

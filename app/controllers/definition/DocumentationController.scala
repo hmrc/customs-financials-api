@@ -24,8 +24,6 @@ import javax.inject.Inject
 
 class DocumentationController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
   def definition(): Action[AnyContent] = Action {
-   Ok(txt.definition()).withHeaders("Content-Type" -> "application/json")
+    Ok(txt.definition()).withHeaders("Content-Type" -> "application/json")
   }
 }
-
-

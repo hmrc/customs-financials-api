@@ -33,7 +33,6 @@ import utils.Utils.emptyString
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-
 @Singleton
 class MetadataController @Inject()(
                                     notificationCache: NotificationCache,
@@ -41,8 +40,8 @@ class MetadataController @Inject()(
                                     dataStore: DataStoreConnector,
                                     dateTimeService: DateTimeService,
                                     histDocReqSearchCacheService: HistoricDocumentRequestSearchCacheService,
-                                    cc: ControllerComponents
-                                  )(implicit execution: ExecutionContext) extends BackendController(cc) {
+                                    cc: ControllerComponents)
+                                  (implicit execution: ExecutionContext) extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -58,14 +57,6 @@ class MetadataController @Inject()(
     } yield result
   }
 
-  /**
-   * Checks the resultsFound status of the HistoricDocumentRequestSearch document
-   * If resultsFound is inProcess
-   * Update the searchSuccessful status to yes and searchDateTime for the relevant searchRequest for statementRequestId
-   * Update resultsFound to yes along with searchStatusUpdateDate
-   * send the email
-   * else no updates and does not send any email
-   */
   private def checkHistDocSearchStatusAndSendEmail(notification: Notification)(
     implicit hc: HeaderCarrier): Future[Boolean] = {
     val statementRequestID = notification.metadata.getOrElse("statementRequestID", emptyString)
@@ -77,6 +68,7 @@ class MetadataController @Inject()(
       } yield {
         updateHistReqSearchDocumentAndSendMail(notification, statementRequestID, optHisDocReq)
       }
+
       result.flatten
     } else {
       sendEmailIfVerified(notification)

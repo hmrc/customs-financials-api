@@ -19,7 +19,10 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.requests._
-import models.responses.{CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail, GetCashAccountTransactionListingResponse}
+import models.responses.{
+  CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
+  GetCashAccountTransactionListingResponse
+}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
@@ -40,8 +43,7 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
 
   def retrieveCashTransactions(can: String,
                                from: LocalDate,
-                               to: LocalDate
-                              ): Future[Either[ErrorResponse, Option[CashTransactionsResponseDetail]]] = {
+                               to: LocalDate): Future[Either[ErrorResponse, Option[CashTransactionsResponseDetail]]] = {
 
     val requestCommon = CashTransactionsRequestCommon(
       MDTP,

@@ -36,6 +36,7 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
 
   def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] = {
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
+
       httpClient.POST[HistoricStatementRequest, HttpResponse](
         appConfig.acc24HistoricalStatementRetrievalEndpoint,
         HistoricStatementRequest.from(historicDocumentRequest),

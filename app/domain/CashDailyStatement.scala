@@ -17,7 +17,7 @@
 package domain
 
 import models.EORI
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CashTransactions(pendingTransactions: Seq[Declaration], cashDailyStatements: Seq[CashDailyStatement])
 
@@ -40,9 +40,9 @@ case class TaxGroup(taxTypeGroup: String, amount: String)
 case class Transaction(amount: String, transactionType: String, bankAccountNumber: Option[String])
 
 object CashDailyStatement {
-  implicit val transactionFormat = Json.format[Transaction]
-  implicit val taxGroupDetailFormat = Json.format[TaxGroup]
-  implicit val declarationFormat = Json.format[Declaration]
-  implicit val cashDailyStatementFormat = Json.format[CashDailyStatement]
-  implicit val cashTransactionsFormat = Json.format[CashTransactions]
+  implicit val transactionFormat: OFormat[Transaction] = Json.format[Transaction]
+  implicit val taxGroupDetailFormat: OFormat[TaxGroup] = Json.format[TaxGroup]
+  implicit val declarationFormat: OFormat[Declaration] = Json.format[Declaration]
+  implicit val cashDailyStatementFormat: OFormat[CashDailyStatement] = Json.format[CashDailyStatement]
+  implicit val cashTransactionsFormat: OFormat[CashTransactions] = Json.format[CashTransactions]
 }
