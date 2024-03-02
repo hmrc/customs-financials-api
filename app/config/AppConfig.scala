@@ -48,8 +48,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
       getConfString("customs-financials-email-throttler.context-base", "/") + "/enqueue-email"
 
   lazy val authUrl: String = baseUrl("auth")
-  lazy val dataStoreServerToken: String =
-    "Bearer " + getConfString("customs-data-store.server-token", "secret-token")
 
   lazy val acc24HistoricalStatementRetrievalEndpoint: String =
     baseUrl("acc24") +
@@ -165,6 +163,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   lazy val mongoHistDocSearchCollectionName: String =
     configuration.get[String]("mongodb.historic-document-request-search.name")
+
   lazy val mongoHistDocSearchTtl: Long =
     configuration.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")
 }
