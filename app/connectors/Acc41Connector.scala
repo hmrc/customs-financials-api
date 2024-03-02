@@ -19,14 +19,13 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain._
-import domain.acc41.{ResponseDetail, StandingAuthoritiesForEORIResponse}
+import domain.acc41.StandingAuthoritiesForEORIResponse
 import models.EORI
 import services.{AuditingService, DateTimeService}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
-import uk.gov.hmrc.http.HttpReads.Implicits._
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class Acc41Connector @Inject()(httpClient: HttpClient,
@@ -36,7 +35,7 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
   def initiateAuthoritiesCSV(requestingEori: EORI, alternateEORI: Option[EORI])
-    (implicit hc: HeaderCarrier): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
+                            (implicit hc: HeaderCarrier): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
 
     val commonRequest = acc41.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -46,7 +45,7 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     )
 
     val requestDetail = alternateEORI match {
-      case Some(x) if x.value.nonEmpty  => acc41.RequestDetail(requestingEori, alternateEORI)
+      case Some(x) if x.value.nonEmpty => acc41.RequestDetail(requestingEori, alternateEORI)
       case _ => acc41.RequestDetail(requestingEori, None)
     }
 
@@ -57,21 +56,23 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
 
     val result: Future[StandingAuthoritiesForEORIResponse] =
       httpClient.POST[acc41.StandingAuthoritiesForEORIRequest, acc41.StandingAuthoritiesForEORIResponse](
-      appConfig.acc41AuthoritiesCsvGenerationEndpoint,
-      request,
-      headers = mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+        appConfig.acc41AuthoritiesCsvGenerationEndpoint,
+        request,
+        headers = mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader)
+      )(implicitly, implicitly, HeaderCarrier(), implicitly)
 
     result.map {
-      res => res.standingAuthoritiesForEORIResponse.responseDetail match {
-        case ResponseDetail(Some(_), None) => Left(Acc41ErrorResponse)
+      res =>
+        val resDetail = res.standingAuthoritiesForEORIResponse.responseDetail
 
-        case v@ResponseDetail(None, Some(_)) =>
-          auditingService.auditRequestAuthCSVStatementRequest(v, res.standingAuthoritiesForEORIResponse.requestDetail)
-          Right(v.toAuthoritiesCsvGeneration)
+        if (resDetail.errorMessage.isDefined) {
+          Left(Acc41ErrorResponse)
+        } else {
+          auditingService.auditRequestAuthCSVStatementRequest(
+            resDetail, res.standingAuthoritiesForEORIResponse.requestDetail)
 
-        case ResponseDetail(_, _) => Left(Acc41ErrorResponse)
-      }
+          Right(resDetail.toAuthoritiesCsvGeneration)
+        }
     }.recover {
       case _ => Left(Acc41ErrorResponse)
     }

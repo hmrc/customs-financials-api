@@ -40,7 +40,7 @@ class Acc41ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
 
       running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI("someAltEori"))))
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
         result mustBe Left(Acc41ErrorResponse)
       }
     }
@@ -51,7 +51,7 @@ class Acc41ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI(emptyString))))
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI(emptyString))))
         result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
       }
     }
@@ -63,19 +63,8 @@ class Acc41ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
 
       running(app) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"),Some(EORI("someAltEori"))))
-        result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
-      }
-    }
-
-    "return Left Acc41ErrorResponse when request returns error message TBD" in new Setup {
-      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
-        mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
-
-      running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
-        result mustBe Left(Acc41ErrorResponse)
+        result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
       }
     }
   }
@@ -87,7 +76,7 @@ class Acc41ConnectorSpec extends SpecBase {
     def response(error: Option[String],
                  requestAcceptedDate: Option[String]): domain.acc41.Response = domain.acc41.Response(
       RequestCommon("date", MDTP, "reference", REGIME_CDS),
-      RequestDetail(EORI("someEORI"),Some(EORI("someAltEori"))),
+      RequestDetail(EORI("someEORI"), Some(EORI("someAltEori"))),
       ResponseDetail(
         errorMessage = error,
         requestAcceptedDate = requestAcceptedDate
