@@ -17,17 +17,29 @@
 package models.responses
 
 import models.{EORI, ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsObject, Json, OFormat, OWrites, Reads, JsSuccess}
 
 case class GuaranteeTransactionsResponse(getGGATransactionResponse: GetGGATransactionResponse)
 
 object GuaranteeTransactionsResponse {
 
-  implicit val thresholdErrorFormat = Json.format[ExceededThresholdErrorException.type]
+  implicit val thresholdErrorFormat: OFormat[ExceededThresholdErrorException.type] =
+    OFormat[ExceededThresholdErrorException.type](Reads[ExceededThresholdErrorException.type] {
+      case JsObject(_) => JsSuccess(ExceededThresholdErrorException)
+      case _ => JsError("Empty object expected")
+    }, OWrites[ExceededThresholdErrorException.type] { _ =>
+      Json.obj()
+    })
 
-  implicit val noAssociatedDataFormat = Json.format[NoAssociatedDataException.type]
+  implicit val noAssociatedDataFormat: OFormat[NoAssociatedDataException.type] =
+    OFormat[NoAssociatedDataException.type](Reads[NoAssociatedDataException.type] {
+      case JsObject(_) => JsSuccess(NoAssociatedDataException)
+      case _ => JsError("Empty object expected")
+    }, OWrites[NoAssociatedDataException.type] { _ =>
+      Json.obj()
+    })
 
-  implicit val errorResponseFormat = Json.format[ErrorResponse]
+  implicit val errorResponseFormat: OFormat[ErrorResponse] = Json.format[ErrorResponse]
 
   implicit val responseCommonFormat = Json.format[ResponseCommon]
 
