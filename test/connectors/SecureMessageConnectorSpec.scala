@@ -107,15 +107,15 @@ class SecureMessageConnectorSpec extends SpecBase {
         SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
     val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
-      SearchResultStatus.no, "", eori.value, params, searchRequests)
+      SearchResultStatus.no, emptyString, eori.value, params, searchRequests)
 
-    val TestContents = {
+    val TestContents: List[Content] = {
       List(secureMessage.Content("en", "DutyDefermentStatement",
         "Message content - 4254101384174917141"), secureMessage.Content(
         "cy", "DutyDefermentStatement", "Cynnwys - 4254101384174917141"))
     }
 
-    val compareRequest = secureMessage.Request(
+    val compareRequest: Request = secureMessage.Request(
       externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
       recipient = secureMessage.Recipient("cds",
         secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),

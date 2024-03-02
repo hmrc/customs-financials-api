@@ -25,6 +25,7 @@ import play.api.test.Helpers._
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -82,7 +83,7 @@ class AccountContactDetailsServiceSpec extends SpecBase {
         domain.acc38.ResponseCommon(
           "OK",
           None,
-          "",
+          emptyString,
           None),
         None
       )
@@ -98,6 +99,5 @@ class AccountContactDetailsServiceSpec extends SpecBase {
     ).build()
 
     val service: AccountContactDetailsService = app.injector.instanceOf[AccountContactDetailsService]
-
   }
 }

@@ -18,6 +18,7 @@ package models
 
 import domain.Notification
 import models.requests.EmailRequest
+import utils.Utils.emptyString
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -142,7 +143,7 @@ object EmailTemplate {
   }
 
   private def createDutyDefermentEmailRequestParams(metadata: Map[String, String]): Option[Map[String, String]] = {
-    val statementType = metadata.getOrElse("DefermentStatementType", "")
+    val statementType = metadata.getOrElse("DefermentStatementType", emptyString)
 
     for {
       periodEndMonth <- metadata.get("PeriodEndMonth")

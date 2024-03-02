@@ -18,6 +18,7 @@ package models.responses
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.BadRequestException
+import utils.Utils.emptyString
 import utils.{SpecBase, Utils}
 
 import java.time.LocalDateTime
@@ -173,7 +174,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg = emptyString
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId, Option(statementReqId))
@@ -205,7 +206,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
       val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg = emptyString
 
       val actualOb = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code500, correlationId, Option(statementReqId))
@@ -239,7 +240,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
         StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg: String = emptyString
 
       val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)),

@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
@@ -44,7 +45,7 @@ class Sub21ConnectorSpec extends SpecBase {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
-    val responseCommon: EORIHistoryResponseCommon = EORIHistoryResponseCommon("OK", "")
+    val responseCommon: EORIHistoryResponseCommon = EORIHistoryResponseCommon("OK", emptyString)
     val eoriHistory: EORIHistory = EORIHistory(EORI("1212"), Some("1211"), Some("12121"))
     val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory).toIndexedSeq)
 

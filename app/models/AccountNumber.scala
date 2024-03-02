@@ -18,6 +18,7 @@ package models
 
 import play.api.libs.json.Format
 import utils.JsonFormatUtils
+import utils.Utils.emptyString
 
 final case class AccountNumber(value: String)
 
@@ -25,7 +26,7 @@ object AccountNumber {
   def apply(value: Option[String]): AccountNumber =
     value match {
       case Some(value) => AccountNumber(value)
-      case None => AccountNumber("")
+      case None => AccountNumber(emptyString)
     }
 
 
