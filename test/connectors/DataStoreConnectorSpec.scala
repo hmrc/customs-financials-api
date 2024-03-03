@@ -16,13 +16,15 @@
 
 package connectors
 
-import models.{EORI, EmailAddress, CompanyInformation, AddressInformation}
+import models.{AddressInformation, CompanyInformation, EORI, EmailAddress}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException}
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -115,7 +117,7 @@ class DataStoreConnectorSpec extends SpecBase {
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI("someEori"), None, None)))
 
     val companyNameResponse: CompanyInformation =
-      CompanyInformation("test_company", "1", AddressInformation("1", "Kailash", None, "GB"))
+      CompanyInformation("test_company", "1", AddressInformation("1", "Kailash", None, COUNTRY_CODE_GB))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)

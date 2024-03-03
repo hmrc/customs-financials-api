@@ -18,7 +18,8 @@ package models
 
 import models.CompanyInformation.format
 import utils.SpecBase
-import play.api.libs.json.{Json, JsSuccess}
+import play.api.libs.json.{JsSuccess, Json}
+import utils.TestData.COUNTRY_CODE_GB
 
 class CompanyInformationSpec extends SpecBase {
 
@@ -30,7 +31,7 @@ class CompanyInformationSpec extends SpecBase {
         streetAndNumber = "street&Number",
         city = "london",
         postalCode = Option("Post"),
-        countryCode = "GB")
+        countryCode = COUNTRY_CODE_GB)
 
       val result: CompanyInformation = CompanyInformation(
         name = "Company Name", consent = "Yes", address = address)
@@ -51,7 +52,7 @@ class CompanyInformationSpec extends SpecBase {
     val streetAndNumber: String = "street&Number"
     val city: String = "london"
     val postalCode: Option[String] = Option("Post")
-    val countryCode: String = "GB"
+    val countryCode: String = COUNTRY_CODE_GB
 
     val testAddress: AddressInformation = AddressInformation(
       streetAndNumber = streetAndNumber,

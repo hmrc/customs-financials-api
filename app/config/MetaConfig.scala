@@ -18,6 +18,7 @@ package config
 
 object MetaConfig {
 
+  val RETURN_PARAM_POSITION = "POSITION"
   object Platform {
     val MDTP = "MDTP"
     val REGIME_CDS = "CDS"

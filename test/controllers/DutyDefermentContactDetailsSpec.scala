@@ -33,6 +33,7 @@ import play.api.{Application, inject}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
 
 import scala.concurrent.Future
 
@@ -120,7 +121,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
           Some("Edinburgh"),
           None,
           Some("AB12 3CD"),
-          Some("GB"),
+          Some(COUNTRY_CODE_GB),
           None,
           None,
           Some(EmailAddress("email@email.com"))
@@ -150,7 +151,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       None,
       Some("Southampton"),
       Some("SO1 1AA"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
       Some(EmailAddress("test@test.com"))
@@ -173,7 +174,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       None,
       Some("Southampton"),
       Some("SO1 1AA"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
       Some(EmailAddress("test@test.com"))

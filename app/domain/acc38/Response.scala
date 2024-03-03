@@ -16,13 +16,14 @@
 
 package domain.acc38
 
+import config.MetaConfig.RETURN_PARAM_POSITION
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
 import play.api.libs.json._
 
 case class Response(getCorrespondenceAddressResponse: GetCorrespondenceAddressResponse) {
   val mdtpError: Boolean = getCorrespondenceAddressResponse
     .responseCommon
-    .returnParameters.exists(_.exists(_.paramName == "POSITION"))
+    .returnParameters.exists(_.exists(_.paramName == RETURN_PARAM_POSITION))
 }
 
 object Response {

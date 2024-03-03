@@ -38,6 +38,8 @@ object Utils {
   val singleSpace = " "
   val hyphen = "-"
   val comma = ","
+  val gbEoriPrefix = "GB"
+  val xIEoriPrefix = "XI"
 
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =
     s"${DateTimeFormatter.ISO_DATE_TIME.format(dateTime.truncatedTo(ChronoUnit.SECONDS))}Z"

@@ -30,6 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
 import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -88,7 +89,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       streetAndNumber = "street&Number",
       city = "london",
       postalCode = Option("Post"),
-      countryCode = "GB")
+      countryCode = COUNTRY_CODE_GB)
 
     val corp: CompanyInformation = CompanyInformation(
       name = "Company Name", consent = "Yes", address = address)

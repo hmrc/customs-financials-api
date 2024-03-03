@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import utils.Utils.{gbEoriPrefix, xIEoriPrefix}
 
 class Acc40Connector @Inject()(httpClient: HttpClient,
                                auditingService: AuditingService,
@@ -78,7 +79,7 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
 
   def searchType(searchID: EORI): String = {
     searchID.value match {
-      case searchEori if searchEori.startsWith("GB") || searchEori.startsWith("XI") => "0"
+      case searchEori if searchEori.startsWith(gbEoriPrefix) || searchEori.startsWith(xIEoriPrefix) => "0"
       case _ => "1"
     }
   }

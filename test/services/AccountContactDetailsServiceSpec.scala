@@ -25,6 +25,7 @@ import play.api.test.Helpers._
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
 import utils.Utils.emptyString
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,7 +73,7 @@ class AccountContactDetailsServiceSpec extends SpecBase {
       None,
       Some("Example"),
       Some("A00 00A"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("011111111111"),
       None,
       Some(EmailAddress("example@email.com")))

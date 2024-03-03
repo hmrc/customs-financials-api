@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
 
 import scala.concurrent.Future
 
@@ -46,7 +47,7 @@ class Sub09ConnectorSpec extends SpecBase {
     val mockHttpClient: HttpClient = mock[HttpClient]
     val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
-      CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
+      CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
 
     val vatIds: VatId = VatId(Some("abc"), Some("123"))
     val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))

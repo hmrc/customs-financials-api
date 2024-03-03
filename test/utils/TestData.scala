@@ -63,4 +63,6 @@ object TestData {
   val NUMBER_5 = 5
   val NUMBER_9 = 9
   val NUMBER_10 = 10
+
+  val COUNTRY_CODE_GB = "GB"
 }
