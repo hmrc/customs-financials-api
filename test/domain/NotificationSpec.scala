@@ -19,15 +19,15 @@ package domain
 import models.{EORI, FileRole}
 import play.api.libs.json.{JsValue, Json}
 import utils.SpecBase
-
-import java.time.LocalDate
+import utils.TestData.{
+  CURRENT_LOCAL_DATE, EORI_VALUE, EORI_VALUE_1, FILE_ROLE_C79_CERTIFICATE,
+  FILE_ROLE_SECURITY_STATEMENT, FILE_SIZE_2417804L, FILE_SIZE_75251L
+}
 
 class NotificationSpec extends SpecBase {
 
   import SDESInputFormats._
 
-  val fileSize75251 = 75251L
-  val fileSize2417804 = 2417804L
   val sdesMessage: JsValue = Json.parse(
     """
       |[
@@ -68,18 +68,18 @@ class NotificationSpec extends SpecBase {
 
       val expectedNotifications = List(
         Notification(
-          EORI("testEORI"),
-          FileRole("C79Certificate"),
+          EORI(EORI_VALUE),
+          FILE_ROLE_C79_CERTIFICATE,
           "vat-2018-05.pdf",
-          fileSize75251,
-          Some(LocalDate.now),
+          FILE_SIZE_75251L,
+          Some(CURRENT_LOCAL_DATE),
           Map("PeriodStartYear" -> "2018", "PeriodStartMonth" -> "5", "FileType" -> "PDF")),
         Notification(
-          EORI("someEORI"),
-          FileRole("SecurityStatement"),
+          EORI(EORI_VALUE_1),
+          FILE_ROLE_SECURITY_STATEMENT,
           "statement-2018-09-19.pdf",
-          fileSize2417804,
-          Some(LocalDate.now),
+          FILE_SIZE_2417804L,
+          Some(CURRENT_LOCAL_DATE),
           Map("PeriodStartYear" -> "2018",
             "PeriodStartDay" -> "13",
             "PeriodEndDay" -> "19",
@@ -110,11 +110,11 @@ class NotificationSpec extends SpecBase {
       val parsedNotifications = Json.fromJson[Seq[Notification]](sdesDutyDefermentMessage)
 
       parsedNotifications.get mustBe List(
-        Notification(EORI("testEORI"),
+        Notification(EORI(EORI_VALUE),
           FileRole("DutyDeferment"),
           "filename",
-          fileSize75251,
-          Some(LocalDate.now),
+          FILE_SIZE_75251L,
+          Some(CURRENT_LOCAL_DATE),
           Map.empty))
     }
   }

@@ -73,7 +73,7 @@ class SecureMessageConnectorSpec extends SpecBase {
         }
       }
 
-      "Json Writesresult in correct output" in new Setup {
+      "Json Writes result in correct output" in new Setup {
         Json.toJson(compareRequest) mustBe Json.parse(jsValue)
       }
     }

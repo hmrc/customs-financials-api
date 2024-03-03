@@ -22,14 +22,19 @@ import java.time.LocalDate
 
 object TestData {
   val EORI_VALUE = "testEORI"
+  val EORI_VALUE_1 = "someEORI"
+
   val TEST_EMAIL = "test@test.com"
   val TEST_COMPANY = "companyName"
 
   val FILE_SIZE_1000L = 1000L
+  val FILE_SIZE_75251L = 75251L
+  val FILE_SIZE_2417804L = 2417804L
   val CURRENT_LOCAL_DATE: LocalDate = LocalDate.now
 
   val CSV_FILE_NAME = "abc.csv"
   val FILE_ROLE_C79_CERTIFICATE: FileRole = FileRole("C79Certificate")
+  val FILE_ROLE_SECURITY_STATEMENT: FileRole = FileRole("SecurityStatement")
 
   val YEAR_2019 = 2019
   val YEAR_2020 = 2020
