@@ -18,10 +18,4 @@ package models
 
 object FailureReason {
   val NO_DOCUMENTS_FOUND = "NoDocumentsFound"
-  val DOCUMENTUM_UNREACHABLE = "DocumentumUnreachable"
-  val DOCUMENT_EXCEPTION = "DocumentumException"
-  val AWS_UNREACHABLE = "AWSUnreachable"
-  val AWS_EXCEPTION = "AWSException"
-  val BAD_REQUEST_RECEIVED = "BadRequestReceived"
-  val CDDM_INTERNAL_ERROR = "CDDMInternalError"
 }

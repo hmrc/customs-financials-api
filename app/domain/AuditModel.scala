@@ -86,10 +86,6 @@ object HistoricDocumentRequestAuditDetail {
     Json.writes[HistoricDocumentRequestAuditDetail]
 }
 
-case class FileUploadRequestAuditDetail(eori: String,
-                                        caseNumber: String,
-                                        applicationName: String)
-
 case class RequestAuthAuditDetail(requestingEori: String,
                                   seachType: String,
                                   searchID: String,

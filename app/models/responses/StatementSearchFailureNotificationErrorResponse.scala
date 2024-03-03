@@ -113,9 +113,7 @@ object SourceFaultDetail {
 }
 
 object ErrorMessage {
-  val invalidMessage = "Invalid message"
   val badRequestReceived = "Bad request received"
-  val missingReqProps = "missing required properties"
   val invalidStatementReqId = "Invalid statementRequestId"
   val technicalError = "Technical error"
 
@@ -131,8 +129,6 @@ object ErrorMessage {
 }
 
 object ErrorSource {
-  val jsonValidation = "JSON validation"
-  val backEnd = "Backend"
   val cdsFinancials = "CDS Financials"
 }
 

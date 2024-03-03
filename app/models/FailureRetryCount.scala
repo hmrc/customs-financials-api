@@ -17,9 +17,5 @@
 package models
 
 object FailureRetryCount {
-  val FIRST_RETRY = 1
-  val SECOND_RETRY = 2
-  val THIRD_RETRY = 3
-  val FOURTH_RETRY = 4
   val FINAL_RETRY = 5
 }
