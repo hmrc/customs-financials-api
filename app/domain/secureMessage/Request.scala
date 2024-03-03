@@ -70,30 +70,30 @@ object Request {
     params.accountType match {
       case "DutyDefermentStatement" =>
         List(
-          Content(englishLangKey, s"${SubjectDutyDef}${en.dateAsNumber}",
+          Content(englishLangKey, s"$SubjectDutyDef${en.dateAsNumber}",
             encodeToUTF8Charsets(dutyDefermentBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"${SubjectDutyDefCy}${cy.dateAsNumber}",
+          Content(welshLangKey, s"$SubjectDutyDefCy${cy.dateAsNumber}",
             encodeToUTF8Charsets(dutyDefermentBody(company, cy, welshLangKey))))
 
       case "C79Certificate" =>
         List(
-          Content(englishLangKey, s"${SubjectCert}${en.dateAsNumber}",
+          Content(englishLangKey, s"$SubjectCert${en.dateAsNumber}",
             encodeToUTF8Charsets(c79CertificateBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"${SubjectCertCy}${cy.dateAsNumber}",
+          Content(welshLangKey, s"$SubjectCertCy${cy.dateAsNumber}",
             encodeToUTF8Charsets(c79CertificateBody(company, cy, welshLangKey))))
 
       case "SecurityStatement" =>
         List(
-          Content(englishLangKey, s"${SubjectSecurity}${en.dateAsNumber}",
+          Content(englishLangKey, s"$SubjectSecurity${en.dateAsNumber}",
             encodeToUTF8Charsets(securityBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"${SubjectSecurityCy}${cy.dateAsNumber}",
+          Content(welshLangKey, s"$SubjectSecurityCy${cy.dateAsNumber}",
             encodeToUTF8Charsets(securityBody(company, cy, welshLangKey))))
 
       case "PostponedVATStatement" =>
         List(
-          Content(englishLangKey, s"${SubjectImport}${en.dateAsNumber}",
+          Content(englishLangKey, s"$SubjectImport${en.dateAsNumber}",
             encodeToUTF8Charsets(postponedVATBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"${SubjectImportCy}${cy.dateAsNumber}",
+          Content(welshLangKey, s"$SubjectImportCy${cy.dateAsNumber}",
             encodeToUTF8Charsets(postponedVATBody(company, cy, welshLangKey))))
     }
   }

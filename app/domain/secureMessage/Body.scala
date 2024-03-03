@@ -129,11 +129,11 @@ object SecureMessage {
       val guidanceLinkText = "Duty Deferment Electronic Statements (DDES)"
 
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
-        s"The duty deferment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
-        s"${WereNotFound}${TwoReasons}" +
-        s"${ImportVATCerts} ${MadeUsingCustoms}" +
+        s"The duty deferment statements $YouRequestedFor ${dateRange.dateAsText}" +
+        s"$WereNotFound$TwoReasons" +
+        s"$ImportVATCerts $MadeUsingCustoms" +
         " You can get duty deferment statements for declarations made using CHIEF" +
-        s" from ${createHyperLink(guidanceLinkText, guidanceLink)}.<br/></li></ol>${SignOff}"
+        s" from ${createHyperLink(guidanceLinkText, guidanceLink)}.<br/></li></ol>$SignOff"
     } else {
       val guidanceLinkText = " Datganiadau Electronig i Ohirio Tollau (DDES)"
 
@@ -159,10 +159,10 @@ object SecureMessage {
 
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
-        s"The import VAT certificates ${YouRequestedFor} ${dateRange.dateAsText}" +
-        s"${WereNotFound}${TwoReasons}${ImportVATCerts} ${MadeUsingCustoms}" +
-        s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
-        s"${RequestChief}</li></ol>${SignOff}"
+        s"The import VAT certificates $YouRequestedFor ${dateRange.dateAsText}" +
+        s"$WereNotFound$TwoReasons$ImportVATCerts $MadeUsingCustoms" +
+        s"$CheckIfYourDeclarations ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+        s"$RequestChief</li></ol>$SignOff"
     } else {
 
       s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
@@ -185,10 +185,10 @@ object SecureMessage {
                    lang: String = englishLangKey): String = {
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
-        s"The notification of adjustment statements ${YouRequestedFor} ${dateRange.dateAsText}" +
-        s"${WereNotFound}${TwoReasons}" +
-        s"<li>Notification of adjustment statements for declarations ${MadeUsingCustoms}" +
-        s"<br/></li></ol>${SignOff}"
+        s"The notification of adjustment statements $YouRequestedFor ${dateRange.dateAsText}" +
+        s"$WereNotFound$TwoReasons" +
+        s"<li>Notification of adjustment statements for declarations $MadeUsingCustoms" +
+        s"<br/></li></ol>$SignOff"
     } else {
       s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"Ni chafwyd hyd i’r hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer mis" +
@@ -210,11 +210,11 @@ object SecureMessage {
 
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
-        s"The postponed import VAT statements ${YouRequestedFor} ${dateRange.dateAsText}" +
-        s"${WereNotFound}${TwoReasons}" +
-        s"<li>Postponed import VAT statements for declarations ${MadeUsingCustoms}" +
-        s"${CheckIfYourDeclarations} ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
-        s"${RequestChief}</li></ol>${SignOff}"
+        s"The postponed import VAT statements $YouRequestedFor ${dateRange.dateAsText}" +
+        s"$WereNotFound$TwoReasons" +
+        s"<li>Postponed import VAT statements for declarations $MadeUsingCustoms" +
+        s"$CheckIfYourDeclarations ${createHyperLink(guidanceLinkText, guidanceLink)} to" +
+        s"$RequestChief</li></ol>$SignOff"
     } else {
       s"Annwyl ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"Ni chafwyd hyd i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +

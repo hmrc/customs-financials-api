@@ -126,7 +126,7 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val jsValue: String =
       s"""{"externalRef": {
-         |"id": "${searchID}",
+         |"id": "$searchID",
          |"source": "mdtp"
          |},
          |"recipient": {

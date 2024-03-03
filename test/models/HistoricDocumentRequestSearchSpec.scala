@@ -87,7 +87,7 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
         YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, Some("1234567")))
 
     val jsValue: String =
-      s"""{"searchID": "${searchID}",
+      s"""{"searchID": "$searchID",
          |"resultsFound": "inProcess",
          |"searchStatusUpdateDate": "",
          |"currentEori": "GB123456789012",
