@@ -20,6 +20,7 @@ import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
 class ParamsSpec extends SpecBase {
+
   "object should be created" should {
     "for correct parameter values" in {
       val paramsOb = Params("2",

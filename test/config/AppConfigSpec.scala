@@ -20,11 +20,13 @@ import play.api.Application
 import utils.SpecBase
 
 class AppConfigSpec extends SpecBase {
+
   "mongoHistDocSearchCollectionName" should {
     "return correct name for the collection" in new Setup {
       appConfig.mongoHistDocSearchCollectionName mustBe "historic-document-request-search"
     }
   }
+
   "mongoHistDocSearchTtl" should {
     "return correct value of 20 days in seconds" in new Setup {
       appConfig.mongoHistDocSearchTtl mustBe 1728000
@@ -62,7 +64,6 @@ class AppConfigSpec extends SpecBase {
       appConfig.secureMessageBearerToken mustBe "test1234567"
     }
   }
-
 
   trait Setup {
     val app: Application = application().build()

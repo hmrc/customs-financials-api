@@ -21,7 +21,9 @@ import utils.SpecBase
 import play.api.libs.json.{Json, JsSuccess}
 
 class CompanyInformationSpec extends SpecBase {
+
   "CompanyInformation" should {
+
     "Populate correctly" in new Setup {
 
       val address: AddressInformation = AddressInformation(
@@ -65,10 +67,9 @@ class CompanyInformationSpec extends SpecBase {
         |"consent": "consent","address": {"streetAndNumber": "street&Number",
         |"city": "london", "postalCode": "Post", "countryCode": "GB"}}""".stripMargin
 
-    val companyInfoObject: CompanyInformation = CompanyInformation(name = "name",
-      consent = "consent", address = testAddress)
+    val companyInfoObject: CompanyInformation =
+      CompanyInformation(name = "name", consent = "consent", address = testAddress)
 
-    val expectedResult: CompanyInformation = CompanyInformation(
-      name = name, consent = consent, address = testAddress)
+    val expectedResult: CompanyInformation = CompanyInformation(name = name, consent = consent, address = testAddress)
   }
 }

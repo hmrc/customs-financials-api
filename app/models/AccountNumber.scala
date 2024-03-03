@@ -24,11 +24,7 @@ final case class AccountNumber(value: String)
 
 object AccountNumber {
   def apply(value: Option[String]): AccountNumber =
-    value match {
-      case Some(value) => AccountNumber(value)
-      case None => AccountNumber(emptyString)
-    }
-
+    value.fold(AccountNumber(emptyString))(accNumber => AccountNumber(accNumber))
 
   implicit val format: Format[AccountNumber] = JsonFormatUtils.stringFormat(AccountNumber.apply)(_.value)
 }

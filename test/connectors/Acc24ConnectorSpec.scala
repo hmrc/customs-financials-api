@@ -84,5 +84,4 @@ class Acc24ConnectorSpec extends SpecBase {
 
     val connector: Acc24Connector = app.injector.instanceOf[Acc24Connector]
   }
-
 }

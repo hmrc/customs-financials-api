@@ -18,10 +18,11 @@ package models.responses
 
 import domain.AccountWithAuthorities
 import models.EORI
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class StandingAuthoritiesResponse(ownerEori: EORI, accounts: Seq[AccountWithAuthorities])
 
 object StandingAuthoritiesResponse {
-  implicit val standingAuthoritiesRequestReads = Json.reads[StandingAuthoritiesResponse]
+  implicit val standingAuthoritiesRequestReads: Reads[StandingAuthoritiesResponse] =
+    Json.reads[StandingAuthoritiesResponse]
 }

@@ -165,7 +165,8 @@ class SubscriptionServiceSpec extends SpecBase {
 
     val responseDetailWithContactInfo: ResponseDetail = responseDetail.copy(contactInformation = Some(contactInfo))
 
-    val responseDetailWithTimestamp: ResponseDetail = responseDetail.copy(contactInformation = Some(contactInfoWithTimeStamp))
+    val responseDetailWithTimestamp: ResponseDetail =
+      responseDetail.copy(contactInformation = Some(contactInfoWithTimeStamp))
 
     val subscriptionResponse: SubscriptionResponse = SubscriptionResponse(
       SubscriptionDisplayResponse(responseCommon, responseDetail))

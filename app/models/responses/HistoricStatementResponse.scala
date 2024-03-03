@@ -17,12 +17,16 @@
 package models.responses
 
 import models.{HistoricStatementErrorDetail, HistoricStatementSourceFaultDetail}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class HistoricStatementResponse(errorDetail: Option[HistoricStatementErrorDetail])
 
 object HistoricStatementResponse {
-  implicit val HistoricStatementSourceFaultDetailReads = Json.reads[HistoricStatementSourceFaultDetail]
-  implicit val HistoricStatementErrorDetailReads = Json.reads[HistoricStatementErrorDetail]
-  implicit val HistoricStatementResponseReads = Json.reads[HistoricStatementResponse]
+  implicit val HistoricStatementSourceFaultDetailReads: Reads[HistoricStatementSourceFaultDetail] =
+    Json.reads[HistoricStatementSourceFaultDetail]
+
+  implicit val HistoricStatementErrorDetailReads: Reads[HistoricStatementErrorDetail] =
+    Json.reads[HistoricStatementErrorDetail]
+
+  implicit val HistoricStatementResponseReads: Reads[HistoricStatementResponse] = Json.reads[HistoricStatementResponse]
 }

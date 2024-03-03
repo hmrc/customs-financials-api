@@ -203,7 +203,8 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       }
     }
 
-    "not update the resultsFound to no if one or more search requests do not have no for searchSuccessful field" in new Setup {
+    "not update the resultsFound to no if one or more search requests do not have no for" +
+      " searchSuccessful field" in new Setup {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 

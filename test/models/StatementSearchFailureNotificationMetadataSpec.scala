@@ -20,7 +20,9 @@ import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
 class StatementSearchFailureNotificationMetadataSpec extends SpecBase {
+
 "Json Reads" should {
+
   "generate the correct output" in new Setup {
     import StatementSearchFailureNotificationMetadata.ssfnMetaDataFormats
 
@@ -54,7 +56,6 @@ class StatementSearchFailureNotificationMetadataSpec extends SpecBase {
         |}""".stripMargin
 
     val ssfnMetaDataOb: StatementSearchFailureNotificationMetadata =
-      StatementSearchFailureNotificationMetadata("3jh1f6b3-f8b1-4f3c-973a-05b4720e64e1",
-      "NoDocumentsFound")
+      StatementSearchFailureNotificationMetadata("3jh1f6b3-f8b1-4f3c-973a-05b4720e64e1", "NoDocumentsFound")
   }
 }

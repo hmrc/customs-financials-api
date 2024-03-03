@@ -60,7 +60,9 @@ class BodySpec extends SpecBase {
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
       dutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe testDutyDefermentBody(applesAndPearsLtd)
     }
 
@@ -80,12 +82,16 @@ class BodySpec extends SpecBase {
     }
 
     "display DutyDefermentBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
       dutyDefermentBody(emptyString, dateRange) mustBe testDutyDefermentBody()
     }
 
     "display C79CertificateBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+
       c79CertificateBody(emptyString, dateRange) mustBe testC79CertificateBody()
     }
 
@@ -95,7 +101,9 @@ class BodySpec extends SpecBase {
     }
 
     "display PostponedVATBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+
       postponedVATBody(emptyString, dateRange) mustBe testPostponedVATBody()
     }
 
@@ -109,13 +117,17 @@ class BodySpec extends SpecBase {
     }
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
       dutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         testDutyDefermentBodyCy(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+
       c79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         testC79CertificateBodyCy(applesAndPearsLtd)
     }
@@ -175,14 +187,14 @@ class BodySpec extends SpecBase {
     }
 
     "short text - There are 2 possible" in new Setup {
-      val result = "There are 2 possible reasons for this:<br/>" +
+      val result: String = "There are 2 possible reasons for this:<br/>" +
         "<ol><li>Statements are only created for the periods in which you imported goods." +
         " Check that you imported goods during the dates you requested.</li><br/>"
       result mustBe TwoReasons
     }
 
     "short text - made using Customs" in new Setup {
-      val result = "made using Customs Handling of Import and Export Freight (CHIEF) " +
+      val result: String = "made using Customs Handling of Import and Export Freight (CHIEF) " +
         "cannot be requested using the Customs Declaration Service."
       result mustBe MadeUsingCustoms
     }

@@ -19,12 +19,10 @@ package models.requests.manageAuthorities
 import models.{AccountNumber, EORI}
 import play.api.libs.json.{Json, OFormat}
 
-case class RevokeAuthorityRequest(
-                                   accountNumber: AccountNumber,
-                                   accountType: RevokeAccountType,
-                                   authorisedEori: EORI,
-                                   authorisedUser: AuthorisedUser
-                                 )
+case class RevokeAuthorityRequest(accountNumber: AccountNumber,
+                                  accountType: RevokeAccountType,
+                                  authorisedEori: EORI,
+                                  authorisedUser: AuthorisedUser)
 
 object RevokeAuthorityRequest {
 

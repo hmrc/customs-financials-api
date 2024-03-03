@@ -38,6 +38,7 @@ class EmailThrottlerConnectorSpec extends SpecBase {
       result mustBe true
     }
   }
+
   "return false when the api responds with a successful response that isn't 204" in new Setup {
     when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
       .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
@@ -47,6 +48,7 @@ class EmailThrottlerConnectorSpec extends SpecBase {
       result mustBe false
     }
   }
+
   "return false when the api fails" in new Setup {
     when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
       .thenReturn(Future.failed(new NotFoundException("error")))
@@ -74,5 +76,4 @@ class EmailThrottlerConnectorSpec extends SpecBase {
 
     val connector: EmailThrottlerConnector = app.injector.instanceOf[EmailThrottlerConnector]
   }
-
 }

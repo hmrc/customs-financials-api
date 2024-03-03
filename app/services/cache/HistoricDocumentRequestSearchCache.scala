@@ -82,9 +82,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
     collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption()
 
-  /**
-   * Updates the matching document (as per queryFilter) with the provided updates
-   */
   def updateDocumentForQueryFilter(queryFilter: Bson,
                                    updates: Bson): Future[Option[HistoricDocumentRequestSearch]] =
     collection.findOneAndUpdate(
@@ -92,10 +89,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       update = updates,
       new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption()
 
-  /**
-   * Retrieves the document using SearchId and
-   * Updates the search requests array with the provided searchRequests
-   */
   def updateSearchRequestForStatementRequestId(searchRequests: Set[SearchRequest],
                                                searchID: String): Future[Option[HistoricDocumentRequestSearch]] = {
 
@@ -105,10 +98,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  /**
-   * Updates the resultsFound status to the provided updatedStatus
-   * for the given searchID
-   */
   def updateResultsFoundStatus(searchID: String,
                                updatedStatus: SearchResultStatus.Value): Future[Option[HistoricDocumentRequestSearch]] = {
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
@@ -121,10 +110,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  /**
-   * Updates the resultsFound status and  searchRequests to the provided values
-   * for the given searchID
-   */
   def updateSearchReqsAndResultsFoundStatus(searchID: String,
                                             searchRequests: Set[SearchRequest],
                                             updatedStatus: SearchResultStatus.Value

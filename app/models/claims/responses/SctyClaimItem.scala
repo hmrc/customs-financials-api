@@ -18,21 +18,19 @@ package models.claims.responses
 
 import play.api.libs.json.{Json, OFormat}
 
-case class SctyClaimItem(
-    CDFPayCaseNumber: String,
-    declarationID: Option[String],
-    claimStartDate: String,
-    closedDate: Option[String],
-    reasonForSecurity: String,
-    caseStatus: String,
-    caseSubStatus: Option[String],
-    declarantEORI: String,
-    importerEORI: String,
-    claimantEORI: Option[String],
-    totalCustomsClaimAmount: Option[String],
-    totalVATClaimAmount: Option[String],
-    declarantReferenceNumber: Option[String]
-)
+case class SctyClaimItem(CDFPayCaseNumber: String,
+                         declarationID: Option[String],
+                         claimStartDate: String,
+                         closedDate: Option[String],
+                         reasonForSecurity: String,
+                         caseStatus: String,
+                         caseSubStatus: Option[String],
+                         declarantEORI: String,
+                         importerEORI: String,
+                         claimantEORI: Option[String],
+                         totalCustomsClaimAmount: Option[String],
+                         totalVATClaimAmount: Option[String],
+                         declarantReferenceNumber: Option[String])
 
 object SctyClaimItem {
   implicit val format: OFormat[SctyClaimItem] = Json.format[SctyClaimItem]

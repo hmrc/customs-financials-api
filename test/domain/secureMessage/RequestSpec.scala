@@ -221,7 +221,9 @@ class RequestSpec extends SpecBase {
 
       val contents: List[Content] = List(
         Content(englishLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange)),
-        Content(welshLangKey, "DutyDefermentStatement", dutyDefermentBody("Company Name", dateRange, welshLangKey)))
+        Content(welshLangKey,
+          "DutyDefermentStatement",
+          dutyDefermentBody("Company Name", dateRange, welshLangKey)))
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(

@@ -45,10 +45,13 @@ class Sub09ConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
     val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
-    val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
+    val cdsEstablishmentAddress: CdsEstablishmentAddress =
+      CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
+
     val vatIds: VatId = VatId(Some("abc"), Some("123"))
     val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
-    val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+    val xiEoriAddress: PbeAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+
     val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
       Some("12345"), Some(Array(euVatIds)), "1", Some("abc"))
 
@@ -56,7 +59,8 @@ class Sub09ConnectorSpec extends SpecBase {
       cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
       None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
 
-    val response: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
+    val response: SubscriptionResponse =
+      SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
@@ -68,5 +72,4 @@ class Sub09ConnectorSpec extends SpecBase {
 
     val connector: Sub09Connector = app.injector.instanceOf[Sub09Connector]
   }
-
 }

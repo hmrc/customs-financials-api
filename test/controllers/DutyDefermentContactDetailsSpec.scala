@@ -52,6 +52,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
   }
 
   "DutyDefermentController.updateContactDetails" should {
+
     "throw an exception when update account contact details fails with a fatal error" in new Setup {
       when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
         .thenThrow(new RuntimeException("Boom1"))
@@ -59,7 +60,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       running(app) {
         intercept[RuntimeException] {
           val result = route(app, updateContactDetailsRequest).value
-          status(result) mustBe 500
+          status(result) mustBe INTERNAL_SERVER_ERROR
         }.getMessage mustBe "Boom1"
       }
     }
@@ -77,7 +78,8 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
       "update account contact details fails with InternalServerException (5xx) " in new Setup {
         when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
+          .thenReturn(
+            Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
 
         running(app) {
           val result = route(app, updateContactDetailsRequest).value
@@ -157,7 +159,10 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
     val acc38Response: acc38.Response = domain.acc38.Response(
       GetCorrespondenceAddressResponse(
         acc38ResponseCommon,
-        Some(domain.acc38.ResponseDetail(traderEORI, domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan), acc38ContactDetails))
+        Some(
+          domain.acc38.ResponseDetail(traderEORI,
+            domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan),
+            acc38ContactDetails))
       )
     )
 

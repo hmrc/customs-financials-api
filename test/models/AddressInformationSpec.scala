@@ -24,7 +24,7 @@ class AddressInformationSpec extends SpecBase {
 
   "AddressInformation" should {
     "populate correctly" in new Setup {
-      val result = AddressInformation("street&Number", "london", Option("Post"), "GB")
+      val result: AddressInformation = AddressInformation("street&Number", "london", Option("Post"), "GB")
       result mustBe expectedResult
     }
 

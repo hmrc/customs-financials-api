@@ -58,7 +58,6 @@ class Acc38ConnectorSpec extends SpecBase {
       )
     )
 
-
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)
     ).configure(

@@ -23,7 +23,9 @@ import utils.Utils._
 import java.time.LocalDateTime
 
 class UtilsSpec extends SpecBase {
+
   "emptyString" should {
+
     "return correct value" in {
       emptyString mustBe empty
     }

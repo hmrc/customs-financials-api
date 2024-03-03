@@ -77,6 +77,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       }
     }
   }
+
   "retrieveCashTransactionsDetail" should {
 
     "return Left with an error if the api request failed" in new Setup {

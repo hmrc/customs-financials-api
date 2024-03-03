@@ -30,7 +30,7 @@ case class ErrorReport(instance: String, errors: String) {
 }
 
 class JSONSchemaValidator {
-  type ValidationReport = Either[List[ErrorReport], Unit]
+  private type ValidationReport = Either[List[ErrorReport], Unit]
   private val basePath = System.getProperty("user.dir")
 
   val ssfnRequestSchema = "/schemas/statement-search-failure-notification-request-schema.json"

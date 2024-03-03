@@ -30,8 +30,7 @@ sealed trait EmailTemplate {
   val params: Map[String, String] = Map.empty
   val eori: String
 
-  def toEmailRequest: EmailRequest =
-    EmailRequest(List(email), templateId, params, force = false, Some(eori), None, None)
+  def toEmailRequest: EmailRequest = EmailRequest(List(email), templateId, params, force = false, Some(eori), None, None)
 }
 
 object EmailTemplate {

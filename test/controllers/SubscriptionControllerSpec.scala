@@ -104,10 +104,17 @@ class SubscriptionControllerSpec extends SpecBase {
   trait Setup {
 
     val traderEORI: EORI = EORI("testEORI")
-    val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
-    val getEmailAddressrequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getEmail().url)
-    val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
+    val enrolments: Enrolments =
+      Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
+
+    val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
+
+    val getEmailAddressrequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getEmail().url)
+
+    val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]

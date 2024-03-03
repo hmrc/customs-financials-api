@@ -48,7 +48,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         XiSubscription("XI1234567",
           Some(xiEoriAddress),
           Some("1"),
-        Some("12345"),
+          Some("12345"),
           Some(Array(euVatIds)),
           "1",
           Some("abc"))

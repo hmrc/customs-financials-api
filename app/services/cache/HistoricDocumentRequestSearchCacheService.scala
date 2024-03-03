@@ -32,8 +32,8 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
   def retrieveHistDocRequestSearchDocsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     historicDocRequestCache.retrieveDocumentsForCurrentEori(currentEori)
 
-  def retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
-    historicDocRequestCache.retrieveDocumentForStatementRequestID(statementRequestID)
+  def retrieveHistDocRequestSearchDocForStatementReqId(statReqID: String): Future[Option[HistoricDocumentRequestSearch]] =
+    historicDocRequestCache.retrieveDocumentForStatementRequestID(statReqID)
 
   def updateSearchRequestForStatementRequestId(req: HistoricDocumentRequestSearch,
                                                statementRequestID: String,

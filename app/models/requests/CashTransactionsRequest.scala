@@ -16,11 +16,12 @@
 
 package models.requests
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 
 case class CashTransactionsRequest(getCashAccountTransactionListingRequest: GetCashAccountTransactionListingRequest)
 
-case class GetCashAccountTransactionListingRequest(requestCommon: CashTransactionsRequestCommon, requestDetail: CashTransactionsRequestDetail)
+case class GetCashAccountTransactionListingRequest(requestCommon: CashTransactionsRequestCommon,
+                                                   requestDetail: CashTransactionsRequestDetail)
 
 case class CashTransactionsRequestCommon(originatingSystem: String,
                                          receiptDate: String,
@@ -33,14 +34,14 @@ case class CashTransactionsRequestDates(dateFrom: String, dateTo: String)
 
 object CashTransactionsRequest {
 
-  implicit val requestDatesWrites = Json.writes[CashTransactionsRequestDates]
+  implicit val requestDatesWrites: OWrites[CashTransactionsRequestDates] = Json.writes[CashTransactionsRequestDates]
 
-  implicit val requestDetailWrites = Json.writes[CashTransactionsRequestDetail]
+  implicit val requestDetailWrites: OWrites[CashTransactionsRequestDetail] = Json.writes[CashTransactionsRequestDetail]
 
-  implicit val requestCommonWrites = Json.writes[CashTransactionsRequestCommon]
+  implicit val requestCommonWrites: OWrites[CashTransactionsRequestCommon] = Json.writes[CashTransactionsRequestCommon]
 
-  implicit val getCashAccountTransactionListingRequestWrites = Json.writes[GetCashAccountTransactionListingRequest]
+  implicit val getCashAccountTransactionListingRequestWrites: OWrites[GetCashAccountTransactionListingRequest] =
+    Json.writes[GetCashAccountTransactionListingRequest]
 
-  implicit val cashTransactionsRequestWrites = Json.writes[CashTransactionsRequest]
-
+  implicit val cashTransactionsRequestWrites: OWrites[CashTransactionsRequest] = Json.writes[CashTransactionsRequest]
 }

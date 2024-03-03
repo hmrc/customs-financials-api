@@ -40,7 +40,7 @@ class SecureMessageConnectorSpec extends SpecBase {
   "SecureMessageConnector" should {
     "Populate Request" in new Setup {
 
-      val request = Request(
+      val request: Request = Request(
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient("cds",
           TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),

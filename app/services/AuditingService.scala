@@ -74,6 +74,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
       grantAuthorityRequest.authority.viewBalance,
       grantAuthorityRequest.authorisedUser.userName,
       grantAuthorityRequest.authorisedUser.userRole))
+
     audit(AuditModel(EDIT_AUTHORITY_ACTION, auditJson, UPDATE_AUTHORITY_AUDIT_TYPE))
   }
 
@@ -105,18 +106,19 @@ class AuditingService @Inject()(appConfig: AppConfig,
     audit(AuditModel(REVOKE_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail, request: domain.acc41.RequestDetail)
+  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail,
+                                          request: domain.acc41.RequestDetail)
                                          (implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestAuthCSVAuditDetail(
       request.requestingEORI.value,
-      response.requestAcceptedDate.get
-    ))
+      response.requestAcceptedDate.get))
 
     audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
   }
 
-  def auditDisplayAuthCSVStatementRequest(notification: Notification, fileType: FileType)
+  def auditDisplayAuthCSVStatementRequest(notification: Notification,
+                                          fileType: FileType)
                                          (implicit hc: HeaderCarrier): Future[AuditResult] = {
 
     val auditJson = Json.toJson(RequestDisplayStandingAuthCSVAuditDetail(
@@ -124,8 +126,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
       isHistoric = notification.metadata.contains("statementRequestID"),
       fileName = notification.fileName,
       fileRole = notification.fileRole.toString,
-      fileType = fileType.toString
-    ))
+      fileType = fileType.toString))
 
     audit(AuditModel(DISPLAY_STANDING_AUTHORITIES_NAME, auditJson, DISPLAY_STANDING_AUTHORITIES_TYPE))
   }
@@ -141,8 +142,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
       response.numberOfAuthorities,
       response.dutyDefermentAccounts,
       response.generalGuaranteeAccounts,
-      response.cdsCashAccounts
-    ))
+      response.cdsCashAccounts))
+
     audit(AuditModel(REQUEST_AUTHORITIES_NAME, auditJson, REQUEST_AUTHORITIES_TYPE))
   }
 
@@ -170,9 +171,10 @@ class AuditingService @Inject()(appConfig: AppConfig,
       auditSource = appConfig.appName,
       auditType = auditModel.auditType,
       tags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags(auditModel.transactionName, referrer(hc)),
-      detail = auditModel.detail
-    )
+      detail = auditModel.detail)
+
     log.debug(s"Splunk Audit Event:\n$dataEvent\n")
+
     auditConnector.sendExtendedEvent(dataEvent)
       .map { auditResult =>
         logAuditResult(auditResult)

@@ -82,8 +82,7 @@ class NotificationCacheSpec extends SpecBase {
           Map("periodStartYear" -> "2019",
             "periodStartMonth" -> "4",
             "fileType" -> "csv",
-            "statementRequestID" -> "12345678")
-        )
+            "statementRequestID" -> "12345678"))
 
       val nonRequestedStatement: Notification =
         Notification(
@@ -92,8 +91,7 @@ class NotificationCacheSpec extends SpecBase {
           CSV_FILE_NAME,
           FILE_SIZE_1000L,
           Some(CURRENT_LOCAL_DATE),
-          Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv")
-        )
+          Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv"))
 
       running(app) {
         val result = await(for {
@@ -130,8 +128,7 @@ class NotificationCacheSpec extends SpecBase {
           Map("periodStartYear" -> "2019",
             "periodStartMonth" -> "4",
             "fileType" -> "csv",
-            "statementRequestID" -> "12345678")
-        )
+            "statementRequestID" -> "12345678"))
 
       val nonRequestedStatement: Notification =
         Notification(
@@ -140,8 +137,7 @@ class NotificationCacheSpec extends SpecBase {
           CSV_FILE_NAME,
           FILE_SIZE_1000L,
           Some(CURRENT_LOCAL_DATE),
-          Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv")
-        )
+          Map("periodStartYear" -> "2019", "periodStartMonth" -> "4", "fileType" -> "csv"))
 
       running(app) {
         val result = await(for {

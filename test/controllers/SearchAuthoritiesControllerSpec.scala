@@ -70,8 +70,9 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
 
     val frontendRequest: RequestDetail = RequestDetail(EORI("someEori"), EORI("otherEori"))
 
-    val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST", routes.SearchAuthoritiesController.searchAuthorities().url)
-      .withJsonBody(Json.toJson(frontendRequest))
+    val request: FakeRequest[AnyContentAsJson] =
+      FakeRequest("POST", routes.SearchAuthoritiesController.searchAuthorities().url)
+        .withJsonBody(Json.toJson(frontendRequest))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc40Connector].toInstance(mockConnector)

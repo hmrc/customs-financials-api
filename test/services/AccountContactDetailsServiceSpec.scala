@@ -75,8 +75,7 @@ class AccountContactDetailsServiceSpec extends SpecBase {
       "GB",
       Some("011111111111"),
       None,
-      Some(EmailAddress("example@email.com"))
-    )
+      Some(EmailAddress("example@email.com")))
 
     val acc38Response: domain.acc38.Response = domain.acc38.Response(
       GetCorrespondenceAddressResponse(

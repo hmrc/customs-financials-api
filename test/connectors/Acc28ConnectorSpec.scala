@@ -89,7 +89,9 @@ class Acc28ConnectorSpec extends SpecBase {
 
     val tooMuchDataRequestedResponse: GuaranteeTransactionsResponse = GuaranteeTransactionsResponse(
       GetGGATransactionResponse(
-        ResponseCommon("OK", Some("091-The query has exceeded the threshold, please refine the search"), LocalDate.now().toString),
+        ResponseCommon("OK",
+          Some("091-The query has exceeded the threshold, please refine the search"),
+          LocalDate.now().toString),
         Some(ResponseDetail(openItems = true, Seq.empty))
       )
     )

@@ -27,22 +27,22 @@ case class ManageStandingAuthoritiesRequestDetail(ownerEori: EORI,
 
 object ManageStandingAuthoritiesRequestDetail {
 
-  def grantAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI): ManageStandingAuthoritiesRequestDetail = {
+  def grantAuthority(grantAuthorityRequest: GrantAuthorityRequest,
+                     eori: EORI): ManageStandingAuthoritiesRequestDetail = {
 
     val accountNumbers = (
       grantAuthorityRequest.accounts.cash
         +: grantAuthorityRequest.accounts.dutyDeferments.map(Some(_))
         :+ grantAuthorityRequest.accounts.guarantee
       ).collect {
-        case Some(accountNumber) => accountNumber
-      }
+      case Some(accountNumber) => accountNumber
+    }
 
     val authority = Authority(
       grantAuthorityRequest.authority.authorisedEori,
       Some(grantAuthorityRequest.authority.authorisedFromDate),
       grantAuthorityRequest.authority.authorisedToDate,
-      Some(grantAuthorityRequest.authority.viewBalance)
-    )
+      Some(grantAuthorityRequest.authority.viewBalance))
 
     ManageStandingAuthoritiesRequestDetail(
       eori, isGrant = true,
@@ -50,7 +50,9 @@ object ManageStandingAuthoritiesRequestDetail {
       accountNumbers.map(number => Account(AccountNumber(number), Seq(authority)))
     )
   }
-  def revokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI): ManageStandingAuthoritiesRequestDetail = {
+
+  def revokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest,
+                      eori: EORI): ManageStandingAuthoritiesRequestDetail = {
 
     val accountNumbers = List(revokeAuthorityRequest.accountNumber)
 
@@ -63,5 +65,6 @@ object ManageStandingAuthoritiesRequestDetail {
     )
   }
 
-  implicit val writes: OWrites[ManageStandingAuthoritiesRequestDetail] = Json.writes[ManageStandingAuthoritiesRequestDetail]
+  implicit val writes: OWrites[ManageStandingAuthoritiesRequestDetail] =
+    Json.writes[ManageStandingAuthoritiesRequestDetail]
 }

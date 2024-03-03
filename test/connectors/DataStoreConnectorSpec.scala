@@ -27,7 +27,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataStoreConnectorSpec extends SpecBase {
+
   "getVerifiedEmail" should {
+
     "return the email from the data-store response" in new Setup {
       when[Future[EmailResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
         .thenReturn(Future.successful(emailResponse))
@@ -50,6 +52,7 @@ class DataStoreConnectorSpec extends SpecBase {
   }
 
   "getEoriHistory" should {
+
     "return EORIHistory on a successful response from the data-store" in new Setup {
       when[Future[EoriHistoryResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
         .thenReturn(Future.successful(eoriHistoryResponse))
@@ -72,6 +75,7 @@ class DataStoreConnectorSpec extends SpecBase {
   }
 
   "getCompanyName" should {
+
     "return companyName on a successful response from the data-store" in new Setup {
       when[Future[CompanyInformation]](mockHttpClient.GET(any, any, any)(any, any, any))
         .thenReturn(Future.successful(companyNameResponse))
@@ -110,8 +114,8 @@ class DataStoreConnectorSpec extends SpecBase {
     val emailResponse: EmailResponse = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI("someEori"), None, None)))
 
-    val companyNameResponse: CompanyInformation =  CompanyInformation(
-      "test_company", "1", AddressInformation("1", "Kailash", None, "GB"))
+    val companyNameResponse: CompanyInformation =
+      CompanyInformation("test_company", "1", AddressInformation("1", "Kailash", None, "GB"))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)

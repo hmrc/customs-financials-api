@@ -77,17 +77,16 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
               None,
               None,
               None,
-          List(
-            domain.DueDate("date",
-              None,
-              Amounts(None, "10000", Some("9000"), "date"),
-            List(
-              domain.TaxTypeGroup("a1", Amounts(None, "10000", None, "date"),
-              domain.TaxType("type", Amounts(None, "10000", None, "date"))))
-            )))
+              List(
+                domain.DueDate("date",
+                  None,
+                  Amounts(None, "10000", Some("9000"), "date"),
+                  List(
+                    domain.TaxTypeGroup("a1", Amounts(None, "10000", None, "date"),
+                      domain.TaxType("type", Amounts(None, "10000", None, "date"))))
+                )))
           ))
       }
-
     }
   }
 

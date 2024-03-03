@@ -22,7 +22,9 @@ import play.api.libs.json._
 sealed trait RevokeAccountType
 
 case object CdsCashAccount extends RevokeAccountType
+
 case object CdsDutyDefermentAccount extends RevokeAccountType
+
 case object CdsGeneralGuaranteeAccount extends RevokeAccountType
 
 object RevokeAccountType {

@@ -16,19 +16,17 @@
 
 package models.claims.responses
 
-case class NdrcClaimItem(
-  CDFPayCaseNumber: String,
-  declarationID: Option[String],
-  claimStartDate: String,
-  closedDate: Option[String],
-  caseStatus: String,
-  caseSubStatus: Option[String],
-  declarantEORI: String,
-  importerEORI: String,
-  claimantEORI: Option[String],
-  totalCustomsClaimAmount: Option[String],
-  totalVATClaimAmount: Option[String],
-  totalExciseClaimAmount: Option[String],
-  declarantReferenceNumber: Option[String],
-  basisOfClaim: Option[String]
-)
+case class NdrcClaimItem(CDFPayCaseNumber: String,
+                         declarationID: Option[String],
+                         claimStartDate: String,
+                         closedDate: Option[String],
+                         caseStatus: String,
+                         caseSubStatus: Option[String],
+                         declarantEORI: String,
+                         importerEORI: String,
+                         claimantEORI: Option[String],
+                         totalCustomsClaimAmount: Option[String],
+                         totalVATClaimAmount: Option[String],
+                         totalExciseClaimAmount: Option[String],
+                         declarantReferenceNumber: Option[String],
+                         basisOfClaim: Option[String])

@@ -62,5 +62,4 @@ class Sub21ConnectorSpec extends SpecBase {
 
     val connector: Sub21Connector = app.injector.instanceOf[Sub21Connector]
   }
-
 }
