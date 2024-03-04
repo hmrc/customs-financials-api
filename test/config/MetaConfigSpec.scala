@@ -38,4 +38,16 @@ class MetaConfigSpec extends SpecBase {
       Platform.DIGITAL mustBe "Digital"
     }
   }
+
+  "Platform.ENROLMENT_KEY" should {
+    "return correct value for MDTP" in {
+      Platform.ENROLMENT_KEY mustBe "HMRC-CUS-ORG"
+    }
+  }
+
+  "Platform.ENROLMENT_IDENTIFIER" should {
+    "return correct value for MDTP" in {
+      Platform.ENROLMENT_IDENTIFIER mustBe "EORINumber"
+    }
+  }
 }

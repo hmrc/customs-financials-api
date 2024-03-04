@@ -16,12 +16,12 @@
 
 package domain.secureMessage
 
-import config.MetaConfig.Platform.SOURCE_MDTP
+import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 import domain.secureMessage
 import domain.secureMessage.SecureMessage._
 import models._
 import utils.SpecBase
-import utils.TestData.REGIME
+import utils.TestData.{REGIME, TEST_EMAIL}
 import utils.Utils.{emptyString, encodeToUTF8Charsets, englishLangKey, welshLangKey}
 
 import java.time.LocalDate
@@ -35,9 +35,9 @@ class RequestSpec extends SpecBase {
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
           regime = REGIME,
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
+          taxIdentifier = TaxIdentifier(ENROLMENT_KEY, currentEori),
           name = Name("Company Name"),
-          email = "test@test.com"),
+          email = TEST_EMAIL),
         tags = Tags("CDS Financials"),
         content = testContents,
         messageType = "customs_financials_requested_duty_deferment_not_found",
@@ -45,7 +45,7 @@ class RequestSpec extends SpecBase {
         alertQueue = "DEFAULT")
 
       val actualRequestOb: Request = Request(histDocRequestSearch,
-        EmailAddress("test@test.com"), "Company Name")
+        EmailAddress(TEST_EMAIL), "Company Name")
 
       actualRequestOb.recipient mustBe expectedRequest.recipient
       actualRequestOb.tags mustBe expectedRequest.tags
@@ -229,9 +229,9 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
           regime = REGIME,
-          taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
+          taxIdentifier = TaxIdentifier(ENROLMENT_KEY, currentEori),
           name = Name("Company Name"),
-          email = "test@test.com"),
+          email = TEST_EMAIL),
         tags = Tags("CDS Financials"),
         content = contents,
         messageType = "newMessageAlert",

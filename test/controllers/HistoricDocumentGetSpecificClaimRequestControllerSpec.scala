@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.DataStoreConnector
 import models.{EORI, FileRole}
 import org.mockito.ArgumentMatchers.{eq => meq}
@@ -29,7 +30,7 @@ import services._
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
-import utils.TestData.{DAY_15, DAY_16, MONTH_1, MONTH_3, YEAR_2019}
+import utils.TestData.{DAY_15, DAY_16, EORI_VALUE, MONTH_1, MONTH_3, YEAR_2019}
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -140,9 +141,9 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
       None
     )
 
-    val eori: EORI = EORI("testEORI")
+    val eori: EORI = EORI(EORI_VALUE)
     val enrolments: Enrolments = Enrolments(
-      Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", eori.value)), "activated")))
+      Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, eori.value)), "activated")))
 
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
     val app: Application = GuiceApplicationBuilder().overrides(

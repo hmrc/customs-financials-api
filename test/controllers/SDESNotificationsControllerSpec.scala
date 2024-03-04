@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.{Notification, NotificationsForEori}
 import models.EORI
@@ -163,7 +164,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
   trait Setup {
     val eori: EORI = EORI("123456789")
     val enrolments: Enrolments =
-      Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", eori.value)), "activated")))
+      Enrolments(Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, eori.value)), "activated")))
 
     val mockNotificationCache: NotificationCache = mock[NotificationCache]
     val mockEmailThrottler: EmailThrottlerConnector = mock[EmailThrottlerConnector]

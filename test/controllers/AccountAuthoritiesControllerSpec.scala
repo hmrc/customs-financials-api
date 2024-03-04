@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain._
 import models.requests.manageAuthorities._
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
@@ -282,7 +283,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   trait Setup {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments =
-      Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
+      Enrolments(Set(Enrolment(ENROLMENT_KEY,
+        Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)),
+        "activated")))
 
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)

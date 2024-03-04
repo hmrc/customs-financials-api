@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.MetaConfig.Platform.SOURCE_MDTP
+import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 
 import java.time.LocalDate
 import java.util.UUID
@@ -44,7 +44,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       val request: Request = Request(
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(REGIME,
-          TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
+          TaxIdentifier(ENROLMENT_KEY, "GB333186811543"),
           name = Name("Company Name"),
           email = TEST_EMAIL),
         tags = Tags("CDS Financials"),
@@ -115,7 +115,7 @@ class SecureMessageConnectorSpec extends SpecBase {
     val compareRequest: Request = secureMessage.Request(
       externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
       recipient = secureMessage.Recipient(REGIME,
-        secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
+        secureMessage.TaxIdentifier(ENROLMENT_KEY, eori.value),
         name = Name("Company Name"),
         email = TEST_EMAIL),
       tags = secureMessage.Tags("CDS Financials"),

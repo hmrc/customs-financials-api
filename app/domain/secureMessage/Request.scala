@@ -16,7 +16,7 @@
 
 package domain.secureMessage
 
-import config.MetaConfig.Platform.SOURCE_MDTP
+import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 import domain.secureMessage.SecureMessage._
 import models.{EmailAddress, HistoricDocumentRequestSearch, Params}
 import play.api.libs.json.{Json, OFormat}
@@ -42,7 +42,7 @@ object Request {
     Request(externalRef = ExternalReference(histDoc.searchID.toString, SOURCE_MDTP),
       recipient = Recipient(
         regime = "cds",
-        taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", histDoc.currentEori),
+        taxIdentifier = TaxIdentifier(ENROLMENT_KEY, histDoc.currentEori),
         name = Name(company),
         email = email.value),
       tags = Tags("CDS Financials"),

@@ -25,5 +25,7 @@ object MetaConfig {
     val DIGITAL = "Digital"
 
     val SOURCE_MDTP = "mdtp"
+    val ENROLMENT_KEY = "HMRC-CUS-ORG"
+    val ENROLMENT_IDENTIFIER = "EORINumber"
   }
 }
