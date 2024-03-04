@@ -19,6 +19,7 @@ package domain.secureMessage
 import domain.secureMessage.SecureMessage._
 import models.Params
 import play.api.libs.json.{JsSuccess, Json}
+import utils.TestData.{REGIME, TEST_COMPANY, TEST_EMAIL}
 import utils.{SpecBase, Utils}
 import utils.Utils._
 import utils.Utils.emptyString
@@ -41,9 +42,9 @@ class BodySpec extends SpecBase {
       tax mustBe testTax
     }
 
-    "Receipient" in new Setup {
+    "Recipient" in new Setup {
       val tax: TaxIdentifier = TaxIdentifier("name", "value")
-      val recip: Recipient = Recipient("regime", tax, Name("Company Name"), "test@test.com")
+      val recip: Recipient = Recipient(REGIME, tax, Name(TEST_COMPANY), TEST_EMAIL)
       recip mustBe testRecip
     }
 
@@ -299,7 +300,7 @@ class BodySpec extends SpecBase {
     val testBody: Body = Body("eori")
     val testRef: ExternalReference = ExternalReference("id", "source")
     val testTax: TaxIdentifier = TaxIdentifier("name", "value")
-    val testRecip: Recipient = Recipient("regime", testTax, Name("Company Name"), "test@test.com")
+    val testRecip: Recipient = Recipient(REGIME, testTax, Name(TEST_COMPANY), TEST_EMAIL)
     val testTags: Tags = Tags("NotificationType")
     val testContent: Content = Content("en", "accountType", "body")
 

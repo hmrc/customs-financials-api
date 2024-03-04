@@ -33,7 +33,7 @@ import play.api.{Application, inject}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
-import utils.TestData.COUNTRY_CODE_GB
+import utils.TestData.{COUNTRY_CODE_GB, TEST_EMAIL}
 
 import scala.concurrent.Future
 
@@ -154,7 +154,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
-      Some(EmailAddress("test@test.com"))
+      Some(EmailAddress(TEST_EMAIL))
     )
 
     val acc38Response: acc38.Response = domain.acc38.Response(
@@ -177,7 +177,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
-      Some(EmailAddress("test@test.com"))
+      Some(EmailAddress(TEST_EMAIL))
     )
 
     val acc37ResponseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)

@@ -30,7 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
-import utils.TestData.COUNTRY_CODE_GB
+import utils.TestData.{COUNTRY_CODE_GB, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,10 +43,10 @@ class SecureMessageConnectorSpec extends SpecBase {
 
       val request: Request = Request(
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
-        recipient = Recipient("cds",
+        recipient = Recipient(REGIME,
           TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
           name = Name("Company Name"),
-          email = "test@test.com"),
+          email = TEST_EMAIL),
         tags = Tags("CDS Financials"),
         content = TestContents,
         messageType = "newMessageAlert",
@@ -114,10 +114,10 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val compareRequest: Request = secureMessage.Request(
       externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
-      recipient = secureMessage.Recipient("cds",
+      recipient = secureMessage.Recipient(REGIME,
         secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
         name = Name("Company Name"),
-        email = "test@test.com"),
+        email = TEST_EMAIL),
       tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
       messageType = "newMessageAlert",

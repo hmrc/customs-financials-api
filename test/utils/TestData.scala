@@ -28,6 +28,7 @@ object TestData {
   val TEST_COMPANY = "companyName"
 
   val FILE_SIZE_1000L = 1000L
+  val FILE_SIZE_1024L = 1024L
   val FILE_SIZE_75251L = 75251L
   val FILE_SIZE_2417804L = 2417804L
   val CURRENT_LOCAL_DATE: LocalDate = LocalDate.now
@@ -70,4 +71,6 @@ object TestData {
   val NUMBER_10 = 10
 
   val COUNTRY_CODE_GB = "GB"
+
+  val REGIME = "cds"
 }

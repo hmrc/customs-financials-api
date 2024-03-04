@@ -21,6 +21,7 @@ import domain.secureMessage
 import domain.secureMessage.SecureMessage._
 import models._
 import utils.SpecBase
+import utils.TestData.REGIME
 import utils.Utils.{emptyString, encodeToUTF8Charsets, englishLangKey, welshLangKey}
 
 import java.time.LocalDate
@@ -33,7 +34,7 @@ class RequestSpec extends SpecBase {
       val expectedRequest: Request = Request(
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
-          regime = "cds",
+          regime = REGIME,
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
           name = Name("Company Name"),
           email = "test@test.com"),
@@ -227,7 +228,7 @@ class RequestSpec extends SpecBase {
 
       val expectedRequest: Request = Request(externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
         recipient = Recipient(
-          regime = "cds",
+          regime = REGIME,
           taxIdentifier = TaxIdentifier("HMRC-CUS-ORG", currentEori),
           name = Name("Company Name"),
           email = "test@test.com"),
