@@ -59,12 +59,7 @@ object StatementSearchFailureNotificationErrorResponse {
                                    errorMsgList: Seq[String]): Seq[String] = {
     statementRequestID.fold(errorMsgList)(stReqId => Seq(
       if (errorCode == ErrorCode.code500) {
-        if (errorDetailMsg.isEmpty) {
-          ErrorMessage.technicalErrorDetail(stReqId)
-        }
-        else {
-          errorDetailMsg
-        }
+        checkErrorDetailsMsg(errorDetailMsg, stReqId)
       } else {
         ErrorMessage.invalidStatementReqIdDetail(stReqId)
       })
@@ -91,6 +86,16 @@ object StatementSearchFailureNotificationErrorResponse {
       }
     } else {
       Seq(aggregateErrorMsg)
+    }
+  }
+
+  private def checkErrorDetailsMsg(errorDetailMsg: String,
+                                   stReqId: String): String = {
+    if (errorDetailMsg.isEmpty) {
+      ErrorMessage.technicalErrorDetail(stReqId)
+    }
+    else {
+      errorDetailMsg
     }
   }
 }

@@ -45,8 +45,8 @@ class StatementSearchFailureNotificationController @Inject()(cc: ControllerCompo
                                                              mdgHeaderFilter: MdgHeaderFilter,
                                                              cacheService: HistoricDocumentRequestSearchCacheService,
                                                              histDocumentService: HistoricDocumentService,
-                                                             smc: SecureMessageConnector
-                                                            )(implicit execution: ExecutionContext)
+                                                             smc: SecureMessageConnector)
+                                                            (implicit execution: ExecutionContext)
   extends BackendController(cc) {
 
   private val logger = play.api.Logger(getClass)

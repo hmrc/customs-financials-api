@@ -32,8 +32,7 @@ import scala.concurrent.ExecutionContext
 class SDESNotificationsController @Inject()(notificationCache: NotificationCache,
                                             authorisedRequest: AuthorisedRequest,
                                             dateTimeService: DateTimeService,
-                                            cc: ControllerComponents)
-                                           (implicit ec: ExecutionContext)
+                                            cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends BackendController(cc) with ControllerChecks {
 
   val log: LoggerLike = Logger(this.getClass)

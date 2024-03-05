@@ -26,8 +26,9 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class SearchAuthoritiesController @Inject()(acc40Connector: Acc40Connector,
-                                            cc: ControllerComponents
-                                           )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                            cc: ControllerComponents)(implicit ec: ExecutionContext)
+  extends BackendController(cc) {
+
   def searchAuthorities(): Action[RequestDetail] = Action.async(parse.json[RequestDetail]) {
     implicit request =>
       acc40Connector.searchAuthorities(request.body.requestingEORI, request.body.searchID).map {

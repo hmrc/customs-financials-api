@@ -34,10 +34,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DefaultNotificationCache @Inject()(
-                                          mongoComponent: MongoComponent,
-                                          appConfig: AppConfig
-                                        )(implicit executionContext: ExecutionContext)
+class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
+                                          appConfig: AppConfig)(implicit executionContext: ExecutionContext)
   extends PlayMongoRepository[NotificationsForEori](
     collectionName = appConfig.notificationCacheCollectionName,
     mongoComponent = mongoComponent,
