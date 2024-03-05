@@ -18,10 +18,9 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CompanyInformation(name: String, consent: String, address: AddressInformation) {
-  def formattedAddress = s"${address.streetAndNumber}," +
-    s" ${address.city}, ${address.postalCode.getOrElse("")}, ${address.countryCode}"
-}
+case class CompanyInformation(name: String,
+                              consent: String,
+                              address: AddressInformation)
 
 object CompanyInformation {
   implicit val format: OFormat[CompanyInformation] = Json.format[CompanyInformation]

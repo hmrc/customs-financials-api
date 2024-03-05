@@ -37,12 +37,14 @@ class EmailThrottlerConnector @Inject()(http: HttpClient,
     metricsReporter.withResponseTimeLogging(s"email.post.${request.templateId}") {
 
       http.POST[EmailRequest, HttpResponse](appConfig.sendEmailEndpoint, request).collect {
-        case response if (response.status == Status.ACCEPTED) =>
+        case response if response.status == Status.ACCEPTED =>
           log.info(s"successfuly sent email notification for ${request.templateId}")
           true
+
         case response =>
           log.error(s"Send email failed with status - ${response.status}")
           false
+
       }.recover {
         case ex: Throwable =>
           log.error(s"Send email threw an exception - ${ex.getMessage}")
@@ -51,5 +53,3 @@ class EmailThrottlerConnector @Inject()(http: HttpClient,
     }
   }
 }
-
-

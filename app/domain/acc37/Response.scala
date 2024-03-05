@@ -16,12 +16,13 @@
 
 package domain.acc37
 
+import config.MetaConfig.RETURN_PARAM_POSITION
 import play.api.libs.json.{Json, OFormat}
 
-case class Response(amendCorrespondenceAddressResponse: AmendCorrespondenceAddressResponse){
+case class Response(amendCorrespondenceAddressResponse: AmendCorrespondenceAddressResponse) {
   val mdtpError: Boolean = amendCorrespondenceAddressResponse
     .responseCommon
-    .returnParameters.exists(_.exists(_.paramName == "POSITION"))
+    .returnParameters.exists(_.exists(_.paramName == RETURN_PARAM_POSITION))
 }
 
 case class AmendCorrespondenceAddressResponse(responseCommon: ResponseCommon)
@@ -42,7 +43,8 @@ object ResponseCommon {
 }
 
 object AmendCorrespondenceAddressResponse {
-  implicit val updateResponseFormat: OFormat[AmendCorrespondenceAddressResponse] = Json.format[AmendCorrespondenceAddressResponse]
+  implicit val updateResponseFormat: OFormat[AmendCorrespondenceAddressResponse] =
+    Json.format[AmendCorrespondenceAddressResponse]
 }
 
 object Response {

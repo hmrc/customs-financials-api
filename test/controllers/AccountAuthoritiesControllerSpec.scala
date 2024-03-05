@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain._
 import models.requests.manageAuthorities._
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
@@ -91,7 +92,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       "get account authorities call fails with InternalServerException (5xx) and error message contains" +
         " 'JSON validation'" in new Setup {
         when(mockAccountAuthorityService.getAccountAuthorities(any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", 500)))
+          .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
 
         running(app) {
           val result = route(app, getRequest).value
@@ -107,7 +108,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 
         when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(
-          Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, 400)))
+          Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
 
         running(app) {
           val result: Future[Result] = route(app, getRequest).value
@@ -141,7 +142,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
       "delegate to the service and auditEditAuthority" in new Setup {
 
-        val editAuth = grantAuthorityRequest.copy(editRequest = true)
+        val editAuth: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
 
         when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
           .thenReturn(Future.successful(true))
@@ -282,7 +283,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   trait Setup {
     val traderEORI: EORI = EORI("testEORI")
     val enrolments: Enrolments =
-      Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
+      Enrolments(Set(Enrolment(ENROLMENT_KEY,
+        Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)),
+        "activated")))
 
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)

@@ -38,7 +38,20 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
 
       running(app) {
         val result = await(service.retrieveGuaranteeTransactionsSummary(request))
-        result mustBe Right(List(GuaranteeTransaction("date", "id", None, None, EORI("someEori"), EORI("someOtherEori"), "10000", None, None, None, List.empty)))
+
+        result mustBe Right(
+          List(
+            GuaranteeTransaction("date",
+              "id",
+              None,
+              None,
+              EORI("someEori"),
+              EORI("someOtherEori"),
+              "10000",
+              None,
+              None,
+              None,
+              List.empty)))
       }
     }
   }
@@ -51,12 +64,29 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
 
       running(app) {
         val result = await(service.retrieveGuaranteeTransactionsDetail(request))
-        result mustBe Right(List(GuaranteeTransaction("date", "id", None, None, EORI("someEori"), EORI("someOtherEori"), "10000", None, None, None,
-          List(domain.DueDate("date", None, Amounts(None, "10000", Some("9000"), "date"),
-            List(domain.TaxTypeGroup("a1", Amounts(None, "10000", None, "date"),
-              domain.TaxType("type", Amounts(None, "10000", None, "date")))))))))
-      }
 
+        result mustBe Right(
+          List(
+            GuaranteeTransaction("date",
+              "id",
+              None,
+              None,
+              EORI("someEori"),
+              EORI("someOtherEori"),
+              "10000",
+              None,
+              None,
+              None,
+              List(
+                domain.DueDate("date",
+                  None,
+                  Amounts(None, "10000", Some("9000"), "date"),
+                  List(
+                    domain.TaxTypeGroup("a1", Amounts(None, "10000", None, "date"),
+                      domain.TaxType("type", Amounts(None, "10000", None, "date"))))
+                )))
+          ))
+      }
     }
   }
 
@@ -76,10 +106,15 @@ class GuaranteeTransactionsServiceSpec extends SpecBase {
       None,
       None,
       Seq(models.responses.DueDate("date", None, DefAmounts(None, "10000", Some("9000"), "date"),
-        Seq(TaxTypeGroup("a1", DefAmounts(None, "10000", None, "date"), Seq(TaxType("type", DefAmounts(None, "10000", None, "date")))))))
+        Seq(
+          TaxTypeGroup("a1",
+            DefAmounts(None, "10000", None, "date"),
+            Seq(TaxType("type", DefAmounts(None, "10000", None, "date"))))
+        )))
     )
 
-    val request: GuaranteeAccountTransactionsRequest = GuaranteeAccountTransactionsRequest(AccountNumber("gan"), None, None)
+    val request: GuaranteeAccountTransactionsRequest =
+      GuaranteeAccountTransactionsRequest(AccountNumber("gan"), None, None)
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc28Connector].toInstance(mockAcc28Connector)

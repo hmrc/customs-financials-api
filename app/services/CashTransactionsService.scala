@@ -26,24 +26,30 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
                                         domainService: DomainService)(implicit executionContext: ExecutionContext) {
-  def retrieveCashTransactionsSummary(can: String, from: LocalDate, to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+  def retrieveCashTransactionsSummary(can: String,
+                                      from: LocalDate,
+                                      to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
     acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainSummary(responseDetail))
           case None => Right(CashTransactions(Nil, Nil))
         }
+
       case Left(errorValue) => Left(errorValue)
     }
   }
 
-  def retrieveCashTransactionsDetail(can: String, from: LocalDate, to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+  def retrieveCashTransactionsDetail(can: String,
+                                     from: LocalDate,
+                                     to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
     acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainDetail(responseDetail))
           case None => Right(CashTransactions(Nil, Nil))
         }
+
       case Left(errorValue) => Left(errorValue)
     }
   }

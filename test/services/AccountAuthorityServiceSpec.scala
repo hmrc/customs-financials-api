@@ -30,12 +30,24 @@ import utils.SpecBase
 import scala.concurrent._
 
 class AccountAuthorityServiceSpec extends SpecBase {
+
   "AccountAuthorityService" when {
+
     "calling ACC29 (get account authorities)" should {
       "get a list of accounts with authorities" in new Setup {
         running(app) {
-          val aListOfAccountWithAuthorities = Seq(AccountWithAuthorities(AccountType("CDSCash"), AccountNumber("123456"), AccountStatus("Open"), Seq(StandingAuthority(EORI("Agent EORI"), "from date", Some("to date"), viewBalance = false))))
-          when(mockAcc29Connector.getStandingAuthorities(eqTo(EORI("Trader EORI")))).thenReturn(Future.successful(aListOfAccountWithAuthorities))
+          val aListOfAccountWithAuthorities =
+            Seq(
+              AccountWithAuthorities(
+                AccountType("CDSCash"),
+                AccountNumber("123456"),
+                AccountStatus("Open"),
+                Seq(StandingAuthority(EORI("Agent EORI"), "from date", Some("to date"), viewBalance = false))
+              ))
+
+          when(mockAcc29Connector.getStandingAuthorities(eqTo(EORI("Trader EORI"))))
+            .thenReturn(Future.successful(aListOfAccountWithAuthorities))
+
           val result = await(service.getAccountAuthorities(EORI("Trader EORI")))
           result mustBe aListOfAccountWithAuthorities
         }
@@ -55,7 +67,9 @@ class AccountAuthorityServiceSpec extends SpecBase {
         when(mockAuditingService.auditGrantAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori))).thenReturn(Future.successful(true))
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori)))
+            .thenReturn(Future.successful(true))
+
           val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest, EORI("testEORI")))
           actualResult mustBe true
         }
@@ -65,7 +79,9 @@ class AccountAuthorityServiceSpec extends SpecBase {
         when(mockAuditingService.auditGrantAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori))).thenReturn(Future.successful(false))
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori)))
+            .thenReturn(Future.successful(false))
+
           val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest, EORI("testEORI")))
           actualResult mustBe false
         }
@@ -82,7 +98,9 @@ class AccountAuthorityServiceSpec extends SpecBase {
         when(mockAuditingService.auditRevokeAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori))).thenReturn(Future.successful(true))
+          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori)))
+            .thenReturn(Future.successful(true))
+
           val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest, EORI("testEORI")))
           actualResult mustBe true
         }
@@ -92,7 +110,9 @@ class AccountAuthorityServiceSpec extends SpecBase {
         when(mockAuditingService.auditRevokeAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori))).thenReturn(Future.successful(false))
+          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori)))
+            .thenReturn(Future.successful(false))
+
           val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest, EORI("testEORI")))
           actualResult mustBe false
         }

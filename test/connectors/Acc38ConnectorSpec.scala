@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
@@ -51,12 +52,11 @@ class Acc38ConnectorSpec extends SpecBase {
         domain.acc38.ResponseCommon(
           "OK",
           None,
-          "",
+          emptyString,
           None),
         None
       )
     )
-
 
     val app: Application = GuiceApplicationBuilder().overrides(
       bind[HttpClient].toInstance(mockHttpClient)

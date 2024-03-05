@@ -34,8 +34,8 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
                                                   dataStoreService: DataStoreConnector,
                                                   authorisedRequest: AuthorisedRequest,
                                                   histDocRequestCacheService: HistoricDocumentRequestSearchCacheService,
-                                                  cc: ControllerComponents)(implicit ec: ExecutionContext)
-  extends BackendController(cc) {
+                                                  cc: ControllerComponents)
+                                                 (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 
@@ -50,16 +50,15 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
           result <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
         } yield {
           log.info(s"Historic Documents requested ${allEoris.size}")
-          if (result.contains(false))
+          if (result.contains(false)) {
             ServiceUnavailable
-          else saveHistoricDocRequestsAndReturnNoContent(request, historicDocumentRequests)
+          } else {
+            saveHistoricDocRequestsAndReturnNoContent(request, historicDocumentRequests)
+          }
         }
       }
   }
 
-  /**
-   * Saves the HistoricDocumentRequests and return 204 NO_CONTENT
-   */
   private def saveHistoricDocRequestsAndReturnNoContent(request: RequestWithEori[JsValue],
                                                         historicDocRequests: Set[HistoricDocumentRequest]): Result = {
     saveHistoricDocRequests(
@@ -79,12 +78,10 @@ class HistoricDocumentRequestController @Inject()(service: HistoricDocumentServi
   }
 }
 
-case class RequestForHistoricDocuments(
-                                        documentType: FileRole,
-                                        from: LocalDate,
-                                        until: LocalDate,
-                                        dan: Option[String]
-                                      ) {
+case class RequestForHistoricDocuments(documentType: FileRole,
+                                       from: LocalDate,
+                                       until: LocalDate,
+                                       dan: Option[String]) {
 
   def toHistoricDocumentRequest(eori: EORI): HistoricDocumentRequest = {
     new HistoricDocumentRequest(

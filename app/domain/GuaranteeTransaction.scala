@@ -17,11 +17,17 @@
 package domain
 
 import models.EORI
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
-case class Amounts(openAmount: Option[String], totalAmount: String, clearedAmount: Option[String], updateDate: String)
+case class Amounts(openAmount: Option[String],
+                   totalAmount: String,
+                   clearedAmount: Option[String],
+                   updateDate: String)
 
-case class DueDate(dueDate: String, reasonForSecurity: Option[String], amounts: Amounts, taxTypeGroups: Seq[TaxTypeGroup])
+case class DueDate(dueDate: String,
+                   reasonForSecurity: Option[String],
+                   amounts: Amounts,
+                   taxTypeGroups: Seq[TaxTypeGroup])
 
 case class TaxTypeGroup(taxTypeGroup: String, amounts: Amounts, taxType: TaxType)
 
@@ -41,13 +47,13 @@ case class GuaranteeTransaction(date: String,
 
 object GuaranteeTransaction {
 
-  implicit val amountsFormat = Json.format[Amounts]
+  implicit val amountsFormat: OFormat[Amounts] = Json.format[Amounts]
 
-  implicit val taxTypeFormat = Json.format[TaxType]
+  implicit val taxTypeFormat: OFormat[TaxType] = Json.format[TaxType]
 
-  implicit val taxTypeGroupFormat = Json.format[TaxTypeGroup]
+  implicit val taxTypeGroupFormat: OFormat[TaxTypeGroup] = Json.format[TaxTypeGroup]
 
-  implicit val dueDateFormat = Json.format[DueDate]
+  implicit val dueDateFormat: OFormat[DueDate] = Json.format[DueDate]
 
-  implicit val guaranteeTransactionFormat = Json.format[GuaranteeTransaction]
+  implicit val guaranteeTransactionFormat: OFormat[GuaranteeTransaction] = Json.format[GuaranteeTransaction]
 }

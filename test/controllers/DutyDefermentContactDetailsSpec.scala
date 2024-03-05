@@ -33,6 +33,7 @@ import play.api.{Application, inject}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
+import utils.TestData.{COUNTRY_CODE_GB, TEST_EMAIL}
 
 import scala.concurrent.Future
 
@@ -52,6 +53,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
   }
 
   "DutyDefermentController.updateContactDetails" should {
+
     "throw an exception when update account contact details fails with a fatal error" in new Setup {
       when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
         .thenThrow(new RuntimeException("Boom1"))
@@ -59,7 +61,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       running(app) {
         intercept[RuntimeException] {
           val result = route(app, updateContactDetailsRequest).value
-          status(result) mustBe 500
+          status(result) mustBe INTERNAL_SERVER_ERROR
         }.getMessage mustBe "Boom1"
       }
     }
@@ -77,7 +79,8 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
       "update account contact details fails with InternalServerException (5xx) " in new Setup {
         when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
+          .thenReturn(
+            Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
 
         running(app) {
           val result = route(app, updateContactDetailsRequest).value
@@ -118,7 +121,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
           Some("Edinburgh"),
           None,
           Some("AB12 3CD"),
-          Some("GB"),
+          Some(COUNTRY_CODE_GB),
           None,
           None,
           Some(EmailAddress("email@email.com"))
@@ -148,16 +151,19 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       None,
       Some("Southampton"),
       Some("SO1 1AA"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
-      Some(EmailAddress("test@test.com"))
+      Some(EmailAddress(TEST_EMAIL))
     )
 
     val acc38Response: acc38.Response = domain.acc38.Response(
       GetCorrespondenceAddressResponse(
         acc38ResponseCommon,
-        Some(domain.acc38.ResponseDetail(traderEORI, domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan), acc38ContactDetails))
+        Some(
+          domain.acc38.ResponseDetail(traderEORI,
+            domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan),
+            acc38ContactDetails))
       )
     )
 
@@ -168,10 +174,10 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       None,
       Some("Southampton"),
       Some("SO1 1AA"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("01234 555555"),
       None,
-      Some(EmailAddress("test@test.com"))
+      Some(EmailAddress(TEST_EMAIL))
     )
 
     val acc37ResponseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)

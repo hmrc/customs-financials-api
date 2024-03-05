@@ -34,8 +34,10 @@ class Sub21Connector @Inject()(appConfig: AppConfig,
 
   def getEORIHistory(eori: EORI): Future[HistoricEoriResponse] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
+
     metricsReporterService.withResponseTimeLogging("hods.get.get-eori-history.validate") {
       val url = s"${appConfig.sub21CheckEORIValidEndpoint}?eori=${eori.value}"
+
       httpClient.GET[HistoricEoriResponse](
         url,
         headers = Seq("Authorization" -> s"Bearer ${appConfig.sub21BearerToken}")

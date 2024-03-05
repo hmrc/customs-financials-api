@@ -26,19 +26,31 @@ import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
+import utils.TestData.{MONTH_1, MONTH_3, YEAR_2019}
 
 import scala.concurrent._
 
 class HistoricDocumentServiceSpec extends SpecBase {
+
   "HistoricDocumentService" when {
+
     "calling ACC24 (request historic documents)" should {
+
       List(true, false).foreach { expectedResult =>
         s"propagate the connector's result when $expectedResult" in new Setup {
+
           running(app) {
-            val historicDocumentRequest = HistoricDocumentRequest(eori, FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
-            val historicDocumentRequestCaptor: ArgumentCaptor[HistoricDocumentRequest] = ArgumentCaptor.forClass(classOf[HistoricDocumentRequest])
-            when(mockAcc24Connector.sendHistoricDocumentRequest(historicDocumentRequestCaptor.capture())).thenReturn(Future.successful(expectedResult))
-            when(mockAuditingService.auditHistoricStatementRequest(any)(any)).thenReturn(Future.successful(AuditResult.Success))
+            val historicDocumentRequest =
+              HistoricDocumentRequest(eori, FileRole("C79Certificate"), YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
+
+            val historicDocumentRequestCaptor: ArgumentCaptor[HistoricDocumentRequest] =
+              ArgumentCaptor.forClass(classOf[HistoricDocumentRequest])
+
+            when(mockAcc24Connector.sendHistoricDocumentRequest(historicDocumentRequestCaptor.capture()))
+              .thenReturn(Future.successful(expectedResult))
+
+            when(mockAuditingService.auditHistoricStatementRequest(any)(any))
+              .thenReturn(Future.successful(AuditResult.Success))
 
             val actualResult = await(service.sendHistoricDocumentRequest(historicDocumentRequest))
 

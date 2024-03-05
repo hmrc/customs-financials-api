@@ -19,6 +19,7 @@ package domain.secureMessage
 import domain.secureMessage.SecureMessage._
 import models.Params
 import play.api.libs.json.{JsSuccess, Json}
+import utils.TestData.{REGIME, TEST_COMPANY, TEST_EMAIL}
 import utils.{SpecBase, Utils}
 import utils.Utils._
 import utils.Utils.emptyString
@@ -28,144 +29,156 @@ class BodySpec extends SpecBase {
   "Case Classes should be populated correctly" should {
     "ExternalReference" in new Setup {
       val exRef: ExternalReference = ExternalReference("id", "source")
-      exRef mustBe TestRef
+      exRef mustBe testRef
     }
 
     "Body" in new Setup {
       val body: Body = Body("eori")
-      body mustBe TestBody
+      body mustBe testBody
     }
 
     "Tax" in new Setup {
       val tax: TaxIdentifier = TaxIdentifier("name", "value")
-      tax mustBe TestTax
+      tax mustBe testTax
     }
 
-    "Receipient" in new Setup {
+    "Recipient" in new Setup {
       val tax: TaxIdentifier = TaxIdentifier("name", "value")
-      val recip: Recipient = Recipient("regime", tax, Name("Company Name"), "test@test.com")
-      recip mustBe TestRecip
+      val recip: Recipient = Recipient(REGIME, tax, Name(TEST_COMPANY), TEST_EMAIL)
+      recip mustBe testRecip
     }
 
     "Tags" in new Setup {
       val tags: Tags = Tags("NotificationType")
-      tags mustBe TestTags
+      tags mustBe testTags
     }
 
     "Content" in new Setup {
       val content: Content = Content("en", "accountType", "body")
-      content mustBe TestContent
+      content mustBe testContent
     }
   }
 
   "Body Text" should {
     "display DutyDeferementBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe TestDutyDefermentBody(applesAndPearsLtd)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
+      dutyDefermentBody("Apples & Pears Ltd", dateRange) mustBe testDutyDefermentBody(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange) mustBe TestC79CertificateBody(applesAndPearsLtd)
+      c79CertificateBody("Apples & Pears Ltd", dateRange) mustBe testC79CertificateBody(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange) mustBe TestSecurityBody(applesAndPearsLtd)
+      securityBody("Apples & Pears Ltd", dateRange) mustBe testSecurityBody(applesAndPearsLtd)
     }
 
     "display PostponedVATBody correctly" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody("Apples & Pears Ltd", dateRange) mustBe TestPostponedVATBody(applesAndPearsLtd)
+      postponedVATBody("Apples & Pears Ltd", dateRange) mustBe testPostponedVATBody(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody(emptyString, dateRange) mustBe TestDutyDefermentBody()
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
+      dutyDefermentBody(emptyString, dateRange) mustBe testDutyDefermentBody()
     }
 
     "display C79CertificateBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody(emptyString, dateRange) mustBe TestC79CertificateBody()
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+
+      c79CertificateBody(emptyString, dateRange) mustBe testC79CertificateBody()
     }
 
     "display SecurityBody correctly when company name is empty for English" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange) mustBe TestSecurityBody()
+      securityBody(emptyString, dateRange) mustBe testSecurityBody()
     }
 
     "display PostponedVATBody correctly when company name is empty for English" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
-      PostponedVATBody(emptyString, dateRange) mustBe TestPostponedVATBody()
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+
+      postponedVATBody(emptyString, dateRange) mustBe testPostponedVATBody()
     }
 
     "should encode correctly" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBody(applesAndPearsLtd)) mustBe encodedDutyDeferementBody
+      Utils.encodeToUTF8Charsets(testDutyDefermentBody(applesAndPearsLtd)) mustBe encodedDutyDeferementBody
     }
 
     "should encode the body with empty company name correctly for English" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBody()) mustBe
+      Utils.encodeToUTF8Charsets(testDutyDefermentBody()) mustBe
         encodedDutyDefermentBodyForEmptyCompanyName
     }
 
     "display DutyDeferementBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
-      DutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
-        TestDutyDefermentBodyCy(applesAndPearsLtd)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+
+      dutyDefermentBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        testDutyDefermentBodyCy(applesAndPearsLtd)
     }
 
     "display C79CertificateBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
-      C79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
-        TestC79CertificateBodyCy(applesAndPearsLtd)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+
+      c79CertificateBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        testC79CertificateBodyCy(applesAndPearsLtd)
     }
 
     "display SecurityBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
-        TestSecurityBodyCy(applesAndPearsLtd)
+      securityBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        testSecurityBodyCy(applesAndPearsLtd)
     }
 
     "display PostponedVATBody correctly in welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
-      PostponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
-        TestPostponedVATBodyCy(applesAndPearsLtd)
+      postponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
+        testPostponedVATBodyCy(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
 
-      DutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe TestDutyDefermentBodyCy()
+      dutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe testDutyDefermentBodyCy()
     }
 
     "display C79CertificateBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
 
-      C79CertificateBody(emptyString, dateRange, welshLangKey) mustBe TestC79CertificateBodyCy()
+      c79CertificateBody(emptyString, dateRange, welshLangKey) mustBe testC79CertificateBodyCy()
     }
 
     "display SecurityBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(dateAsText = "March 2021 to May 2021", dateAsNumber = emptyString)
-      SecurityBody(emptyString, dateRange, welshLangKey) mustBe TestSecurityBodyCy()
+      securityBody(emptyString, dateRange, welshLangKey) mustBe testSecurityBodyCy()
     }
 
     "display PostponedVATBody correctly when company name is empty for Welsh" in new Setup {
       override val dateRange: DateRange = DateRange(
         dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
-      PostponedVATBody(emptyString, dateRange, welshLangKey) mustBe TestPostponedVATBodyCy()
+      postponedVATBody(emptyString, dateRange, welshLangKey) mustBe testPostponedVATBodyCy()
     }
 
     "should encode correctly in welsh" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy(applesAndPearsLtd)) mustBe encodedDutyDeferementBodyCy
+      Utils.encodeToUTF8Charsets(testDutyDefermentBodyCy(applesAndPearsLtd)) mustBe encodedDutyDeferementBodyCy
     }
 
     "should encode the body with empty company name correctly for Welsh" in new Setup {
-      Utils.encodeToUTF8Charsets(TestDutyDefermentBodyCy()) mustBe
+      Utils.encodeToUTF8Charsets(testDutyDefermentBodyCy()) mustBe
         encodedDutyDeferementBodyCyForEmptyCompanyName
     }
 
@@ -175,14 +188,14 @@ class BodySpec extends SpecBase {
     }
 
     "short text - There are 2 possible" in new Setup {
-      val result = "There are 2 possible reasons for this:<br/>" +
+      val result: String = "There are 2 possible reasons for this:<br/>" +
         "<ol><li>Statements are only created for the periods in which you imported goods." +
         " Check that you imported goods during the dates you requested.</li><br/>"
       result mustBe TwoReasons
     }
 
     "short text - made using Customs" in new Setup {
-      val result = "made using Customs Handling of Import and Export Freight (CHIEF) " +
+      val result: String = "made using Customs Handling of Import and Export Freight (CHIEF) " +
         "cannot be requested using the Customs Declaration Service."
       result mustBe MadeUsingCustoms
     }
@@ -215,37 +228,37 @@ class BodySpec extends SpecBase {
 
   "messageType" should {
     "match for DutyDefermentTemplate" in new Setup {
-      TestDutyDefermentTemplate mustBe DutyDefermentTemplate
+      testDutyDefermentTemplate mustBe DutyDefermentTemplate
     }
 
     "match for C79CertificateTemplate" in new Setup {
-      TestC79CertificateTemplate mustBe C79CertificateTemplate
+      testC79CertificateTemplate mustBe C79CertificateTemplate
     }
 
     "match for SecurityTemplate" in new Setup {
-      TestSecurityTemplate mustBe SecurityTemplate
+      testSecurityTemplate mustBe SecurityTemplate
     }
 
     "match for TestPostponedVATBody" in new Setup {
-      TestPostponedVATTemplate mustBe PostponedVATemplate
+      testPostponedVATTemplate mustBe PostponedVATemplate
     }
   }
 
   "Subject" should {
     "match for TestSubjectDutyDef" in new Setup {
-      TestSubjectDutyDef mustBe SubjectDutyDef
+      testSubjectDutyDef mustBe SubjectDutyDef
     }
 
     "match for TestSubjectCert" in new Setup {
-      TestSubjectCert mustBe SubjectCert
+      testSubjectCert mustBe SubjectCert
     }
 
     "match for TestSubjectSecurity" in new Setup {
-      TestSubjectSecurity mustBe SubjectSecurity
+      testSubjectSecurity mustBe SubjectSecurity
     }
 
     "match for TestSubjectImport" in new Setup {
-      TestSubjectImport mustBe SubjectImport
+      testSubjectImport mustBe SubjectImport
     }
   }
 
@@ -284,28 +297,28 @@ class BodySpec extends SpecBase {
 
   trait Setup {
 
-    val TestBody = Body("eori")
-    val TestRef = ExternalReference("id", "source")
-    val TestTax = TaxIdentifier("name", "value")
-    val TestRecip = Recipient("regime", TestTax, Name("Company Name"), "test@test.com")
-    val TestTags = Tags("NotificationType")
-    val TestContent = Content("en", "accountType", "body")
+    val testBody: Body = Body("eori")
+    val testRef: ExternalReference = ExternalReference("id", "source")
+    val testTax: TaxIdentifier = TaxIdentifier("name", "value")
+    val testRecip: Recipient = Recipient(REGIME, testTax, Name(TEST_COMPANY), TEST_EMAIL)
+    val testTags: Tags = Tags("NotificationType")
+    val testContent: Content = Content("en", "accountType", "body")
 
-    val TestDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
-    val TestC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-    val TestSecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
-    val TestPostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+    val testDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+    val testC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
+    val testSecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
+    val testPostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
-    val TestSubjectDutyDef = "Requested duty deferment statements "
-    val TestSubjectCert = "Requested import VAT certificates (C79) "
-    val TestSubjectSecurity: String = "Requested notification of adjustment statements "
-    val TestSubjectImport = "Requested postponed import VAT statements "
+    val testSubjectDutyDef = "Requested duty deferment statements "
+    val testSubjectCert = "Requested import VAT certificates (C79) "
+    val testSubjectSecurity: String = "Requested notification of adjustment statements "
+    val testSubjectImport = "Requested postponed import VAT statements "
 
     val applesAndPearsLtd = "Apples & Pears Ltd"
     val defaultCompanyName = "Customer"
     val defaultCompanyNameCy = "Gwsmer"
 
-    def TestDutyDefermentBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
+    def testDutyDefermentBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The duty deferment statements you requested for September 2022 to October 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>" +
       "Statements are only created for the periods in which you imported goods." +
@@ -317,7 +330,7 @@ class BodySpec extends SpecBase {
       "Duty Deferment Electronic Statements (DDES)</a>.<br/>" +
       "</li></ol>From the Customs Declaration Service"
 
-    def TestC79CertificateBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
+    def testC79CertificateBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The import VAT certificates you requested for January 2022 to April 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created " +
       "for the periods in which you imported goods. Check that you imported goods during" +
@@ -328,7 +341,7 @@ class BodySpec extends SpecBase {
       "cbc-c79requests@hmrc.gov.uk</a> to request CHIEF statements.<br/></li></ol>" +
       "From the Customs Declaration Service"
 
-    def TestSecurityBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
+    def testSecurityBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The notification of adjustment statements you requested for March 2021 to May 2021 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
@@ -336,7 +349,7 @@ class BodySpec extends SpecBase {
       "of Import and Export Freight (CHIEF) cannot be requested using the Customs Declaration Service." +
       "<br/></li></ol>From the Customs Declaration Service"
 
-    def TestPostponedVATBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
+    def testPostponedVATBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
       "The postponed import VAT statements you requested for February 2022 to March 2022 were not found." +
       "<br/><br/>There are 2 possible reasons for this:<br/><ol><li>Statements are only created for the " +
       "periods in which you imported goods. Check that you imported goods during the dates you requested." +
@@ -371,7 +384,7 @@ class BodySpec extends SpecBase {
       "wiPkR1dHkgRGVmZXJtZW50IEVsZWN0cm9uaWMgU3RhdGVtZW50cyAoRERFUyk8L2E+Ljxici8+PC9saT48L29sPkZyb20gdGhlIEN1c3RvbXMg" +
       "RGVjbGFyYXRpb24gU2VydmljZQ=="
 
-    def TestDutyDefermentBodyCy(companyName: String = defaultCompanyNameCy): String =
+    def testDutyDefermentBodyCy(companyName: String = defaultCompanyNameCy): String =
       s"Annwyl $companyName <br/><br/>Ni chafwyd hyd i’r" +
         " datganiadau gohirio tollau y gwnaethoch gais amdanynt ar gyfer mis September 2022 to October" +
         " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
@@ -385,7 +398,7 @@ class BodySpec extends SpecBase {
         "tollau ar gyfer datganiadau a wnaed gan ddefnyddio’r gwasanaeth CHIEF." +
         "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
-    def TestC79CertificateBodyCy(companyName: String = defaultCompanyNameCy): String =
+    def testC79CertificateBodyCy(companyName: String = defaultCompanyNameCy): String =
       s"Annwyl $companyName<br/><br/>Ni chafwyd hyd i’r" +
         " Tystysgrifau TAW mewnforio y gwnaethoch gais amdanynt ar gyfer mis January 2022 to April" +
         " 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y gwnaethoch" +
@@ -397,7 +410,7 @@ class BodySpec extends SpecBase {
         " <a class=\"govuk-link\" href=\"mailto:cbc-c79requests@hmrc.gov.uk\">cbc-c79requests@hmrc.gov.uk</a>" +
         " i wneud cais am ddatganiadau CHIEF.</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
 
-    def TestSecurityBodyCy(companyName: String = defaultCompanyNameCy): String =
+    def testSecurityBodyCy(companyName: String = defaultCompanyNameCy): String =
       s"Annwyl $companyName<br/><br/>Ni chafwyd hyd i’r" +
         " hysbysiad o ddatganiadau addasu y gwnaethoch gais amdanynt ar gyfer misMarch 2021 to" +
         " May 2021.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim ond ar gyfer y cyfnodau lle y" +
@@ -408,7 +421,7 @@ class BodySpec extends SpecBase {
         " gyfer Trin Nwyddau a Gaiff eu Mewnforio a’u Hallforio (CHIEF).</li></ol><br/>Oddi" +
         " wrth y Gwasanaeth Datganiadau Tollau"
 
-    def TestPostponedVATBodyCy(companyName: String = defaultCompanyNameCy): String =
+    def testPostponedVATBodyCy(companyName: String = defaultCompanyNameCy): String =
       s"Annwyl $companyName<br/><br/>Ni chafwyd hyd" +
         " i’r datganiadau TAW mewnforio ohiriedig y gwnaethoch gais amdanynt ar gyfer mis" +
         "February 2022 to March 2022.<br/><br/>Mae dau reswm posibl am hyn:<br/><ol><li>Dim" +

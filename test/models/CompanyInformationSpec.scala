@@ -18,17 +18,20 @@ package models
 
 import models.CompanyInformation.format
 import utils.SpecBase
-import play.api.libs.json.{Json, JsSuccess}
+import play.api.libs.json.{JsSuccess, Json}
+import utils.TestData.COUNTRY_CODE_GB
 
 class CompanyInformationSpec extends SpecBase {
+
   "CompanyInformation" should {
+
     "Populate correctly" in new Setup {
 
       val address: AddressInformation = AddressInformation(
         streetAndNumber = "street&Number",
         city = "london",
         postalCode = Option("Post"),
-        countryCode = "GB")
+        countryCode = COUNTRY_CODE_GB)
 
       val result: CompanyInformation = CompanyInformation(
         name = "Company Name", consent = "Yes", address = address)
@@ -49,7 +52,7 @@ class CompanyInformationSpec extends SpecBase {
     val streetAndNumber: String = "street&Number"
     val city: String = "london"
     val postalCode: Option[String] = Option("Post")
-    val countryCode: String = "GB"
+    val countryCode: String = COUNTRY_CODE_GB
 
     val testAddress: AddressInformation = AddressInformation(
       streetAndNumber = streetAndNumber,
@@ -65,10 +68,9 @@ class CompanyInformationSpec extends SpecBase {
         |"consent": "consent","address": {"streetAndNumber": "street&Number",
         |"city": "london", "postalCode": "Post", "countryCode": "GB"}}""".stripMargin
 
-    val companyInfoObject: CompanyInformation = CompanyInformation(name = "name",
-      consent = "consent", address = testAddress)
+    val companyInfoObject: CompanyInformation =
+      CompanyInformation(name = "name", consent = "consent", address = testAddress)
 
-    val expectedResult: CompanyInformation = CompanyInformation(
-      name = name, consent = consent, address = testAddress)
+    val expectedResult: CompanyInformation = CompanyInformation(name = name, consent = consent, address = testAddress)
   }
 }

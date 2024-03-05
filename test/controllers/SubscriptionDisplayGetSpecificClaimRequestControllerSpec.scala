@@ -26,26 +26,40 @@ import play.api.test.Helpers._
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
 
 import scala.concurrent.Future
 
 class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase {
 
   "SubscriptionRequestController.get" should {
+
     "validate the EORI and return 200 status code" in new Setup {
-      val responseCommon: ResponseCommon = ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
-      val cdsEstablishmentAddress: CdsEstablishmentAddress = CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), "GB")
+      val responseCommon: ResponseCommon =
+        ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
+
+      val cdsEstablishmentAddress: CdsEstablishmentAddress =
+        CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
+
       val vatIds: VatId = VatId(Some("abc"), Some("123"))
       val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
-      val xiEoriAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
-      val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
-        Some("12345"), Some(Array(euVatIds)), "1", Some("abc"))
+
+      val xiEoriAddress: PbeAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+      val xiEoriSubscription: XiSubscription =
+        XiSubscription("XI1234567",
+          Some(xiEoriAddress),
+          Some("1"),
+          Some("12345"),
+          Some(Array(euVatIds)),
+          "1",
+          Some("abc"))
 
       val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
         cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
         None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
 
-      val response: SubscriptionResponse = SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
+      val response: SubscriptionResponse =
+        SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
       when(mockSub09Connector.getSubscriptions(any))
         .thenReturn(Future.successful(response))
@@ -58,7 +72,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
 
     "return 404 for invalid EORI" in new Setup {
       when(mockSub09Connector.getSubscriptions(any))
-        .thenReturn(Future.failed(UpstreamErrorResponse("failed", 404, 404, Map.empty)))
+        .thenReturn(Future.failed(UpstreamErrorResponse("failed", NOT_FOUND, NOT_FOUND, Map.empty)))
 
       running(app) {
         val result = route(app, request).value
@@ -81,4 +95,3 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
     ).build()
   }
 }
-

@@ -23,26 +23,43 @@ import models.responses._
 class DomainService {
 
   def toDomainSummary(gtd: GuaranteeTransactionDeclaration): GuaranteeTransaction = {
-    GuaranteeTransaction(gtd.postingDate, gtd.declarationID, gtd.defAmounts.openAmount, gtd.declarantsRefNumber,
-      gtd.declarantsEORINumber, gtd.importersEORINumber, gtd.defAmounts.totalAmount, gtd.defAmounts.clearedAmount, None, None, Nil)
+    GuaranteeTransaction(gtd.postingDate,
+      gtd.declarationID,
+      gtd.defAmounts.openAmount,
+      gtd.declarantsRefNumber,
+      gtd.declarantsEORINumber,
+      gtd.importersEORINumber,
+      gtd.defAmounts.totalAmount,
+      gtd.defAmounts.clearedAmount,
+      None,
+      None,
+      Nil)
   }
-
 
   def toDomainSummary(cashTransactionsResponseDetail: CashTransactionsResponseDetail): domain.CashTransactions = {
     CashTransactions(
-      cashTransactionsResponseDetail.pendingTransactions.map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
-      cashTransactionsResponseDetail.dailyStatements.map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty))
+      cashTransactionsResponseDetail.pendingTransactions
+        .map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
+      cashTransactionsResponseDetail.dailyStatements
+        .map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty))
   }
 
   private def toDomain(declaration: DeclarationDetail): domain.Declaration = {
-    Declaration(declaration.declarationID, declaration.importerEORINumber, declaration.declarantEORINumber,
-      declaration.declarantReference, declaration.postingDate, declaration.amount, Nil)
+    Declaration(declaration.declarationID,
+      declaration.importerEORINumber,
+      declaration.declarantEORINumber,
+      declaration.declarantReference,
+      declaration.postingDate,
+      declaration.amount,
+      Nil)
   }
 
   def toDomainDetail(cashTransactionsResponseDetail: CashTransactionsResponseDetail): domain.CashTransactions = {
     CashTransactions(
-      cashTransactionsResponseDetail.pendingTransactions.map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
-      cashTransactionsResponseDetail.dailyStatements.map(_.map(ds => toDomainDetail(ds.dailyStatement))).getOrElse(Seq.empty))
+      cashTransactionsResponseDetail.pendingTransactions
+        .map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
+      cashTransactionsResponseDetail.dailyStatements
+        .map(_.map(ds => toDomainDetail(ds.dailyStatement))).getOrElse(Seq.empty))
   }
 
   private def toDomain(dailyStatementDetail: DailyStatementDetail): domain.CashDailyStatement = {
@@ -50,7 +67,8 @@ class DomainService {
       dailyStatementDetail.openingBalance,
       dailyStatementDetail.closingBalance,
       dailyStatementDetail.declarations.map(_.map(d => toDomain(d.declaration))).getOrElse(Seq.empty),
-      dailyStatementDetail.paymentsAndWithdrawals.map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
+      dailyStatementDetail.paymentsAndWithdrawals
+        .map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
   }
 
   def toDomainDetail(dailyStatementDetail: DailyStatementDetail): domain.CashDailyStatement = {
@@ -58,14 +76,18 @@ class DomainService {
       dailyStatementDetail.openingBalance,
       dailyStatementDetail.closingBalance,
       dailyStatementDetail.declarations.map(_.map(d => toDomainDetail(d.declaration))).getOrElse(Seq.empty),
-      dailyStatementDetail.paymentsAndWithdrawals.map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
+      dailyStatementDetail.paymentsAndWithdrawals
+        .map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
   }
 
 
-
   def toDomainDetail(declaration: DeclarationDetail): domain.Declaration = {
-    Declaration(declaration.declarationID, declaration.importerEORINumber, declaration.declarantEORINumber,
-      declaration.declarantReference, declaration.postingDate, declaration.amount,
+    Declaration(declaration.declarationID,
+      declaration.importerEORINumber,
+      declaration.declarantEORINumber,
+      declaration.declarantReference,
+      declaration.postingDate,
+      declaration.amount,
       declaration.taxGroups.map(container => toDomain(container.taxGroup)))
   }
 

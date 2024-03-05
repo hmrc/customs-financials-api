@@ -16,9 +16,10 @@
 
 package connectors
 
+import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
+
 import java.time.LocalDate
 import java.util.UUID
-
 import domain.secureMessage
 import domain.secureMessage._
 import models._
@@ -29,9 +30,10 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.{COUNTRY_CODE_GB, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SecureMessageConnectorSpec extends SpecBase {
@@ -39,12 +41,12 @@ class SecureMessageConnectorSpec extends SpecBase {
   "SecureMessageConnector" should {
     "Populate Request" in new Setup {
 
-      val request = Request(
-        externalRef = ExternalReference(searchID.toString, "mdtp"),
-        recipient = Recipient("cds",
-          TaxIdentifier("HMRC-CUS-ORG", "GB333186811543"),
+      val request: Request = Request(
+        externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
+        recipient = Recipient(REGIME,
+          TaxIdentifier(ENROLMENT_KEY, "GB333186811543"),
           name = Name("Company Name"),
-          email = "test@test.com"),
+          email = TEST_EMAIL),
         tags = Tags("CDS Financials"),
         content = TestContents,
         messageType = "newMessageAlert",
@@ -57,10 +59,6 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
-
-      //TODO Update this to work and uncomment
-      /*when[Future[domain.secureMessage.Response]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(response))*/
 
         when(mockDataStoreService.getCompanyName(any)(any))
           .thenReturn(Future.successful(Option("test")))
@@ -75,7 +73,7 @@ class SecureMessageConnectorSpec extends SpecBase {
         }
       }
 
-      "Json Writesresult in correct output" in new Setup {
+      "Json Writes result in correct output" in new Setup {
         Json.toJson(compareRequest) mustBe Json.parse(jsValue)
       }
     }
@@ -91,7 +89,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       streetAndNumber = "street&Number",
       city = "london",
       postalCode = Option("Post"),
-      countryCode = "GB")
+      countryCode = COUNTRY_CODE_GB)
 
     val corp: CompanyInformation = CompanyInformation(
       name = "Company Name", consent = "Yes", address = address)
@@ -106,20 +104,20 @@ class SecureMessageConnectorSpec extends SpecBase {
         SearchResultStatus.inProcess, emptyString, emptyString, 0))
 
     val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
-      SearchResultStatus.no, "", eori.value, params, searchRequests)
+      SearchResultStatus.no, emptyString, eori.value, params, searchRequests)
 
-    val TestContents = {
+    val TestContents: List[Content] = {
       List(secureMessage.Content("en", "DutyDefermentStatement",
         "Message content - 4254101384174917141"), secureMessage.Content(
         "cy", "DutyDefermentStatement", "Cynnwys - 4254101384174917141"))
     }
 
-    val compareRequest = secureMessage.Request(
-      externalRef = secureMessage.ExternalReference(searchID.toString, "mdtp"),
-      recipient = secureMessage.Recipient("cds",
-        secureMessage.TaxIdentifier("HMRC-CUS-ORG", eori.value),
+    val compareRequest: Request = secureMessage.Request(
+      externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
+      recipient = secureMessage.Recipient(REGIME,
+        secureMessage.TaxIdentifier(ENROLMENT_KEY, eori.value),
         name = Name("Company Name"),
-        email = "test@test.com"),
+        email = TEST_EMAIL),
       tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
       messageType = "newMessageAlert",
@@ -128,7 +126,7 @@ class SecureMessageConnectorSpec extends SpecBase {
 
     val jsValue: String =
       s"""{"externalRef": {
-         |"id": "${searchID}",
+         |"id": "$searchID",
          |"source": "mdtp"
          |},
          |"recipient": {

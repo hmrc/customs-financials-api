@@ -17,6 +17,7 @@
 package controllers
 
 import connectors.SecureMessageConnector
+import models.SearchResultStatus.inProcess
 import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
@@ -65,7 +66,7 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         SearchRequest(
           "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess,
           emptyString, emptyString, 0)
       )
 
@@ -121,18 +122,16 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "return 204 when request is valid and reason is not NoDocumentsFound" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, docUnreachable, 1),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
@@ -162,12 +161,13 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "return 500 and valid error response when request is valid and reason is not NoDocumentsFound and " +
       "failureRetryCount already has 5 as value" in new Setup {
 
+      val failureRetryCount = 5
+
       val searchRequestsWithMaximumRetryCount: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, docUnreachable, 5),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, failureRetryCount),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
@@ -205,10 +205,9 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "return 500 with correct error response when there is exception while updating the document" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
@@ -229,24 +228,22 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
       verify(mockHistDocReqSearchCacheService, Mockito.times(1))
         .retrieveHistDocRequestSearchDocForStatementReqId(any)
-      }
+    }
 
     "return 204 when exception occurs while sending the ACC24 request " +
       "after updating the retry count" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, docUnreachable, 1),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
@@ -275,18 +272,16 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "return 204 when exception occurs while sending secure message" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
         SearchRequest(
           "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, noDocumentsFound, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
@@ -317,12 +312,12 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     }
   }
 
-    "send error response when the request is not valid" in new Setup {
-      running(app) {
-        val response: Future[Result] = route(app, invalidRequest).value
-        status(response) mustBe UNAUTHORIZED
-      }
+  "send error response when the request is not valid" in new Setup {
+    running(app) {
+      val response: Future[Result] = route(app, invalidRequest).value
+      status(response) mustBe UNAUTHORIZED
     }
+  }
 
   "produce BAD REQUEST when the request's headers has invalid date format" in new Setup {
     running(app) {
@@ -428,17 +423,15 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val historicDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
       val searchID: UUID = UUID.randomUUID()
-      val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
+      val resultsFound: SearchResultStatus.Value = inProcess
       val searchStatusUpdateDate: String = emptyString
       val currentEori: String = "GB123456789012"
       val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
       val searchRequests: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-          emptyString, emptyString, 0)
-      )
+          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0))
 
       HistoricDocumentRequestSearch(searchID,
         resultsFound,

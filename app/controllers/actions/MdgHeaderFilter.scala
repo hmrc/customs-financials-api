@@ -19,17 +19,15 @@ package controllers.actions
 import _root_.config.AppConfig
 import play.api.mvc.Results.{BadRequest, Unauthorized}
 import play.api.mvc._
-import utils.Utils.{emptyString, iso8601DateFormatter}
+import utils.Utils.{comma, emptyString, iso8601DateFormatter}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class MdgHeaderDefaultFilter @Inject()(
-                                        val parser: BodyParsers.Default,
-                                        appConfig: AppConfig
-                                      )(implicit val executionContext: ExecutionContext)
-  extends MdgHeaderFilter {
+class MdgHeaderDefaultFilter @Inject()(val parser: BodyParsers.Default,
+                                       appConfig: AppConfig)
+                                      (implicit val executionContext: ExecutionContext) extends MdgHeaderFilter {
 
   private val logger = play.api.Logger(getClass)
 
@@ -53,7 +51,6 @@ class MdgHeaderDefaultFilter @Inject()(
     )
   }
 
-  // Play 2.6 updates Content-Type key to lower case which means we need to do a case insensitive check
   private def checkForMissingHeaders[A](request: Request[A]): Either[Result, Request[A]] = {
     val mandatoryHeaders =
       List(dateHeader, correlationIdHeader, forwardHostHeader, contentTypeHeader, acceptHeader, authorizationHeader)
@@ -63,7 +60,7 @@ class MdgHeaderDefaultFilter @Inject()(
     missingHeaders match {
       case Nil => Right(request)
       case _ =>
-        logger.error(s"Missing header(s): ${missingHeaders.mkString(",")}")
+        logger.error(s"Missing header(s): ${missingHeaders.mkString(comma)}")
         Left(BadRequest)
     }
   }

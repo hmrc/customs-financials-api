@@ -28,9 +28,12 @@ case class GGATransactionListing(requestCommon: RequestCommon, requestDetail: Re
 case class RequestParameters(paramName: String, paramValue: String)
 
 case class RequestCommon(receiptDate: String,
-                         acknowledgementReference: String, requestParameters: RequestParameters)
+                         acknowledgementReference: String,
+                         requestParameters: RequestParameters)
 
-case class RequestDetail(gan: AccountNumber, openItems: Boolean, dates: Option[RequestDates])
+case class RequestDetail(gan: AccountNumber,
+                         openItems: Boolean,
+                         dates: Option[RequestDates])
 
 case class RequestDates(dateFrom: LocalDate, dateTo: LocalDate)
 
@@ -38,17 +41,15 @@ object RequestDates {
   implicit val requestDates: OFormat[RequestDates] = Json.format[RequestDates]
 }
 
-
 object GuaranteeTransactionsRequest {
+  implicit val requestDetailWrites: OWrites[RequestDetail] = Json.writes[RequestDetail]
 
-  implicit val requestDetailWrites = Json.writes[RequestDetail]
+  implicit val requestParametersWrites: OWrites[RequestParameters] = Json.writes[RequestParameters]
 
-  implicit val requestParametersWrites = Json.writes[RequestParameters]
+  implicit val requestCommonWrites: OWrites[RequestCommon] = Json.writes[RequestCommon]
 
-  implicit val requestCommonWrites = Json.writes[RequestCommon]
+  implicit val ggaTransactionListingWrites: OWrites[GGATransactionListing] = Json.writes[GGATransactionListing]
 
-  implicit val ggaTransactionListingWrites = Json.writes[GGATransactionListing]
-
-  implicit val guaranteeTransactionsRequestWrites = Json.writes[GuaranteeTransactionsRequest]
-
+  implicit val guaranteeTransactionsRequestWrites: OWrites[GuaranteeTransactionsRequest] =
+    Json.writes[GuaranteeTransactionsRequest]
 }

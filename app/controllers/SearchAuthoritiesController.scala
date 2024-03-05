@@ -25,16 +25,17 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class SearchAuthoritiesController @Inject()(
-                                             acc40Connector: Acc40Connector,
-                                             cc: ControllerComponents
-                                           )(implicit ec: ExecutionContext) extends BackendController(cc) {
+class SearchAuthoritiesController @Inject()(acc40Connector: Acc40Connector,
+                                            cc: ControllerComponents)(implicit ec: ExecutionContext)
+  extends BackendController(cc) {
+
   def searchAuthorities(): Action[RequestDetail] = Action.async(parse.json[RequestDetail]) {
     implicit request =>
       acc40Connector.searchAuthorities(request.body.requestingEORI, request.body.searchID).map {
         case Left(NoAuthoritiesFound) => NoContent
         case Left(ErrorResponse) => InternalServerError
         case Right(value) => Ok(Json.toJson(value))
+        case _ => InternalServerError
       }
   }
 }

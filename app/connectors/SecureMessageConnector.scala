@@ -34,8 +34,7 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
                                        appConfig: AppConfig,
                                        jsonSchemaValidator: JSONSchemaValidator,
                                        mdgHeaders: MdgHeaders,
-                                       dataStore: DataStoreConnector
-                                      )(implicit executionContext: ExecutionContext) {
+                                       dataStore: DataStoreConnector)(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
 
@@ -58,8 +57,8 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
         emailAddress.getOrElse(EmailAddress(emptyString)),
         companyName.getOrElse(emptyString))
 
-      jsonSchemaValidator.validatePayload(requestBody(request),
-        jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
+      jsonSchemaValidator.validatePayload(
+        requestBody(request), jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
         case Success(_) =>
           val result: Future[Response] = httpClient.POST[Request, Response](
             appConfig.secureMessageEndpoint,
@@ -74,7 +73,9 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
                 s"message id ${request.externalRef.id} while sending secure message")
               Response(id = s"Secure Message API Error for :::${request.externalRef.id}")
           }
+
           result.map(res => Right(res))
+
         case Failure(exception) =>
           log.error(s"Json Schema Failed Validation for sendSecureMessage")
           Future(Left(exception.getMessage))

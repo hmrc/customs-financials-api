@@ -34,10 +34,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DefaultNotificationCache @Inject()(
-  mongoComponent: MongoComponent,
-  appConfig: AppConfig
-)(implicit executionContext: ExecutionContext)
+class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
+                                          appConfig: AppConfig)(implicit executionContext: ExecutionContext)
   extends PlayMongoRepository[NotificationsForEori](
     collectionName = appConfig.notificationCacheCollectionName,
     mongoComponent = mongoComponent,
@@ -124,16 +122,19 @@ class DefaultNotificationCache @Inject()(
     val findResult = collection.find(equal("eori", eori.value)).toFuture().map(_.flatMap(_.notifications))
 
     findResult.flatMap { notifications =>
-      Future.sequence(notifications.map { notification => {
-        val retentionDays: Option[String] = notification.metadata.get("RETENTION_DAYS")
-        val statementRequestIDExists: Boolean = notification.metadata.contains("statementRequestID")
-        val created: Option[LocalDate] = notification.created
-        (retentionDays, statementRequestIDExists, created) match {
-          case (Some(days), true, Some(date)) if date.plusDays(days.toInt).isBefore(LocalDate.now) =>
-            removeByMetaData(notification.eori, notification.metadata)
-          case _ => Future.successful(())
+      Future.sequence(notifications.map {
+        notification => {
+          val retentionDays: Option[String] = notification.metadata.get("RETENTION_DAYS")
+          val statementRequestIDExists: Boolean = notification.metadata.contains("statementRequestID")
+          val created: Option[LocalDate] = notification.created
+
+          (retentionDays, statementRequestIDExists, created) match {
+            case (Some(days), true, Some(date)) if date.plusDays(days.toInt).isBefore(LocalDate.now) =>
+              removeByMetaData(notification.eori, notification.metadata)
+
+            case _ => Future.successful(())
+          }
         }
-      }
       })
     }
   }

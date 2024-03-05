@@ -1,19 +1,19 @@
 import play.core.PlayVersion
 import play.sbt.PlayImport.ws
-import sbt._
+import sbt.*
 
 object AppDependencies {
 
   val bootstrapVersion = "7.22.0"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     ws,
     "uk.gov.hmrc" %% "bootstrap-backend-play-28" % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "1.3.0",
     "com.github.java-json-tools" % "json-schema-validator" % "2.2.14"
   )
 
-  val test = Seq(
+  val test: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % "3.2.16" % "test",
     "com.typesafe.play" %% "play-test" % PlayVersion.current % "test",
     "org.pegdown" % "pegdown" % "1.6.0" % "test, it",

@@ -31,6 +31,7 @@ import scala.concurrent.Future
 class Acc31ConnectorSpec extends SpecBase {
 
   "retrieveCashTransactions" should {
+
     "return a list of declarations on a successful response" in new Setup {
       when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(response))

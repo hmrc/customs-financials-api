@@ -19,6 +19,7 @@ package domain.acc37
 import models.requests.UpdateContactDetailsRequest
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
 import play.api.libs.json.{Json, OFormat}
+import utils.Utils.emptyString
 
 case class Request(amendCorrespondenceAddressRequest: AmendCorrespondenceAddressRequest)
 
@@ -77,7 +78,7 @@ object ContactDetails {
       request.addressLine3,
       request.addressLine4,
       request.postCode,
-      request.countryCode.getOrElse(""),
+      request.countryCode.getOrElse(emptyString),
       request.telephone,
       request.fax,
       request.email

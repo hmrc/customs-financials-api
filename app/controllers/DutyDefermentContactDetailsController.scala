@@ -37,12 +37,12 @@ class DutyDefermentContactDetailsController @Inject()(service: AccountContactDet
     Action.async(parse.json[GetContactDetailsRequest]) { implicit request =>
       service.getAccountContactDetails(request.body.dan, request.body.eori)
         .map {
-          case response if response.mdtpError =>
-            InternalServerError
+          case response if response.mdtpError => InternalServerError
+
           case domain.acc38.Response(GetCorrespondenceAddressResponse(_, Some(responseDetail))) =>
             Ok(Json.toJson(responseDetail.contactDetails))
-          case domain.acc38.Response(GetCorrespondenceAddressResponse(_, None)) =>
-            BadRequest
+
+          case domain.acc38.Response(GetCorrespondenceAddressResponse(_, None)) => BadRequest
         }
         .recover {
           case e =>
@@ -67,4 +67,3 @@ class DutyDefermentContactDetailsController @Inject()(service: AccountContactDet
       }
     }
 }
-

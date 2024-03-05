@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.LocalDate
 import domain.{Notification, StandingAuthority, acc41}
 import models._
 import models.requests.HistoricDocumentRequest
@@ -31,6 +30,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector._
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.SpecBase
+import utils.TestData._
+import utils.Utils.emptyString
+
 import scala.concurrent._
 
 class AuditingServiceSpec extends SpecBase {
@@ -42,8 +44,7 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = false
-      )
+        editRequest = false)
 
       val auditRequest =
         """{
@@ -62,7 +63,8 @@ class AuditingServiceSpec extends SpecBase {
           "authoriserJobRole": "Managing Director"
         }"""
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -74,7 +76,6 @@ class AuditingServiceSpec extends SpecBase {
         result.auditType mustBe "ManageAuthority"
         result.auditSource mustBe "customs-financials-api"
         result.tags.get("transactionName") mustBe Some("Grant Authority")
-
       }
     }
 
@@ -84,8 +85,7 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = true
-      )
+        editRequest = true)
 
       val auditRequest: String =
         """{
@@ -101,7 +101,8 @@ class AuditingServiceSpec extends SpecBase {
           "authoriserJobRole": "Managing Director"
         }"""
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -132,7 +133,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"), CdsCashAccount, EORI("agentEORI"), AuthorisedUser("John Smith", "Managing Director")
       )
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -160,10 +162,13 @@ class AuditingServiceSpec extends SpecBase {
           }"""
 
       val revokeAuthorityRequest: RevokeAuthorityRequest = RevokeAuthorityRequest(
-        AccountNumber("123"), CdsDutyDefermentAccount, EORI("agentEORI"), AuthorisedUser("John Smith", "Managing Director")
-      )
+        AccountNumber("123"),
+        CdsDutyDefermentAccount,
+        EORI("agentEORI"),
+        AuthorisedUser("John Smith", "Managing Director"))
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -191,10 +196,13 @@ class AuditingServiceSpec extends SpecBase {
           }"""
 
       val revokeAuthorityRequest: RevokeAuthorityRequest = RevokeAuthorityRequest(
-        AccountNumber("123"), CdsGeneralGuaranteeAccount, EORI("agentEORI"), AuthorisedUser("John Smith", "Managing Director")
-      )
+        AccountNumber("123"),
+        CdsGeneralGuaranteeAccount,
+        EORI("agentEORI"),
+        AuthorisedUser("John Smith", "Managing Director"))
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -221,9 +229,18 @@ class AuditingServiceSpec extends SpecBase {
           |   "periodEndMonth" : "12"
           | }""".stripMargin
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("DutyDefermentStatement"), 2020, 4, 2020, 12, Some("DAN123"))
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
+      val historicDocumentRequest: HistoricDocumentRequest =
+        HistoricDocumentRequest(
+          EORI("testEORI"),
+          FileRole("DutyDefermentStatement"),
+          YEAR_2020,
+          MONTH_4,
+          YEAR_2020,
+          MONTH_12,
+          Some("DAN123"))
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -250,8 +267,12 @@ class AuditingServiceSpec extends SpecBase {
           |   "periodEndMonth" : "03"
           | }""".stripMargin
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("SecurityStatement"), 2019, 1, 2019, 3, None)
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val historicDocumentRequest: HistoricDocumentRequest =
+        HistoricDocumentRequest(
+          EORI("testEORI"), FileRole("SecurityStatement"), YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -259,6 +280,7 @@ class AuditingServiceSpec extends SpecBase {
 
         service.auditHistoricStatementRequest(historicDocumentRequest)
         val result = extendedDataEventCaptor.getValue
+
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "RequestHistoricStatement"
         result.auditSource mustBe "customs-financials-api"
@@ -278,8 +300,12 @@ class AuditingServiceSpec extends SpecBase {
           |   "periodEndMonth" : "03"
           | }""".stripMargin
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val historicDocumentRequest: HistoricDocumentRequest =
+        HistoricDocumentRequest(
+          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -287,6 +313,7 @@ class AuditingServiceSpec extends SpecBase {
 
         service.auditHistoricStatementRequest(historicDocumentRequest)
         val result = extendedDataEventCaptor.getValue
+
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "RequestHistoricStatement"
         result.auditSource mustBe "customs-financials-api"
@@ -295,19 +322,26 @@ class AuditingServiceSpec extends SpecBase {
     }
 
     "not throw an exception when failing to audit the events" in new Setup {
-      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
+      val historicDocumentRequest: HistoricDocumentRequest =
+        HistoricDocumentRequest(
+          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
 
       running(app) {
         val auditResult = AuditResult.Failure("failed to audit", Some(new Exception("error")))
         when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.successful(auditResult))
         await(service.auditHistoricStatementRequest(historicDocumentRequest))
+
         auditResult.msg must be("failed to audit")
       }
     }
 
     "throw an exception when send fails to connect" in new Setup {
-      when(mockAuditConnector.sendExtendedEvent(any)(any, any)).thenReturn(Future.failed(new Exception("An audit failure occurred")))
-      val historicDocumentRequest: HistoricDocumentRequest = HistoricDocumentRequest(EORI("testEORI"), FileRole("C79Certificate"), 2019, 1, 2019, 3, None)
+      when(mockAuditConnector.sendExtendedEvent(any)(any, any))
+        .thenReturn(Future.failed(new Exception("An audit failure occurred")))
+
+      val historicDocumentRequest: HistoricDocumentRequest =
+        HistoricDocumentRequest(
+          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
 
       running(app) {
         intercept[Exception] {
@@ -316,18 +350,17 @@ class AuditingServiceSpec extends SpecBase {
       }
     }
 
-
     "Audit the ACC41 audit Display Auth CSV Statement Request" in new Setup {
 
-      val display = Map("Name" -> "DISPLAY_STANDING_AUTHORITIES_NAME",
+      val display: Map[String, String] = Map("Name" -> "DISPLAY_STANDING_AUTHORITIES_NAME",
         "Type" -> "DISPLAY_STANDING_AUTHORITIES_TYPE")
 
       val notification: Notification = Notification(
         EORI("GB123456789"),
         FileRole("fileRole"),
         "file name",
-        12,
-        Some(LocalDate.now()),
+        FILE_SIZE_1000L,
+        Some(CURRENT_LOCAL_DATE),
         display)
 
       val fileType: FileType = FileType("CSV")
@@ -344,7 +377,7 @@ class AuditingServiceSpec extends SpecBase {
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent]
       = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      running(app){
+      running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
@@ -358,8 +391,7 @@ class AuditingServiceSpec extends SpecBase {
     }
 
     "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
-
-      val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(""), Some(""))
+      val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(emptyString), Some(emptyString))
       val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"), Some(EORI("someAltEori")))
 
       val auditRequest =
@@ -368,7 +400,8 @@ class AuditingServiceSpec extends SpecBase {
           "requestAcceptedDate":""
         }"""
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -376,6 +409,7 @@ class AuditingServiceSpec extends SpecBase {
 
         service.auditRequestAuthCSVStatementRequest(response, request)
         val result = extendedDataEventCaptor.getValue
+
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "RequestAuthoritiesCSV"
         result.auditSource mustBe "customs-financials-api"

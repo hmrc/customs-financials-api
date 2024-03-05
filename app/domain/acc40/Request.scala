@@ -29,4 +29,3 @@ case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)
 object Request {
   implicit val format: OFormat[Request] = Json.format[Request]
 }
-

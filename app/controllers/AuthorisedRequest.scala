@@ -19,6 +19,7 @@ package controllers
 import config.AppConfig
 import models.EORI
 import play.api.mvc._
+import _root_.config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -29,8 +30,13 @@ import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
-  extends ActionBuilder[RequestWithEori, AnyContent] with ActionRefiner[Request, RequestWithEori] with AuthorisedFunctions with Results {
+class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnector,
+                                  cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+  extends ActionBuilder[RequestWithEori, AnyContent]
+    with ActionRefiner[Request, RequestWithEori]
+    with AuthorisedFunctions
+    with Results {
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, RequestWithEori[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
@@ -38,7 +44,7 @@ class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnecto
     val retrievals = Retrievals.allEnrolments
 
     authConnector.authorise(predicates, retrievals)
-      .map(_.getEnrolment("HMRC-CUS-ORG").flatMap(_.getIdentifier("EORINumber")))
+      .map(_.getEnrolment(ENROLMENT_KEY).flatMap(_.getIdentifier(ENROLMENT_IDENTIFIER)))
       .map {
         case Some(eori) =>
           Right(new RequestWithEori(EORI(eori.value), request))
@@ -62,6 +68,11 @@ class CustomAuthConnector @Inject()(appConfig: AppConfig,
 trait ControllerChecks extends Results {
   def matchingEoriNumber(eori: EORI)(fn: EORI => Future[Result])(implicit request: RequestWithEori[_]): Future[Result] = {
     val eoriRetrievedFromAuth = request.eori.value
-    if (eoriRetrievedFromAuth == eori.value) fn(eori) else successful(Forbidden(s"Enrolment Identifier EORINumber $eoriRetrievedFromAuth not matched with ${eori.value}"))
+
+    if (eoriRetrievedFromAuth == eori.value) {
+      fn(eori)
+    } else {
+      successful(Forbidden(s"Enrolment Identifier EORINumber $eoriRetrievedFromAuth not matched with ${eori.value}"))
+    }
   }
 }

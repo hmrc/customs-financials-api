@@ -17,7 +17,7 @@
 package models.responses
 
 import models.EORI
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class HistoricEoriResponse(getEORIHistoryResponse: GetEORIHistoryResponse)
 
@@ -34,9 +34,9 @@ case class EORIHistory(EORI: EORI,
                        validUntil: Option[String])
 
 object HistoricEoriResponse {
-  implicit val eoriHistoryFormat = Json.format[EORIHistory]
-  implicit val responseDetailFormat = Json.format[EORIHistoryResponseDetail]
-  implicit val responseCommonFormat = Json.format[EORIHistoryResponseCommon]
-  implicit val getEORIHistoryResponseFormat = Json.format[GetEORIHistoryResponse]
-  implicit val historicEoriResponseFormat = Json.format[HistoricEoriResponse]
+  implicit val eoriHistoryFormat: OFormat[EORIHistory] = Json.format[EORIHistory]
+  implicit val responseDetailFormat: OFormat[EORIHistoryResponseDetail] = Json.format[EORIHistoryResponseDetail]
+  implicit val responseCommonFormat: OFormat[EORIHistoryResponseCommon] = Json.format[EORIHistoryResponseCommon]
+  implicit val getEORIHistoryResponseFormat: OFormat[GetEORIHistoryResponse] = Json.format[GetEORIHistoryResponse]
+  implicit val historicEoriResponseFormat: OFormat[HistoricEoriResponse] = Json.format[HistoricEoriResponse]
 }

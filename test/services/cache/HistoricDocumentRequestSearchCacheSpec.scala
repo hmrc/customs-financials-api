@@ -38,7 +38,9 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   with BeforeAndAfterAll
   with ScalaFutures {
 
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(30, Seconds), Span(1, Millis))
+  val spanLength = 30
+
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(spanLength, Seconds), Span(1, Millis))
 
   import HistoricDocumentRequestSearchCacheSpec._
 

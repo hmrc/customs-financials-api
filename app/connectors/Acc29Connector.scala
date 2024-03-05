@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.AccountWithAuthorities
 import models.EORI
 import models.requests.manageAuthorities.{AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest}
@@ -36,13 +37,14 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
 
   def getStandingAuthorities(eori: EORI): Future[Seq[AccountWithAuthorities]] = {
     val commonRequest = AuthoritiesRequestCommon(
-      "CDS",
+      REGIME_CDS,
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      "MDTP"
-    )
+      MDTP)
 
-    val standingAuthoritiesRequest = StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
+    val standingAuthoritiesRequest =
+      StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
+
     metricsReporterService.withResponseTimeLogging("hods.post.get-standing-authority-details") {
       httpClient.POST[StandingAuthoritiesRequest, StandingAuthoritiesResponse](
         appConfig.acc29GetStandingAuthoritiesEndpoint,

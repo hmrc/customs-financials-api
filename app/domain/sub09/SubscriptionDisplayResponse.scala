@@ -17,66 +17,54 @@
 package domain.sub09
 
 import models.{EORI, EmailAddress}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SubscriptionResponse(subscriptionDisplayResponse: SubscriptionDisplayResponse)
 
-case class SubscriptionDisplayResponse (
-                                         responseCommon: ResponseCommon,
-                                         responseDetail: ResponseDetail
-                                       )
+case class SubscriptionDisplayResponse(responseCommon: ResponseCommon,
+                                       responseDetail: ResponseDetail)
 
-case class CdsEstablishmentAddress (
-                                     streetAndNumber: String,
-                                     city: String,
-                                     postalCode: Option[String],
-                                     countryCode: String
-                                   )
+case class CdsEstablishmentAddress(streetAndNumber: String,
+                                   city: String,
+                                   postalCode: Option[String],
+                                   countryCode: String)
 
-case class ContactInformation (
-                                personOfContact: Option[String],
-                                sepCorrAddrIndicator: Option[Boolean],
-                                streetAndNumber: Option[String],
-                                city: Option[String],
-                                postalCode: Option[String],
-                                countryCode: Option[String],
-                                telephoneNumber: Option[String],
-                                faxNumber: Option[String],
-                                emailAddress: Option[EmailAddress],
-                                emailVerificationTimestamp: Option[String]
-                              )
+case class ContactInformation(personOfContact: Option[String],
+                              sepCorrAddrIndicator: Option[Boolean],
+                              streetAndNumber: Option[String],
+                              city: Option[String],
+                              postalCode: Option[String],
+                              countryCode: Option[String],
+                              telephoneNumber: Option[String],
+                              faxNumber: Option[String],
+                              emailAddress: Option[EmailAddress],
+                              emailVerificationTimestamp: Option[String])
 
-case class VatId(
-                    countryCode: Option[String],
-                    VATID: Option[String]
-                  )
+case class VatId(countryCode: Option[String],
+                 VATID: Option[String])
 
-case class ResponseCommon (
-                            status: String,
-                            statusText: Option[String],
-                            processingDate: String,
-                            returnParameters: Option[Array[ReturnParameters]]
-                          )
+case class ResponseCommon(status: String,
+                          statusText: Option[String],
+                          processingDate: String,
+                          returnParameters: Option[Array[ReturnParameters]])
 
-case class ResponseDetail (
-                            EORINo: Option[EORI],
-                            EORIStartDate: Option[String],
-                            EORIEndDate: Option[String],
-                            CDSFullName: String,
-                            CDSEstablishmentAddress: CdsEstablishmentAddress,
-                            establishmentInTheCustomsTerritoryOfTheUnion: Option[String],
-                            typeOfLegalEntity: Option[String],
-                            contactInformation: Option[ContactInformation],
-                            VATIDs: Option[Array[VatId]],
-                            thirdCountryUniqueIdentificationNumber: Option[Array[String]],
-                            consentToDisclosureOfPersonalData: Option[String],
-                            shortName: Option[String],
-                            dateOfEstablishment: Option[String],
-                            typeOfPerson: Option[String],
-                            principalEconomicActivity: Option[String],
-                            ETMP_Master_Indicator: Boolean,
-                            XI_Subscription: Option[XiSubscription]
-                          )
+case class ResponseDetail(EORINo: Option[EORI],
+                          EORIStartDate: Option[String],
+                          EORIEndDate: Option[String],
+                          CDSFullName: String,
+                          CDSEstablishmentAddress: CdsEstablishmentAddress,
+                          establishmentInTheCustomsTerritoryOfTheUnion: Option[String],
+                          typeOfLegalEntity: Option[String],
+                          contactInformation: Option[ContactInformation],
+                          VATIDs: Option[Array[VatId]],
+                          thirdCountryUniqueIdentificationNumber: Option[Array[String]],
+                          consentToDisclosureOfPersonalData: Option[String],
+                          shortName: Option[String],
+                          dateOfEstablishment: Option[String],
+                          typeOfPerson: Option[String],
+                          principalEconomicActivity: Option[String],
+                          ETMP_Master_Indicator: Boolean,
+                          XI_Subscription: Option[XiSubscription])
 
 case class ReturnParameters(paramName: String,
                             paramValue: String)
@@ -87,8 +75,7 @@ case class XiSubscription(XI_EORINo: String,
                           XI_VATNumber: Option[String],
                           EU_VATNumber: Option[Array[EUVATNumber]],
                           XI_ConsentToDisclose: String,
-                          XI_SICCode: Option[String]
-                  )
+                          XI_SICCode: Option[String])
 
 case class PbeAddress(pbeAddressLine1: String,
                       pbeAddressLine2: Option[String],
@@ -100,15 +87,17 @@ case class EUVATNumber(countryCode: Option[String],
                        VATId: Option[String])
 
 object SubscriptionResponse {
-  implicit val pbeAddressFormat = Json.format[PbeAddress]
-  implicit val euVatFormat = Json.format[EUVATNumber]
-  implicit val xiSubscriptionFormat = Json.format[XiSubscription]
-  implicit val returnParametersFormat = Json.format[ReturnParameters]
-  implicit val vatIDFormat = Json.format[VatId]
-  implicit val contactInformationFormat = Json.format[ContactInformation]
-  implicit val cdsEstablishmentAddressFormat = Json.format[CdsEstablishmentAddress]
-  implicit val responseDetailFormat = Json.format[ResponseDetail]
-  implicit val responseCommonFormat = Json.format[ResponseCommon]
-  implicit val subscriptionDisplayResponseFormat = Json.format[SubscriptionDisplayResponse]
-  implicit val responseSubscriptionFormat = Json.format[SubscriptionResponse]
+  implicit val pbeAddressFormat: OFormat[PbeAddress] = Json.format[PbeAddress]
+  implicit val euVatFormat: OFormat[EUVATNumber] = Json.format[EUVATNumber]
+  implicit val xiSubscriptionFormat: OFormat[XiSubscription] = Json.format[XiSubscription]
+  implicit val returnParametersFormat: OFormat[ReturnParameters] = Json.format[ReturnParameters]
+  implicit val vatIDFormat: OFormat[VatId] = Json.format[VatId]
+  implicit val contactInformationFormat: OFormat[ContactInformation] = Json.format[ContactInformation]
+  implicit val cdsEstablishmentAddressFormat: OFormat[CdsEstablishmentAddress] = Json.format[CdsEstablishmentAddress]
+  implicit val responseDetailFormat: OFormat[ResponseDetail] = Json.format[ResponseDetail]
+  implicit val responseCommonFormat: OFormat[ResponseCommon] = Json.format[ResponseCommon]
+  implicit val subscriptionDisplayResponseFormat: OFormat[SubscriptionDisplayResponse] =
+    Json.format[SubscriptionDisplayResponse]
+
+  implicit val responseSubscriptionFormat: OFormat[SubscriptionResponse] = Json.format[SubscriptionResponse]
 }

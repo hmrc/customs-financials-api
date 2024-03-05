@@ -27,13 +27,14 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import play.api.inject.bind
 
-trait SpecBase extends AnyWordSpecLike
-  with MockitoSugar
-  with Matchers
-  with FutureAwaits
-  with DefaultAwaitTimeout
-  with OptionValues
-  with BeforeAndAfterEach {
+trait SpecBase
+  extends AnyWordSpecLike
+    with MockitoSugar
+    with Matchers
+    with FutureAwaits
+    with DefaultAwaitTimeout
+    with OptionValues
+    with BeforeAndAfterEach {
 
   val reimbursementResponse: ReimbursementResponse = ReimbursementResponse("date", "10.00", "10.00", "method")
 
@@ -56,8 +57,7 @@ trait SpecBase extends AnyWordSpecLike
     Some("name"),
     Some("email@email.com"),
     Some("20221012"),
-    Some(Seq(reimbursementResponse))
-  )
+    Some(Seq(reimbursementResponse)))
 
   def application(): GuiceApplicationBuilder = new GuiceApplicationBuilder().overrides(
     bind[Metrics].toInstance(new FakeMetrics)

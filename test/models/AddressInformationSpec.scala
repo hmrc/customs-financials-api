@@ -18,13 +18,14 @@ package models
 
 import models.AddressInformation.format
 import utils.SpecBase
-import play.api.libs.json.{Json, JsSuccess}
+import play.api.libs.json.{JsSuccess, Json}
+import utils.TestData.COUNTRY_CODE_GB
 
 class AddressInformationSpec extends SpecBase {
 
   "AddressInformation" should {
     "populate correctly" in new Setup {
-      val result = AddressInformation("street&Number", "london", Option("Post"), "GB")
+      val result: AddressInformation = AddressInformation("street&Number", "london", Option("Post"), COUNTRY_CODE_GB)
       result mustBe expectedResult
     }
 
@@ -41,7 +42,7 @@ class AddressInformationSpec extends SpecBase {
     val streetAndNumber: String = "street&Number"
     val city: String = "london"
     val postalCode: Option[String] = Option("Post")
-    val countryCode: String = "GB"
+    val countryCode: String = COUNTRY_CODE_GB
 
     val expectedResult: AddressInformation = AddressInformation(
       streetAndNumber = streetAndNumber,

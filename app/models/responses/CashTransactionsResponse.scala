@@ -21,11 +21,15 @@ import play.api.libs.json.Json
 
 case class CashTransactionsResponse(getCashAccountTransactionListingResponse: GetCashAccountTransactionListingResponse)
 
-case class GetCashAccountTransactionListingResponse(responseCommon: CashTransactionsResponseCommon, responseDetail: Option[CashTransactionsResponseDetail])
+case class GetCashAccountTransactionListingResponse(responseCommon: CashTransactionsResponseCommon,
+                                                    responseDetail: Option[CashTransactionsResponseDetail])
 
-case class CashTransactionsResponseCommon(status: String, statusText: Option[String], processingDate: String)
+case class CashTransactionsResponseCommon(status: String,
+                                          statusText: Option[String],
+                                          processingDate: String)
 
-case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]], pendingTransactions: Option[PendingTransactions])
+case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
+                                          pendingTransactions: Option[PendingTransactions])
 
 case class DailyStatementContainer(dailyStatement: DailyStatementDetail)
 
@@ -53,7 +57,9 @@ case class TaxGroupDetail(taxGroupDescription: String, amount: String)
 
 case class PaymentAndWithdrawalContainer(paymentAndWithdrawal: PaymentAndWithdrawalDetail)
 
-case class PaymentAndWithdrawalDetail(amount: String, `type`: String, bankAccount: Option[String])
+case class PaymentAndWithdrawalDetail(amount: String,
+                                      `type`: String,
+                                      bankAccount: Option[String])
 
 object CashTransactionsResponse {
 
@@ -83,4 +89,3 @@ object CashTransactionsResponse {
 
   implicit val cashTransactionsResponseFormat = Json.format[CashTransactionsResponse]
 }
-

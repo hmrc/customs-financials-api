@@ -30,89 +30,91 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MetricsReporterServiceSpec extends SpecBase {
+
   "MetricsReporterService" should {
+
     "withResponseTimeLogging" should {
-        "log successful call metrics" in new Setup {
-          running(app) {
+      "log successful call metrics" in new Setup {
+        running(app) {
+          await {
+            service.withResponseTimeLogging("foo") {
+              Future.successful("OK")
+            }
+          }
+          verify(mockRegistry).histogram("responseTimes.foo.200")
+          verify(mockHistogram).update(elapsedTimeInMillis)
+        }
+      }
+
+      "log default error during call metrics" in new Setup {
+        running(app) {
+          assertThrows[InternalServerException] {
             await {
-              service.withResponseTimeLogging("foo") {
-                Future.successful("OK")
+              service.withResponseTimeLogging("bar") {
+                Future.failed(new InternalServerException("boom"))
               }
             }
-            verify(mockRegistry).histogram("responseTimes.foo.200")
-            verify(mockHistogram).update(elapsedTimeInMillis)
           }
+          verify(mockRegistry).histogram("responseTimes.bar.500")
+          verify(mockHistogram).update(elapsedTimeInMillis)
         }
+      }
 
-        "log default error during call metrics" in new Setup {
-          running(app) {
-            assertThrows[InternalServerException] {
-              await {
-                service.withResponseTimeLogging("bar") {
-                  Future.failed(new InternalServerException("boom"))
-                }
+      "log not found call metrics" in new Setup {
+        running(app) {
+          assertThrows[NotFoundException] {
+            await {
+              service.withResponseTimeLogging("bar") {
+                Future.failed(new NotFoundException("boom"))
               }
             }
-            verify(mockRegistry).histogram("responseTimes.bar.500")
-            verify(mockHistogram).update(elapsedTimeInMillis)
           }
+          verify(mockRegistry).histogram("responseTimes.bar.404")
+          verify(mockHistogram).update(elapsedTimeInMillis)
         }
+      }
 
-        "log not found call metrics" in new Setup {
-          running(app) {
-            assertThrows[NotFoundException] {
-              await {
-                service.withResponseTimeLogging("bar") {
-                  Future.failed(new NotFoundException("boom"))
-                }
+      "log bad request error call metrics" in new Setup {
+        running(app) {
+          assertThrows[BadRequestException] {
+            await {
+              service.withResponseTimeLogging("bar") {
+                Future.failed(new BadRequestException("boom"))
               }
             }
-            verify(mockRegistry).histogram("responseTimes.bar.404")
-            verify(mockHistogram).update(elapsedTimeInMillis)
           }
+          verify(mockRegistry).histogram("responseTimes.bar.400")
+          verify(mockHistogram).update(elapsedTimeInMillis)
         }
+      }
 
-        "log bad request error call metrics" in new Setup {
-          running(app) {
-            assertThrows[BadRequestException] {
-              await {
-                service.withResponseTimeLogging("bar") {
-                  Future.failed(new BadRequestException("boom"))
-                }
+      "log 5xx error call metrics" in new Setup {
+        running(app) {
+          assertThrows[UpstreamErrorResponse] {
+            await {
+              service.withResponseTimeLogging("bar") {
+                Future.failed(UpstreamErrorResponse("boom", Status.SERVICE_UNAVAILABLE, Status.NOT_IMPLEMENTED))
               }
             }
-            verify(mockRegistry).histogram("responseTimes.bar.400")
-            verify(mockHistogram).update(elapsedTimeInMillis)
           }
+          verify(mockRegistry).histogram("responseTimes.bar.503")
+          verify(mockHistogram).update(elapsedTimeInMillis)
         }
+      }
 
-        "log 5xx error call metrics" in new Setup {
-          running(app) {
-            assertThrows[UpstreamErrorResponse] {
-              await {
-                service.withResponseTimeLogging("bar") {
-                  Future.failed(UpstreamErrorResponse("boom", Status.SERVICE_UNAVAILABLE, Status.NOT_IMPLEMENTED))
-                }
+      "log 4xx error call metrics" in new Setup {
+        running(app) {
+          assertThrows[UpstreamErrorResponse] {
+            await {
+              service.withResponseTimeLogging("bar") {
+                Future.failed(UpstreamErrorResponse("boom", Status.FORBIDDEN, Status.NOT_IMPLEMENTED))
               }
             }
-            verify(mockRegistry).histogram("responseTimes.bar.503")
-            verify(mockHistogram).update(elapsedTimeInMillis)
           }
+          verify(mockRegistry).histogram("responseTimes.bar.403")
+          verify(mockHistogram).update(elapsedTimeInMillis)
         }
-
-        "log 4xx error call metrics" in new Setup {
-          running(app) {
-            assertThrows[UpstreamErrorResponse] {
-              await {
-                service.withResponseTimeLogging("bar") {
-                  Future.failed(UpstreamErrorResponse("boom", Status.FORBIDDEN, Status.NOT_IMPLEMENTED))
-                }
-              }
-            }
-            verify(mockRegistry).histogram("responseTimes.bar.403")
-            verify(mockHistogram).update(elapsedTimeInMillis)
-          }
-        }
+      }
 
     }
   }

@@ -34,6 +34,5 @@ class DateTimeService @Inject()() {
     s"${DateTimeFormatter.ISO_DATE_TIME.format(now().truncatedTo(ChronoUnit.SECONDS))}Z"
   }
 
-  def utcDateTime = DateTime.now(DateTimeZone.UTC)
-
+  def utcDateTime: DateTime = DateTime.now(DateTimeZone.UTC)
 }

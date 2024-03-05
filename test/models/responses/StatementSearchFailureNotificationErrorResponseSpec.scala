@@ -18,6 +18,7 @@ package models.responses
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.BadRequestException
+import utils.Utils.emptyString
 import utils.{SpecBase, Utils}
 
 import java.time.LocalDateTime
@@ -162,20 +163,22 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
 
-      val sourceFaultDetail = SourceFaultDetail(Seq(ErrorMessage.invalidStatementReqIdDetail(statementReqId)))
+      val sourceFaultDetail: SourceFaultDetail =
+        SourceFaultDetail(Seq(ErrorMessage.invalidStatementReqIdDetail(statementReqId)))
 
-      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+      val errorDetail: ErrorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code400,
         errorMessage = ErrorMessage.invalidStatementReqId,
         source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
-      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+      val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
+        StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg: String = emptyString
 
-      val actualOb = StatementSearchFailureNotificationErrorResponse(
+      val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code400, correlationId, Option(statementReqId))
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
@@ -194,20 +197,22 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val correlationId = "3jh1f6b3-f8b1-4f3c-973a-05b4720e"
       val statementReqId = "9041cc6e-9afb-42ad-b4f1-f017d884fc17"
 
-      val sourceFaultDetail = SourceFaultDetail(Seq(ErrorMessage.technicalErrorDetail(statementReqId)))
+      val sourceFaultDetail: SourceFaultDetail =
+        SourceFaultDetail(Seq(ErrorMessage.technicalErrorDetail(statementReqId)))
 
-      val errorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
+      val errorDetail: ErrorDetail = ErrorDetail(Utils.currentDateTimeAsRFC7231(LocalDateTime.now()),
         correlationId,
         errorCode = ErrorCode.code500,
         errorMessage = ErrorMessage.technicalError,
         source = ErrorSource.cdsFinancials,
         sourceFaultDetail = sourceFaultDetail)
 
-      val expectedSSFNErrorResOb = StatementSearchFailureNotificationErrorResponse(errorDetail)
+      val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
+        StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg: String = emptyString
 
-      val actualOb = StatementSearchFailureNotificationErrorResponse(
+      val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)), ErrorCode.code500, correlationId, Option(statementReqId))
 
       actualOb.errorDetail.errorCode mustBe expectedSSFNErrorResOb.errorDetail.errorCode
@@ -239,7 +244,7 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
       val expectedSSFNErrorResOb: StatementSearchFailureNotificationErrorResponse =
         StatementSearchFailureNotificationErrorResponse(errorDetail)
 
-      val schemaErrorMsg = ""
+      val schemaErrorMsg: String = emptyString
 
       val actualOb: StatementSearchFailureNotificationErrorResponse = StatementSearchFailureNotificationErrorResponse(
         Option(new BadRequestException(schemaErrorMsg)),
@@ -347,7 +352,5 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
     val ssfnNotErrorResOb2: StatementSearchFailureNotificationErrorResponse =
       StatementSearchFailureNotificationErrorResponse(errorDetail2)
-
   }
-
 }

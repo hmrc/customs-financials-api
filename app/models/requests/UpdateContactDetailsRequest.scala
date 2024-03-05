@@ -35,4 +35,3 @@ case class UpdateContactDetailsRequest(dan: AccountNumber,
 object UpdateContactDetailsRequest {
   implicit val format: Format[UpdateContactDetailsRequest] = Json.format[UpdateContactDetailsRequest]
 }
-

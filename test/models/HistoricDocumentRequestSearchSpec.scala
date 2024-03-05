@@ -19,6 +19,7 @@ package models
 import models.requests.HistoricDocumentRequest
 import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
+import utils.TestData.{MONTH_2, MONTH_4, YEAR_2021}
 import utils.Utils.emptyString
 
 import java.util.UUID
@@ -49,7 +50,9 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
       actualHistDocReqSearch.searchRequests.size mustBe expected.searchRequests.size
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB123456789012") mustBe true
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB234567890121") mustBe true
-      actualHistDocReqSearch.searchRequests.exists(req => req.searchSuccessful == SearchResultStatus.inProcess) mustBe true
+      actualHistDocReqSearch.searchRequests.exists(
+        req => req.searchSuccessful == SearchResultStatus.inProcess) mustBe true
+
       actualHistDocReqSearch.searchRequests.exists(req => req.failureRetryCount == 0) mustBe true
     }
   }
@@ -79,12 +82,12 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
     val historicDocumentRequests: Set[HistoricDocumentRequest] = Set(
       HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDefermentStatement"),
-        2021, 2, 2021, 4, Some("1234567")),
+        YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, Some("1234567")),
       HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDefermentStatement"),
-        2021, 2, 2021, 4, Some("1234567")))
+        YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, Some("1234567")))
 
     val jsValue: String =
-      s"""{"searchID": "${searchID}",
+      s"""{"searchID": "$searchID",
          |"resultsFound": "inProcess",
          |"searchStatusUpdateDate": "",
          |"currentEori": "GB123456789012",

@@ -58,17 +58,14 @@ object StatementSearchFailureNotificationErrorResponse {
                                    errorDetailMsg: String,
                                    errorMsgList: Seq[String]): Seq[String] = {
     statementRequestID.fold(errorMsgList)(stReqId => Seq(
-      if (errorCode == ErrorCode.code500)
-        if (errorDetailMsg.isEmpty) ErrorMessage.technicalErrorDetail(stReqId)
-        else errorDetailMsg
-      else ErrorMessage.invalidStatementReqIdDetail(stReqId))
+      if (errorCode == ErrorCode.code500) {
+        checkErrorDetailsMsg(errorDetailMsg, stReqId)
+      } else {
+        ErrorMessage.invalidStatementReqIdDetail(stReqId)
+      })
     )
   }
 
-  /**
-   * Formats the aggregate error msg into Seq of error msgs for individual fields
-   * for error response
-   */
   private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] = {
     val leftParenthesis = "("
     val parenWithColonSpace = "(: "
@@ -82,11 +79,24 @@ object StatementSearchFailureNotificationErrorResponse {
           if (strAfterQuotesReplacement.startsWith(parenWithColonSpace)) {
             val strAfterParenReplacement = strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
             strAfterParenReplacement.substring(1, strAfterParenReplacement.length - 1)
-          } else
+          } else {
             strAfterQuotesReplacement.substring(1, strAfterQuotesReplacement.length - 1)
+          }
         }
       }
-    } else Seq(aggregateErrorMsg)
+    } else {
+      Seq(aggregateErrorMsg)
+    }
+  }
+
+  private def checkErrorDetailsMsg(errorDetailMsg: String,
+                                   stReqId: String): String = {
+    if (errorDetailMsg.isEmpty) {
+      ErrorMessage.technicalErrorDetail(stReqId)
+    }
+    else {
+      errorDetailMsg
+    }
   }
 }
 
@@ -108,13 +118,12 @@ object SourceFaultDetail {
 }
 
 object ErrorMessage {
-  val invalidMessage = "Invalid message"
   val badRequestReceived = "Bad request received"
-  val missingReqProps = "missing required properties"
   val invalidStatementReqId = "Invalid statementRequestId"
   val technicalError = "Technical error"
+
   def invalidStatementReqIdDetail: String => String =
-    statementReqId =>  s"statementRequestId : $statementReqId is not recognised"
+    statementReqId => s"statementRequestId : $statementReqId is not recognised"
 
   def technicalErrorDetail: String => String =
     statementReqId => s"Technical error occurred while processing the statementRequestId : $statementReqId"
@@ -125,8 +134,6 @@ object ErrorMessage {
 }
 
 object ErrorSource {
-  val jsonValidation = "JSON validation"
-  val backEnd = "Backend"
   val cdsFinancials = "CDS Financials"
 }
 

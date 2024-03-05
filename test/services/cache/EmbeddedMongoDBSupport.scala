@@ -26,8 +26,9 @@ import scala.util.Random
 
 trait EmbeddedMongoDBSupport {
 
+  val minNumberForPort = 10000
   val mongoHost = "localhost"
-  val mongoPort: Int = 10000 + Random.nextInt(10000)
+  val mongoPort: Int = minNumberForPort + Random.nextInt(minNumberForPort)
 
   var mongodExecutable: MongodExecutable = _
 

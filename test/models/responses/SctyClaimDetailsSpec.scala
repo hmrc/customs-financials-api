@@ -18,15 +18,34 @@ package models.responses
 
 import models.claims.responses.{Goods, Reimbursement, SctyClaimDetails}
 import utils.SpecBase
+import utils.Utils.emptyString
 
 class SctyClaimDetailsSpec extends SpecBase {
 
   "SctyClaimDetails" should {
+
     "case class model" should {
       "populated correctly" in new Setup {
-        val result = SctyClaimDetails("", Option(""), "", "", "", Option(""),
-          testGoods, "", "", Option(""), Option(""), Option(""),
-          Option(""), Option(""), "", Option(""), Option(""), Option(""), testReimbursement)
+        val result: SctyClaimDetails =
+          SctyClaimDetails(emptyString,
+            Option(emptyString),
+            emptyString,
+            emptyString,
+            emptyString,
+            Option(emptyString),
+            testGoods,
+            emptyString,
+            emptyString,
+            Option(emptyString),
+            Option(emptyString),
+            Option(emptyString),
+            Option(emptyString),
+            Option(emptyString),
+            emptyString,
+            Option(emptyString),
+            Option(emptyString),
+            Option(emptyString),
+            testReimbursement)
 
         result mustBe compareResult
       }
@@ -34,152 +53,49 @@ class SctyClaimDetailsSpec extends SpecBase {
 
     "caseSubStatus" should {
       "Resolved-Refund" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Resolved-Refund")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Resolved-Refund")
         result mustBe testRefund
       }
 
       "Resolved-Manual BTA" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Resolved-Manual BTA")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Resolved-Manual BTA")
         result mustBe testManual
       }
 
       "Closed-C18 Raised" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Closed-C18 Raised")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Closed-C18 Raised")
         result mustBe testClosedC18
       }
 
       "Resolved-Auto BTA" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Resolved-Auto BTA")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Resolved-Auto BTA")
         result mustBe testResolvedAuto
       }
 
       "Resolved-Manual BTA/Refund" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Resolved-Manual BTA/Refund")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Resolved-Manual BTA/Refund")
         result mustBe testResolvedManual
       }
 
       "Resolved-Withdrawn" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Resolved-Withdrawn")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Resolved-Withdrawn")
         result mustBe testResolvedWithdrawn
       }
 
       "Other" in new Setup {
-        val result = SctyClaimDetails.caseSubStatus("Other")
+        val result: Option[String] = SctyClaimDetails.caseSubStatus("Other")
         result mustBe None
-      }
-    }
-
-    "transformedCaseStatus" should {
-      "Open convert to in progress" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Open")
-        result mustBe testInProgress
-      }
-
-      "Pending-Approval convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Pending-Approval")
-        result mustBe testPending
-      }
-
-      "Pending-Payment convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Pending-Payment")
-        result mustBe testPending
-      }
-
-      "Partial Refund convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Partial Refund")
-        result mustBe testPending
-      }
-
-      "Resolved-Refund convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Resolved-Refund")
-        result mustBe testClosed
-      }
-
-      "Pending-Query convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Pending-Query")
-        result mustBe testPending
-      }
-
-      "Resolved-Manual BTA convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Resolved-Manual BTA")
-        result mustBe testClosed
-      }
-
-      "Pending-C18 convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Pending-C18")
-        result mustBe testPending
-      }
-
-      "Closed-C18 Raised convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Closed-C18 Raised")
-        result mustBe testClosed
-      }
-
-      "RTBH Letter Initiated convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("RTBH Letter Initiated")
-        result mustBe testPending
-      }
-
-      "Awaiting RTBH Letter Response convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Awaiting RTBH Letter Response")
-        result mustBe testPending
-      }
-
-      "Reminder Letter Initiated convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Reminder Letter Initiated")
-        result mustBe testPending
-      }
-
-      "Awaiting Reminder Letter Response convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Awaiting Reminder Letter Response")
-        result mustBe testPending
-      }
-
-      "Decision Letter Initiated convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Decision Letter Initiated")
-        result mustBe testPending
-      }
-
-      "Partial BTA convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Partial BTA")
-        result mustBe testPending
-      }
-
-      "Partial BTA/Refund convert to pending" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Partial BTA/Refund")
-        result mustBe testPending
-      }
-
-      "Resolved-Auto BTA convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Resolved-Auto BTA")
-        result mustBe testClosed
-      }
-
-      "Resolved-Manual BTA/Refund convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Resolved-Manual BTA/Refund")
-        result mustBe testClosed
-      }
-
-      "Open-Extension Grantedconvert to inProgress" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Open-Extension Granted")
-        result mustBe testInProgress
-      }
-
-      "Resolved-Withdrawn convert to closed" in new Setup {
-        val result = SctyClaimDetails.transformedCaseStatus("Resolved-Withdrawn")
-        result mustBe testClosed
       }
     }
   }
 
   trait Setup {
-
-    val testRefund = Some("Resolved-Refund")
-    val testManual = Some("Resolved-Manual BTA")
-    val testClosedC18 = Some("Closed-C18 Raised")
-    val testResolvedAuto = Some("Resolved-Auto BTA")
-    val testResolvedManual = Some("Resolved-Manual BTA/Refund")
-    val testResolvedWithdrawn = Some("Resolved-Withdrawn")
+    val testRefund: Option[String] = Some("Resolved-Refund")
+    val testManual: Option[String] = Some("Resolved-Manual BTA")
+    val testClosedC18: Option[String] = Some("Closed-C18 Raised")
+    val testResolvedAuto: Option[String] = Some("Resolved-Auto BTA")
+    val testResolvedManual: Option[String] = Some("Resolved-Manual BTA/Refund")
+    val testResolvedWithdrawn: Option[String] = Some("Resolved-Withdrawn")
 
     val testInProgress = "In Progress"
     val testPending = "Pending"
@@ -187,16 +103,33 @@ class SctyClaimDetailsSpec extends SpecBase {
 
     val testGoods: Option[Seq[Goods]] =
       Option(Seq(
-        Goods("", Option("")),
-        Goods("", Option(""))))
+        Goods(emptyString, Option(emptyString)),
+        Goods(emptyString, Option(emptyString))))
 
     val testReimbursement: Option[Seq[Reimbursement]] =
       Option(Seq(
-        Reimbursement("", "", "", ""),
-        Reimbursement("", "", "", "")))
+        Reimbursement(emptyString, emptyString, emptyString, emptyString),
+        Reimbursement(emptyString, emptyString, emptyString, emptyString)))
 
-    val compareResult = SctyClaimDetails("", Option(""), "", "", "", Option(""),
-      testGoods, "", "", Option(""), Option(""), Option(""),
-      Option(""), Option(""), "", Option(""), Option(""), Option(""), testReimbursement)
+    val compareResult: SctyClaimDetails =
+      SctyClaimDetails(emptyString,
+        Option(emptyString),
+        emptyString,
+        emptyString,
+        emptyString,
+        Option(emptyString),
+        testGoods,
+        emptyString,
+        emptyString,
+        Option(emptyString),
+        Option(emptyString),
+        Option(emptyString),
+        Option(emptyString),
+        Option(emptyString),
+        emptyString,
+        Option(emptyString),
+        Option(emptyString),
+        Option(emptyString),
+        testReimbursement)
   }
 }

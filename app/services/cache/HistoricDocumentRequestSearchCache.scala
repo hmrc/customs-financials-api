@@ -32,6 +32,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 @Singleton
 class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
                                                    mongoComponent: MongoComponent)
@@ -60,13 +61,11 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
     )
   ) {
-  private val logger = play.api.Logger(getClass)
-
   private val searchIDFieldKey = "searchID"
   private val searchRequestsFieldKey = "searchRequests"
   private val currentEoriFieldKey = "currentEori"
   private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
-  private val  resultsFoundFieldKey = "resultsFound"
+  private val resultsFoundFieldKey = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
@@ -83,9 +82,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
     collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption()
 
-  /**
-   * Updates the matching document (as per queryFilter) with the provided updates
-   */
   def updateDocumentForQueryFilter(queryFilter: Bson,
                                    updates: Bson): Future[Option[HistoricDocumentRequestSearch]] =
     collection.findOneAndUpdate(
@@ -93,10 +89,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
       update = updates,
       new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption()
 
-  /**
-   * Retrieves the document using SearchId and
-   * Updates the search requests array with the provided searchRequests
-   */
   def updateSearchRequestForStatementRequestId(searchRequests: Set[SearchRequest],
                                                searchID: String): Future[Option[HistoricDocumentRequestSearch]] = {
 
@@ -106,12 +98,8 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  /**
-   * Updates the resultsFound status to the provided updatedStatus
-   * for the given searchID
-   */
   def updateResultsFoundStatus(searchID: String,
-                               updatedStatus: SearchResultStatus.Value):Future[Option[HistoricDocumentRequestSearch]] = {
+                               updatedStatus: SearchResultStatus.Value): Future[Option[HistoricDocumentRequestSearch]] = {
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
 
     val updates = Updates.combine(
@@ -122,10 +110,6 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  /**
-   * Updates the resultsFound status and  searchRequests to the provided values
-   * for the given searchID
-   */
   def updateSearchReqsAndResultsFoundStatus(searchID: String,
                                             searchRequests: Set[SearchRequest],
                                             updatedStatus: SearchResultStatus.Value

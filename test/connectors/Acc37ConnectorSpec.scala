@@ -24,6 +24,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.COUNTRY_CODE_GB
+import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
@@ -36,7 +38,9 @@ class Acc37ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo))
+        val result =
+          await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo))
+
         result mustBe response
       }
     }
@@ -51,7 +55,7 @@ class Acc37ConnectorSpec extends SpecBase {
         ResponseCommon(
           "OK",
           None,
-          "",
+          emptyString,
           None
         )
       )
@@ -64,7 +68,7 @@ class Acc37ConnectorSpec extends SpecBase {
       None,
       Some("Docks"),
       Some("DDD 111"),
-      "GB",
+      COUNTRY_CODE_GB,
       Some("011111111111"),
       None,
       Some(EmailAddress("somedata@email.com"))

@@ -17,7 +17,7 @@
 package models.requests
 
 import models.HistoricalStatementRetrievalInterfaceMetadata
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 
 case class HistoricStatementRequest(HistoricalStatementRetrievalInterfaceMetadata: HistoricalStatementRetrievalInterfaceMetadata)
 
@@ -37,8 +37,10 @@ object HistoricStatementRequest {
     )
   }
 
-  implicit val historicalStatementRetrievalInterfaceMetadataWrites = Json.writes[HistoricalStatementRetrievalInterfaceMetadata]
-  implicit val HistoricStatementRequestWrites = Json.writes[HistoricStatementRequest]
+  implicit val historicalStatementRetrievalInterfaceMetadataWrites: OWrites[HistoricalStatementRetrievalInterfaceMetadata] =
+    Json.writes[HistoricalStatementRetrievalInterfaceMetadata]
+
+  implicit val HistoricStatementRequestWrites: OWrites[HistoricStatementRequest] = Json.writes[HistoricStatementRequest]
 
   private def zeroPad(value: Int): String = "%02d".format(value)
 }

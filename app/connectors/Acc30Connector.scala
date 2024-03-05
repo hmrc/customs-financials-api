@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import models.EORI
 import models.requests.manageAuthorities._
 import play.api.http.Status
@@ -47,15 +48,13 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
 
   private def makeRequest(detail: ManageStandingAuthoritiesRequestDetail): Future[Boolean] = {
     val requestCommon = AuthoritiesRequestCommon(
-      "CDS",
+      REGIME_CDS,
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      "MDTP"
-    )
+      MDTP)
 
     val manageStandingAuthoritiesRequestContainer = ManageStandingAuthoritiesRequestContainer(
-      ManageStandingAuthoritiesRequest(requestCommon, detail)
-    )
+      ManageStandingAuthoritiesRequest(requestCommon, detail))
 
     metricsReporterService.withResponseTimeLogging("hods.post.manage-standing-authority.grant") {
       httpClient.POST[ManageStandingAuthoritiesRequestContainer, HttpResponse](
@@ -67,7 +66,7 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
           case Status.NO_CONTENT => true
           case _ => false
         }
-      }.recover { case ex: Throwable => false }
+      }.recover { case _: Throwable => false }
     }
   }
 }

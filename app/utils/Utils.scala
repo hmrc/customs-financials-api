@@ -16,14 +16,14 @@
 
 package utils
 
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
 import play.api.libs.json.Writes
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-
-import com.google.common.base.Charsets
-import com.google.common.io.BaseEncoding
 
 object Utils {
   val emptyString = ""
@@ -36,69 +36,63 @@ object Utils {
   val englishLangKey = "en"
   val welshLangKey = "cy"
   val singleSpace = " "
+  val hyphen = "-"
+  val comma = ","
+  val gbEoriPrefix = "GB"
+  val xIEoriPrefix = "XI"
 
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =
     s"${DateTimeFormatter.ISO_DATE_TIME.format(dateTime.truncatedTo(ChronoUnit.SECONDS))}Z"
 
   def isDateTimeStringInIso8601(isoDate: String): Boolean = isoDate.trim.matches(iso8601DateTimeRegEx)
 
-  /**
-   * Returns the value with zero padding
-   * ex - input - 2  returns 02
-   * input  - 10 returns 10
-   */
   def zeroPad(value: Int): String = "%02d".format(value)
 
-  /**
-   * Returns dateTime string in "Thu, 14 Sep 2023 16:30:30 GMT" format
-   */
   def currentDateTimeAsRFC7231(dateTime: LocalDateTime): String = httpDateFormatter.format(dateTime)
 
-  /** Returns base64 encoded string or string on failure */
   def encodeToUTF8Charsets(msg: String): String =
-    if (msg.nonEmpty)
+    if (msg.nonEmpty) {
       BaseEncoding.base64().encode(msg.trim.getBytes(Charsets.UTF_8))
-    else
+    } else {
       msg
+    }
 
   implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
     implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))
     Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
   }
 
-  /**
-   * Converts the month integer value to Full month name string
-   * ex - input - 01
-   *      output - January
-   */
   def convertMonthValueToFullMonthName(intPaddedValue: String,
                                        lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
-  
+
   def monthValueToNameMap(lang: String): Map[String, String] =
     Map(
-      "01" -> (if (lang == welshLangKey) "Ionawr" else "January"),
-      "02" -> (if (lang == welshLangKey) "Chwefror" else "February"),
-      "03" -> (if (lang == welshLangKey) "Mawrth" else "March"),
-      "04" -> (if (lang == welshLangKey) "Ebrill" else "April"),
-      "05" -> (if (lang == welshLangKey) "Mai" else "May"),
-      "06" -> (if (lang == welshLangKey) "Mehefin" else "June"),
-      "07" -> (if (lang == welshLangKey) "Gorffennaf" else "July"),
-      "08" -> (if (lang == welshLangKey) "Awst" else "August"),
-      "09" -> (if (lang == welshLangKey) "Medi" else "September"),
-      "10" -> (if (lang == welshLangKey) "Hydref" else "October"),
-      "11" -> (if (lang == welshLangKey) "Tachwedd" else "November"),
-      "12" -> (if (lang == welshLangKey) "Rhagfyr" else "December")
+      "01" -> msgForKey(lang, welshStr = "Ionawr", engStr = "January"),
+      "02" -> msgForKey(lang, welshStr = "Chwefror", engStr = "February"),
+      "03" -> msgForKey(lang, welshStr = "Mawrth", engStr = "March"),
+      "04" -> msgForKey(lang, welshStr = "Ebrill", engStr = "April"),
+      "05" -> msgForKey(lang, welshStr = "Mai", engStr = "May"),
+      "06" -> msgForKey(lang, welshStr = "Mehefin", engStr = "June"),
+      "07" -> msgForKey(lang, welshStr = "Gorffennaf", engStr = "July"),
+      "08" -> msgForKey(lang, welshStr = "Awst", engStr = "August"),
+      "09" -> msgForKey(lang, welshStr = "Medi", engStr = "September"),
+      "10" -> msgForKey(lang, welshStr = "Hydref", engStr = "October"),
+      "11" -> msgForKey(lang, welshStr = "Tachwedd", engStr = "November"),
+      "12" -> msgForKey(lang, welshStr = "Rhagfyr", engStr = "December")
     )
 
-  /**
-   * Creates the inline html for hyperLink with given text, link and style class
-   */
   def createHyperLink(text: String,
                       link: String,
                       styleClass: String = "govuk-link"): String = {
     val doubleQuotes = "\""
 
     s"<a class=$doubleQuotes$styleClass$doubleQuotes href=$doubleQuotes$link$doubleQuotes>$text</a>"
+  }
+
+  private def msgForKey(lang: String,
+                        welshStr: String,
+                        engStr: String): String = {
+    if (lang == welshLangKey) welshStr else engStr
   }
 }

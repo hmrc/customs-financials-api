@@ -16,8 +16,10 @@
 
 package connectors
 
+import config.MetaConfig.Platform.MDTP
 import play.api.{Logger, LoggerLike}
 import services.DateTimeService
+import utils.Utils.{emptyString, hyphen}
 
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -30,35 +32,29 @@ class MdgHeaders @Inject()(dateTimeService: DateTimeService) {
   private val MDG_MAX_ACKNOWLEDGEMENT_REFERENCE_LENGTH = 32
 
   def acknowledgementReference: String =
-    UUID.randomUUID().toString.replace("-", "")
+    UUID.randomUUID().toString.replace(hyphen, emptyString)
       .takeRight(MDG_MAX_ACKNOWLEDGEMENT_REFERENCE_LENGTH)
 
   private def mdgCompliantCorrelationId: String =
-    UUID.randomUUID().toString.replace("-", "")
+    UUID.randomUUID().toString.replace(hyphen, emptyString)
       .takeRight(MDG_MAX_CORRELATION_ID_LENGTH)
-
 
   private val httpDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'")
 
-  private def currentDateTimeAsRFC7231: String = {
-    httpDateFormatter.format(dateTimeService.now())
-  }
+  private def currentDateTimeAsRFC7231: String = httpDateFormatter.format(dateTimeService.now())
 
   def headers(authorization: String, maybeHostHeader: Option[String]): Seq[(String, String)] = {
 
     val mandatoryHeaders = Seq(
-      "X-Forwarded-Host" -> "MDTP",
+      "X-Forwarded-Host" -> MDTP,
       "Authorization" -> s"Bearer $authorization",
       "Content-Type" -> "application/json",
       "Accept" -> "application/json",
       "Date" -> currentDateTimeAsRFC7231,
-      "X-Correlation-ID" -> mdgCompliantCorrelationId
-    )
+      "X-Correlation-ID" -> mdgCompliantCorrelationId)
 
     maybeHostHeader match {
-      case Some(hostHeader) => {
-        mandatoryHeaders :+ ("Host" -> hostHeader)
-      }
+      case Some(hostHeader) => mandatoryHeaders :+ ("Host" -> hostHeader)
       case _ => mandatoryHeaders
     }
   }

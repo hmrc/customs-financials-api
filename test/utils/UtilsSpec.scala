@@ -17,12 +17,15 @@
 package utils
 
 import models.responses.StatementSearchFailureNotificationErrorResponse
+import utils.TestData.{DAY_11, DAY_14, HOUR_11, HOUR_16, MINUTES_10, MINUTES_30, MONTH_9, NUMBER_10, NUMBER_5, NUMBER_9, SECONDS_30, SECONDS_35, YEAR_2023}
 import utils.Utils._
 
 import java.time.LocalDateTime
 
 class UtilsSpec extends SpecBase {
+
   "emptyString" should {
+
     "return correct value" in {
       emptyString mustBe empty
     }
@@ -41,7 +44,7 @@ class UtilsSpec extends SpecBase {
 
     "dateTimeAsIso8601" should {
       "return correct ISO 8601 date time string for input date" in {
-        val date = LocalDateTime.of(2023, 9, 11, 11, 10, 35)
+        val date = LocalDateTime.of(YEAR_2023, MONTH_9, DAY_11, HOUR_11, MINUTES_10, SECONDS_35)
 
         dateTimeAsIso8601(date) mustBe "2023-09-11T11:10:35Z"
       }
@@ -64,15 +67,15 @@ class UtilsSpec extends SpecBase {
     "zeroPad" should {
       "return correct value" in {
         zeroPad(2) mustBe "02"
-        zeroPad(5) mustBe "05"
-        zeroPad(10) mustBe "10"
-        zeroPad(9) mustBe "09"
+        zeroPad(NUMBER_5) mustBe "05"
+        zeroPad(NUMBER_10) mustBe "10"
+        zeroPad(NUMBER_9) mustBe "09"
       }
     }
 
     "currentDateTimeAsRFC7231" should {
       "return correct output datetime string " in {
-        val localDateTime = LocalDateTime.of(2023,9,14,16,30,30)
+        val localDateTime = LocalDateTime.of(YEAR_2023, MONTH_9, DAY_14, HOUR_16, MINUTES_30, SECONDS_30)
         currentDateTimeAsRFC7231(localDateTime) mustBe "Thu, 14 Sep 2023 16:30:30 GMT"
       }
     }
@@ -95,6 +98,12 @@ class UtilsSpec extends SpecBase {
     "threeColons" should {
       "return correct value" in {
         threeColons mustBe ":::"
+      }
+    }
+
+    "comma" should {
+      "return correct value" in {
+        comma mustBe ","
       }
     }
 

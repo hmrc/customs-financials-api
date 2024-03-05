@@ -22,10 +22,11 @@ import play.api.mvc._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-class DefaultAuthorizationHeaderFilter @Inject()(
-                                                  val parser: BodyParsers.Default,
-                                                  appConfig: AppConfig
-                                                )(implicit val executionContext: ExecutionContext) extends AuthorizationHeaderFilter {
+
+class DefaultAuthorizationHeaderFilter @Inject()(val parser: BodyParsers.Default,
+                                                 appConfig: AppConfig)
+                                                (implicit val executionContext: ExecutionContext)
+  extends AuthorizationHeaderFilter {
 
   private val logger = play.api.Logger(getClass)
 

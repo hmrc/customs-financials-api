@@ -35,8 +35,10 @@ class DocumentationControllerSpec extends SpecBase {
 
       val view = views.txt.definition().toString
 
-      running(app){
-        val result = route(app, FakeRequest(GET, controllers.definition.routes.DocumentationController.definition().url)).value
+      running(app) {
+        val result = route(app,
+          FakeRequest(GET, controllers.definition.routes.DocumentationController.definition().url)).value
+
         contentAsString(result) mustBe view
       }
     }

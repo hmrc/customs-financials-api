@@ -19,10 +19,8 @@ package domain.acc41
 import domain.AuthoritiesCsvGenerationResponse
 import play.api.libs.json.{Json, OFormat}
 
-//Could potentially have custom reads for optional values
 case class ResponseDetail(errorMessage: Option[String],
-                          requestAcceptedDate: Option[String])
-{
+                          requestAcceptedDate: Option[String]) {
   def toAuthoritiesCsvGeneration: AuthoritiesCsvGenerationResponse =
     AuthoritiesCsvGenerationResponse(requestAcceptedDate)
 }

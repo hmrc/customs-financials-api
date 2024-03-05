@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain.sub09.{EmailUnverifiedResponse, EmailVerifiedResponse}
 import models.{EORI, EmailAddress}
 import org.mockito.ArgumentMatchers.{eq => is}
@@ -28,6 +29,7 @@ import services.SubscriptionService
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.NotFoundException
 import utils.SpecBase
+import utils.TestData.EORI_VALUE
 
 import scala.concurrent.Future
 
@@ -103,11 +105,21 @@ class SubscriptionControllerSpec extends SpecBase {
 
   trait Setup {
 
-    val traderEORI: EORI = EORI("testEORI")
-    val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-CUS-ORG", Seq(EnrolmentIdentifier("EORINumber", traderEORI.value)), "activated")))
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
-    val getEmailAddressrequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getEmail().url)
-    val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
+    val traderEORI: EORI = EORI(EORI_VALUE)
+    val enrolments: Enrolments =
+      Enrolments(
+        Set(Enrolment(ENROLMENT_KEY,
+          Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)),
+          "activated")))
+
+    val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
+
+    val getEmailAddressrequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getEmail().url)
+
+    val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]

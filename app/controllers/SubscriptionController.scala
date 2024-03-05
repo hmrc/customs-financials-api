@@ -28,7 +28,8 @@ import scala.util.control.NonFatal
 
 class SubscriptionController @Inject()(service: SubscriptionService,
                                        authorisedRequest: AuthorisedRequest,
-                                       cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                       cc: ControllerComponents)
+                                      (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val log: Logger = Logger(this.getClass)
 
@@ -54,14 +55,16 @@ class SubscriptionController @Inject()(service: SubscriptionService,
       }
   }
 
-  def getUnverifiedEmail: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
-    service.getUnverifiedEmail(request.eori)
-      .map(response => Ok(Json.toJson(response)))
-      .recover {
-        case NonFatal(error) =>
-          log.error(s"getSubscriptions failed: ${error.getMessage}")
-          ServiceUnavailable
-      }
+  def getUnverifiedEmail: Action[AnyContent] = authorisedRequest async {
+    implicit request: RequestWithEori[AnyContent] =>
+
+      service.getUnverifiedEmail(request.eori)
+        .map(response => Ok(Json.toJson(response)))
+        .recover {
+          case NonFatal(error) =>
+            log.error(s"getSubscriptions failed: ${error.getMessage}")
+            ServiceUnavailable
+        }
   }
 
 }

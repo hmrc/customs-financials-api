@@ -21,16 +21,14 @@ import play.api.libs.json._
 
 import java.util.UUID
 
-case class HistoricDocumentRequest(
-                                    eori: EORI,
-                                    documentType: FileRole,
-                                    periodStartYear: Int,
-                                    periodStartMonth: Int,
-                                    periodEndYear: Int,
-                                    periodEndMonth: Int,
-                                    dan: Option[String],
-                                    statementRequestID: UUID = UUID.randomUUID()
-                                  )
+case class HistoricDocumentRequest(eori: EORI,
+                                   documentType: FileRole,
+                                   periodStartYear: Int,
+                                   periodStartMonth: Int,
+                                   periodEndYear: Int,
+                                   periodEndMonth: Int,
+                                   dan: Option[String],
+                                   statementRequestID: UUID = UUID.randomUUID())
 
 object HistoricDocumentRequest {
   implicit val historicDocumentRequestFormat: OFormat[HistoricDocumentRequest] = Json.format[HistoricDocumentRequest]

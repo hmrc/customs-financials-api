@@ -19,9 +19,3 @@ package models.requests.manageAuthorities
 case class Accounts(cash: Option[String],
                     dutyDeferments: Seq[String],
                     guarantee: Option[String])
-
-
-
-
-
-

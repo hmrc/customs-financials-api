@@ -78,6 +78,7 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
           readJsonFromFile(ssfnValidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+
         result.success.value mustBe()
       }
     }
@@ -117,5 +118,4 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     val app: Application = application().build()
     val jsonPayloadSchemaValidator: JSONSchemaValidator = app.injector.instanceOf[JSONSchemaValidator]
   }
-
 }

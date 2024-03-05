@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import config.MetaConfig.Platform.DIGITAL
 import domain.acc37.{AccountDetails, AmendCorrespondenceAddressRequest}
 import models.{AccountNumber, AccountType, EORI}
 import services.DateTimeService
@@ -31,11 +32,13 @@ class Acc37Connector @Inject()(httpClient: HttpClient,
                                dateTimeService: DateTimeService,
                                headers: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
-  def updateAccountContactDetails(dan: AccountNumber, eori: EORI, contactInformation: domain.acc37.ContactDetails): Future[domain.acc37.Response] = {
+  def updateAccountContactDetails(dan: AccountNumber,
+                                  eori: EORI,
+                                  contactInformation: domain.acc37.ContactDetails): Future[domain.acc37.Response] = {
 
     val request = domain.acc37.Request(
       AmendCorrespondenceAddressRequest(
-        domain.acc37.RequestCommon("Digital", dateTimeService.currentDateTimeAsIso8601, headers.acknowledgementReference),
+        domain.acc37.RequestCommon(DIGITAL, dateTimeService.currentDateTimeAsIso8601, headers.acknowledgementReference),
         domain.acc37.RequestDetail(eori, AccountDetails(AccountType("DutyDeferment"), dan), contactInformation, None)
       ))
 

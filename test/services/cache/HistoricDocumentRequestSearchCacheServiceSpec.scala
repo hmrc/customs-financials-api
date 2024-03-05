@@ -29,6 +29,7 @@ import scala.concurrent.Future
 class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
   "saveHistoricDocumentRequestSearch" should {
+
     "return true when document is insert successfully" in new Setup {
       when(mockHistDocReqSearchCache.insertDocument(any)).thenReturn(Future.successful(true))
 
@@ -114,10 +115,14 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
       val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
         sr =>
-          if (sr.statementRequestId.equals(statReqId)) sr.copy(
-            searchSuccessful = SearchResultStatus.no,
-            searchDateTime = searchDtTime,
-            searchFailureReasonCode = searchFailureReasonCode) else sr
+          if (sr.statementRequestId.equals(statReqId)) {
+            sr.copy(
+              searchSuccessful = SearchResultStatus.no,
+              searchDateTime = searchDtTime,
+              searchFailureReasonCode = searchFailureReasonCode)
+          } else {
+            sr
+          }
       }
 
       when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(any, any)).thenReturn(
@@ -133,6 +138,7 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
         optDoc => {
           val doc = optDoc.get
           val updatedSR = doc.searchRequests.find(x => x.statementRequestId == statReqId).get
+
           doc.searchID.toString mustBe searchID.toString
           updatedSR.searchFailureReasonCode mustBe searchFailureReasonCode
           updatedSR.searchDateTime mustBe searchDtTime
@@ -197,15 +203,21 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
       }
     }
 
-    "not update the resultsFound to no if one or more search requests do not have no for searchSuccessful field" in new Setup {
+    "not update the resultsFound to no if one or more search requests do not have no for" +
+      " searchSuccessful field" in new Setup {
       val service: HistoricDocumentRequestSearchCacheService =
         app.injector.instanceOf[HistoricDocumentRequestSearchCacheService]
 
       val searchRequestsOb: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
+          "GB123456789012",
+          "5b89895-f0da-4472-af5a-d84d340e7mn5",
+          SearchResultStatus.inProcess,
+          emptyString, emptyString, 0),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.no,
+          "GB234567890121",
+          "5c79895-f0da-4472-af5a-d84d340e7mn6",
+          SearchResultStatus.no,
           Utils.dateTimeAsIso8601(LocalDateTime.now), "AWSUnreachable", 0)
       )
 
@@ -227,9 +239,13 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
       val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
         sr =>
-          if (sr.statementRequestId.equals(statReqId)) sr.copy(
-            searchSuccessful = SearchResultStatus.yes,
-            searchDateTime = searchDtTime) else sr
+          if (sr.statementRequestId.equals(statReqId)) {
+            sr.copy(
+              searchSuccessful = SearchResultStatus.yes,
+              searchDateTime = searchDtTime)
+          } else {
+            sr
+          }
       }
 
       when(mockHistDocReqSearchCache.updateSearchReqsAndResultsFoundStatus(
@@ -268,13 +284,16 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
 
       val statReqId = "5b89895-f0da-4472-af5a-d84d340e7mn5"
       val searchFailureReasonCode = "AWSUnreachable"
-      //val searchDtTime: String = Utils.dateTimeAsIso8601(LocalDateTime.now)
 
       val updatedSearchRequests: Set[SearchRequest] = searchRequests.map {
         sr =>
-          if (sr.statementRequestId.equals(statReqId)) sr.copy(
-            searchFailureReasonCode = searchFailureReasonCode,
-            failureRetryCount = sr.failureRetryCount + 1) else sr
+          if (sr.statementRequestId.equals(statReqId)) {
+            sr.copy(
+              searchFailureReasonCode = searchFailureReasonCode,
+              failureRetryCount = sr.failureRetryCount + 1)
+          } else {
+            sr
+          }
       }
 
       when(mockHistDocReqSearchCache.updateSearchRequestForStatementRequestId(
@@ -321,11 +340,18 @@ class HistoricDocumentRequestSearchCacheServiceSpec extends SpecBase {
     val searchStatusUpdateDate: String = emptyString
     val currentEori: String = "GB123456789012"
     val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.inProcess, emptyString, emptyString, 0),
+        "GB123456789012",
+        "5b89895-f0da-4472-af5a-d84d340e7mn5",
+        SearchResultStatus.inProcess,
+        emptyString, emptyString, 0),
       SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess, emptyString, emptyString, 0)
+        "GB234567890121",
+        "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess,
+        emptyString, emptyString, 0)
     )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =

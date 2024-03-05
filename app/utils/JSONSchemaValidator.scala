@@ -30,7 +30,7 @@ case class ErrorReport(instance: String, errors: String) {
 }
 
 class JSONSchemaValidator {
-  type ValidationReport = Either[List[ErrorReport], Unit]
+  private type ValidationReport = Either[List[ErrorReport], Unit]
   private val basePath = System.getProperty("user.dir")
 
   val ssfnRequestSchema = "/schemas/statement-search-failure-notification-request-schema.json"
@@ -54,6 +54,7 @@ class JSONSchemaValidator {
     val jsonDataAsString = JsonLoader.fromString(data.toString())
     val doValidation = schema.validate(jsonDataAsString, deepValidationCheck)
     val isSuccess = doValidation.isSuccess
+
     if (!isSuccess) {
       val jsArray = Json.parse(
         doValidation.asInstanceOf[ListProcessingReport].asJson().toString).asInstanceOf[JsArray].value

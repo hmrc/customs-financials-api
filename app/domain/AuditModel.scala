@@ -20,8 +20,9 @@ import domain.acc40.{CashAccount, DutyDefermentAccount, GeneralGuaranteeAccount}
 import models.{AccountNumber, AccountType, EORI, FileRole}
 import play.api.libs.json.{JsValue, Json, OWrites}
 
-
-case class AuditModel(transactionName: String, detail: JsValue, auditType: String)
+case class AuditModel(transactionName: String,
+                      detail: JsValue,
+                      auditType: String)
 
 case class GrantAuthorityRequestAuditDetail(ownerEORI: EORI,
                                             authorisedEORI: EORI,
@@ -49,11 +50,14 @@ case class AccountAuditDetail(accountType: AccountType,
 
 object GrantAuthorityRequestAuditDetail {
   implicit val AccountAuditDetail: OWrites[AccountAuditDetail] = Json.writes[AccountAuditDetail]
-  implicit val GrantAuthorityRequestAuditDetailWrites: OWrites[GrantAuthorityRequestAuditDetail] = Json.writes[GrantAuthorityRequestAuditDetail]
+
+  implicit val GrantAuthorityRequestAuditDetailWrites: OWrites[GrantAuthorityRequestAuditDetail] =
+    Json.writes[GrantAuthorityRequestAuditDetail]
 }
 
 object EditAuthorityRequestAuditDetail {
-  implicit val EditAuthorityRequestAuditDetailWrites: OWrites[EditAuthorityRequestAuditDetail] = Json.writes[EditAuthorityRequestAuditDetail]
+  implicit val EditAuthorityRequestAuditDetailWrites: OWrites[EditAuthorityRequestAuditDetail] =
+    Json.writes[EditAuthorityRequestAuditDetail]
 }
 
 case class RevokeAuthorityRequestAuditDetail(ownerEORI: EORI,
@@ -65,7 +69,8 @@ case class RevokeAuthorityRequestAuditDetail(ownerEORI: EORI,
                                              authoriserJobRole: String)
 
 object RevokeAuthorityRequestAuditDetail {
-  implicit val RevokeAuthorityRequestAuditDetailWrites: OWrites[RevokeAuthorityRequestAuditDetail] = Json.writes[RevokeAuthorityRequestAuditDetail]
+  implicit val RevokeAuthorityRequestAuditDetailWrites: OWrites[RevokeAuthorityRequestAuditDetail] =
+    Json.writes[RevokeAuthorityRequestAuditDetail]
 }
 
 case class HistoricDocumentRequestAuditDetail(eori: EORI,
@@ -77,12 +82,9 @@ case class HistoricDocumentRequestAuditDetail(eori: EORI,
                                               periodEndMonth: String)
 
 object HistoricDocumentRequestAuditDetail {
-  implicit val historicDocumentRequestAuditDetailWrites: OWrites[HistoricDocumentRequestAuditDetail] = Json.writes[HistoricDocumentRequestAuditDetail]
+  implicit val historicDocumentRequestAuditDetailWrites: OWrites[HistoricDocumentRequestAuditDetail] =
+    Json.writes[HistoricDocumentRequestAuditDetail]
 }
-
-case class FileUploadRequestAuditDetail(eori: String,
-                                        caseNumber: String,
-                                        applicationName: String)
 
 case class RequestAuthAuditDetail(requestingEori: String,
                                   seachType: String,
@@ -90,30 +92,25 @@ case class RequestAuthAuditDetail(requestingEori: String,
                                   numberOfAuthorities: Option[String],
                                   dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
                                   generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
-                                  cdsCashAccounts: Option[Seq[CashAccount]]
-)
+                                  cdsCashAccounts: Option[Seq[CashAccount]])
 
 object RequestAuthAuditDetail {
   implicit val requestAuthAuditDetailsWrites: OWrites[RequestAuthAuditDetail] = Json.writes[RequestAuthAuditDetail]
 }
 
-case class RequestAuthCSVAuditDetail(
-  requestingEori: String,
-  requestAcceptedDate: String
-)
+case class RequestAuthCSVAuditDetail(requestingEori: String,
+                                     requestAcceptedDate: String)
 
 object RequestAuthCSVAuditDetail {
   implicit val requestAuthCSVAuditDetailsWrites: OWrites[RequestAuthCSVAuditDetail] =
     Json.writes[RequestAuthCSVAuditDetail]
 }
 
-case class RequestDisplayStandingAuthCSVAuditDetail(
-  Eori: String,
-  isHistoric: Boolean,
-  fileName: String,
-  fileRole: String,
-  fileType: String
-)
+case class RequestDisplayStandingAuthCSVAuditDetail(Eori: String,
+                                                    isHistoric: Boolean,
+                                                    fileName: String,
+                                                    fileRole: String,
+                                                    fileType: String)
 
 object RequestDisplayStandingAuthCSVAuditDetail {
   implicit val requestStandingAuthCSVAuditDetailsWrites: OWrites[RequestDisplayStandingAuthCSVAuditDetail] =

@@ -21,11 +21,9 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 
-case class NotificationsForEori(
-                                 eori: EORI,
-                                 notifications: Seq[Notification],
-                                 lastUpdated: Option[DateTime]
-                               )
+case class NotificationsForEori(eori: EORI,
+                                notifications: Seq[Notification],
+                                lastUpdated: Option[DateTime])
 
 object NotificationsForEori {
   implicit val lastUpdatedFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat

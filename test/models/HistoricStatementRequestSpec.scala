@@ -18,10 +18,12 @@ package models
 
 import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
 import utils.SpecBase
+import utils.TestData.{MONTH_2, MONTH_4, YEAR_2021}
 
 import java.util.UUID
 
 class HistoricStatementRequestSpec extends SpecBase {
+
   "from" should {
     "create HistoricStatementRequest object correctly" in new Setup {
       HistoricStatementRequest.from(histDocRequest) mustBe histStatementReq
@@ -46,10 +48,10 @@ class HistoricStatementRequestSpec extends SpecBase {
     val histDocRequest: HistoricDocumentRequest = HistoricDocumentRequest(
       eori,
       fileRole,
-      2021,
-      2,
-      2021,
-      4,
+      YEAR_2021,
+      MONTH_2,
+      YEAR_2021,
+      MONTH_4,
       None,
       statementRequestID)
 

@@ -19,7 +19,6 @@ package models.requests
 import models.EmailAddress
 import play.api.libs.json.{Json, OFormat}
 
-
 case class EmailRequest(to: List[EmailAddress],
                         templateId: String,
                         parameters: Map[String, String],
