@@ -20,7 +20,6 @@ import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.{Notification, NotificationsForEori}
 import models.EORI
-import org.joda.time.DateTime
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -31,8 +30,9 @@ import play.api.{Application, inject}
 import services.{DateTimeService, NotificationCache}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
-import utils.TestData.{CSV_FILE_NAME, FILE_ROLE_C79_CERTIFICATE, FILE_SIZE_1000L}
+import utils.TestData._
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class SDESNotificationsControllerSpec extends SpecBase {
@@ -42,7 +42,9 @@ class SDESNotificationsControllerSpec extends SpecBase {
     "return no notifications from a mongo when there isn't any" in new Setup {
       when(mockNotificationCache.getNotifications(any)).thenReturn(Future.successful(None))
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
-      when(mockDateTimeService.utcDateTime).thenReturn(DateTime.parse("2021-07-07T10:05:29.352Z"))
+      when(mockDateTimeService.utcDateTime)
+        .thenReturn(
+          LocalDateTime.of(YEAR_2021, MONTH_7, DAY_7, HOUR_10, MINUTES_5, SECONDS_29, MILI_SECONDS_352))
 
       running(app) {
         val result = route(app, getRequest).value
@@ -69,7 +71,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
             "fileSize" -> "1000")
         )
       ),
-        Some(DateTime.parse("2021-07-07T10:05:29.352Z")))
+        Some(LocalDateTime.parse("2021-07-07T10:05:29.352Z")))
 
       when(mockNotificationCache.getNotifications(ArgumentMatchers.eq(eori)))
         .thenReturn(Future.successful(Some(notification)))

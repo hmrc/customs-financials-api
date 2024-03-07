@@ -17,7 +17,6 @@
 package utils
 
 import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
 import models.claims.responses.{SctyClaimDetails, Goods => GoodsResponse, Reimbursement => ReimbursementResponse}
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.must.Matchers
@@ -26,6 +25,7 @@ import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import play.api.inject.bind
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 trait SpecBase
   extends AnyWordSpecLike
@@ -74,6 +74,5 @@ trait SpecBase
 
   class FakeMetrics extends Metrics {
     override val defaultRegistry: MetricRegistry = new MetricRegistry
-    override val toJson: String = "{}"
   }
 }

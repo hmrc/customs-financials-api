@@ -20,7 +20,6 @@ import com.mongodb.client.model.Indexes.ascending
 import com.mongodb.client.model.{FindOneAndUpdateOptions, ReturnDocument}
 import config.AppConfig
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
-import org.joda.time.DateTime
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Updates}
@@ -69,7 +68,7 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
-    val expireAtTS = DateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
+    val expireAtTS = LocalDateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
 
     collection.insertOne(req.copy(expireAt = Option(expireAtTS))).toFuture() map { _ => false } recover {
       case _ => true

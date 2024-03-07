@@ -17,11 +17,11 @@
 package models
 
 import models.requests.HistoricDocumentRequest
-import org.joda.time.DateTime
 import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Utils.{emptyString, zeroPad}
 
+import java.time.{Instant, LocalDateTime}
 import java.util.UUID
 
 case class HistoricDocumentRequestSearch(searchID: UUID,
@@ -30,12 +30,12 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
                                          currentEori: String,
                                          params: Params,
                                          searchRequests: Set[SearchRequest],
-                                         expireAt: Option[DateTime] = None) {
+                                         expireAt: Option[LocalDateTime] = None) {
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
 object HistoricDocumentRequestSearch {
-  implicit val dateFormats: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+  implicit val dateFormats: Format[Instant] = MongoJavatimeFormats.instantFormat
   implicit val historicDocumentRequestSearchFormat: OFormat[HistoricDocumentRequestSearch] =
     Json.format[HistoricDocumentRequestSearch]
 

@@ -4,22 +4,22 @@ import uk.gov.hmrc.DefaultBuildSettings.itSettings
 
 val appName = "customs-financials-api"
 
-val scala2_13_8 = "2.13.8"
-val bootstrapVersion = "7.22.0"
-val silencerVersion = "1.17.13"
+val scala2_13_12 = "2.13.12"
+val bootstrapVersion = "8.4.0"
+val silencerVersion = "1.7.16"
 
 val testDirectory = "test"
 val scalaStyleConfigFile = "scalastyle-config.xml"
 val testScalaStyleConfigFile = "test-scalastyle-config.xml"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := scala2_13_8
+ThisBuild / scalaVersion := scala2_13_12
 
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(itSettings())
-  .settings(libraryDependencies ++= Seq("uk.gov.hmrc" %% "bootstrap-test-play-28" % bootstrapVersion % Test))
+  .settings(libraryDependencies ++= Seq("uk.gov.hmrc" %% "bootstrap-test-play-29" % bootstrapVersion % Test))
 
 lazy val scalastyleSettings = Seq(scalastyleConfig := baseDirectory.value / scalaStyleConfigFile,
   (Test / scalastyleConfig) := baseDirectory.value / testDirectory / testScalaStyleConfigFile)
@@ -60,7 +60,6 @@ lazy val microservice = Project(appName, file("."))
       "-Wunused:explicits",
       "-Wunused:privates")
   )
-  .configs(IntegrationTest)
   .settings(scalastyleSettings)
   .settings(Test / parallelExecution := false)
   .settings(resolvers += Resolver.jcenterRepo)

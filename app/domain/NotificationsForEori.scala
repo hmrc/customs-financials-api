@@ -17,16 +17,17 @@
 package domain
 
 import models.EORI
-import org.joda.time.DateTime
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+
+import java.time.{Instant, LocalDateTime}
 
 case class NotificationsForEori(eori: EORI,
                                 notifications: Seq[Notification],
-                                lastUpdated: Option[DateTime])
+                                lastUpdated: Option[LocalDateTime])
 
 object NotificationsForEori {
-  implicit val lastUpdatedFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+  implicit val lastUpdatedFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   implicit val notificationWrites: OFormat[Notification] = Json.format[Notification]
   implicit val notificationsFormat: OFormat[NotificationsForEori] = Json.format[NotificationsForEori]
 }

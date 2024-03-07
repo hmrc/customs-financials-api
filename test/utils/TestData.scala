@@ -47,24 +47,31 @@ object TestData {
   val MONTH_3 = 3
   val MONTH_4 = 4
   val MONTH_6 = 6
+  val MONTH_7 = 7
   val MONTH_9 = 9
   val MONTH_10 = 10
   val MONTH_12 = 12
 
   val DAY_1 = 1
+  val DAY_7 = 7
   val DAY_11 = 11
   val DAY_14 = 14
   val DAY_15 = 15
   val DAY_16 = 16
 
+  val HOUR_10 = 10
   val HOUR_11 = 11
   val HOUR_16 = 16
 
+  val MINUTES_5 = 5
   val MINUTES_10 = 10
   val MINUTES_30 = 30
 
   val SECONDS_35 = 35
+  val SECONDS_29 = 29
   val SECONDS_30 = 30
+
+  val MILI_SECONDS_352 = 352
 
   val NUMBER_5 = 5
   val NUMBER_9 = 9

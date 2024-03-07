@@ -41,23 +41,26 @@ object GuaranteeTransactionsResponse {
 
   implicit val errorResponseFormat: OFormat[ErrorResponse] = Json.format[ErrorResponse]
 
-  implicit val responseCommonFormat = Json.format[ResponseCommon]
+  implicit val responseCommonFormat: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 
-  implicit val defAmountsFormat = Json.format[DefAmounts]
+  implicit val defAmountsFormat: OFormat[DefAmounts] = Json.format[DefAmounts]
 
-  implicit val taxTypeFormat = Json.format[TaxType]
+  implicit val taxTypeFormat: OFormat[TaxType] = Json.format[TaxType]
 
-  implicit val taxTypeGroupFormat = Json.format[TaxTypeGroup]
+  implicit val taxTypeGroupFormat: OFormat[TaxTypeGroup] = Json.format[TaxTypeGroup]
 
-  implicit val dueDateFormat = Json.format[DueDate]
+  implicit val dueDateFormat: OFormat[DueDate] = Json.format[DueDate]
 
-  implicit val declarationsFormat = Json.format[GuaranteeTransactionDeclaration]
+  implicit val declarationsFormat: OFormat[GuaranteeTransactionDeclaration] =
+    Json.format[GuaranteeTransactionDeclaration]
 
-  implicit val responseDetailFormat = Json.format[ResponseDetail]
+  implicit val responseDetailFormat: OFormat[ResponseDetail] = Json.format[ResponseDetail]
 
-  implicit val getGGATransactionResponseFormat = Json.format[GetGGATransactionResponse]
+  implicit val getGGATransactionResponseFormat: OFormat[GetGGATransactionResponse] =
+    Json.format[GetGGATransactionResponse]
 
-  implicit val guaranteeTransactionsResponseFormat = Json.format[GuaranteeTransactionsResponse]
+  implicit val guaranteeTransactionsResponseFormat: OFormat[GuaranteeTransactionsResponse] =
+    Json.format[GuaranteeTransactionsResponse]
 }
 
 case class GetGGATransactionResponse(responseCommon: ResponseCommon,
