@@ -33,6 +33,7 @@ import utils.SpecBase
 import utils.TestData._
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class SDESNotificationsControllerSpec extends SpecBase {
@@ -71,7 +72,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
             "fileSize" -> "1000")
         )
       ),
-        Some(LocalDateTime.parse("2021-07-07T10:05:29.352Z")))
+        Some(LocalDateTime.parse("2021-07-07T10:05:29.352", DateTimeFormatter.ISO_DATE_TIME)))
 
       when(mockNotificationCache.getNotifications(ArgumentMatchers.eq(eori)))
         .thenReturn(Future.successful(Some(notification)))

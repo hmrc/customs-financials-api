@@ -29,7 +29,6 @@ class NotificationsForEoriSpec extends SpecBase {
   "Writes" should {
 
     "generate the correct output" in new Setup {
-      println("============ output is "+Json.toJson(notificationsForEori))
       Json.toJson(notificationsForEori) mustBe Json.parse(expectedJsValue)
     }
   }
@@ -37,6 +36,7 @@ class NotificationsForEoriSpec extends SpecBase {
   "Reads" should {
 
     "generate the correct output" in new Setup {
+
       import domain.NotificationsForEori.notificationsFormat
 
       Json.fromJson(Json.parse(expectedJsValue)) mustBe JsSuccess(notificationsForEori)
@@ -47,9 +47,8 @@ class NotificationsForEoriSpec extends SpecBase {
     val eori: EORI = EORI(EORI_VALUE)
     val localDate: LocalDate = LocalDate.of(YEAR_2023, MONTH_3, DAY_11)
 
-    val formatterTest: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")
-
-    val lastUpdatedTime: LocalDateTime = LocalDateTime.parse("2023-03-11T10:05:30.352Z", formatterTest)
+    val lastUpdatedTime: LocalDateTime =
+      LocalDateTime.parse("2023-03-11T10:05:30.352Z", DateTimeFormatter.ISO_DATE_TIME)
 
     val notification: Notification = Notification(eori = eori,
       fileRole = FILE_ROLE_C79_CERTIFICATE,

@@ -70,7 +70,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+          " List((/gan,List(JsonValidationError(List(error.path.missing),List()))))"
     }
   }
 
@@ -177,7 +177,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+          " List((/gan,List(JsonValidationError(List(error.path.missing),List()))))"
     }
   }
 

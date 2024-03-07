@@ -51,7 +51,7 @@ class NotificationCacheSpec extends SpecBase {
       }
     }
 
-    "get statement request notifications which are not expired from mongo db" ignore new Setup {
+    "get statement request notifications which are not expired from mongo db" in new Setup {
       running(app) {
         val result = for {
           _ <- cache.putNotifications(NotificationsForEori(Eori1, notifications1, lastUpdated))
@@ -72,7 +72,7 @@ class NotificationCacheSpec extends SpecBase {
       }
     }
 
-    "delete non-requested C79Certificate by fileRole" ignore new Setup {
+    "delete non-requested C79Certificate by fileRole" in new Setup {
       val requestedStatement: Notification =
         Notification(
           Eori1,
@@ -106,7 +106,7 @@ class NotificationCacheSpec extends SpecBase {
       }
     }
 
-    "delete requested C79Certificate by fileRole" ignore new Setup {
+    "delete requested C79Certificate by fileRole" in new Setup {
       val requestedStatement1: Notification =
         Notification(
           Eori1,
