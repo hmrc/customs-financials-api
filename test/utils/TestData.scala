@@ -34,6 +34,7 @@ object TestData {
   val CURRENT_LOCAL_DATE: LocalDate = LocalDate.now
 
   val CSV_FILE_NAME = "abc.csv"
+  val TEST_FILE_NAME = "test_file"
   val FILE_ROLE_C79_CERTIFICATE: FileRole = FileRole("C79Certificate")
   val FILE_ROLE_SECURITY_STATEMENT: FileRole = FileRole("SecurityStatement")
 
