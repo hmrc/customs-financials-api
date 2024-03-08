@@ -67,7 +67,7 @@ class NotificationsForEoriSpec extends SpecBase {
         |"fileName":"test_file",
         |"fileSize":1024,
         |"created":"2023-03-11",
-        |"metadata":{"Something":"Random"}}],"lastUpdated":"2023-03-11T10:05:30.352"
+        |"metadata":{"Something":"Random"}}],"lastUpdated":1678529130352
         |}""".stripMargin
   }
 }
