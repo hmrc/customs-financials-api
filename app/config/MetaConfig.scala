@@ -28,5 +28,7 @@ object MetaConfig {
     val SOURCE_MDTP = "mdtp"
     val ENROLMENT_KEY = "HMRC-CUS-ORG"
     val ENROLMENT_IDENTIFIER = "EORINumber"
+
+    val EXPIRE_TIME_STAMP_SECONDS = 1728000L
   }
 }

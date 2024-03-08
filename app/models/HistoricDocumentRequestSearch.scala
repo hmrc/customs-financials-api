@@ -16,12 +16,14 @@
 
 package models
 
+import config.MetaConfig.Platform.EXPIRE_TIME_STAMP_SECONDS
 import models.requests.HistoricDocumentRequest
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Utils.{emptyString, zeroPad}
 
-import java.time.{Instant, LocalDateTime}
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.UUID
 
 case class HistoricDocumentRequestSearch(searchID: UUID,
@@ -36,6 +38,21 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
 
 object HistoricDocumentRequestSearch {
   implicit val dateFormats: Format[Instant] = MongoJavatimeFormats.instantFormat
+
+  implicit val milliDateTimeFormat: Format[LocalDateTime] = Format[LocalDateTime](
+    Reads[LocalDateTime](js =>
+      js.validate[Long] match {
+        case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
+        case _ =>
+          JsSuccess(Instant.now()
+            .plus(EXPIRE_TIME_STAMP_SECONDS, ChronoUnit.SECONDS).atOffset(ZoneOffset.UTC).toLocalDateTime)
+      }
+    ),
+    Writes[LocalDateTime](d =>
+      JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli)
+    )
+  )
+
   implicit val historicDocumentRequestSearchFormat: OFormat[HistoricDocumentRequestSearch] =
     Json.format[HistoricDocumentRequestSearch]
 
