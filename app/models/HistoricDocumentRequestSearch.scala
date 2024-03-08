@@ -39,7 +39,7 @@ case class HistoricDocumentRequestSearch(searchID: UUID,
 object HistoricDocumentRequestSearch {
   implicit val dateFormats: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  implicit val milliDateTimeFormat: Format[LocalDateTime] = Format[LocalDateTime](
+  implicit val expireAtDateTimeFormat: Format[LocalDateTime] = Format[LocalDateTime](
     Reads[LocalDateTime](js =>
       js.validate[Long] match {
         case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
