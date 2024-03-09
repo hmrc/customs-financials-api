@@ -4,12 +4,12 @@ import sbt.*
 
 object AppDependencies {
 
-  val bootstrapVersion = "8.4.0"
+  val bootstrapVersion = "8.5.0"
 
   val compile: Seq[ModuleID] = Seq(
     ws,
     "uk.gov.hmrc" %% "bootstrap-backend-play-29" % bootstrapVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-29" % "1.6.0",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-29" % "1.7.0",
     "com.github.java-json-tools" % "json-schema-validator" % "2.2.14"
   )
 

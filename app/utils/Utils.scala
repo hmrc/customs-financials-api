@@ -41,6 +41,8 @@ object Utils {
   val gbEoriPrefix = "GB"
   val xIEoriPrefix = "XI"
 
+  val UTC_TIME_ZONE = "UTC"
+
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =
     s"${DateTimeFormatter.ISO_DATE_TIME.format(dateTime.truncatedTo(ChronoUnit.SECONDS))}Z"
 

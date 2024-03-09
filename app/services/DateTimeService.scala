@@ -16,6 +16,8 @@
 
 package services
 
+import utils.Utils.UTC_TIME_ZONE
+
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDateTime, ZoneId}
@@ -32,5 +34,5 @@ class DateTimeService @Inject()() {
     s"${DateTimeFormatter.ISO_DATE_TIME.format(now().truncatedTo(ChronoUnit.SECONDS))}Z"
   }
 
-  def utcDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.MILLIS)
+  def utcDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of(UTC_TIME_ZONE)).truncatedTo(ChronoUnit.MILLIS)
 }

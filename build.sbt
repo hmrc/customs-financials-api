@@ -5,7 +5,7 @@ import uk.gov.hmrc.DefaultBuildSettings.itSettings
 val appName = "customs-financials-api"
 
 val scala2_13_12 = "2.13.12"
-val bootstrapVersion = "8.4.0"
+val bootstrapVersion = "8.5.0"
 val silencerVersion = "1.7.16"
 
 val testDirectory = "test"
