@@ -17,22 +17,21 @@
 package connectors
 
 import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
-
-import java.time.LocalDate
-import java.util.UUID
 import domain.secureMessage
 import domain.secureMessage._
 import models._
-import play.api.{Application, inject}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.running
+import play.api.{Application, inject}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
 import utils.TestData.{COUNTRY_CODE_GB, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
 
+import java.time.LocalDate
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -69,6 +68,35 @@ class SecureMessageConnectorSpec extends SpecBase {
         running(app) {
           connector.sendSecureMessage(histDoc = doc).map {
             result => result mustBe Right(Response(eori.value))
+          }
+        }
+      }
+
+      "successfully post httpclient when getCompanyName call fails and verified email has empty values" in new Setup {
+
+        when(mockDataStoreService.getCompanyName(any)(any))
+          .thenReturn(Future.failed(new RuntimeException("error occurred")))
+
+        when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
+
+        running(app) {
+          connector.sendSecureMessage(histDoc = doc).map {
+            result => result mustBe Right(Response(eori.value))
+          }
+        }
+      }
+
+      "return error response when exception occurs while getting VerifiedEmail" in new Setup {
+
+        when(mockDataStoreService.getCompanyName(any)(any))
+          .thenReturn(Future.successful(Option("test")))
+
+        when(mockDataStoreService.getVerifiedEmail(any)(any))
+          .thenReturn(Future.failed(new RuntimeException("Error occurred")))
+
+        running(app) {
+          connector.sendSecureMessage(histDoc = doc).map {
+            result => result mustBe Left("Error occurred")
           }
         }
       }

@@ -57,6 +57,20 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+    "return 200 when companyName retrieval throws exception and " in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
     "send email when 4th week duty deferment statement is available" in new Setup {
       val dd4emailRequest: JsValue = Json.parse(
         """

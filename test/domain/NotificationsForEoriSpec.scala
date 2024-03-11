@@ -41,6 +41,13 @@ class NotificationsForEoriSpec extends SpecBase {
 
       Json.fromJson(Json.parse(expectedJsValue)) mustBe JsSuccess(notificationsForEori)
     }
+
+    "return current LocalDateTime when  input string does not match the format" in new Setup {
+
+      import domain.NotificationsForEori.notificationsFormat
+
+      Json.fromJson(Json.parse(jsValueWithIncorrectDateTimeString)).isSuccess mustBe true
+    }
   }
 
   trait Setup {
@@ -68,6 +75,17 @@ class NotificationsForEoriSpec extends SpecBase {
         |"fileSize":1024,
         |"created":"2023-03-11",
         |"metadata":{"Something":"Random"}}],"lastUpdated":1678529130352
+        |}""".stripMargin
+
+    val jsValueWithIncorrectDateTimeString: String =
+      """{
+        |"eori":"testEORI",
+        |"notifications":[{"eori":"testEORI",
+        |"fileRole":"C79Certificate",
+        |"fileName":"test_file",
+        |"fileSize":1024,
+        |"created":"2023-03-11",
+        |"metadata":{"Something":"Random"}}],"lastUpdated":"2023-03-11T10:05:30"
         |}""".stripMargin
   }
 }

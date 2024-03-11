@@ -26,6 +26,7 @@ import java.util.UUID
 class HistoricDocumentRequestSpec extends SpecBase {
 
   "apply" should {
+
     "create the object correctly" in new Setup {
       HistoricDocumentRequest(incomingStatementReqId, historicDocumentRequestSearchDoc) mustBe
         HistoricDocumentRequest(

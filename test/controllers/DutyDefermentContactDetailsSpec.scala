@@ -16,9 +16,10 @@
 
 package controllers
 
+import config.MetaConfig.RETURN_PARAM_POSITION
 import domain.acc37._
 import domain.acc38
-import domain.acc38.GetCorrespondenceAddressResponse
+import domain.acc38.{GetCorrespondenceAddressResponse, ReturnParameter => ACC38ReturnParameter}
 import models.requests.{GetContactDetailsRequest, UpdateContactDetailsRequest}
 import models.responses.UpdateContactDetailsResponse
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
@@ -39,7 +40,8 @@ import scala.concurrent.Future
 
 class DutyDefermentContactDetailsSpec extends SpecBase {
 
-  "DutyDefermentController.get" should {
+  "getContactDetails" should {
+
     "delegate to the service and return contact details with a 200 status code" in new Setup {
       when(mockAccountContactDetailsService.getAccountContactDetails(eqTo(traderDan), eqTo(traderEORI)))
         .thenReturn(Future.successful(acc38Response))
@@ -50,9 +52,42 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
         contentAsJson(result) mustBe Json.toJson(acc38ContactDetails)
       }
     }
+
+    "return InternalServerError" in new Setup {
+      when(mockAccountContactDetailsService.getAccountContactDetails(eqTo(traderDan), eqTo(traderEORI)))
+        .thenReturn(Future.successful(acc38ResponseWithMdtpError))
+
+      running(app) {
+        val result = route(app, getContactDetailsRequest).value
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "return BadRequest" in new Setup {
+      val acc38ResponseForBadRequest: acc38.Response =
+        domain.acc38.Response(GetCorrespondenceAddressResponse(acc38ResponseCommon, None))
+
+      when(mockAccountContactDetailsService.getAccountContactDetails(eqTo(traderDan), eqTo(traderEORI)))
+        .thenReturn(Future.successful(acc38ResponseForBadRequest))
+
+      running(app) {
+        val result = route(app, getContactDetailsRequest).value
+        status(result) mustBe BAD_REQUEST
+      }
+    }
+
+    "return ServiceUnavailable" in new Setup {
+      when(mockAccountContactDetailsService.getAccountContactDetails(any, any))
+        .thenReturn(Future.failed(new RuntimeException("error occurred")))
+
+      running(app) {
+        val result = route(app, getContactDetailsRequest).value
+        status(result) mustBe SERVICE_UNAVAILABLE
+      }
+    }
   }
 
-  "DutyDefermentController.updateContactDetails" should {
+  "updateContactDetails" should {
 
     "throw an exception when update account contact details fails with a fatal error" in new Setup {
       when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
@@ -102,6 +137,19 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
           .updateAccountContactDetails(any, any, any)
       }
     }
+
+    "return InternalServerError when there is mdtp error" in new Setup {
+      val acc37ResponseWithMdtpError: Response =
+        domain.acc37.Response(AmendCorrespondenceAddressResponse(acc37ResponseCommonMdtpError))
+
+      when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
+        .thenReturn(Future.successful(acc37ResponseWithMdtpError))
+
+      running(app) {
+        val result = route(app, updateContactDetailsRequest).value
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
   }
 
   trait Setup extends TestData {
@@ -143,6 +191,12 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
     val traderDan: AccountNumber = AccountNumber("1234567")
 
     val acc38ResponseCommon: acc38.ResponseCommon = domain.acc38.ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+    val acc38ResponseCommonMdtpError: acc38.ResponseCommon =
+      domain.acc38.ResponseCommon(
+        "OK",
+        None,
+        "2020-10-05T09:30:47Z",
+        Some(List(ACC38ReturnParameter(RETURN_PARAM_POSITION, "test_value"))))
 
     val acc38ContactDetails: acc38.ContactDetails = domain.acc38.ContactDetails(
       Some("Bobby Shaftoe"),
@@ -167,6 +221,16 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       )
     )
 
+    val acc38ResponseWithMdtpError: acc38.Response = domain.acc38.Response(
+      GetCorrespondenceAddressResponse(
+        acc38ResponseCommonMdtpError,
+        Some(
+          domain.acc38.ResponseDetail(traderEORI,
+            domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan),
+            acc38ContactDetails))
+      )
+    )
+
     val acc37ContactInfo: ContactDetails = domain.acc37.ContactDetails(
       Some("Bobby Shaftoe"),
       "Boaty Lane",
@@ -181,6 +245,14 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
     )
 
     val acc37ResponseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+    val acc37ResponseCommonMdtpError: ResponseCommon =
+      ResponseCommon("OK",
+        None,
+        "2020-10-05T09:30:47Z",
+        Some(List(ReturnParameter(RETURN_PARAM_POSITION, "test_value")).toArray)
+      )
+
     val acc37SuccessResponse: Response = domain.acc37.Response(AmendCorrespondenceAddressResponse(acc37ResponseCommon))
+
   }
 }
