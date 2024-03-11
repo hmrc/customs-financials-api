@@ -31,8 +31,7 @@ object NotificationsForEori {
     Reads[LocalDateTime](js =>
       js.validate[Long] match {
         case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
-        case _ =>
-          JsSuccess(Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime)
+        case _ => JsSuccess(Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime)
       }
     ),
     Writes[LocalDateTime](d =>
