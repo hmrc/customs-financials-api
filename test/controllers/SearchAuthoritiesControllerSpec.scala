@@ -19,13 +19,13 @@ package controllers
 import connectors.Acc40Connector
 import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound, RequestDetail}
 import models.EORI
-import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
-import utils.SpecBase
 import play.api.test.Helpers._
+import play.api.{Application, inject}
+import utils.SpecBase
 
 import scala.concurrent.Future
 

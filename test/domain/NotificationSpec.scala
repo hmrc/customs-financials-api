@@ -118,4 +118,37 @@ class NotificationSpec extends SpecBase {
           Map.empty))
     }
   }
+
+  "toString" should {
+
+    "return the correct value" in {
+
+      val fileRole = FileRole("DutyDeferment")
+      val fileName = "filename"
+      val key = "DAN"
+      val key1 = "test_key"
+      val keyValue = "test_value"
+      val metaData = Map(key -> keyValue)
+      val metaData1 = Map(key1 -> keyValue)
+      val expectedMetaData = Map(key -> "xxxxxx")
+
+      Notification(
+        EORI(EORI_VALUE),
+        fileRole,
+        fileName,
+        FILE_SIZE_75251L,
+        Some(CURRENT_LOCAL_DATE),
+        metaData).toString mustBe
+        s"Notification(xxxxxxxx, $fileRole, $fileName, $FILE_SIZE_75251L, ${Some(CURRENT_LOCAL_DATE)}, $expectedMetaData"
+
+      Notification(
+        EORI(EORI_VALUE),
+        fileRole,
+        fileName,
+        FILE_SIZE_75251L,
+        Some(CURRENT_LOCAL_DATE),
+        metaData1).toString mustBe
+        s"Notification(xxxxxxxx, $fileRole, $fileName, $FILE_SIZE_75251L, ${Some(CURRENT_LOCAL_DATE)}, $metaData1"
+    }
+  }
 }

@@ -17,16 +17,28 @@
 package domain
 
 import models.EORI
-import org.joda.time.DateTime
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 case class NotificationsForEori(eori: EORI,
                                 notifications: Seq[Notification],
-                                lastUpdated: Option[DateTime])
+                                lastUpdated: Option[LocalDateTime])
 
 object NotificationsForEori {
-  implicit val lastUpdatedFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+
+  implicit val lastUpdatedDateTimeFormat: Format[LocalDateTime] = Format[LocalDateTime](
+    Reads[LocalDateTime](js =>
+      js.validate[Long] match {
+        case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
+        case _ => JsSuccess(Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime)
+      }
+    ),
+    Writes[LocalDateTime](d =>
+      JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli)
+    )
+  )
+
   implicit val notificationWrites: OFormat[Notification] = Json.format[Notification]
   implicit val notificationsFormat: OFormat[NotificationsForEori] = Json.format[NotificationsForEori]
 }

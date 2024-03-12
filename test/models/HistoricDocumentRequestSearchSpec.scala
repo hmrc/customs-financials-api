@@ -17,7 +17,7 @@
 package models
 
 import models.requests.HistoricDocumentRequest
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsString, JsSuccess, Json}
 import utils.SpecBase
 import utils.TestData.{MONTH_2, MONTH_4, YEAR_2021}
 import utils.Utils.emptyString
@@ -28,8 +28,19 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
   "Json Reads" should {
     "result the correct output" in new Setup {
+
       import HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat
+
       Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(histDocRequestSearch)
+    }
+  }
+
+  "expireAtDateTimeFormat Reads" should {
+    "create the date successfully if the date time is not in right format" in new Setup {
+
+      import HistoricDocumentRequestSearch.expireAtDateTimeFormat
+
+      Json.fromJson(JsString(emptyString)).isSuccess mustBe true
     }
   }
 

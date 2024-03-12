@@ -26,6 +26,7 @@ import java.util.UUID
 class HistoricDocumentRequestSpec extends SpecBase {
 
   "apply" should {
+
     "create the object correctly" in new Setup {
       HistoricDocumentRequest(incomingStatementReqId, historicDocumentRequestSearchDoc) mustBe
         HistoricDocumentRequest(
@@ -36,6 +37,38 @@ class HistoricDocumentRequestSpec extends SpecBase {
           periodEndMonth = MONTH_4,
           periodEndYear = YEAR_2021,
           dan = Some(dan),
+          statementRequestID = UUID.fromString(incomingStatementReqId)
+        )
+    }
+
+    "throw exception when SearchRequest is not found for statementRequestId" in new Setup {
+      intercept[RuntimeException] {
+
+        HistoricDocumentRequest(incomingStatementReqId,
+          historicDocumentRequestSearchDoc.copy(
+            searchRequests = Set(SearchRequest("GB234567890121",
+              "5c79895-f0da-4472-af5a-d84d340e7mn6",
+              SearchResultStatus.inProcess,
+              emptyString, emptyString, 0))
+          )
+        )
+      }.getMessage mustBe s"SearchRequest is not found for statementRequestId :: $incomingStatementReqId"
+
+    }
+
+    "create the object with empty DAN" in new Setup {
+      val paramsWithEmptyDan: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", emptyString)
+
+      HistoricDocumentRequest(incomingStatementReqId,
+        historicDocumentRequestSearchDoc.copy(params = paramsWithEmptyDan)) mustBe
+        HistoricDocumentRequest(
+          eori = EORI(eoriNumber),
+          documentType = FileRole(accountType),
+          periodStartMonth = MONTH_2,
+          periodStartYear = YEAR_2021,
+          periodEndMonth = MONTH_4,
+          periodEndYear = YEAR_2021,
+          dan = None,
           statementRequestID = UUID.fromString(incomingStatementReqId)
         )
     }

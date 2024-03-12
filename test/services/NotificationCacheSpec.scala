@@ -18,13 +18,14 @@ package services
 
 import domain.{Notification, NotificationsForEori}
 import models.{EORI, FileRole}
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import utils.SpecBase
 import utils.TestData.{CSV_FILE_NAME, CURRENT_LOCAL_DATE, FILE_ROLE_C79_CERTIFICATE, FILE_SIZE_1000L}
 
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDateTime, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationCacheSpec extends SpecBase {
@@ -293,7 +294,7 @@ class NotificationCacheSpec extends SpecBase {
 
     val requestedAndNonRequestedNotifications: Seq[Notification] = Seq(c79CertNotification1, c79StatementRequest1)
 
-    val lastUpdated: Option[DateTime] = Some(DateTime.now(DateTimeZone.UTC))
+    val lastUpdated: Option[LocalDateTime] = Some(LocalDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.MILLIS))
 
     val app: Application = GuiceApplicationBuilder().configure(
       "microservice.metrics.enabled" -> false,

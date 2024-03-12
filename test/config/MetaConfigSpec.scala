@@ -22,32 +22,38 @@ import utils.SpecBase
 class MetaConfigSpec extends SpecBase {
 
   "Platform.MDTP" should {
-    "return correct value for MDTP" in {
+    "return correct value" in {
       Platform.MDTP mustBe "MDTP"
     }
   }
 
   "Platform.REGIME_CDS" should {
-    "return correct value for MDTP" in {
+    "return correct value" in {
       Platform.REGIME_CDS mustBe "CDS"
     }
   }
 
   "Platform.DIGITAL" should {
-    "return correct value for MDTP" in {
+    "return correct value" in {
       Platform.DIGITAL mustBe "Digital"
     }
   }
 
   "Platform.ENROLMENT_KEY" should {
-    "return correct value for MDTP" in {
+    "return correct value" in {
       Platform.ENROLMENT_KEY mustBe "HMRC-CUS-ORG"
     }
   }
 
   "Platform.ENROLMENT_IDENTIFIER" should {
-    "return correct value for MDTP" in {
+    "return correct value" in {
       Platform.ENROLMENT_IDENTIFIER mustBe "EORINumber"
+    }
+  }
+
+  "Platform.EXPIRE_TIME_STAMP_SECONDS" should {
+    "return correct value" in {
+      Platform.EXPIRE_TIME_STAMP_SECONDS mustBe 1728000L
     }
   }
 }

@@ -57,6 +57,42 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+    "return 200 when companyName retrieval throws exception" in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
+    "return 200 when VerifiedEmail is returned as None " in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
+    "return 200 when VerifiedEmail retrieval throws exception" in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
     "send email when 4th week duty deferment statement is available" in new Setup {
       val dd4emailRequest: JsValue = Json.parse(
         """
@@ -97,8 +133,7 @@ class MetadataControllerSpec extends SpecBase {
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "weekly",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly",
             "PeriodIssueNumber" -> "4",
             "date" -> "15 Sep 2018",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
@@ -271,8 +306,7 @@ class MetadataControllerSpec extends SpecBase {
 
         status(result) mustBe OK
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "supplementary",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary",
             "date" -> "15 Sep 2018",
             "PeriodIssueNumber" -> "1",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
@@ -320,8 +354,7 @@ class MetadataControllerSpec extends SpecBase {
 
         status(result) mustBe OK
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "excise",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "excise",
             "date" -> "29 Aug 2018",
             "PeriodIssueNumber" -> "1",
             "DutyText" -> "The total excise owed will be collected by direct debit on or before",
@@ -363,7 +396,6 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
 
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_new_c79_certificate")))(any)
       }
@@ -409,7 +441,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_historic_c79_certificate",
             enrolment = testEnrolment)))(any)
@@ -448,7 +479,6 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
 
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_new_import_adjustment")))(any)
       }
@@ -494,7 +524,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_import_adjustment",
             enrolment = testEnrolment)))(any)
@@ -578,7 +607,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_postponed_vat_notification")))(any)
       }
@@ -751,6 +779,7 @@ class MetadataControllerSpec extends SpecBase {
     val emailAddress: EmailAddress = EmailAddress(TEST_EMAIL)
     val testEori: EORI = EORI(EORI_VALUE)
     val testEnrolment: Option[String] = Some("123456789")
+    val errorMsg: String = "Error occurred"
 
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789", inProcess, emptyString, emptyString, 0),

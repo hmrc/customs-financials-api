@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package config
+package connectors
 
-object MetaConfig {
+import services.DateTimeService
+import utils.SpecBase
 
-  val RETURN_PARAM_POSITION = "POSITION"
+class MdgHeadersSpec extends SpecBase {
 
-  object Platform {
-    val MDTP = "MDTP"
-    val REGIME_CDS = "CDS"
-    val DIGITAL = "Digital"
+  "headers" should {
+    "return the mandatory headers with Host when host header is provided" in {
+      val hostHeader = "test_host"
 
-    val SOURCE_MDTP = "mdtp"
-    val ENROLMENT_KEY = "HMRC-CUS-ORG"
-    val ENROLMENT_IDENTIFIER = "EORINumber"
+      val mdgHeadersOb = new MdgHeaders(new DateTimeService())
 
-    val EXPIRE_TIME_STAMP_SECONDS = 1728000L
+      val outputHeaders: Seq[(String, String)] =
+        mdgHeadersOb.headers("test_string", Some(hostHeader))
+
+      outputHeaders.contains(("Host", hostHeader)) mustBe true
+    }
   }
 }

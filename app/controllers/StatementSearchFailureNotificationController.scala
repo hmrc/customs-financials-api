@@ -22,6 +22,7 @@ import models.FailureReason.NO_DOCUMENTS_FOUND
 import models.FailureRetryCount.FINAL_RETRY
 import models.requests.HistoricDocumentRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
+import models.responses.ErrorMessage.technicalErrorDetail
 import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -32,7 +33,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.JSONSchemaValidator
 import utils.Utils.{currentDateTimeAsRFC7231, emptyString, writable}
-import ErrorMessage.technicalErrorDetail
 
 import java.time.LocalDateTime
 import javax.inject.Inject

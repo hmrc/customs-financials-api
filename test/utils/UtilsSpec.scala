@@ -227,5 +227,15 @@ class UtilsSpec extends SpecBase {
         }
       }
     }
+
+    "encodeToUTF8Charsets" should {
+
+      "return the correct value" in {
+        val msg = "test_msg"
+
+        encodeToUTF8Charsets(emptyString) mustBe emptyString
+        encodeToUTF8Charsets(msg) mustBe "dGVzdF9tc2c="
+      }
+    }
   }
 }

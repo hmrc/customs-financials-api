@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsString, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess, Json}
 import utils.SpecBase
 import utils.Utils.emptyString
 
@@ -40,11 +40,18 @@ class AccountNumberSpec extends SpecBase {
   }
 
   "Json reads" should {
+
     "read the object correctly" in {
       import models.AccountNumber.format
       val accountNumberValue = "12345678"
 
       Json.fromJson(JsString(accountNumberValue)) mustBe JsSuccess(AccountNumber(accountNumberValue))
+    }
+
+    "return JsError for invalid input" in {
+      import models.AccountNumber.format
+
+      Json.fromJson(JsNumber(1)) mustBe JsError(s"Expected JSON string type")
     }
   }
 }

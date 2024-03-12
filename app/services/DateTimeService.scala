@@ -16,11 +16,11 @@
 
 package services
 
-import org.joda.time.{DateTime, DateTimeZone}
+import utils.Utils.UTC_TIME_ZONE
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDateTime}
+import java.time.{Instant, LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -34,5 +34,5 @@ class DateTimeService @Inject()() {
     s"${DateTimeFormatter.ISO_DATE_TIME.format(now().truncatedTo(ChronoUnit.SECONDS))}Z"
   }
 
-  def utcDateTime: DateTime = DateTime.now(DateTimeZone.UTC)
+  def utcDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of(UTC_TIME_ZONE)).truncatedTo(ChronoUnit.MILLIS)
 }

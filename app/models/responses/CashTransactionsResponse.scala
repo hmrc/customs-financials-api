@@ -17,7 +17,7 @@
 package models.responses
 
 import models.EORI
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CashTransactionsResponse(getCashAccountTransactionListingResponse: GetCashAccountTransactionListingResponse)
 
@@ -63,29 +63,34 @@ case class PaymentAndWithdrawalDetail(amount: String,
 
 object CashTransactionsResponse {
 
-  implicit val responseCommonFormat = Json.format[CashTransactionsResponseCommon]
+  implicit val responseCommonFormat: OFormat[CashTransactionsResponseCommon] =
+    Json.format[CashTransactionsResponseCommon]
 
-  implicit val paymentAndWithdrawalDetailFormat = Json.format[PaymentAndWithdrawalDetail]
+  implicit val paymentAndWithdrawalDetailFormat: OFormat[PaymentAndWithdrawalDetail] =
+    Json.format[PaymentAndWithdrawalDetail]
 
-  implicit val paymentAndWithdrawalContainerFormat = Json.format[PaymentAndWithdrawalContainer]
+  implicit val paymentAndWithdrawalContainerFormat: OFormat[PaymentAndWithdrawalContainer] =
+    Json.format[PaymentAndWithdrawalContainer]
 
-  implicit val taxGroupFormat = Json.format[TaxGroupDetail]
+  implicit val taxGroupFormat: OFormat[TaxGroupDetail] = Json.format[TaxGroupDetail]
 
-  implicit val taxGroupContainerFormat = Json.format[TaxGroupContainer]
+  implicit val taxGroupContainerFormat: OFormat[TaxGroupContainer] = Json.format[TaxGroupContainer]
 
-  implicit val declarationFormat = Json.format[DeclarationDetail]
+  implicit val declarationFormat: OFormat[DeclarationDetail] = Json.format[DeclarationDetail]
 
-  implicit val declarationContainerFormat = Json.format[DeclarationContainer]
+  implicit val declarationContainerFormat: OFormat[DeclarationContainer] = Json.format[DeclarationContainer]
 
-  implicit val PendingTransactionsFormat = Json.format[PendingTransactions]
+  implicit val PendingTransactionsFormat: OFormat[PendingTransactions] = Json.format[PendingTransactions]
 
-  implicit val dailyStatementDetailFormat = Json.format[DailyStatementDetail]
+  implicit val dailyStatementDetailFormat: OFormat[DailyStatementDetail] = Json.format[DailyStatementDetail]
 
-  implicit val dailyStatementFormat = Json.format[DailyStatementContainer]
+  implicit val dailyStatementFormat: OFormat[DailyStatementContainer] = Json.format[DailyStatementContainer]
 
-  implicit val responseDetailFormat = Json.format[CashTransactionsResponseDetail]
+  implicit val responseDetailFormat: OFormat[CashTransactionsResponseDetail] =
+    Json.format[CashTransactionsResponseDetail]
 
-  implicit val getCashAccountTransactionListingResponseFormat = Json.format[GetCashAccountTransactionListingResponse]
+  implicit val getCashAccountTransactionListingResponseFormat: OFormat[GetCashAccountTransactionListingResponse] =
+    Json.format[GetCashAccountTransactionListingResponse]
 
-  implicit val cashTransactionsResponseFormat = Json.format[CashTransactionsResponse]
+  implicit val cashTransactionsResponseFormat: OFormat[CashTransactionsResponse] = Json.format[CashTransactionsResponse]
 }
