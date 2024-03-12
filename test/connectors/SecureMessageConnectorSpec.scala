@@ -27,7 +27,7 @@ import play.api.test.Helpers.running
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
-import utils.TestData.{COUNTRY_CODE_GB, REGIME, TEST_EMAIL}
+import utils.TestData.{COUNTRY_CODE_GB, ERROR_MSG, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
 
 import java.time.LocalDate
@@ -75,7 +75,7 @@ class SecureMessageConnectorSpec extends SpecBase {
       "successfully post httpclient when getCompanyName call fails and verified email has empty values" in new Setup {
 
         when(mockDataStoreService.getCompanyName(any)(any))
-          .thenReturn(Future.failed(new RuntimeException("error occurred")))
+          .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
         when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
@@ -88,15 +88,14 @@ class SecureMessageConnectorSpec extends SpecBase {
 
       "return error response when exception occurs while getting VerifiedEmail" in new Setup {
 
-        when(mockDataStoreService.getCompanyName(any)(any))
-          .thenReturn(Future.successful(Option("test")))
+        when(mockDataStoreService.getCompanyName(any)(any)).thenReturn(Future.successful(None))
 
         when(mockDataStoreService.getVerifiedEmail(any)(any))
-          .thenReturn(Future.failed(new RuntimeException("Error occurred")))
+          .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
         running(app) {
           connector.sendSecureMessage(histDoc = doc).map {
-            result => result mustBe Left("Error occurred")
+            result => result mustBe Left(ERROR_MSG)
           }
         }
       }

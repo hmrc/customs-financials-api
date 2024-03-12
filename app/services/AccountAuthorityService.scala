@@ -36,11 +36,13 @@ class AccountAuthorityService @Inject()(acc29Connector: Acc29Connector,
 
   def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest,
                               eori: EORI)(implicit hc: HeaderCarrier): Future[Boolean] = {
+
     if (grantAuthorityRequest.editRequest) {
       auditingService.auditEditAuthority(grantAuthorityRequest, eori)
     } else {
       auditingService.auditGrantAuthority(grantAuthorityRequest, eori)
     }
+
     acc30Connector.grantAccountAuthorities(grantAuthorityRequest, eori)
   }
 

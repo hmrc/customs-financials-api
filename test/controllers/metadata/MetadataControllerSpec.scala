@@ -57,10 +57,34 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
-    "return 200 when companyName retrieval throws exception and " in new Setup {
+    "return 200 when companyName retrieval throws exception" in new Setup {
       when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
+    "return 200 when VerifiedEmail is returned as None " in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      running(app) {
+        val result = route(app, addRequest).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+      }
+    }
+
+    "return 200 when VerifiedEmail retrieval throws exception" in new Setup {
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -765,6 +789,7 @@ class MetadataControllerSpec extends SpecBase {
     val emailAddress: EmailAddress = EmailAddress(TEST_EMAIL)
     val testEori: EORI = EORI(EORI_VALUE)
     val testEnrolment: Option[String] = Some("123456789")
+    val errorMsg: String = "Error occurred"
 
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789", inProcess, emptyString, emptyString, 0),

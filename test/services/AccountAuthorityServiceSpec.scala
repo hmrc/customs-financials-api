@@ -86,6 +86,22 @@ class AccountAuthorityServiceSpec extends SpecBase {
           actualResult mustBe false
         }
       }
+
+      "return true when grantAuthorityRequest has editRequest is true" in new Setup {
+        val grantAuthRequestWithEditRequest: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
+
+        when(mockAuditingService.auditEditAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+
+        running(app) {
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthRequestWithEditRequest), eqTo(eori)))
+            .thenReturn(Future.successful(true))
+
+          val actualResult =
+            await(service.grantAccountAuthorities(grantAuthRequestWithEditRequest, EORI("testEORI")))
+
+          actualResult mustBe true
+        }
+      }
     }
 
     "calling ACC30 revokeAccountAuthorities" should {

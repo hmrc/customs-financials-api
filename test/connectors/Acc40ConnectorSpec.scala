@@ -26,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.{EORI_VALUE_1, ERROR_MSG}
 
 import scala.concurrent.Future
 
@@ -38,7 +39,7 @@ class Acc40ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
 
       running(app) {
-        val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
+        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
         result mustBe Left(NoAuthoritiesFound)
       }
     }
@@ -48,7 +49,17 @@ class Acc40ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
 
       running(app) {
-        val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
+        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
+        result mustBe Left(ErrorResponse)
+      }
+    }
+
+    "return error response when exception occurs while making the POST call" in new Setup {
+      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
+
+      running(app) {
+        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
         result mustBe Left(ErrorResponse)
       }
     }
@@ -64,7 +75,7 @@ class Acc40ConnectorSpec extends SpecBase {
               None)))
 
       running(app) {
-        val result = await(connector.searchAuthorities(EORI("someEori"), EORI("someEori")))
+        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
         result mustBe
           Right(
             AuthoritiesFound(Some("1"),
@@ -113,7 +124,7 @@ class Acc40ConnectorSpec extends SpecBase {
       SearchAuthoritiesResponse(
         domain.acc40.Response(
           RequestCommon("date", MDTP, "reference", REGIME_CDS),
-          RequestDetail(EORI("someEORI"), "1", EORI("someOtherEORI")),
+          RequestDetail(EORI(EORI_VALUE_1), "1", EORI("someOtherEORI")),
           ResponseDetail(
             errorMessage = error,
             numberOfAuthorities = numberOfAuthorities,

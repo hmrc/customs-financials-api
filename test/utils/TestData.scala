@@ -81,4 +81,6 @@ object TestData {
   val COUNTRY_CODE_GB = "GB"
 
   val REGIME = "cds"
+
+  val ERROR_MSG = "Error occurred"
 }
