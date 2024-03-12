@@ -26,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.SpecBase
+import utils.TestData.ERROR_MSG
 import utils.Utils.emptyString
 
 import scala.concurrent.Future
@@ -38,6 +39,17 @@ class Acc41ConnectorSpec extends SpecBase {
       when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
         mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
+
+      running(app) {
+        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
+        result mustBe Left(Acc41ErrorResponse)
+      }
+    }
+
+    "return Left Acc41ErrorResponse when POST api call throws exception" in new Setup {
+      when[Future[domain.acc41.StandingAuthoritiesForEORIResponse]](
+        mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
