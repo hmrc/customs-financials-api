@@ -189,6 +189,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
   trait TestData {
     val traderEORI: EORI = EORI("testEORI")
     val traderDan: AccountNumber = AccountNumber("1234567")
+    val testValue = "test_value"
 
     val acc38ResponseCommon: acc38.ResponseCommon = domain.acc38.ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val acc38ResponseCommonMdtpError: acc38.ResponseCommon =
@@ -196,7 +197,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
         "OK",
         None,
         "2020-10-05T09:30:47Z",
-        Some(List(ACC38ReturnParameter(RETURN_PARAM_POSITION, "test_value"))))
+        Some(List(ACC38ReturnParameter(RETURN_PARAM_POSITION, testValue))))
 
     val acc38ContactDetails: acc38.ContactDetails = domain.acc38.ContactDetails(
       Some("Bobby Shaftoe"),
@@ -249,8 +250,7 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       ResponseCommon("OK",
         None,
         "2020-10-05T09:30:47Z",
-        Some(List(ReturnParameter(RETURN_PARAM_POSITION, "test_value")).toArray)
-      )
+        Some(List(ReturnParameter(RETURN_PARAM_POSITION, testValue)).toArray))
 
     val acc37SuccessResponse: Response = domain.acc37.Response(AmendCorrespondenceAddressResponse(acc37ResponseCommon))
 

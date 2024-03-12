@@ -77,7 +77,6 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val result = route(app, addRequest).value
-
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
       }
@@ -89,7 +88,6 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val result = route(app, addRequest).value
-
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
       }
@@ -135,8 +133,7 @@ class MetadataControllerSpec extends SpecBase {
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "weekly",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly",
             "PeriodIssueNumber" -> "4",
             "date" -> "15 Sep 2018",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
@@ -309,8 +306,7 @@ class MetadataControllerSpec extends SpecBase {
 
         status(result) mustBe OK
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "supplementary",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary",
             "date" -> "15 Sep 2018",
             "PeriodIssueNumber" -> "1",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
@@ -358,8 +354,7 @@ class MetadataControllerSpec extends SpecBase {
 
         status(result) mustBe OK
 
-        val params: Map[String, String] =
-          Map("DefermentStatementType" -> "excise",
+        val params: Map[String, String] = Map("DefermentStatementType" -> "excise",
             "date" -> "29 Aug 2018",
             "PeriodIssueNumber" -> "1",
             "DutyText" -> "The total excise owed will be collected by direct debit on or before",
@@ -401,7 +396,6 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
 
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_new_c79_certificate")))(any)
       }
@@ -447,7 +441,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_historic_c79_certificate",
             enrolment = testEnrolment)))(any)
@@ -486,7 +479,6 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
 
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_new_import_adjustment")))(any)
       }
@@ -532,7 +524,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_import_adjustment",
             enrolment = testEnrolment)))(any)
@@ -616,7 +607,6 @@ class MetadataControllerSpec extends SpecBase {
 
         val result = route(app, req).value
         status(result) mustBe OK
-
         verify(mockEmailThrottler)
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_postponed_vat_notification")))(any)
       }
