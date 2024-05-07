@@ -52,9 +52,32 @@ class Acc31ConnectorSpec extends SpecBase {
       }
     }
 
+    "return NoAssociatedData error response when responded with no associated data " +
+      "and additionalTransactions field is set to Y" in new Setup {
+      when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(noDataResponse02))
+
+      running(app) {
+        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+        result mustBe Left(NoAssociatedDataException)
+      }
+    }
+
+
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
       when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(tooMuchDataRequestedResponse))
+
+      running(app) {
+        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+        result mustBe Left(ExceededThresholdErrorException)
+      }
+    }
+
+    "return ExceededThreshold error response when responded with exceeded threshold " +
+      "and additionalTransactions field is set to N" in new Setup {
+      when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        .thenReturn(Future.successful(tooMuchDataRequestedResponse02))
 
       running(app) {
         val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
@@ -71,21 +94,35 @@ class Acc31ConnectorSpec extends SpecBase {
 
     val response: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", None, LocalDate.now().toString),
+        CashTransactionsResponseCommon("OK", None, LocalDate.now().toString, None),
         Some(CashTransactionsResponseDetail(None, None))
       )
     )
 
     val noDataResponse: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString),
+        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, None),
+        Some(CashTransactionsResponseDetail(None, None))
+      )
+    )
+
+    val noDataResponse02: CashTransactionsResponse = CashTransactionsResponse(
+      GetCashAccountTransactionListingResponse(
+        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, Some("Y")),
         Some(CashTransactionsResponseDetail(None, None))
       )
     )
 
     val tooMuchDataRequestedResponse: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString),
+        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, None),
+        Some(CashTransactionsResponseDetail(None, None))
+      )
+    )
+
+    val tooMuchDataRequestedResponse02: CashTransactionsResponse = CashTransactionsResponse(
+      GetCashAccountTransactionListingResponse(
+        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, Some("N")),
         Some(CashTransactionsResponseDetail(None, None))
       )
     )
