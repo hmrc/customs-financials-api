@@ -74,11 +74,11 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
   private def cashAccountTransactions(resp: GetCashAccountTransactionListingResponse):
                                                         Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
     resp.responseCommon match {
-      case CashTransactionsResponseCommon(status@"OK", Some(msg), _) if msg.contains("025-No associated data found") =>
+      case CashTransactionsResponseCommon(status@"OK", Some(msg), _, _) if msg.contains("025-No associated data found") =>
         log.info(message = s"$status: $msg")
         Left(NoAssociatedDataException)
 
-      case CashTransactionsResponseCommon(status@"OK", Some(msg), _) if hasQueryExceededTheThreshold(msg) =>
+      case CashTransactionsResponseCommon(status@"OK", Some(msg), _, _) if hasQueryExceededTheThreshold(msg) =>
         log.info(message = s"$status: $msg")
         Left(ExceededThresholdErrorException)
 

@@ -26,7 +26,8 @@ case class GetCashAccountTransactionListingResponse(responseCommon: CashTransact
 
 case class CashTransactionsResponseCommon(status: String,
                                           statusText: Option[String],
-                                          processingDate: String)
+                                          processingDate: String,
+                                          additionalTransactions: Option[String])
 
 case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
                                           pendingTransactions: Option[PendingTransactions])

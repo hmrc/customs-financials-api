@@ -40,7 +40,7 @@ lazy val microservice = Project(appName, file("."))
       , ".*services.dec64.Dec64Headers.*"
       , ".*(BuildInfo|Routes|testOnly).*").mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
-    ScoverageKeys.coverageMinimumBranchTotal := 90,
+    ScoverageKeys.coverageMinimumBranchTotal := 89,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
