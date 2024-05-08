@@ -32,6 +32,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
+//TODO its only temporarily since EmbeddedMongoDB Support is failing in pipeline, will remove once its fixed.
+// Also set branch coverage to 90%
 @Ignore
 class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   with EmbeddedMongoDBSupport
