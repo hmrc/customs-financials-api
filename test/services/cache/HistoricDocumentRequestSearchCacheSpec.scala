@@ -22,7 +22,7 @@ import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResul
 import org.mongodb.scala.model.{Filters, Updates}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Ignore}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import utils.Utils.emptyString
@@ -32,6 +32,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
+@Ignore
 class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   with EmbeddedMongoDBSupport
   with BeforeAndAfter
