@@ -16,7 +16,10 @@
 
 package connectors
 
-import models.responses.{CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail, GetCashAccountTransactionListingResponse}
+import models.responses.{
+  CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
+  GetCashAccountTransactionListingResponse
+}
 import models.{ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.Application
 import play.api.inject.bind
@@ -27,6 +30,7 @@ import utils.SpecBase
 
 import java.time.LocalDate
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class Acc31ConnectorSpec extends SpecBase {
 
@@ -58,11 +62,11 @@ class Acc31ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(noDataResponse02))
 
       running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Left(NoAssociatedDataException)
+        connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map {
+          result => result mustBe Left(NoAssociatedDataException)
+        }
       }
     }
-
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
       when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
@@ -80,8 +84,9 @@ class Acc31ConnectorSpec extends SpecBase {
         .thenReturn(Future.successful(tooMuchDataRequestedResponse02))
 
       running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Left(ExceededThresholdErrorException)
+        connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map {
+          result => result mustBe Left(ExceededThresholdErrorException)
+        }
       }
     }
   }
