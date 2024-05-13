@@ -5,7 +5,7 @@ import uk.gov.hmrc.DefaultBuildSettings.itSettings
 val appName = "customs-financials-api"
 
 val scala2_13_12 = "2.13.12"
-val bootstrapVersion = "8.5.0"
+val bootstrapVersion = "8.6.0"
 val silencerVersion = "1.7.16"
 
 val testDirectory = "test"
@@ -19,7 +19,7 @@ lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(itSettings())
-  .settings(libraryDependencies ++= Seq("uk.gov.hmrc" %% "bootstrap-test-play-29" % bootstrapVersion % Test))
+  .settings(libraryDependencies ++= Seq("uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion % Test))
 
 lazy val scalastyleSettings = Seq(scalastyleConfig := baseDirectory.value / scalaStyleConfigFile,
   (Test / scalastyleConfig) := baseDirectory.value / testDirectory / testScalaStyleConfigFile)
