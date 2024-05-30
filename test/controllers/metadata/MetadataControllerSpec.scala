@@ -135,7 +135,7 @@ class MetadataControllerSpec extends SpecBase {
 
         val params: Map[String, String] = Map("DefermentStatementType" -> "weekly",
             "PeriodIssueNumber" -> "4",
-            "date" -> "15 Sep 2018",
+            "date" -> "16 Sep 2018",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
             "recipientName_line1" -> TEST_COMPANY)
 
@@ -307,7 +307,7 @@ class MetadataControllerSpec extends SpecBase {
         status(result) mustBe OK
 
         val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary",
-            "date" -> "15 Sep 2018",
+            "date" -> "16 Sep 2018",
             "PeriodIssueNumber" -> "1",
             "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
             "recipientName_line1" -> TEST_COMPANY)

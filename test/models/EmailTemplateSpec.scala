@@ -34,7 +34,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1" -> companyName,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber" -> "4",
-          "date" -> "15 Sep 2018",
+          "date" -> "16 Sep 2018",
           "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
 
         val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
