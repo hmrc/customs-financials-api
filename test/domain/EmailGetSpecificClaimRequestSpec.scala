@@ -47,7 +47,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1" -> TEST_COMPANY,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber" -> "4",
-          "date" -> "15 Sep 2018",
+          "date" -> "16 Sep 2018",
           "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
 
         val expected =
@@ -85,7 +85,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1" -> TEST_COMPANY,
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber" -> "4",
-          "date" -> "15 Sep 2018",
+          "date" -> "16 Sep 2018",
           "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
 
         val expected =
@@ -389,23 +389,23 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         actualDate mustBe expectedDate
       }
 
-      "statement type is not Excise, due date is 15th of the following month" in {
+      "statement type is not Excise, due date is 16th of the following month" in {
         val periodEndYear = 2018
         val periodEndMonth = 9
         val defermentStatementType = "anything that isn't Excise..."
 
-        val expectedDate = "15 Oct 2018"
+        val expectedDate = "16 Oct 2018"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate
       }
 
-      "statement type is not Excise, due date is 15th of January next year, when current month is December" in {
+      "statement type is not Excise, due date is 16th of January next year, when current month is December" in {
         val periodEndYear = 2018
         val periodEndMonth = 12
         val defermentStatementType = "anything that isn't Excise..."
 
-        val expectedDate = "15 Jan 2019"
+        val expectedDate = "16 Jan 2019"
         val actualDate = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate

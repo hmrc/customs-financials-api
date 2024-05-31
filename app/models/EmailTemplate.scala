@@ -36,7 +36,7 @@ sealed trait EmailTemplate {
 object EmailTemplate {
   private val EXCISE_DUTY_DUE_DATE = 29
   private val EXCISE_DUTY_DUE_DATE_FEB = 28
-  private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 15
+  private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 16
   private val emailDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
   def fromNotification(emailAddress: EmailAddress,
