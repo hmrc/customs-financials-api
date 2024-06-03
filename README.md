@@ -644,4 +644,3 @@ tests, you can expect the build to fail.
 This is a sbt command alias specific to this project. It will run a scala style check, run unit tests, run integration
 tests and produce a coverage report:
 > `sbt runAllChecks`
-> 
