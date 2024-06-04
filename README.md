@@ -637,4 +637,10 @@ There is just one test source tree in the `test` folder. Use `sbt test` to run t
 To get a unit test coverage report, you can run `sbt clean coverage test coverageReport`,
 then open the resulting coverage report `target/scala-2.12/scoverage-report/index.html` in a web browser.
 
-Test coverage threshold is set at 90% - so if you commit any significant amount of implementation code without writing tests, you can expect the build to fail.
+Test coverage threshold is set at 90% - so if you commit any significant amount of implementation code without writing 
+tests, you can expect the build to fail.
+
+## All tests and checks
+This is a sbt command alias specific to this project. It will run a scala style check, run unit tests, run integration
+tests and produce a coverage report:
+> `sbt runAllChecks`
