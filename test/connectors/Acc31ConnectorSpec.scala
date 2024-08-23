@@ -57,7 +57,7 @@ class Acc31ConnectorSpec extends SpecBase {
     }
 
     "return NoAssociatedData error response when responded with no associated data " +
-      "and additionalTransactions field is set to Y" in new Setup {
+      "and maxTransactionsExceeded field is set to true" in new Setup {
       when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(noDataResponse02))
 
@@ -79,7 +79,7 @@ class Acc31ConnectorSpec extends SpecBase {
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold " +
-      "and additionalTransactions field is set to N" in new Setup {
+      "and maxTransactionsExceeded field is set to false" in new Setup {
       when[Future[CashTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
         .thenReturn(Future.successful(tooMuchDataRequestedResponse02))
 
@@ -113,7 +113,7 @@ class Acc31ConnectorSpec extends SpecBase {
 
     val noDataResponse02: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, Some("Y")),
+        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, Some(true)),
         Some(CashTransactionsResponseDetail(None, None))
       )
     )
@@ -127,7 +127,7 @@ class Acc31ConnectorSpec extends SpecBase {
 
     val tooMuchDataRequestedResponse02: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, Some("N")),
+        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, Some(false)),
         Some(CashTransactionsResponseDetail(None, None))
       )
     )
