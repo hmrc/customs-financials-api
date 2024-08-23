@@ -1,5 +1,4 @@
 import scoverage.ScoverageKeys
-import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.DefaultBuildSettings.itSettings
 
 val appName = "customs-financials-api"
@@ -25,7 +24,7 @@ lazy val scalastyleSettings = Seq(scalastyleConfig := baseDirectory.value / scal
   (Test / scalastyleConfig) := baseDirectory.value / testDirectory / testScalaStyleConfigFile)
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(PlayKeys.playDefaultPort := 9878)
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
