@@ -53,4 +53,6 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
       case Left(errorValue) => Left(errorValue)
     }
   }
+
+  def retrieveCashAccountTransactions(): Future[Either[ErrorResponse, CashTransactions]] = ???
 }

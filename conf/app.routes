@@ -33,3 +33,5 @@ GET           /customs-financials-api/subscriptions/email-display               
 GET           /api/conf/1.0/*file                                                         controllers.Assets.at(path="/public/api/conf/1.0", file)
 
 POST          /customs/statements/StatementSearchFailureNotification                      controllers.StatementSearchFailureNotificationController.processNotification()
+
+POST          /customs-financials-api/cash-account-transaction-search                     controllers.CashTransactionsController.

@@ -51,6 +51,8 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     }
   }
 
+  def retrieveCashAccountTransactions(): Action[JsValue] = ???
+
   private def failedResponse(errorResponse: ErrorResponse): Result = errorResponse match {
     case NoAssociatedDataException => NotFound
     case ExceededThresholdErrorException => EntityTooLarge
