@@ -34,4 +34,4 @@ GET           /api/conf/1.0/*file                                               
 
 POST          /customs/statements/StatementSearchFailureNotification                      controllers.StatementSearchFailureNotificationController.processNotification()
 
-POST          /customs-financials-api/cash-account-transaction-search                     controllers.CashTransactionsController.
+POST          /customs-financials-api/cash-account-transaction-search                     controllers.CashTransactionsController.retrieveCashAccountTransactions()
