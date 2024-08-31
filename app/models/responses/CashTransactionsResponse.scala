@@ -32,6 +32,22 @@ case class CashTransactionsResponseCommon(status: String,
 case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
                                           pendingTransactions: Option[PendingTransactions])
 
+case class EoriData(eoriNumber: String, name: String)
+case class Declaration(declarationID: String,
+                       declarantEORINumber: String,
+                       declarantRef: Option[String] = None,
+                       c18OrOverpaymentReference: Option[String] = None,
+                       importersEORINumber: String,
+                       postingDate: String,
+                       acceptanceDate: String,
+                       amount: Double)
+
+case class TaxGroup()
+case class CashAccountTransactionSearchResponseDetail(can: String,
+                                                      eoriDetails: Seq[EoriData],
+                                                      declarations: Option[Seq[Declaration]],
+                                                      taxGroups: Option[Seq[TaxGroup]])
+
 case class DailyStatementContainer(dailyStatement: DailyStatementDetail)
 
 case class DailyStatementDetail(date: String,
