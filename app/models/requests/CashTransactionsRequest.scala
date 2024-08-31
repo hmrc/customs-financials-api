@@ -51,7 +51,9 @@ object SearchType extends Enumeration {
 
   val P, D = Value
 
-  implicit val searchTypeReads: Reads[requests.SearchType.Value] = JsPath.read[String].map(strVal => SearchType.withName(strVal))
+  implicit val searchTypeReads: Reads[requests.SearchType.Value] =
+    JsPath.read[String].map(strVal => SearchType.withName(strVal))
+
   implicit val searchTypeWrites: Writes[SearchType.Value] = Writes { value => JsString(value.toString) }
 
   implicit val searchTypeFormat: Format[requests.SearchType.Value] = Format(searchTypeReads, searchTypeWrites)
@@ -62,14 +64,15 @@ object ParamName extends Enumeration {
 
   val MRN, UCR = Value
 
-  implicit val paramNameReads: Reads[requests.ParamName.Value] = JsPath.read[String].map(strVal => ParamName.withName(strVal))
+  implicit val paramNameReads: Reads[requests.ParamName.Value] =
+    JsPath.read[String].map(strVal => ParamName.withName(strVal))
+
   implicit val paramNameWrites: Writes[ParamName.Value] = Writes { value => JsString(value.toString) }
 
   implicit val paramNameFormat: Format[requests.ParamName.Value] = Format(paramNameReads, paramNameWrites)
 }
 
-case class DeclarationDetails(paramName: ParamName.Value,
-                              paramValue: String)
+case class DeclarationDetails(paramName: ParamName.Value, paramValue: String)
 
 object DeclarationDetails {
   implicit val format: OFormat[DeclarationDetails] = Json.format[DeclarationDetails]
