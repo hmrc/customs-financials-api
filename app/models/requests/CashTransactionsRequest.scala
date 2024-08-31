@@ -51,9 +51,7 @@ object SearchType extends Enumeration {
 
   val P, D = Value
 
-  implicit val searchTypeReads: Reads[requests.SearchType.Value] =
-    JsPath.read[String].map(strVal => SearchType.withName(strVal))
-
+  implicit val searchTypeReads: Reads[SearchType.Value] = JsPath.read[String].map(strVal => SearchType.withName(strVal))
   implicit val searchTypeWrites: Writes[SearchType.Value] = Writes { value => JsString(value.toString) }
 
   implicit val searchTypeFormat: Format[requests.SearchType.Value] = Format(searchTypeReads, searchTypeWrites)
@@ -64,9 +62,7 @@ object ParamName extends Enumeration {
 
   val MRN, UCR = Value
 
-  implicit val paramNameReads: Reads[requests.ParamName.Value] =
-    JsPath.read[String].map(strVal => ParamName.withName(strVal))
-
+  implicit val paramNameReads: Reads[ParamName.Value] = JsPath.read[String].map(strVal => ParamName.withName(strVal))
   implicit val paramNameWrites: Writes[ParamName.Value] = Writes { value => JsString(value.toString) }
 
   implicit val paramNameFormat: Format[requests.ParamName.Value] = Format(paramNameReads, paramNameWrites)
@@ -86,12 +82,32 @@ object CashAccountPaymentDetails {
   implicit val format: OFormat[CashAccountPaymentDetails] = Json.format[CashAccountPaymentDetails]
 }
 
-case class CashTransactionSearchRequestDetails(can: String,
-                                               ownerEORI: String,
-                                               searchType: SearchType.Value,
-                                               declarationDetails: Option[DeclarationDetails] = None,
-                                               cashAccountPaymentDetails: Option[CashAccountPaymentDetails] = None)
+case class CashAccountTransactionSearchRequestDetails(can: String,
+                                                      ownerEORI: String,
+                                                      searchType: SearchType.Value,
+                                                      declarationDetails: Option[DeclarationDetails] = None,
+                                                      cashAccountPaymentDetails: Option[CashAccountPaymentDetails] = None)
 
-object CashTransactionSearchRequestDetails {
-  implicit val format: OFormat[CashTransactionSearchRequestDetails] = Json.format[CashTransactionSearchRequestDetails]
+object CashAccountTransactionSearchRequestDetails {
+
+  implicit val format: OFormat[CashAccountTransactionSearchRequestDetails] =
+    Json.format[CashAccountTransactionSearchRequestDetails]
+}
+
+case class CashAccountTransactionSearchRequest(requestCommon: CashTransactionsRequestCommon,
+                                               requestDetail: CashAccountTransactionSearchRequestDetails)
+
+object CashAccountTransactionSearchRequest {
+  implicit val requestCommonWrites: OFormat[CashTransactionsRequestCommon] = Json.format[CashTransactionsRequestCommon]
+  implicit val requestDetailFormat: OFormat[CashAccountTransactionSearchRequestDetails] =
+    Json.format[CashAccountTransactionSearchRequestDetails]
+
+  implicit val format: OFormat[CashAccountTransactionSearchRequest] = Json.format[CashAccountTransactionSearchRequest]
+}
+
+case class CashAccountTransactionSearchRequestWrapper(cashAccountTransactionSearchRequest: CashAccountTransactionSearchRequest)
+
+object CashAccountTransactionSearchRequestWrapper {
+  implicit val format: OFormat[CashAccountTransactionSearchRequestWrapper] =
+    Json.format[CashAccountTransactionSearchRequestWrapper]
 }

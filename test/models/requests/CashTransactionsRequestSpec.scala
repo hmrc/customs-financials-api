@@ -26,7 +26,6 @@ class CashTransactionsRequestSpec extends SpecBase {
   "SearchType" should {
 
     "return correct value for Json Reads" in {
-
       import models.requests.SearchType.searchTypeReads
 
       val incomingJsValueP: JsString = JsString("P")
@@ -45,7 +44,6 @@ class CashTransactionsRequestSpec extends SpecBase {
   "ParamName" should {
 
     "return correct value for Json Reads" in {
-
       import models.requests.ParamName.paramNameReads
 
       val incomingJsValueMRN: JsString = JsString("MRN")
@@ -78,11 +76,10 @@ class CashTransactionsRequestSpec extends SpecBase {
     }
   }
 
-  "CashTransactionSearchRequestDetails" should {
+  "CashAccountTransactionSearchRequestDetails" should {
 
     "return correct value for Json Reads" in new Setup {
-
-      import models.requests.CashTransactionSearchRequestDetails.format
+      import models.requests.CashAccountTransactionSearchRequestDetails.format
 
       Json.fromJson(Json.parse(cashTranSearchRequestDetailsObString)) mustBe JsSuccess(cashTranSearchRequestDetailsOb)
     }
@@ -92,14 +89,54 @@ class CashTransactionsRequestSpec extends SpecBase {
     }
   }
 
+  "CashAccountTransactionSearchRequest" should {
+
+    "return correct value for Json Reads" in new Setup {
+      import models.requests.CashAccountTransactionSearchRequest.format
+
+      Json.fromJson(Json.parse(cashAccTransSearchRequestJsString)) mustBe JsSuccess(cashAccTransSearchRequestOb)
+    }
+
+    "return correct value for Json Writes" in new Setup {
+      Json.toJson(cashAccTransSearchRequestOb) mustBe Json.parse(cashAccTransSearchRequestJsString)
+    }
+  }
+
+  "CashAccountTransactionSearchRequestWrapper" should {
+
+    "return correct value for Json Reads" in new Setup {
+      import models.requests.CashAccountTransactionSearchRequestWrapper.format
+
+      Json.fromJson(Json.parse(cashAccTransSearchRequestWithSearchTypeDJsString)) mustBe
+        JsSuccess(cashAccTransSearchRequestWrapperOb)
+    }
+
+    "return correct value for Json Writes" in new Setup {
+      Json.toJson(cashAccTransSearchRequestWrapperOb) mustBe
+        Json.parse(cashAccTransSearchRequestWithSearchTypeDJsString)
+    }
+  }
+
   trait Setup {
     val amount = 999.90
+
     val dateFromString = "2024-05-28"
     val dateToString = "2024-05-28"
-    val can = "12345678"
+
+    val can = "12345678901"
+
     val ownerEORI = "test_eori"
+    val ownerEoriGB = "GB1234678900"
+
     val paramValue = "test_value"
+    val paramValue_1 = "123456789abcd"
+
+    val originatingSystem = "MDTP"
+    val receiptDate = "2001-12-17T09:30:47Z"
+    val acknowledgementReference = "601bb176b8e411ed8a9800001e3b1802"
+
     val declarationDetailsOb: DeclarationDetails = DeclarationDetails(MRN, paramValue)
+    val declarationDetailsWithUCROb: DeclarationDetails = DeclarationDetails(UCR, paramValue_1)
 
     val cashAccountPaymentDetailsOb: CashAccountPaymentDetails =
       CashAccountPaymentDetails(amount, Some(dateFromString), Some(dateToString))
@@ -110,15 +147,63 @@ class CashTransactionsRequestSpec extends SpecBase {
     val cashAccountPaymentDetailsAmountOnlyJsString =
       """{"amount":999.9}"""
 
-    val cashTranSearchRequestDetailsOb: CashTransactionSearchRequestDetails =
-      CashTransactionSearchRequestDetails(can, ownerEORI, P, Some(declarationDetailsOb), Some(cashAccountPaymentDetailsOb))
+    val cashTranSearchRequestDetailsOb: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(can, ownerEORI, P, Some(declarationDetailsOb), Some(cashAccountPaymentDetailsOb))
+
+    val cashTranSearchRequestDetailsWithSearchTypeDOb: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, D, Some(declarationDetailsWithUCROb))
 
     val cashTranSearchRequestDetailsObString: String =
-      """{"can":"12345678",
+      """{"can":"12345678901",
         |"ownerEORI":"test_eori",
         |"searchType":"P",
         |"declarationDetails":{"paramName":"MRN","paramValue":"test_value"},
         |"cashAccountPaymentDetails":{"amount":999.9,"dateFrom":"2024-05-28","dateTo":"2024-05-28"}
+        |}""".stripMargin
+
+    val commonRequest: CashTransactionsRequestCommon =
+      CashTransactionsRequestCommon(originatingSystem, receiptDate, acknowledgementReference)
+
+    val cashAccTransSearchRequestOb: CashAccountTransactionSearchRequest =
+      CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsOb)
+
+    val cashAccTransSearchRequestWithSearchTypeDOb: CashAccountTransactionSearchRequest =
+      CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsWithSearchTypeDOb)
+
+    val cashAccTransSearchRequestWrapperOb: CashAccountTransactionSearchRequestWrapper =
+      CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequestWithSearchTypeDOb)
+
+    val cashAccTransSearchRequestJsString: String =
+      """{
+        |"requestCommon":{"originatingSystem":"MDTP",
+        |"receiptDate":"2001-12-17T09:30:47Z","acknowledgementReference":"601bb176b8e411ed8a9800001e3b1802"
+        |},
+        |"requestDetail":{"can":"12345678901",
+        |"ownerEORI":"test_eori",
+        |"searchType":"P",
+        |"declarationDetails":{"paramName":"MRN","paramValue":"test_value"},
+        |"cashAccountPaymentDetails":{"amount":999.9,"dateFrom":"2024-05-28","dateTo":"2024-05-28"}
+        |}
+        |}""".stripMargin
+
+    val cashAccTransSearchRequestWithSearchTypeDJsString: String =
+      """{
+        |"cashAccountTransactionSearchRequest": {
+        |"requestCommon": {
+        |"originatingSystem": "MDTP",
+        |"receiptDate": "2001-12-17T09:30:47Z",
+        |"acknowledgementReference": "601bb176b8e411ed8a9800001e3b1802"
+        |},
+        |"requestDetail": {
+        |"can": "12345678901",
+        |"ownerEORI": "GB1234678900",
+        |"searchType": "D",
+        |"declarationDetails": {
+        |"paramName": "UCR",
+        |"paramValue": "123456789abcd"
+        |}
+        |}
+        |}
         |}""".stripMargin
   }
 }
