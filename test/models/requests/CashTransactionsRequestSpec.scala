@@ -109,11 +109,17 @@ class CashTransactionsRequestSpec extends SpecBase {
 
       Json.fromJson(Json.parse(cashAccTransSearchRequestWithSearchTypeDJsString)) mustBe
         JsSuccess(cashAccTransSearchRequestWrapperOb)
+
+      Json.fromJson(Json.parse(cashAccTransSearchRequestWithSearchTypePJsString)) mustBe
+        JsSuccess(cashAccTransSearchRequestWrapperWithSearchTypePOb)
     }
 
     "return correct value for Json Writes" in new Setup {
       Json.toJson(cashAccTransSearchRequestWrapperOb) mustBe
         Json.parse(cashAccTransSearchRequestWithSearchTypeDJsString)
+
+      Json.toJson(cashAccTransSearchRequestWrapperWithSearchTypePOb) mustBe
+        Json.parse(cashAccTransSearchRequestWithSearchTypePJsString)
     }
   }
 
@@ -148,10 +154,14 @@ class CashTransactionsRequestSpec extends SpecBase {
       """{"amount":999.9}"""
 
     val cashTranSearchRequestDetailsOb: CashAccountTransactionSearchRequestDetails =
-      CashAccountTransactionSearchRequestDetails(can, ownerEORI, P, Some(declarationDetailsOb), Some(cashAccountPaymentDetailsOb))
+      CashAccountTransactionSearchRequestDetails(
+        can, ownerEORI, P, Some(declarationDetailsOb), Some(cashAccountPaymentDetailsOb))
 
     val cashTranSearchRequestDetailsWithSearchTypeDOb: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, D, Some(declarationDetailsWithUCROb))
+
+    val cashTranSearchRequestDetailsWithSearchTypePOb: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, P, None, Some(cashAccountPaymentDetailsOb))
 
     val cashTranSearchRequestDetailsObString: String =
       """{"can":"12345678901",
@@ -170,8 +180,14 @@ class CashTransactionsRequestSpec extends SpecBase {
     val cashAccTransSearchRequestWithSearchTypeDOb: CashAccountTransactionSearchRequest =
       CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsWithSearchTypeDOb)
 
+    val cashAccTransSearchRequestWithSearchTypePOb: CashAccountTransactionSearchRequest =
+      CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsWithSearchTypePOb)
+
     val cashAccTransSearchRequestWrapperOb: CashAccountTransactionSearchRequestWrapper =
       CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequestWithSearchTypeDOb)
+
+    val cashAccTransSearchRequestWrapperWithSearchTypePOb: CashAccountTransactionSearchRequestWrapper =
+      CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequestWithSearchTypePOb)
 
     val cashAccTransSearchRequestJsString: String =
       """{
@@ -205,5 +221,26 @@ class CashTransactionsRequestSpec extends SpecBase {
         |}
         |}
         |}""".stripMargin
+
+    val cashAccTransSearchRequestWithSearchTypePJsString: String =
+     """{
+       |"cashAccountTransactionSearchRequest": {
+       |"requestCommon": {
+       |"originatingSystem": "MDTP",
+       |"receiptDate": "2001-12-17T09:30:47Z",
+       |"acknowledgementReference": "601bb176b8e411ed8a9800001e3b1802"
+       |},
+       |"requestDetail": {
+       |"can": "12345678901",
+       |"ownerEORI": "GB1234678900",
+       |"searchType": "P",
+       |"cashAccountPaymentDetails": {
+       |"amount": 999.90,
+       |"dateFrom": "2024-05-28",
+       |"dateTo": "2024-05-28"
+       |}
+       |}
+       |}
+       |}""".stripMargin
   }
 }
