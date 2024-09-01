@@ -98,6 +98,10 @@ object CashTransactionsResponse {
 
 case class EoriData(eoriNumber: String, name: String)
 
+object EoriData {
+  implicit val format: OFormat[EoriData] = Json.format[EoriData]
+}
+
 case class Declaration(declarationID: String,
                        declarantEORINumber: String,
                        declarantRef: Option[String] = None,
@@ -107,11 +111,23 @@ case class Declaration(declarationID: String,
                        acceptanceDate: String,
                        amount: Double)
 
+object Declaration {
+  implicit val format: OFormat[Declaration] = Json.format[Declaration]
+}
+
 case class TaxGroup(taxGroupDescription: String, amount: Double)
+
+object TaxGroup {
+  implicit val format: OFormat[TaxGroup] = Json.format[TaxGroup]
+}
 
 case class TaxType(reasonForSecurity: Option[String] = None,
                    taxTypeID: String,
                    amount: Double)
+
+object TaxType {
+  implicit val format: OFormat[TaxType] = Json.format[TaxType]
+}
 
 object PaymentType extends Enumeration {
   type PaymentType = Value
