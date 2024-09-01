@@ -17,7 +17,7 @@
 package models.responses
 
 import models.EORI
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 case class CashTransactionsResponse(getCashAccountTransactionListingResponse: GetCashAccountTransactionListingResponse)
 
@@ -31,22 +31,6 @@ case class CashTransactionsResponseCommon(status: String,
 
 case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
                                           pendingTransactions: Option[PendingTransactions])
-
-case class EoriData(eoriNumber: String, name: String)
-case class Declaration(declarationID: String,
-                       declarantEORINumber: String,
-                       declarantRef: Option[String] = None,
-                       c18OrOverpaymentReference: Option[String] = None,
-                       importersEORINumber: String,
-                       postingDate: String,
-                       acceptanceDate: String,
-                       amount: Double)
-
-case class TaxGroup()
-case class CashAccountTransactionSearchResponseDetail(can: String,
-                                                      eoriDetails: Seq[EoriData],
-                                                      declarations: Option[Seq[Declaration]],
-                                                      taxGroups: Option[Seq[TaxGroup]])
 
 case class DailyStatementContainer(dailyStatement: DailyStatementDetail)
 
@@ -110,4 +94,70 @@ object CashTransactionsResponse {
     Json.format[GetCashAccountTransactionListingResponse]
 
   implicit val cashTransactionsResponseFormat: OFormat[CashTransactionsResponse] = Json.format[CashTransactionsResponse]
+}
+
+case class EoriData(eoriNumber: String, name: String)
+
+case class Declaration(declarationID: String,
+                       declarantEORINumber: String,
+                       declarantRef: Option[String] = None,
+                       c18OrOverpaymentReference: Option[String] = None,
+                       importersEORINumber: String,
+                       postingDate: String,
+                       acceptanceDate: String,
+                       amount: Double)
+
+case class TaxGroup(taxGroupDescription: String, amount: Double)
+
+case class TaxType(reasonForSecurity: Option[String] = None,
+                   taxTypeID: String,
+                   amount: Double)
+
+object PaymentType extends Enumeration {
+  type PaymentType = Value
+
+  val Payment, Withdrawal, Transfer = Value
+
+  implicit val paymentTypeReads: Reads[PaymentType.Value] = JsPath.read[String].map(strVal => PaymentType.withName(strVal))
+  implicit val paymentTypeWrites: Writes[PaymentType.Value] = Writes { value => JsString(value.toString) }
+
+  implicit val format: Format[PaymentType.Value] = Format(paymentTypeReads, paymentTypeWrites)
+}
+
+case class PaymentsWithdrawalsAndTransfer(valueDate: String,
+                                          postingDate: String,
+                                          paymentReference: String,
+                                          amount: Double,
+                                          `type`: PaymentType.Value,
+                                          bankAccount: Option[String] = None,
+                                          sortCode: Option[String] = None)
+
+object PaymentsWithdrawalsAndTransfer {
+  implicit val format: OFormat[PaymentsWithdrawalsAndTransfer] = Json.format[PaymentsWithdrawalsAndTransfer]
+}
+
+case class CashAccountTransactionSearchResponseDetail(can: String,
+                                                      eoriDetails: Seq[EoriData],
+                                                      declarations: Option[Seq[Declaration]],
+                                                      taxGroups: Option[Seq[TaxGroup]],
+                                                      taxTypes: Seq[TaxType],
+                                                      paymentsWithdrawalsAndTransfers: Option[Seq[PaymentsWithdrawalsAndTransfer]] = None)
+
+object CashAccountTransactionSearchResponseDetail {
+  implicit val format: OFormat[CashAccountTransactionSearchResponseDetail] =
+    Json.format[CashAccountTransactionSearchResponseDetail]
+}
+
+case class CashAccountTransactionSearchResponse(responseCommon: CashTransactionsResponseCommon,
+                                                responseDetail: Option[CashAccountTransactionSearchResponseDetail] = None)
+
+object CashAccountTransactionSearchResponse {
+  implicit val format: OFormat[CashAccountTransactionSearchResponse] = Json.format[CashAccountTransactionSearchResponse]
+}
+
+case class CashAccountTransactionSearchResponseWrapper(cashAccountTransactionSearchResponse: CashAccountTransactionSearchResponse)
+
+object CashAccountTransactionSearchResponseWrapper {
+  implicit val format: OFormat[CashAccountTransactionSearchResponseWrapper] =
+    Json.format[CashAccountTransactionSearchResponseWrapper]
 }
