@@ -25,10 +25,17 @@ case class CashTransactionsResponse(getCashAccountTransactionListingResponse: Ge
 case class GetCashAccountTransactionListingResponse(responseCommon: CashTransactionsResponseCommon,
                                                     responseDetail: Option[CashTransactionsResponseDetail])
 
+case class ReturnParameter(paramName: String, paramValue: String)
+
+object ReturnParameter {
+  implicit val format: OFormat[ReturnParameter] = Json.format[ReturnParameter]
+}
+
 case class CashTransactionsResponseCommon(status: String,
                                           statusText: Option[String],
                                           processingDate: String,
-                                          maxTransactionsExceeded: Option[Boolean])
+                                          maxTransactionsExceeded: Option[Boolean],
+                                          returnParameters: Option[Array[ReturnParameter]] = None)
 
 case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
                                           pendingTransactions: Option[PendingTransactions])
