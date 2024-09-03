@@ -55,30 +55,29 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
       appConfig.acc44CashTransactionSearchEndpoint,
       cashAccTransSearchRequestContainer,
       headers = headers.headers(appConfig.acc44BearerToken, None)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly).map {
-
-      res => res.status match {
+    )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
+      res.status match {
         case OK | CREATED => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-            Left(Json.fromJson[ErrorDetail](res.json).get)
-          } else {
-            Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](JsString(res.body)).get)
-          }
+          Left(Json.fromJson[ErrorDetail](res.json).get)
+        } else {
+          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](JsString(res.body)).get)
+        }
 
         case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-            Left(Json.fromJson[ErrorDetail](res.json).get)
-          } else {
-            Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-              "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
-            )
+          Left(Json.fromJson[ErrorDetail](res.json).get)
+        } else {
+          Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
+            "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
+          )
         }
 
         case _ => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-            Left(Json.fromJson[ErrorDetail](res.json).get)
-          } else {
-            Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-              "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
-            )
-          }
+          Left(Json.fromJson[ErrorDetail](res.json).get)
+        } else {
+          Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
+            "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
+          )
+        }
       }
     }.recover {
       case exception: Throwable =>
