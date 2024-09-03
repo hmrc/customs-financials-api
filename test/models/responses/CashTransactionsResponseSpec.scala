@@ -98,17 +98,17 @@ class CashTransactionsResponseSpec extends SpecBase {
     }
   }
 
-  "CashAccountTransactionSearchResponseWrapper" should {
+  "CashAccountTransactionSearchResponseContainer" should {
 
     "generate correct output for Json Reads" in new SetUp {
-      import models.responses.CashAccountTransactionSearchResponseWrapper.format
+      import models.responses.CashAccountTransactionSearchResponseContainer.format
 
-      Json.fromJson(Json.parse(cashAccTranSearchResponseWrapperJsString)) mustBe
-        JsSuccess(cashAccTranSearchResponseWrapperOb)
+      Json.fromJson(Json.parse(cashAccTranSearchResponseContainerJsString)) mustBe
+        JsSuccess(cashAccTranSearchResponseContainerOb)
     }
 
     "generate correct output for Json Writes" in new SetUp {
-      Json.toJson(cashAccTranSearchResponseWrapperOb) mustBe Json.parse(cashAccTranSearchResponseWrapperJsString)
+      Json.toJson(cashAccTranSearchResponseContainerOb) mustBe Json.parse(cashAccTranSearchResponseContainerJsString)
     }
   }
 
@@ -240,10 +240,10 @@ class CashTransactionsResponseSpec extends SpecBase {
         |}
         |}""".stripMargin
 
-    val cashAccTranSearchResponseWrapperOb: CashAccountTransactionSearchResponseWrapper =
-      CashAccountTransactionSearchResponseWrapper(cashAccountTransactionSearchResponseOb)
+    val cashAccTranSearchResponseContainerOb: CashAccountTransactionSearchResponseContainer =
+      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseOb)
 
-    val cashAccTranSearchResponseWrapperJsString: String =
+    val cashAccTranSearchResponseContainerJsString: String =
       """{
         |"cashAccountTransactionSearchResponse": {
         |"responseCommon": {

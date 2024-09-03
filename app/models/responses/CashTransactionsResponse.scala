@@ -220,9 +220,9 @@ object CashAccountTransactionSearchResponse {
   implicit val format: OFormat[CashAccountTransactionSearchResponse] = Json.format[CashAccountTransactionSearchResponse]
 }
 
-case class CashAccountTransactionSearchResponseWrapper(cashAccountTransactionSearchResponse: CashAccountTransactionSearchResponse)
+case class CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponse: CashAccountTransactionSearchResponse)
 
-object CashAccountTransactionSearchResponseWrapper {
-  implicit val format: OFormat[CashAccountTransactionSearchResponseWrapper] =
-    Json.format[CashAccountTransactionSearchResponseWrapper]
+object CashAccountTransactionSearchResponseContainer {
+  implicit val format: OFormat[CashAccountTransactionSearchResponseContainer] =
+    Json.format[CashAccountTransactionSearchResponseContainer]
 }
