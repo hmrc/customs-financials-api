@@ -19,6 +19,8 @@ package services
 import connectors.Acc31Connector
 import domain.CashTransactions
 import models.ErrorResponse
+import models.requests.CashAccountTransactionSearchRequestDetails
+import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, SourceFaultDetail}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -54,5 +56,10 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
     }
   }
 
-  def retrieveCashAccountTransactions(): Future[Either[ErrorResponse, CashTransactions]] = ???
+  def retrieveCashAccountTransactions(request: CashAccountTransactionSearchRequestDetails): Future[Either[ErrorDetail,
+    CashAccountTransactionSearchResponseContainer]] = {
+    Future.successful(
+      Left(
+        ErrorDetail("test_timestamp", "test", "test", "test", "test", SourceFaultDetail(Seq()))))
+  }
 }

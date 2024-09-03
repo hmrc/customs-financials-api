@@ -17,6 +17,8 @@
 package controllers
 
 import domain.CashDailyStatement._
+import models.requests.CashAccountTransactionSearchRequestDetails
+import models.responses.ErrorCode.code400
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
@@ -51,7 +53,15 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     }
   }
 
-  def retrieveCashAccountTransactions(): Action[JsValue] = ???
+  def retrieveCashAccountTransactions(): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    withJsonBody[CashAccountTransactionSearchRequestDetails] { cashTransactionsSearchReq =>
+      service.retrieveCashAccountTransactions(cashTransactionsSearchReq).map {
+        case Right(cashAccTransSearchResponse) => Ok(Json.toJson(cashAccTransSearchResponse))
+        case Left(errorDetail) =>
+          if (errorDetail.errorCode == code400) BadRequest else InternalServerError
+      }
+    }
+  }
 
   private def failedResponse(errorResponse: ErrorResponse): Result = errorResponse match {
     case NoAssociatedDataException => NotFound
