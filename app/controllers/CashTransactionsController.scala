@@ -55,7 +55,7 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     }
   }
 
-  def retrieveCashAccountTransactions(): Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def retrieveCashAccountTransactions: Action[JsValue] = Action.async(parse.json) { implicit request =>
     withJsonBody[CashAccountTransactionSearchRequestDetails] { cashTransactionsSearchReq =>
 
       service.retrieveCashAccountTransactions(cashTransactionsSearchReq).map {
