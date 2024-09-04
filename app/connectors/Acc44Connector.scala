@@ -83,7 +83,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
     }.recover {
       case exception: Throwable =>
         log.error("Error occurred while calling backend System")
-        
+
         Left(
           ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, "ETMP",
             SourceFaultDetail(Seq("Failure while calling ETMP")))
