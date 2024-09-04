@@ -213,7 +213,7 @@ class Acc44ConnectorSpec extends SpecBase {
       CashAccountTransactionSearchResponseDetail(
         can,
         eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
-        declarations = Some(Seq(Declaration(declarationID,
+        declarations = Some(Seq(DeclarationWrapper(Declaration(declarationID,
           eoriNumber,
           Some(declarantRef),
           Some(c18OrOverpaymentReference),
@@ -221,8 +221,12 @@ class Acc44ConnectorSpec extends SpecBase {
           dateString,
           dateString,
           amount,
-          Seq(TaxGroup("Customs", amount, Seq(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))
-      )
+          Seq(TaxGroupWrapper(
+            TaxGroup(
+              "Customs",
+              amount,
+              Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))))
+      ))
 
     val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",

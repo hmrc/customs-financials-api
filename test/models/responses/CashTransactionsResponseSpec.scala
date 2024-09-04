@@ -25,6 +25,7 @@ class CashTransactionsResponseSpec extends SpecBase {
   "PaymentAndWithdrawalDetail" should {
 
     "generate correct output for Json Writes" in new Setup {
+
       import models.responses.CashTransactionsResponse.paymentAndWithdrawalDetailFormat
 
       Json.toJson(PaymentAndWithdrawalDetail("999", "test", Some("1234567890987"))) mustBe
@@ -54,6 +55,7 @@ class CashTransactionsResponseSpec extends SpecBase {
   "PaymentsWithdrawalsAndTransfer" should {
 
     "generate correct output for Json Reads" in new Setup {
+
       import models.responses.PaymentsWithdrawalsAndTransfer.format
 
       Json.fromJson(Json.parse(paymentsWithdrawalAndTransferJsString)) mustBe
@@ -61,6 +63,7 @@ class CashTransactionsResponseSpec extends SpecBase {
     }
 
     "generate correct output for Json Writes" in new Setup {
+
       import models.responses.PaymentsWithdrawalsAndTransfer.format
 
       Json.toJson(paymentsWithdrawalsAndTransferOb) mustBe Json.parse(paymentsWithdrawalAndTransferJsString)
@@ -70,6 +73,7 @@ class CashTransactionsResponseSpec extends SpecBase {
   "CashAccountTransactionSearchResponseDetail" should {
 
     "generate correct output for Json Reads" in new Setup {
+
       import models.responses.CashAccountTransactionSearchResponseDetail.format
 
       Json.fromJson(Json.parse(cashAccountTransactionSearchResponseDetailJsString)) mustBe
@@ -86,6 +90,7 @@ class CashTransactionsResponseSpec extends SpecBase {
   "CashAccountTransactionSearchResponse" should {
 
     "generate correct output for Json Reads" in new Setup {
+
       import models.responses.CashAccountTransactionSearchResponse.format
 
       Json.fromJson(Json.parse(cashAccountTransactionSearchResponseJsString)) mustBe
@@ -106,6 +111,9 @@ class CashTransactionsResponseSpec extends SpecBase {
       "response is success" in new Setup {
         Json.fromJson(Json.parse(cashAccTranSearchResponseContainerJsString)) mustBe
           JsSuccess(cashAccTranSearchResponseContainerOb)
+
+        Json.fromJson(Json.parse(cashAccTranSearchResponseContainerWithDeclarationJsString)) mustBe
+          JsSuccess(cashAccTranSearchResponseContainerWithDeclarationOb)
       }
 
       "EIS returns 201 to MDTP" in new Setup {
@@ -151,6 +159,12 @@ class CashTransactionsResponseSpec extends SpecBase {
     val can = "12345678909"
     val eoriNumber = "GB123456789"
     val eoriDataName = "test"
+
+    val declarationID = "24GB123456789"
+    val declarantEORINumber = "GB12345678"
+    val declarantRef = "1234567890abcdefgh"
+    val c18OrOverpaymentReference = "RPCSCCCS1"
+    val importersEORINumber = "GB1234567"
 
     val paymentsWithdrawalsAndTransferOb: PaymentsWithdrawalsAndTransfer =
       PaymentsWithdrawalsAndTransfer(
@@ -201,6 +215,33 @@ class CashTransactionsResponseSpec extends SpecBase {
             ))
       )
 
+    val declarationWrapper: DeclarationWrapper = DeclarationWrapper(
+      Declaration(
+        declarationID,
+        declarantEORINumber,
+        Some(declarantRef),
+        Some(c18OrOverpaymentReference),
+        importersEORINumber,
+        dateString,
+        dateString,
+        amount,
+        taxGroups =
+          Seq(
+            TaxGroupWrapper(
+              TaxGroup(
+                "Customs",
+                amount,
+                Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))
+    )
+
+    val cashAccountTransactionSearchResponseDetailWithDeclarationOb: CashAccountTransactionSearchResponseDetail =
+      CashAccountTransactionSearchResponseDetail(
+        can,
+        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        declarations = Some(Seq(declarationWrapper)),
+        paymentsWithdrawalsAndTransfers = None
+      )
+
     val cashAccountTransactionSearchResponseDetailJsString: String =
       """{
         |"can": "12345678909",
@@ -236,6 +277,9 @@ class CashTransactionsResponseSpec extends SpecBase {
 
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
       CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccountTransactionSearchResponseDetailOb))
+
+    val cashAccountTransactionSearchResponseWithDeclarationOb: CashAccountTransactionSearchResponse =
+      CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccountTransactionSearchResponseDetailWithDeclarationOb))
 
     val cashAccountTransactionSearchResponseJsString: String =
       """{
@@ -335,5 +379,36 @@ class CashTransactionsResponseSpec extends SpecBase {
         |}
         |}
         |}""".stripMargin
+
+    val cashAccTranSearchResponseContainerWithDeclarationJsString: String =
+      """{
+        |"cashAccountTransactionSearchResponse":
+        |{"responseCommon":
+        |{"status":"OK",
+        |"processingDate":"2001-12-17T09:30:47Z"
+        |},
+        |"responseDetail":
+        |{"can":"12345678909",
+        |"eoriDetails":[
+        |{"eoriData":{"eoriNumber":"GB123456789","name":"test"}}
+        |],
+        |"declarations":
+        |[{"declaration":
+        |{"declarationID":"24GB123456789",
+        |"declarantEORINumber":"GB12345678",
+        |"declarantRef":"1234567890abcdefgh",
+        |"c18OrOverpaymentReference":"RPCSCCCS1",
+        |"importersEORINumber":"GB1234567",
+        |"postingDate":"2024-05-28",
+        |"acceptanceDate":"2024-05-28",
+        |"amount":9999.99,
+        |"taxGroups":[
+        |{"taxGroup":
+        |{"taxGroupDescription":"Customs",
+        |"amount":9999.99,
+        |"taxTypes":[{"taxType":{"reasonForSecurity":"CRQ","taxTypeID":"A00","amount":9999.99}}]}}]}}]}}}""".stripMargin
+
+    val cashAccTranSearchResponseContainerWithDeclarationOb: CashAccountTransactionSearchResponseContainer =
+      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseWithDeclarationOb)
   }
 }

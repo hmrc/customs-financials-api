@@ -124,10 +124,22 @@ object TaxTypeWithSecurity {
   implicit val format: OFormat[TaxTypeWithSecurity] = Json.format[TaxTypeWithSecurity]
 }
 
-case class TaxGroup(taxGroupDescription: String, amount: Double, taxTypes: Seq[TaxTypeWithSecurity])
+case class TaxTypeWithSecurityContainer(taxType: TaxTypeWithSecurity)
+
+object TaxTypeWithSecurityContainer {
+  implicit val format: OFormat[TaxTypeWithSecurityContainer] = Json.format[TaxTypeWithSecurityContainer]
+}
+
+case class TaxGroup(taxGroupDescription: String, amount: Double, taxTypes: Seq[TaxTypeWithSecurityContainer])
 
 object TaxGroup {
   implicit val format: OFormat[TaxGroup] = Json.format[TaxGroup]
+}
+
+case class TaxGroupWrapper(taxGroup: TaxGroup)
+
+object TaxGroupWrapper {
+  implicit val format: OFormat[TaxGroupWrapper] = Json.format[TaxGroupWrapper]
 }
 
 case class Declaration(declarationID: String,
@@ -138,10 +150,15 @@ case class Declaration(declarationID: String,
                        postingDate: String,
                        acceptanceDate: String,
                        amount: Double,
-                       taxGroups: Seq[TaxGroup])
-
+                       taxGroups: Seq[TaxGroupWrapper])
 object Declaration {
   implicit val format: OFormat[Declaration] = Json.format[Declaration]
+}
+
+case class DeclarationWrapper(declaration: Declaration)
+
+object DeclarationWrapper {
+  implicit val format: OFormat[DeclarationWrapper] = Json.format[DeclarationWrapper]
 }
 
 object PaymentType extends Enumeration {
@@ -196,21 +213,21 @@ object PaymentsWithdrawalsAndTransferContainer {
 
 case class CashAccountTransactionSearchResponseDetail(can: String,
                                                       eoriDetails: Seq[EoriDataContainer],
-                                                      declarations: Option[Seq[Declaration]],
+                                                      declarations: Option[Seq[DeclarationWrapper]],
                                                       paymentsWithdrawalsAndTransfers: Option[Seq[PaymentsWithdrawalsAndTransferContainer]] = None)
 
 object CashAccountTransactionSearchResponseDetail {
   implicit val cashAccTransSearchResponseDetailReads: Reads[CashAccountTransactionSearchResponseDetail] = (
     (JsPath \ "can").read[String] and
       (JsPath \ "eoriDetails").read[Seq[EoriDataContainer]] and
-      (JsPath \ "declarations").readNullable[Seq[Declaration]].map(identity) and
+      (JsPath \ "declarations").readNullable[Seq[DeclarationWrapper]].map(identity) and
       (JsPath \ "paymentsWithdrawalsAndTransfers").readNullable[Seq[PaymentsWithdrawalsAndTransferContainer]].map(identity)
     )(CashAccountTransactionSearchResponseDetail.apply _)
 
   implicit val cashAccTransSearchResponseDetailWrites: Writes[CashAccountTransactionSearchResponseDetail] = (
     (JsPath \ "can").write[String] and
       (JsPath \ "eoriDetails").write[Seq[EoriDataContainer]] and
-      (JsPath \ "declarations").writeNullable[Seq[Declaration]] and
+      (JsPath \ "declarations").writeNullable[Seq[DeclarationWrapper]] and
       (JsPath \ "paymentsWithdrawalsAndTransfers").writeNullable[Seq[PaymentsWithdrawalsAndTransferContainer]]
     )(resDetails =>
     (resDetails.can, resDetails.eoriDetails, resDetails.declarations, resDetails.paymentsWithdrawalsAndTransfers))

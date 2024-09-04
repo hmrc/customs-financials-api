@@ -56,11 +56,12 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
       cashAccTransSearchRequestContainer,
       headers = headers.headers(appConfig.acc44BearerToken, None)
     )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
+
       res.status match {
         case OK | CREATED => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
           Left(Json.fromJson[ErrorDetail](res.json).get)
         } else {
-          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](JsString(res.body)).get)
+          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](Json.parse(res.body)).get)
         }
 
         case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
@@ -82,7 +83,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
     }.recover {
       case exception: Throwable =>
         log.error("Error occurred while calling backend System")
-
+        
         Left(
           ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, "ETMP",
             SourceFaultDetail(Seq("Failure while calling ETMP")))
