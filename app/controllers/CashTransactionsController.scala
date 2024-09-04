@@ -18,7 +18,8 @@ package controllers
 
 import domain.CashDailyStatement._
 import models.requests.CashAccountTransactionSearchRequestDetails
-import models.responses.ErrorCode.code400
+import models.responses.ErrorDetail
+import models.responses.EtmpErrorCode._
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
@@ -59,9 +60,19 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
 
       service.retrieveCashAccountTransactions(cashTransactionsSearchReq).map {
         case Right(cashAccTransSearchResponse) => Ok(Json.toJson(cashAccTransSearchResponse))
-        case Left(errorDetail) =>
-          if (errorDetail.errorCode == code400) BadRequest(errorDetail) else InternalServerError
+        case Left(errorDetail) => checkErrorCodeAndCreateResponse(errorDetail)
       }
+    }
+  }
+
+  private def checkErrorCodeAndCreateResponse(errorDetail: ErrorDetail): Result = {
+    val etmpErrorCodes = List(code001, code002, code003, code004, code005)
+
+    errorDetail.errorCode match {
+      case "400" => BadRequest(errorDetail)
+      case "500" => InternalServerError(errorDetail)
+      case etmpErrorCode if (etmpErrorCodes.contains(etmpErrorCode)) => PreconditionFailed(errorDetail)
+      case _ => ServiceUnavailable(errorDetail)
     }
   }
 

@@ -141,3 +141,11 @@ object ErrorCode {
   val code400 = "400"
   val code500 = "500"
 }
+
+object EtmpErrorCode {
+  val code001 = "001"
+  val code002 = "002"
+  val code003 = "003"
+  val code004 = "004"
+  val code005 = "005"
+}

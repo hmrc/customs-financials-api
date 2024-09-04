@@ -16,7 +16,7 @@
 
 package services
 
-import domain._
+import domain.{Declaration, GuaranteeTransaction, CashTransactions, CashDailyStatement, Amounts, Transaction, TaxGroup}
 import models.responses
 import models.responses._
 
