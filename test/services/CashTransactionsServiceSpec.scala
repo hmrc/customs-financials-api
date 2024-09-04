@@ -16,15 +16,19 @@
 
 package services
 
-import connectors.Acc31Connector
-import domain._
+import connectors.{Acc31Connector, Acc44Connector}
+import domain.{Declaration, _}
+import domain.TaxGroup
 import models._
+import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.responses.PaymentType.Payment
 import models.responses._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -123,10 +127,29 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Right(None))
       )
+
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(Nil, Nil)
         result mustBe Right(expectedResult)
+      }
+    }
+  }
+
+  "retrieveCashAccountTransactions" should {
+
+    "return successful response" in new Setup {
+      when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+        .thenReturn(Future.successful(Right(cashAccTranSearchResponseContainerOb)))
+
+      running(app) {
+        val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
+
+        result.map {
+          response =>
+            response mustBe
+              Right(cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.responseDetail.get)
+        }
       }
     }
   }
@@ -137,7 +160,23 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
     val dateTo: LocalDate = LocalDate.now()
+    val can = "12345678909"
+    val eoriNumber = "GB123456789"
+    val dateString = "2024-05-28"
+    val amount = 9999.99
+    val processingDate = "2001-12-17T09:30:47Z"
+    val eoriDataName = "test"
+    val paymentReference = "CDSC1234567890"
+    val bankAccount = "1234567890987"
+    val sortCode = "123456789"
+
+    val declarationID = "24GB123456789"
+    val declarantRef = "1234567890abcdefgh"
+    val c18OrOverpaymentReference = "RPCSCCCS1"
+    val importersEORINumber = "GB1234567"
+
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
+    val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
       DailyStatementDetail(
@@ -183,8 +222,50 @@ class CashTransactionsServiceSpec extends SpecBase {
       Some(Seq(dailyStatement)),
       Some(pending))
 
+    val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(
+        can,
+        eoriNumber,
+        SearchType.P,
+        declarationDetails = None,
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(amount, Some(dateString), Some(dateString))))
+
+    val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
+      status = "OK",
+      statusText = None,
+      processingDate = processingDate,
+      maxTransactionsExceeded = None,
+      returnParameters = None)
+
+    val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =
+      CashAccountTransactionSearchResponseDetail(
+        can,
+        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        declarations = None,
+        paymentsWithdrawalsAndTransfers =
+          Some(
+            Seq(
+              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+                dateString,
+                dateString,
+                paymentReference,
+                amount,
+                Payment,
+                Some(bankAccount),
+                Some(sortCode)
+              ))
+            ))
+      )
+
+    val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
+      CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccTranSearchResponseDetailWithPaymentWithdrawalOb))
+
+    val cashAccTranSearchResponseContainerOb: CashAccountTransactionSearchResponseContainer =
+      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseOb)
+
     val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc31Connector].toInstance(mockAcc31Connector)
+      inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
+      inject.bind[Acc44Connector].toInstance(mockAcc44Connector)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

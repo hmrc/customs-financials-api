@@ -24,6 +24,7 @@ import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import services.CashTransactionsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.Utils.writable
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -55,10 +56,11 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
 
   def retrieveCashAccountTransactions(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     withJsonBody[CashAccountTransactionSearchRequestDetails] { cashTransactionsSearchReq =>
+
       service.retrieveCashAccountTransactions(cashTransactionsSearchReq).map {
         case Right(cashAccTransSearchResponse) => Ok(Json.toJson(cashAccTransSearchResponse))
         case Left(errorDetail) =>
-          if (errorDetail.errorCode == code400) BadRequest else InternalServerError
+          if (errorDetail.errorCode == code400) BadRequest(errorDetail) else InternalServerError
       }
     }
   }
