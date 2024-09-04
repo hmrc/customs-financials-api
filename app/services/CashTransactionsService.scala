@@ -82,7 +82,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
   private def populateErrorDetails(cashTranResponseCommon: CashTransactionsResponseCommon): ErrorDetail = {
     val statusText = cashTranResponseCommon.statusText.getOrElse("001-Invalid Cash Account")
     val statusTextAfterSplitByHyphen: Array[String] = statusText.split(hyphen)
-    
+
     val etmpErrorCode: String = statusTextAfterSplitByHyphen.head
     val etmpErrorMessage = statusTextAfterSplitByHyphen.tail.head
 

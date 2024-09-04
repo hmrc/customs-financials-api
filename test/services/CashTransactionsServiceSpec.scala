@@ -17,8 +17,7 @@
 package services
 
 import connectors.{Acc31Connector, Acc44Connector}
-import domain.{Declaration, _}
-import domain.TaxGroup
+import domain.{Declaration, TaxGroup, _}
 import models._
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.PaymentType.Payment
@@ -28,7 +27,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
-
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -149,6 +147,35 @@ class CashTransactionsServiceSpec extends SpecBase {
           response =>
             response mustBe
               Right(cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.responseDetail.get)
+        }
+      }
+    }
+
+    "return Left[ErrorDetails] when business error occurs and response details is not present" in new Setup {
+      when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+        .thenReturn(
+          Future.successful(
+            Right(cashAccTranSearchResponseContainerOb.copy(
+              cashAccountTransactionSearchResponse =
+                cashAccountTransactionSearchResponseOb.copy(
+                  responseDetail = None,
+                  responseCommon = resCommonOb.copy(statusText = Some("001-Invalid Cash Account"))))
+            )))
+
+      running(app) {
+        val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
+
+        result.map {
+          response =>
+            response mustBe
+              Left(ErrorDetail(
+                timestamp = cashAccountTransactionSearchResponseOb.responseCommon.processingDate,
+                correlationId = "NA",
+                errorCode = "001",
+                errorMessage = "Invalid Cash Account",
+                source = "Backend",
+                sourceFaultDetail = SourceFaultDetail(Seq())
+              ))
         }
       }
     }
