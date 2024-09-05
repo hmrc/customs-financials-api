@@ -16,7 +16,9 @@
 
 package controllers
 
+
 import domain.CashDailyStatement._
+import models.requests.CashAccountStatementRequestDetail
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
@@ -48,6 +50,18 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
           case Right(cashDailyStatements) => Ok(Json.toJson(cashDailyStatements))
           case Left(errorValue) => failedResponse(errorValue)
         }
+    }
+  }
+
+  //TODO Validate incoming requests
+  def submitCashAccStatementRequest(): Action[JsValue] = Action.async(parse.json) {
+    implicit request => {
+      withJsonBody[CashAccountStatementRequestDetail] { cashAccSttReq =>
+        service.submitCashAccountStatementRequest(cashAccSttReq).map {
+          case Left(errorDetails) => BadRequest(Json.toJson(errorDetails))
+          case Right(cashAccSttResponse) => Ok(Json.toJson(cashAccSttResponse))
+        }
+      }
     }
   }
 

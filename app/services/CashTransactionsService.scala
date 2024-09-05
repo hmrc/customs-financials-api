@@ -16,15 +16,18 @@
 
 package services
 
-import connectors.Acc31Connector
+import connectors.{Acc31Connector, Acc45Connector}
 import domain.CashTransactions
 import models.ErrorResponse
+import models.requests.CashAccountStatementRequestDetail
+import models.responses.{CashAccountStatementResponseContainer, ErrorDetail}
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
+                                        acc45Connector: Acc45Connector,
                                         domainService: DomainService)(implicit executionContext: ExecutionContext) {
   def retrieveCashTransactionsSummary(can: String,
                                       from: LocalDate,
@@ -52,5 +55,12 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
 
       case Left(errorValue) => Left(errorValue)
     }
+  }
+
+
+  def submitCashAccountStatementRequest(
+                                         request: CashAccountStatementRequestDetail
+                                       ): Future[Either[ErrorDetail, CashAccountStatementResponseContainer]] = {
+    acc45Connector.submitStatementRequest(request)
   }
 }
