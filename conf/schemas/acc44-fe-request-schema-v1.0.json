@@ -47,7 +47,7 @@
 							"maxLength": 17,
 							"pattern": "[A-Z]{2}[0-9A-Z]+"
 						},
-						"searchType ": {
+						"searchType": {
 							"description": "Possible Values D - Declaration; P – Payments ",
 							"type": "string",
 							"minLength": 1,
@@ -111,7 +111,7 @@
 					"required": [
 						"can",
 						"ownerEORI",
-						"searchType "
+						"searchType"
 					],
 					"additionalProperties": false
 				}

@@ -27,13 +27,17 @@ import play.api.{Logger, LoggerLike}
 import services.DateTimeService
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import utils.JSONSchemaValidator
 
 import javax.inject.Inject
+import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class Acc44Connector @Inject()(httpClient: HttpClient,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
+                               jsonSchemaValidator: JSONSchemaValidator,
                                headers: MdgHeaders)(implicit ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
@@ -50,6 +54,28 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
 
     val cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestWrapper =
       CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequest)
+
+    jsonSchemaValidator.validatePayload(
+      Json.toJson(cashAccTransSearchRequestContainer), jsonSchemaValidator.acc44RequestSchema) match {
+
+      case Success(_) => postValidRequest(cashAccTransSearchRequestContainer)
+
+      case Failure(exception) =>
+        log.error(s"Request validation failed against the schema and error is ::::: ${exception.getMessage}")
+        Future(Left(
+          ErrorDetail(
+            dateTimeService.currentDateTimeAsIso8601,
+            "MDTP_ID",
+            BAD_REQUEST.toString,
+            exception.getMessage,
+            "MDTP",
+            SourceFaultDetail(Seq("Failure while validating request against schema")))
+        ))
+    }
+  }
+
+  private def postValidRequest(cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestWrapper):
+  Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
 
     httpClient.POST[CashAccountTransactionSearchRequestWrapper, HttpResponse](
       appConfig.acc44CashTransactionSearchEndpoint,
@@ -90,5 +116,4 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
         )
     }
   }
-
 }
