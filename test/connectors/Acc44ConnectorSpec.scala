@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestContainer, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.PaymentType.Payment
 import models.responses._
@@ -59,12 +59,55 @@ class Acc44ConnectorSpec extends SpecBase {
 
     "return Error response" when {
 
+      "Request fails to validate against schema" in new Setup {
+        intercept[RuntimeException] {
+          connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetailsInvalid).map {
+            failureRes => failureRes
+          }
+        }
+      }
+
       "EIS returns 201 to MDTP" in new Setup {
         when[Future[CashAccountTransactionSearchResponseContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
           .thenReturn(Future.successful(cashAccTranSearchResponseContainerWith201EISCodeOb))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
+        }
+      }
+
+      "api call produces Http status 500 due to backEnd error" in new Setup {
+        val errorDetails: ErrorDetail =
+          ErrorDetail(
+            "2024-01-21T11:30:47Z",
+            "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+            code500,
+            "Internal Server Error",
+            "Backend",
+            SourceFaultDetail(Seq("Failure in backend System"))
+          )
+
+        val errorDetailJsString: String = """{
+                                    |"errorDetail": {
+                                    |"timestamp": "2024-01-21T11:30:47Z",
+                                    |"correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+                                    |"errorCode": "500",
+                                    |"errorMessage": "Internal Server Error",
+                                    |"source": "Backend",
+                                    |"sourceFaultDetail": {
+                                    |"detail": [
+                                    |"Failure in backend System"
+                                    |]
+                                    |}
+                                    |}
+                                    |}""".stripMargin
+
+        when[Future[CashAccountTransactionSearchRequestContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.failed(UpstreamErrorResponse(errorDetailJsString, INTERNAL_SERVER_ERROR)))
+
+        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
+          failureRes =>
+            failureRes mustBe Left(errorDetails)
         }
       }
 
@@ -173,6 +216,7 @@ class Acc44ConnectorSpec extends SpecBase {
     val bankAccount = "1234567890987"
     val sortCode = "123456789"
     val can = "12345678909"
+    val invalidCan = "123456789091234567"
     val eoriNumber = "GB123456789"
     val eoriDataName = "test"
 
@@ -184,6 +228,14 @@ class Acc44ConnectorSpec extends SpecBase {
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
         can,
+        eoriNumber,
+        SearchType.P,
+        declarationDetails = None,
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(amount, Some(dateString), Some(dateString))))
+
+    val cashAccTransactionSearchRequestDetailsInvalid: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(
+        invalidCan,
         eoriNumber,
         SearchType.P,
         declarationDetails = None,

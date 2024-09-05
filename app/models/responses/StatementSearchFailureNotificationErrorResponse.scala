@@ -111,6 +111,12 @@ object ErrorDetail {
   implicit val errorDetailsFormat: OFormat[ErrorDetail] = Json.format[ErrorDetail]
 }
 
+case class ErrorDetailContainer(errorDetail: ErrorDetail)
+
+object ErrorDetailContainer {
+  implicit val format: OFormat[ErrorDetailContainer] = Json.format[ErrorDetailContainer]
+}
+
 case class SourceFaultDetail(detail: Seq[String])
 
 object SourceFaultDetail {

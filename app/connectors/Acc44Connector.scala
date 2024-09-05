@@ -18,11 +18,12 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer, CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
+import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer,
+  CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
 import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
 import models.responses.SourceFaultDetailMsg._
-import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, SourceFaultDetail}
+import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json._
 import play.api.{Logger, LoggerLike}
@@ -81,26 +82,32 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
   Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
 
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-transaction-search") {
-
       httpClient.POST[CashAccountTransactionSearchRequestContainer, HttpResponse](
         appConfig.acc44CashTransactionSearchEndpoint,
         cashAccTransSearchRequestContainer,
         headers = headers.headers(appConfig.acc44BearerToken, None)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
-
         res.status match {
-          case OK | CREATED => validateAndProcessIncomingSuccessResponse(res)
+          case OK => validateAndProcessIncomingSuccessResponse(res)
 
-          case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-            Left(Json.fromJson[ErrorDetail](res.json).get)
-          } else {
-            Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-              SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
-            )
-          }
+          case CREATED =>
+            if (isResponseContainsErrorDetails(res)) {
+              Left(retrieveErrorDetailsResponse(res))
+            } else {
+              Right(retrieveCashAccountTransactionSsearchResponse(res))
+            }
 
-          case _ => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-            Left(Json.fromJson[ErrorDetail](res.json).get)
+          case BAD_REQUEST | INTERNAL_SERVER_ERROR =>
+            if (isResponseContainsErrorDetails(res)) {
+              Left(retrieveErrorDetailsResponse(res))
+            } else {
+              Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
+                SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
+              )
+            }
+
+          case _ => if (isResponseContainsErrorDetails(res)) {
+            Left(retrieveErrorDetailsResponse(res))
           } else {
             Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
               SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
@@ -124,10 +131,10 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
 
     jsonSchemaValidator.validatePayload(res.json, jsonSchemaValidator.acc44ResponseSchema) match {
       case Success(_) =>
-        if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-          Left(Json.fromJson[ErrorDetail](res.json).get)
+        if (isResponseContainsErrorDetails(res)) {
+          Left(retrieveErrorDetailsResponse(res))
         } else {
-          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](res.json).get)
+          Right(retrieveCashAccountTransactionSsearchResponse(res))
         }
 
       case Failure(exception) =>
@@ -143,5 +150,17 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
             SourceFaultDetail(Seq(SUCCESS_RESPONSE_SCHEMA_VALIDATION_ERROR)))
         )
     }
+  }
+
+  private def retrieveCashAccountTransactionSsearchResponse(res: HttpResponse): CashAccountTransactionSearchResponseContainer = {
+    Json.fromJson[CashAccountTransactionSearchResponseContainer](res.json).get
+  }
+
+  private def isResponseContainsErrorDetails(res: HttpResponse) = {
+    Json.fromJson[ErrorDetailContainer](res.json).isSuccess
+  }
+
+  private def retrieveErrorDetailsResponse(res: HttpResponse): ErrorDetail = {
+    Json.fromJson[ErrorDetailContainer](res.json).get.errorDetail
   }
 }
