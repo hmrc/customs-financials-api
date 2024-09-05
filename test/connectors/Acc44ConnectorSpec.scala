@@ -25,7 +25,7 @@ import play.api.http.Status._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -157,18 +157,9 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "4xx error is returned from ETMP" in new Setup {
-        override val errorDetails: ErrorDetail =
-          ErrorDetail(
-            "2024-01-21T11:30:47Z",
-            "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-            code400,
-            "Request could not be processed",
-            "ETMP",
-            SourceFaultDetail(Seq("Failure while calling ETMP"))
-          )
-
         when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("ETMP Error", BAD_REQUEST)))
+          .thenReturn(
+            Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
