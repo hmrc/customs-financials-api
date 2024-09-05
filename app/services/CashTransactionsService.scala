@@ -20,6 +20,8 @@ import connectors.{Acc31Connector, Acc44Connector}
 import domain.CashTransactions
 import models.ErrorResponse
 import models.requests.CashAccountTransactionSearchRequestDetails
+import models.responses.ErrorSource.backEnd
+import models.responses.EtmpErrorCode.INVALID_CASH_ACCOUNT_STATUS_TEXT
 import models.responses._
 import utils.Utils.hyphen
 
@@ -80,7 +82,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
   }
 
   private def populateErrorDetails(cashTranResponseCommon: CashTransactionsResponseCommon): ErrorDetail = {
-    val statusText = cashTranResponseCommon.statusText.getOrElse("001-Invalid Cash Account")
+    val statusText = cashTranResponseCommon.statusText.getOrElse(INVALID_CASH_ACCOUNT_STATUS_TEXT)
     val statusTextAfterSplitByHyphen: Array[String] = statusText.split(hyphen)
 
     val etmpErrorCode: String = statusTextAfterSplitByHyphen.head
@@ -91,7 +93,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
       correlationId = "NA",
       errorCode = etmpErrorCode,
       errorMessage = etmpErrorMessage,
-      source = "Backend",
+      source = backEnd,
       sourceFaultDetail = SourceFaultDetail(Seq())
     )
   }

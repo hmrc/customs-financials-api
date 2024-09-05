@@ -135,6 +135,9 @@ object ErrorMessage {
 
 object ErrorSource {
   val cdsFinancials = "CDS Financials"
+  val backEnd = "Backend"
+  val etmp = "ETMP"
+  val mdtp = "MDTP"
 }
 
 object ErrorCode {
@@ -148,4 +151,14 @@ object EtmpErrorCode {
   val code003 = "003"
   val code004 = "004"
   val code005 = "005"
+
+  val INVALID_CASH_ACCOUNT_STATUS_TEXT = "001-Invalid Cash Account"
+}
+
+object SourceFaultDetailMsg {
+  val REQUEST_SCHEMA_VALIDATION_ERROR = "Failure while validating request against schema"
+  val SUCCESS_RESPONSE_SCHEMA_VALIDATION_ERROR = "Failure while validating response against schema"
+  val ETMP_FAILURE = "Failure while calling ETMP"
+  val BACK_END_FAILURE = "Failure in backend System"
+  val SERVER_CONNECTION_ERROR = "Error connecting to the server"
 }

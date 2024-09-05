@@ -18,11 +18,11 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{
-  CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestDetails,
-  CashAccountTransactionSearchRequestContainer, CashTransactionsRequestCommon
-}
+import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer,
+  CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
 import models.responses.ErrorCode.code500
+import models.responses.ErrorSource.{backEnd, etmp, mdtp}
+import models.responses.SourceFaultDetailMsg._
 import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json._
@@ -71,8 +71,8 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
             "MDTP_ID",
             BAD_REQUEST.toString,
             exception.getMessage,
-            "MDTP",
-            SourceFaultDetail(Seq("Failure while validating request against schema")))
+            mdtp,
+            SourceFaultDetail(Seq(REQUEST_SCHEMA_VALIDATION_ERROR)))
         ))
     }
   }
@@ -93,7 +93,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
           Left(Json.fromJson[ErrorDetail](res.json).get)
         } else {
           Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-            "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
+            SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
           )
         }
 
@@ -101,7 +101,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
           Left(Json.fromJson[ErrorDetail](res.json).get)
         } else {
           Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-            "Error connecting to the server", "Backend", SourceFaultDetail(Seq("Failure in backend System")))
+            SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
           )
         }
       }
@@ -110,8 +110,8 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
         log.error("Error occurred while calling backend System")
 
         Left(
-          ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, "ETMP",
-            SourceFaultDetail(Seq("Failure while calling ETMP")))
+          ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, etmp,
+            SourceFaultDetail(Seq(ETMP_FAILURE)))
         )
     }
   }
@@ -136,8 +136,8 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
             "MDTP_ID",
             code500,
             exception.getMessage,
-            "MDTP",
-            SourceFaultDetail(Seq("Failure while validating response against schema")))
+            mdtp,
+            SourceFaultDetail(Seq(SUCCESS_RESPONSE_SCHEMA_VALIDATION_ERROR)))
         )
     }
   }
