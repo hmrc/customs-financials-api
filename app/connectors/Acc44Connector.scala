@@ -18,8 +18,7 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer,
-  CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
+import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer, CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
 import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
 import models.responses.SourceFaultDetailMsg._
@@ -27,7 +26,7 @@ import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDet
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json._
 import play.api.{Logger, LoggerLike}
-import services.DateTimeService
+import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.JSONSchemaValidator
@@ -41,6 +40,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                jsonSchemaValidator: JSONSchemaValidator,
+                               metricsReporterService: MetricsReporterService,
                                headers: MdgHeaders)(implicit ec: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
@@ -80,39 +80,42 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
   private def postValidRequest(cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestContainer):
   Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
 
-    httpClient.POST[CashAccountTransactionSearchRequestContainer, HttpResponse](
-      appConfig.acc44CashTransactionSearchEndpoint,
-      cashAccTransSearchRequestContainer,
-      headers = headers.headers(appConfig.acc44BearerToken, None)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
+    metricsReporterService.withResponseTimeLogging("hods.post.cash-account-transaction-search") {
 
-      res.status match {
-        case OK | CREATED => validateAndProcessIncomingSuccessResponse(res)
+      httpClient.POST[CashAccountTransactionSearchRequestContainer, HttpResponse](
+        appConfig.acc44CashTransactionSearchEndpoint,
+        cashAccTransSearchRequestContainer,
+        headers = headers.headers(appConfig.acc44BearerToken, None)
+      )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
 
-        case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-          Left(Json.fromJson[ErrorDetail](res.json).get)
-        } else {
-          Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-            SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
-          )
+        res.status match {
+          case OK | CREATED => validateAndProcessIncomingSuccessResponse(res)
+
+          case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
+            Left(Json.fromJson[ErrorDetail](res.json).get)
+          } else {
+            Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
+              SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
+            )
+          }
+
+          case _ => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
+            Left(Json.fromJson[ErrorDetail](res.json).get)
+          } else {
+            Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
+              SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
+            )
+          }
         }
+      }.recover {
+        case exception: Throwable =>
+          log.error("Error occurred while calling backend System")
 
-        case _ => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-          Left(Json.fromJson[ErrorDetail](res.json).get)
-        } else {
-          Left(ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", res.status.toString,
-            SERVER_CONNECTION_ERROR, backEnd, SourceFaultDetail(Seq(BACK_END_FAILURE)))
+          Left(
+            ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, etmp,
+              SourceFaultDetail(Seq(ETMP_FAILURE)))
           )
-        }
       }
-    }.recover {
-      case exception: Throwable =>
-        log.error("Error occurred while calling backend System")
-
-        Left(
-          ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, etmp,
-            SourceFaultDetail(Seq(ETMP_FAILURE)))
-        )
     }
   }
 
