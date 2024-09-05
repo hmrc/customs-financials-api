@@ -16,12 +16,12 @@
 
 package connectors
 
-import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestContainer, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.PaymentType.Payment
 import models.responses._
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
@@ -38,7 +38,8 @@ class Acc44ConnectorSpec extends SpecBase {
     "return success response" when {
 
       "response has declarations" in new Setup {
-        when[Future[CashAccountTransactionSearchResponseContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        when[Future[CashAccountTransactionSearchResponseContainer]](
+          mockHttpClient.POST(any, any, any)(any, any, any, any))
           .thenReturn(Future.successful(cashAccTranSearchResponseContainerWithDeclarationOb))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
@@ -47,7 +48,8 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "response has paymentsWithdrawalsAndTransfers" in new Setup {
-        when[Future[CashAccountTransactionSearchResponseContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+        when[Future[CashAccountTransactionSearchResponseContainer]](
+          mockHttpClient.POST(any, any, any)(any, any, any, any))
           .thenReturn(Future.successful(cashAccTranSearchResponseContainerOb))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
@@ -67,43 +69,33 @@ class Acc44ConnectorSpec extends SpecBase {
         }
       }
 
-      "EIS returns 201 to MDTP" in new Setup {
-        when[Future[CashAccountTransactionSearchResponseContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(cashAccTranSearchResponseContainerWith201EISCodeOb))
+      "EIS returns 201 to MDTP without responseDetails in success response" in new Setup {
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(CREATED, Json.toJson(cashAccTranSearchResponseContainerWith201EISCodeOb), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
         }
       }
 
+      "EIS returns 201 to MDTP with errorDetails" in new Setup {
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(CREATED, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+
+        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
+          successResponse => successResponse mustBe Left(errorDetails)
+        }
+      }
+
       "api call produces Http status 500 due to backEnd error" in new Setup {
-        val errorDetails: ErrorDetail =
-          ErrorDetail(
-            "2024-01-21T11:30:47Z",
-            "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-            code500,
-            "Internal Server Error",
-            "Backend",
-            SourceFaultDetail(Seq("Failure in backend System"))
-          )
 
-        val errorDetailJsString: String = """{
-                                    |"errorDetail": {
-                                    |"timestamp": "2024-01-21T11:30:47Z",
-                                    |"correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-                                    |"errorCode": "500",
-                                    |"errorMessage": "Internal Server Error",
-                                    |"source": "Backend",
-                                    |"sourceFaultDetail": {
-                                    |"detail": [
-                                    |"Failure in backend System"
-                                    |]
-                                    |}
-                                    |}
-                                    |}""".stripMargin
-
-        when[Future[CashAccountTransactionSearchRequestContainer]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.failed(UpstreamErrorResponse(errorDetailJsString, INTERNAL_SERVER_ERROR)))
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(
+            Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes =>
@@ -112,7 +104,7 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "request times out with Http status 500 due to EIS system error" in new Setup {
-        val errorDetails: ErrorDetail =
+        override val errorDetails: ErrorDetail =
           ErrorDetail(
             "2024-01-21T11:30:47Z",
             "f058ebd6-02f7-4d3f-942e-904344e8cde5",
@@ -133,7 +125,7 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "request times out with Http status 400 due to EIS schema error" in new Setup {
-        val errorDetails: ErrorDetail =
+        override val errorDetails: ErrorDetail =
           ErrorDetail(
             "2024-01-21T11:30:47Z",
             "f058ebd6-02f7-4d3f-942e-904344e8cde5",
@@ -154,18 +146,10 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "INTERNAL_SERVER_ERROR is returned from ETMP" in new Setup {
-        val errorDetails: ErrorDetail =
-          ErrorDetail(
-            "2024-01-21T11:30:47Z",
-            "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-            code500,
-            "Request could not be processed",
-            "ETMP",
-            SourceFaultDetail(Seq("Failure while calling ETMP"))
-          )
-
         when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("ETMP Error", INTERNAL_SERVER_ERROR)))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(INTERNAL_SERVER_ERROR, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
@@ -173,7 +157,7 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "4xx error is returned from ETMP" in new Setup {
-        val errorDetails: ErrorDetail =
+        override val errorDetails: ErrorDetail =
           ErrorDetail(
             "2024-01-21T11:30:47Z",
             "f058ebd6-02f7-4d3f-942e-904344e8cde5",
@@ -188,6 +172,41 @@ class Acc44ConnectorSpec extends SpecBase {
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
+        }
+      }
+
+      "api call produces Http status code apart from 200, 400, 500 due to backEnd error with errorDetails" in new Setup {
+
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(SERVICE_UNAVAILABLE, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+
+        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
+          failureRes =>
+            failureRes mustBe Left(errorDetails)
+        }
+      }
+
+      "api call produces Http status code apart from 200, 400, 500 due to backEnd error with object other " +
+        "than errorDetails" in new Setup {
+
+        val cashAccTranSearchResponseContainerWithNoResponseDetailsOb: CashAccountTransactionSearchResponseContainer =
+          cashAccTranSearchResponseContainerOb.copy(
+            cashAccountTransactionSearchResponse =
+              cashAccTranSearchResponseContainerOb
+                .cashAccountTransactionSearchResponse.copy(responseDetail = None))
+
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                SERVICE_UNAVAILABLE,
+                Json.toJson(cashAccTranSearchResponseContainerWithNoResponseDetailsOb), Map())))
+
+        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
+          failureRes =>
+            failureRes mustBe Left(errorDetails)
         }
       }
     }
@@ -224,6 +243,16 @@ class Acc44ConnectorSpec extends SpecBase {
     val declarantRef = "1234567890abcdefgh"
     val c18OrOverpaymentReference = "RPCSCCCS1"
     val importersEORINumber = "GB1234567"
+
+    val errorDetails: ErrorDetail =
+      ErrorDetail(
+        "2024-01-21T11:30:47Z",
+        "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+        code500,
+        "Internal Server Error",
+        "Backend",
+        SourceFaultDetail(Seq("Failure in backend System"))
+      )
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
@@ -278,7 +307,7 @@ class Acc44ConnectorSpec extends SpecBase {
               "Customs",
               amount,
               Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))))
-      ))
+        ))
 
     val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
@@ -297,6 +326,9 @@ class Acc44ConnectorSpec extends SpecBase {
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
       CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccTranSearchResponseDetailWithPaymentWithdrawalOb))
 
+    val cashAccountTransactionSearchResponseEIS201Ob: CashAccountTransactionSearchResponse =
+      CashAccountTransactionSearchResponse(resCommonOb)
+
     val cashAccountTransactionSearchResponseWithDeclarationOb: CashAccountTransactionSearchResponse =
       CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccTranSearchResponseDetailWithDeclarationsOb))
 
@@ -310,6 +342,6 @@ class Acc44ConnectorSpec extends SpecBase {
       CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseWithDeclarationOb)
 
     val cashAccTranSearchResponseContainerWith201EISCodeOb: CashAccountTransactionSearchResponseContainer =
-      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseOb)
+      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseEIS201Ob)
   }
 }
