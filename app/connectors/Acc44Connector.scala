@@ -18,7 +18,10 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestDetails, CashAccountTransactionSearchRequestWrapper, CashTransactionsRequestCommon}
+import models.requests.{
+  CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestDetails,
+  CashAccountTransactionSearchRequestWrapper, CashTransactionsRequestCommon
+}
 import models.responses.ErrorCode.code500
 import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
@@ -84,11 +87,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
     )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
 
       res.status match {
-        case OK | CREATED => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
-          Left(Json.fromJson[ErrorDetail](res.json).get)
-        } else {
-          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](Json.parse(res.body)).get)
-        }
+        case OK | CREATED => validateAndProcessIncomingSuccessResponse(res)
 
         case BAD_REQUEST | INTERNAL_SERVER_ERROR => if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
           Left(Json.fromJson[ErrorDetail](res.json).get)
@@ -113,6 +112,32 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
         Left(
           ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", code500, exception.getMessage, "ETMP",
             SourceFaultDetail(Seq("Failure while calling ETMP")))
+        )
+    }
+  }
+
+  private def validateAndProcessIncomingSuccessResponse(res: HttpResponse): Either[ErrorDetail,
+    CashAccountTransactionSearchResponseContainer] = {
+
+    jsonSchemaValidator.validatePayload(res.json, jsonSchemaValidator.acc44ResponseSchema) match {
+      case Success(_) =>
+        if (Json.fromJson[ErrorDetail](res.json).isSuccess) {
+          Left(Json.fromJson[ErrorDetail](res.json).get)
+        } else {
+          Right(Json.fromJson[CashAccountTransactionSearchResponseContainer](res.json).get)
+        }
+
+      case Failure(exception) =>
+        log.error(s"Response is failed against schema and error is :::: ${exception.getMessage}")
+
+        Left(
+          ErrorDetail(
+            dateTimeService.currentDateTimeAsIso8601,
+            "MDTP_ID",
+            code500,
+            exception.getMessage,
+            "MDTP",
+            SourceFaultDetail(Seq("Failure while validating response against schema")))
         )
     }
   }
