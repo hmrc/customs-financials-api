@@ -53,7 +53,6 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     }
   }
 
-  //TODO Validate incoming requests
   def submitCashAccStatementRequest(): Action[JsValue] = Action.async(parse.json) {
     implicit request => {
       withJsonBody[CashAccountStatementRequestDetail] { cashAccSttReq =>

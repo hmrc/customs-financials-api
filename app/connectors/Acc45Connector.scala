@@ -18,19 +18,14 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.responses.{CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail}
+import models.responses.{CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import play.api.libs.json.{JsValue, Json}
-import models.requests.{
-  CashAccountStatementRequest,
-  CashAccountStatementRequestCommon,
-  CashAccountStatementRequestDetail,
-  CashAccountStatementRequestContainer
-}
+import models.requests.{CashAccountStatementRequest, CashAccountStatementRequestCommon, CashAccountStatementRequestContainer, CashAccountStatementRequestDetail}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,12 +49,13 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
         receiptDate = dateTimeService.currentDateTimeAsIso8601,
         acknowledgementReference = mdgHeaders.acknowledgementReference)
 
-      val request: CashAccountStatementRequest = CashAccountStatementRequest(reqCommon, reqDetail)
-      val reqWrapper: CashAccountStatementRequestContainer = CashAccountStatementRequestContainer(request)
+      val cashAccSttReq: CashAccountStatementRequest = CashAccountStatementRequest(reqCommon, reqDetail)
+      val cashAccSttReqContainer: CashAccountStatementRequestContainer =
+        CashAccountStatementRequestContainer(cashAccSttReq)
 
       httpClient.POST[CashAccountStatementRequestContainer, HttpResponse](
         appConfig.acc54SubmitCashAccountStatementRequestEndpoint,
-        reqWrapper,
+        cashAccSttReqContainer,
         mdgHeaders.headers(appConfig.acc45BearerToken, appConfig.acc45HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
         log.info(s"submitCashAccountStatementResponse :  $response")
@@ -67,8 +63,10 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
           case OK | CREATED => Right(handleSuccessCase(response.json))
           case BAD_REQUEST => Left(handleErrorCase(response.json))
           case INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-          case _ => Left(handleErrorCase(response.json))
+          case _ => Left(handleUnknownErrorCase(response.toString()))
         }
+      }.recover {
+        case exception: Exception => Left(handleUnknownErrorCase(exception.toString))
       }
     }
   }
@@ -77,8 +75,9 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
     Json.fromJson[CashAccountStatementErrorResponse](jsonObject).get.errorDetail
   }
 
-  private def handleUnknownErrorCase(jsonObject: JsValue): ErrorDetail = {
-    Json.fromJson[CashAccountStatementErrorResponse](jsonObject).get.errorDetail
+  private def handleUnknownErrorCase(exceptionDetails: String): ErrorDetail = {
+    ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", BAD_REQUEST.toString, exceptionDetails, "MDTP",
+      SourceFaultDetail(Seq("UNKNOWN ERROR")))
   }
 
   private def handleSuccessCase(jsonObject: JsValue): CashAccountStatementResponseContainer = {
