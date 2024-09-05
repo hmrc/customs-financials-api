@@ -20,7 +20,7 @@ import connectors.{Acc31Connector, Acc45Connector}
 import domain.CashTransactions
 import models.ErrorResponse
 import models.requests.CashAccountStatementRequestDetail
-import models.responses.{CashAccountStatementResponseContainer, ErrorDetail}
+import models.responses.{Acc45ResponseCommon, ErrorDetail}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -60,7 +60,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
 
   def submitCashAccountStatementRequest(
                                          request: CashAccountStatementRequestDetail
-                                       ): Future[Either[ErrorDetail, CashAccountStatementResponseContainer]] = {
+                                       ): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
     acc45Connector.submitStatementRequest(request)
   }
 }

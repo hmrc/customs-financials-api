@@ -18,7 +18,7 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.responses.{CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail}
+import models.responses.{Acc45ResponseCommon, CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
@@ -40,7 +40,7 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
 
 
   def submitStatementRequest(reqDetail: CashAccountStatementRequestDetail
-                            ): Future[Either[ErrorDetail, CashAccountStatementResponseContainer]] = {
+                            ): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
 
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-statement-request") {
 
@@ -54,19 +54,18 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
         CashAccountStatementRequestContainer(cashAccSttReq)
 
       httpClient.POST[CashAccountStatementRequestContainer, HttpResponse](
-        appConfig.acc54SubmitCashAccountStatementRequestEndpoint,
+        appConfig.acc45SubmitCashAccountStatementRequestEndpoint,
         cashAccSttReqContainer,
         mdgHeaders.headers(appConfig.acc45BearerToken, appConfig.acc45HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
         log.info(s"submitCashAccountStatementResponse :  $response")
         response.status match {
           case OK | CREATED => Right(handleSuccessCase(response.json))
-          case BAD_REQUEST => Left(handleErrorCase(response.json))
-          case INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-          case _ => Left(handleUnknownErrorCase(response.toString()))
+          case BAD_REQUEST | INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
+          case _ => Left(handleUnknownErrorCase(BAD_REQUEST.toString, response.toString(), "Failure in backend System"))
         }
       }.recover {
-        case exception: Exception => Left(handleUnknownErrorCase(exception.toString))
+        case exception: Exception => Left(handleUnknownErrorCase(INTERNAL_SERVER_ERROR.toString, exception.toString, "Failure in backend System"))
       }
     }
   }
@@ -75,12 +74,12 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
     Json.fromJson[CashAccountStatementErrorResponse](jsonObject).get.errorDetail
   }
 
-  private def handleUnknownErrorCase(exceptionDetails: String): ErrorDetail = {
-    ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", BAD_REQUEST.toString, exceptionDetails, "MDTP",
-      SourceFaultDetail(Seq("UNKNOWN ERROR")))
+  private def handleUnknownErrorCase(errorCode: String, exceptionDetails: String, sourceFaultDetail: String): ErrorDetail = {
+    ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", errorCode, exceptionDetails, "MDTP",
+      SourceFaultDetail(Seq(sourceFaultDetail)))
   }
 
-  private def handleSuccessCase(jsonObject: JsValue): CashAccountStatementResponseContainer = {
-    Json.fromJson[CashAccountStatementResponseContainer](jsonObject).get
+  private def handleSuccessCase(jsonObject: JsValue): Acc45ResponseCommon = {
+    Json.fromJson[CashAccountStatementResponseContainer](jsonObject).get.cashAccountStatementResponse.responseCommon
   }
 }

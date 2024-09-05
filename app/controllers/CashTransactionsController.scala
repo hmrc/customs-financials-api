@@ -19,6 +19,7 @@ package controllers
 
 import domain.CashDailyStatement._
 import models.requests.CashAccountStatementRequestDetail
+import models.responses.{Acc45ResponseCommon, ErrorDetail}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
@@ -57,10 +58,26 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     implicit request => {
       withJsonBody[CashAccountStatementRequestDetail] { cashAccSttReq =>
         service.submitCashAccountStatementRequest(cashAccSttReq).map {
-          case Left(errorDetails) => BadRequest(Json.toJson(errorDetails))
-          case Right(cashAccSttResponse) => Ok(Json.toJson(cashAccSttResponse))
+          case Left(errorDetail) => handleCashAccSttResFailures(errorDetail)
+          case Right(cashAccSttResponse) => handleCashAccSttRequestSuccessCases(cashAccSttResponse)
         }
       }
+    }
+  }
+
+  private def handleCashAccSttResFailures(errorDetail: ErrorDetail): Result = {
+    errorDetail.errorCode match {
+      case "400" => BadRequest(Json.toJson(errorDetail))
+      case "500" => InternalServerError(Json.toJson(errorDetail))
+      case _ => ServiceUnavailable(Json.toJson(errorDetail))
+    }
+  }
+
+  private def handleCashAccSttRequestSuccessCases(res: Acc45ResponseCommon): Result = {
+    res.statusText match {
+      case statusTxt if statusTxt.isEmpty => Ok(Json.toJson(res))
+      case statusTxt if statusTxt.isDefined => Created(Json.toJson(res))
+      case _ => BadRequest(Json.toJson(res))
     }
   }
 
