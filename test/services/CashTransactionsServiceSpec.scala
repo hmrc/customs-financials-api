@@ -27,6 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -187,20 +188,8 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
     val dateTo: LocalDate = LocalDate.now()
-    val can = "12345678909"
     val eoriNumber = "GB123456789"
-    val dateString = "2024-05-28"
-    val amount = 9999.99
     val processingDate = "2001-12-17T09:30:47Z"
-    val eoriDataName = "test"
-    val paymentReference = "CDSC1234567890"
-    val bankAccount = "1234567890987"
-    val sortCode = "123456789"
-
-    val declarationID = "24GB123456789"
-    val declarantRef = "1234567890abcdefgh"
-    val c18OrOverpaymentReference = "RPCSCCCS1"
-    val importersEORINumber = "GB1234567"
 
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
     val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
@@ -251,11 +240,11 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
-        can,
+        CAN,
         eoriNumber,
         SearchType.P,
         declarationDetails = None,
-        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(amount, Some(dateString), Some(dateString))))
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
 
     val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
@@ -266,20 +255,20 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
-        can,
-        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, EORI_DATA_NAME))),
         declarations = None,
         paymentsWithdrawalsAndTransfers =
           Some(
             Seq(
               PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
-                dateString,
-                dateString,
-                paymentReference,
-                amount,
+                DATE_STRING,
+                DATE_STRING,
+                PAYMENT_REFERENCE,
+                AMOUNT,
                 Payment,
-                Some(bankAccount),
-                Some(sortCode)
+                Some(BANK_ACCOUNT),
+                Some(SORT_CODE)
               ))
             ))
       )

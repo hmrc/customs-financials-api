@@ -19,6 +19,8 @@ package models.responses
 import models.responses.PaymentType._
 import play.api.libs.json.{JsString, JsSuccess, Json}
 import utils.SpecBase
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_EORI_NUMBER,
+  DECLARANT_REF, DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, PAYMENT_REFERENCE, SORT_CODE}
 
 class CashTransactionsResponseSpec extends SpecBase {
 
@@ -149,32 +151,17 @@ class CashTransactionsResponseSpec extends SpecBase {
   }
 
   trait Setup {
-    val dateString = "2024-05-28"
     val processingDate = "2001-12-17T09:30:47Z"
-
-    val paymentReference = "CDSC1234567890"
-    val amount = 9999.99
-    val bankAccount = "1234567890987"
-    val sortCode = "123456789"
-    val can = "12345678909"
-    val eoriNumber = "GB123456789"
-    val eoriDataName = "test"
-
-    val declarationID = "24GB123456789"
-    val declarantEORINumber = "GB12345678"
-    val declarantRef = "1234567890abcdefgh"
-    val c18OrOverpaymentReference = "RPCSCCCS1"
-    val importersEORINumber = "GB1234567"
 
     val paymentsWithdrawalsAndTransferOb: PaymentsWithdrawalsAndTransfer =
       PaymentsWithdrawalsAndTransfer(
-        valueDate = dateString,
-        postingDate = dateString,
-        paymentReference = paymentReference,
-        amount = amount,
+        valueDate = DATE_STRING,
+        postingDate = DATE_STRING,
+        paymentReference = PAYMENT_REFERENCE,
+        amount = AMOUNT,
         `type` = Payment,
-        bankAccount = Some(bankAccount),
-        sortCode = Some(sortCode)
+        bankAccount = Some(BANK_ACCOUNT),
+        sortCode = Some(SORT_CODE)
       )
 
     val paymentsWithdrawalAndTransferJsString: String =
@@ -197,47 +184,47 @@ class CashTransactionsResponseSpec extends SpecBase {
 
     val cashAccountTransactionSearchResponseDetailOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
-        can,
-        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(EORI_NUMBER, EORI_DATA_NAME))),
         declarations = None,
         paymentsWithdrawalsAndTransfers =
           Some(
             Seq(
               PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
-                dateString,
-                dateString,
-                paymentReference,
-                amount,
+                DATE_STRING,
+                DATE_STRING,
+                PAYMENT_REFERENCE,
+                AMOUNT,
                 Payment,
-                Some(bankAccount),
-                Some(sortCode)
+                Some(BANK_ACCOUNT),
+                Some(SORT_CODE)
               ))
             ))
       )
 
     val declarationWrapper: DeclarationWrapper = DeclarationWrapper(
       Declaration(
-        declarationID,
-        declarantEORINumber,
-        Some(declarantRef),
-        Some(c18OrOverpaymentReference),
-        importersEORINumber,
-        dateString,
-        dateString,
-        amount,
+        DECLARATION_ID,
+        DECLARANT_EORI_NUMBER,
+        Some(DECLARANT_REF),
+        Some(C18_OR_OVER_PAYMENT_REFERENCE),
+        IMPORTERS_EORI_NUMBER,
+        DATE_STRING,
+        DATE_STRING,
+        AMOUNT,
         taxGroups =
           Seq(
             TaxGroupWrapper(
               TaxGroup(
                 "Customs",
-                amount,
-                Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))
+                AMOUNT,
+                Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", AMOUNT)))))))
     )
 
     val cashAccountTransactionSearchResponseDetailWithDeclarationOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
-        can,
-        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(EORI_NUMBER, EORI_DATA_NAME))),
         declarations = Some(Seq(declarationWrapper)),
         paymentsWithdrawalsAndTransfers = None
       )

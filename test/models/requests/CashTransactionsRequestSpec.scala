@@ -20,6 +20,7 @@ import models.requests.ParamName.{MRN, UCR}
 import models.requests.SearchType.{D, P}
 import play.api.libs.json.{JsString, JsSuccess, Json}
 import utils.SpecBase
+import utils.TestData.ORIGINATING_SYSTEM
 
 class CashTransactionsRequestSpec extends SpecBase {
 
@@ -137,7 +138,6 @@ class CashTransactionsRequestSpec extends SpecBase {
     val paramValue = "test_value"
     val paramValue_1 = "123456789abcd"
 
-    val originatingSystem = "MDTP"
     val receiptDate = "2001-12-17T09:30:47Z"
     val acknowledgementReference = "601bb176b8e411ed8a9800001e3b1802"
 
@@ -172,7 +172,7 @@ class CashTransactionsRequestSpec extends SpecBase {
         |}""".stripMargin
 
     val commonRequest: CashTransactionsRequestCommon =
-      CashTransactionsRequestCommon(originatingSystem, receiptDate, acknowledgementReference)
+      CashTransactionsRequestCommon(ORIGINATING_SYSTEM, receiptDate, acknowledgementReference)
 
     val cashAccTransSearchRequestOb: CashAccountTransactionSearchRequest =
       CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsOb)

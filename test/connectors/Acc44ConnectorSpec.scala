@@ -27,6 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.SpecBase
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_REF, DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, INVALID_CAN, PAYMENT_REFERENCE, PROCESSING_DATE, SORT_CODE}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -218,23 +219,6 @@ class Acc44ConnectorSpec extends SpecBase {
 
     val connector: Acc44Connector = app.injector.instanceOf[Acc44Connector]
 
-    val dateString = "2024-05-28"
-    val processingDate = "2001-12-17T09:30:47Z"
-
-    val paymentReference = "CDSC1234567890"
-    val amount = 9999.99
-    val bankAccount = "1234567890987"
-    val sortCode = "123456789"
-    val can = "12345678909"
-    val invalidCan = "123456789091234567"
-    val eoriNumber = "GB123456789"
-    val eoriDataName = "test"
-
-    val declarationID = "24GB123456789"
-    val declarantRef = "1234567890abcdefgh"
-    val c18OrOverpaymentReference = "RPCSCCCS1"
-    val importersEORINumber = "GB1234567"
-
     val errorDetails: ErrorDetail =
       ErrorDetail(
         "2024-01-21T11:30:47Z",
@@ -247,70 +231,70 @@ class Acc44ConnectorSpec extends SpecBase {
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
-        can,
-        eoriNumber,
+        CAN,
+        EORI_NUMBER,
         SearchType.P,
         declarationDetails = None,
-        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(amount, Some(dateString), Some(dateString))))
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
 
     val cashAccTransactionSearchRequestDetailsInvalid: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
-        invalidCan,
-        eoriNumber,
+        INVALID_CAN,
+        EORI_NUMBER,
         SearchType.P,
         declarationDetails = None,
-        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(amount, Some(dateString), Some(dateString))))
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
 
     val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
-        can,
-        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(EORI_NUMBER, EORI_DATA_NAME))),
         declarations = None,
         paymentsWithdrawalsAndTransfers =
           Some(
             Seq(
               PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
-                dateString,
-                dateString,
-                paymentReference,
-                amount,
+                DATE_STRING,
+                DATE_STRING,
+                PAYMENT_REFERENCE,
+                AMOUNT,
                 Payment,
-                Some(bankAccount),
-                Some(sortCode)
+                Some(BANK_ACCOUNT),
+                Some(SORT_CODE)
               ))
             ))
       )
 
     val cashAccTranSearchResponseDetailWithDeclarationsOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
-        can,
-        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
-        declarations = Some(Seq(DeclarationWrapper(Declaration(declarationID,
-          eoriNumber,
-          Some(declarantRef),
-          Some(c18OrOverpaymentReference),
-          importersEORINumber,
-          dateString,
-          dateString,
-          amount,
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(EORI_NUMBER, EORI_DATA_NAME))),
+        declarations = Some(Seq(DeclarationWrapper(Declaration(DECLARATION_ID,
+          EORI_NUMBER,
+          Some(DECLARANT_REF),
+          Some(C18_OR_OVER_PAYMENT_REFERENCE),
+          IMPORTERS_EORI_NUMBER,
+          DATE_STRING,
+          DATE_STRING,
+          AMOUNT,
           Seq(TaxGroupWrapper(
             TaxGroup(
               "Customs",
-              amount,
-              Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", amount)))))))))
+              AMOUNT,
+              Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", AMOUNT)))))))))
         ))
 
     val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
       statusText = None,
-      processingDate = processingDate,
+      processingDate = PROCESSING_DATE,
       maxTransactionsExceeded = None,
       returnParameters = None)
 
     val resCommonEIS201CodeOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
       statusText = Some("001-Invalid Cash Account"),
-      processingDate = processingDate,
+      processingDate = PROCESSING_DATE,
       maxTransactionsExceeded = None,
       returnParameters = Some(Seq(ReturnParameter("POSITION", "FAIL")).toArray))
 
