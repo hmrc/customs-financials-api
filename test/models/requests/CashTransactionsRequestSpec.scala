@@ -102,10 +102,10 @@ class CashTransactionsRequestSpec extends SpecBase {
     }
   }
 
-  "CashAccountTransactionSearchRequestWrapper" should {
+  "CashAccountTransactionSearchRequestContainer" should {
 
     "return correct value for Json Reads" in new Setup {
-      import models.requests.CashAccountTransactionSearchRequestWrapper.format
+      import models.requests.CashAccountTransactionSearchRequestContainer.format
 
       Json.fromJson(Json.parse(cashAccTransSearchRequestWithSearchTypeDJsString)) mustBe
         JsSuccess(cashAccTransSearchRequestWrapperOb)
@@ -183,11 +183,11 @@ class CashTransactionsRequestSpec extends SpecBase {
     val cashAccTransSearchRequestWithSearchTypePOb: CashAccountTransactionSearchRequest =
       CashAccountTransactionSearchRequest(commonRequest, cashTranSearchRequestDetailsWithSearchTypePOb)
 
-    val cashAccTransSearchRequestWrapperOb: CashAccountTransactionSearchRequestWrapper =
-      CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequestWithSearchTypeDOb)
+    val cashAccTransSearchRequestWrapperOb: CashAccountTransactionSearchRequestContainer =
+      CashAccountTransactionSearchRequestContainer(cashAccTransSearchRequestWithSearchTypeDOb)
 
-    val cashAccTransSearchRequestWrapperWithSearchTypePOb: CashAccountTransactionSearchRequestWrapper =
-      CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequestWithSearchTypePOb)
+    val cashAccTransSearchRequestWrapperWithSearchTypePOb: CashAccountTransactionSearchRequestContainer =
+      CashAccountTransactionSearchRequestContainer(cashAccTransSearchRequestWithSearchTypePOb)
 
     val cashAccTransSearchRequestJsString: String =
       """{

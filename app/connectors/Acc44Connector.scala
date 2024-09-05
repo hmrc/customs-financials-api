@@ -20,7 +20,7 @@ import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.requests.{
   CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestDetails,
-  CashAccountTransactionSearchRequestWrapper, CashTransactionsRequestCommon
+  CashAccountTransactionSearchRequestContainer, CashTransactionsRequestCommon
 }
 import models.responses.ErrorCode.code500
 import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, SourceFaultDetail}
@@ -55,8 +55,8 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
 
     val cashAccTransSearchRequest = CashAccountTransactionSearchRequest(commonRequest, reqDetails)
 
-    val cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestWrapper =
-      CashAccountTransactionSearchRequestWrapper(cashAccTransSearchRequest)
+    val cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestContainer =
+      CashAccountTransactionSearchRequestContainer(cashAccTransSearchRequest)
 
     jsonSchemaValidator.validatePayload(
       Json.toJson(cashAccTransSearchRequestContainer), jsonSchemaValidator.acc44RequestSchema) match {
@@ -77,10 +77,10 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
     }
   }
 
-  private def postValidRequest(cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestWrapper):
+  private def postValidRequest(cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestContainer):
   Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
 
-    httpClient.POST[CashAccountTransactionSearchRequestWrapper, HttpResponse](
+    httpClient.POST[CashAccountTransactionSearchRequestContainer, HttpResponse](
       appConfig.acc44CashTransactionSearchEndpoint,
       cashAccTransSearchRequestContainer,
       headers = headers.headers(appConfig.acc44BearerToken, None)
