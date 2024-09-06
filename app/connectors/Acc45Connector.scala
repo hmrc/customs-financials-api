@@ -62,7 +62,7 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
         response.status match {
           case OK | CREATED => Right(handleSuccessCase(response.json))
           case BAD_REQUEST | INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-          case _ => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, response.toString(), "Failure in backend System"))
+          case _ => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, response.status.toString(), "Failure in backend System"))
         }
       }.recover {
         case exception: Exception => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, exception.toString, "Failure in backend System"))
