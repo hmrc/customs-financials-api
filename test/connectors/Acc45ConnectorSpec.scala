@@ -17,16 +17,20 @@
 package connectors
 
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountStatementRequest, CashAccountStatementRequestCommon,
-  CashAccountStatementRequestContainer, CashAccountStatementRequestDetail}
-import models.responses.{Acc45ResponseCommon, CashAccountStatementErrorResponse,
-  CashAccountStatementResponseContainer, ErrorDetail}
+import models.requests.{
+  CashAccountStatementRequest, CashAccountStatementRequestCommon,
+  CashAccountStatementRequestContainer, CashAccountStatementRequestDetail
+}
+import models.responses.{
+  Acc45ResponseCommon, CashAccountStatementErrorResponse,
+  CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail
+}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import utils.SpecBase
 
 import scala.concurrent.Future
@@ -106,6 +110,34 @@ class Acc45ConnectorSpec extends SpecBase {
           result mustBe Left(errorResponseDetails03)
         }
       }
+
+      "Backend system sends ServiceUnavailable error" in new Setup {
+
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03)))
+
+        running(app) {
+          val result = await(connector.submitStatementRequest(reqDetail01))
+          val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
+          errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+          errorDetail.errorMessage must not be empty
+        }
+      }
+
+      "Not Found Error is thrown from API call" in new Setup {
+
+        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
+          .thenReturn(Future.failed(new NotFoundException("error")))
+
+        running(app) {
+          val result = await(connector.submitStatementRequest(reqDetail01))
+          val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
+          errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+          errorDetail.errorMessage must not be empty
+        }
+      }
+
+
     }
 
   }
@@ -114,6 +146,10 @@ class Acc45ConnectorSpec extends SpecBase {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockHttpClient: HttpClient = mock[HttpClient]
 
+    val defaultErrorDetail: ErrorDetail = ErrorDetail(
+      "2024-01-21T11:30:47Z", "f058ebd6", "500",
+      "Internal Server Error", "MDTP", SourceFaultDetail(Seq("Failure in backend System"))
+    )
     val reqCommon = CashAccountStatementRequestCommon(MDTP, "2021-01-01T10:00:00Z", "601bb176b8e411e")
     val reqDetail01 = CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
     val request01: CashAccountStatementRequestContainer =
@@ -216,6 +252,20 @@ class Acc45ConnectorSpec extends SpecBase {
         |    }
         |  }
         |}""".stripMargin
+
+    val casErrorResponseStr04 =
+      """
+        |  "errorDetail": {
+        |    "timestamp": "2024-01-21T11:30:47Z",
+        |    "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+        |    "errorMessage": "Internal Server Error",
+        |    "source": "Backend",
+        |    "sourceFaultDetail": {
+        |      "detail": [
+        |        "Failure in backend System"
+        |      ]
+        |    }
+        |  }""".stripMargin
 
     val responseCommon01: Acc45ResponseCommon = Json.fromJson[CashAccountStatementResponseContainer](
       Json.parse(casResponseStr01)).get.cashAccountStatementResponse.responseCommon

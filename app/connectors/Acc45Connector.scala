@@ -19,7 +19,7 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.responses.{Acc45ResponseCommon, CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail}
-import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -62,10 +62,10 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
         response.status match {
           case OK | CREATED => Right(handleSuccessCase(response.json))
           case BAD_REQUEST | INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-          case _ => Left(handleUnknownErrorCase(BAD_REQUEST.toString, response.toString(), "Failure in backend System"))
+          case _ => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, response.toString(), "Failure in backend System"))
         }
       }.recover {
-        case exception: Exception => Left(handleUnknownErrorCase(INTERNAL_SERVER_ERROR.toString, exception.toString, "Failure in backend System"))
+        case exception: Exception => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, exception.toString, "Failure in backend System"))
       }
     }
   }
