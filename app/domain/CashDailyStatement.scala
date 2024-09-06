@@ -35,13 +35,25 @@ case class Declaration(movementReferenceNumber: String,
                        amount: String,
                        taxGroups: Seq[TaxGroup])
 
-case class TaxGroup(taxTypeGroup: String, amount: String)
+case class TaxGroup(taxGroupDescription: String, amount: BigDecimal, taxTypes: Seq[TaxType])
+
+case class TaxType(reasonForSecurity: String, taxTypeID: String, amount: String)
+
+
+
+
+
+
+
+
+
 
 case class Transaction(amount: String, transactionType: String, bankAccountNumber: Option[String])
 
 object CashDailyStatement {
   implicit val transactionFormat: OFormat[Transaction] = Json.format[Transaction]
   implicit val taxGroupDetailFormat: OFormat[TaxGroup] = Json.format[TaxGroup]
+  implicit val cashTaxTypeDetailFormat: OFormat[TaxType] = Json.format[TaxType]
   implicit val declarationFormat: OFormat[Declaration] = Json.format[Declaration]
   implicit val cashDailyStatementFormat: OFormat[CashDailyStatement] = Json.format[CashDailyStatement]
   implicit val cashTransactionsFormat: OFormat[CashTransactions] = Json.format[CashTransactions]

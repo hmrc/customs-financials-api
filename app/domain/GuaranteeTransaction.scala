@@ -29,9 +29,9 @@ case class DueDate(dueDate: String,
                    amounts: Amounts,
                    taxTypeGroups: Seq[TaxTypeGroup])
 
-case class TaxTypeGroup(taxTypeGroup: String, amounts: Amounts, taxType: TaxType)
+case class TaxTypeGroup(taxTypeGroup: String, amounts: Amounts, taxType: TaxTypeG)
 
-case class TaxType(taxType: String, amounts: Amounts)
+case class TaxTypeG(taxType: String, amounts: Amounts)
 
 case class GuaranteeTransaction(date: String,
                                 movementReferenceNumber: String,
@@ -49,7 +49,7 @@ object GuaranteeTransaction {
 
   implicit val amountsFormat: OFormat[Amounts] = Json.format[Amounts]
 
-  implicit val taxTypeFormat: OFormat[TaxType] = Json.format[TaxType]
+  implicit val taxTypeFormat: OFormat[TaxTypeG] = Json.format[TaxTypeG]
 
   implicit val taxTypeGroupFormat: OFormat[TaxTypeGroup] = Json.format[TaxTypeGroup]
 

@@ -51,7 +51,7 @@ class DomainService {
       declaration.declarantReference,
       declaration.postingDate,
       declaration.amount,
-      Nil)
+      declaration.taxGroups.map(container => toDomain(container.taxGroup)))
   }
 
   def toDomainDetail(cashTransactionsResponseDetail: CashTransactionsResponseDetail): domain.CashTransactions = {
@@ -92,12 +92,23 @@ class DomainService {
   }
 
   private def toDomain(taxGroupDetail: TaxGroupDetail): domain.TaxGroup = {
-    TaxGroup(taxGroupDetail.taxGroupDescription, taxGroupDetail.amount)
+    domain.TaxGroup(
+      taxGroupDetail.taxGroupDescription,
+      taxGroupDetail.amount,
+      taxGroupDetail.taxTypes.map(taxTypeContainer => toDomain(taxTypeContainer.taxType))
+    )
   }
 
+  private def toDomain(taxTypeDetail: TaxTypeDetail): domain.TaxType = {
+    domain.TaxType(
+      taxTypeDetail.reasonForSecurity,
+      taxTypeDetail.taxTypeID,
+      taxTypeDetail.amount
+    )
+  }
 
-  private def toDomain(tt: responses.TaxType): domain.TaxType = {
-    domain.TaxType(tt.taxType, toDomain(tt.defAmounts))
+  private def toDomain(tt: responses.TaxTypeG): domain.TaxTypeG = {
+    domain.TaxTypeG(tt.taxType, toDomain(tt.defAmounts))
   }
 
   private def toDomain(ttg: responses.TaxTypeGroup): domain.TaxTypeGroup = {

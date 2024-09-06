@@ -45,7 +45,7 @@ object GuaranteeTransactionsResponse {
 
   implicit val defAmountsFormat: OFormat[DefAmounts] = Json.format[DefAmounts]
 
-  implicit val taxTypeFormat: OFormat[TaxType] = Json.format[TaxType]
+  implicit val taxTypeFormat: OFormat[TaxTypeG] = Json.format[TaxTypeG]
 
   implicit val taxTypeGroupFormat: OFormat[TaxTypeGroup] = Json.format[TaxTypeGroup]
 
@@ -94,6 +94,6 @@ case class DueDate(dueDate: String,
 
 case class TaxTypeGroup(taxTypeGroup: String,
                         defAmounts: DefAmounts,
-                        taxTypes: Seq[TaxType])
+                        taxTypes: Seq[TaxTypeG])
 
-case class TaxType(taxType: String, defAmounts: DefAmounts)
+case class TaxTypeG(taxType: String, defAmounts: DefAmounts)
