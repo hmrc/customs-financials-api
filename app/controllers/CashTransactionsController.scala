@@ -16,8 +16,9 @@
 
 package controllers
 
-
 import domain.CashDailyStatement._
+import models.requests.CashAccountTransactionSearchRequestDetails
+import models.responses.EtmpErrorCode._
 import models.requests.CashAccountStatementRequestDetail
 import models.responses.{Acc45ResponseCommon, ErrorDetail}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
@@ -25,6 +26,7 @@ import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import services.CashTransactionsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.Utils.writable
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -54,6 +56,16 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
     }
   }
 
+  def retrieveCashAccountTransactions: Action[JsValue] = Action.async(parse.json) { implicit request =>
+    withJsonBody[CashAccountTransactionSearchRequestDetails] { cashTransactionsSearchReq =>
+
+      service.retrieveCashAccountTransactions(cashTransactionsSearchReq).map {
+        case Right(cashAccTransSearchResponse) => Ok(Json.toJson(cashAccTransSearchResponse))
+        case Left(errorDetail) => checkErrorCodeAndCreateResponse(errorDetail)
+      }
+    }
+  }
+
   def submitCashAccStatementRequest(): Action[JsValue] = Action.async(parse.json) {
     implicit request => {
       withJsonBody[CashAccountStatementRequestDetail] { cashAccSttReq =>
@@ -78,6 +90,17 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
       case statusTxt if statusTxt.isEmpty => Ok(Json.toJson(res))
       case statusTxt if statusTxt.isDefined => Created(Json.toJson(res))
       case _ => BadRequest(Json.toJson(res))
+    }
+  }
+
+  private def checkErrorCodeAndCreateResponse(errorDetail: ErrorDetail): Result = {
+    val etmpErrorCodes = List(code001, code002, code003, code004, code005)
+
+    errorDetail.errorCode match {
+      case "400" => BadRequest(errorDetail)
+      case "500" => InternalServerError(errorDetail)
+      case etmpErrorCode if (etmpErrorCodes.contains(etmpErrorCode)) => PreconditionFailed(errorDetail)
+      case _ => ServiceUnavailable(errorDetail)
     }
   }
 

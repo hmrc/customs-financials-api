@@ -41,11 +41,11 @@ object Acc45ResponseCommon {
   implicit val acc45ResponseCommonFormat: OFormat[Acc45ResponseCommon] = Json.format[Acc45ResponseCommon]
 }
 
-case class ReturnParameter(paramName: String, paramValue: String)
+/*case class ReturnParameter(paramName: String, paramValue: String)
 
 object ReturnParameter {
   implicit val returnParameterFormat: OFormat[ReturnParameter] = Json.format[ReturnParameter]
-}
+}*/
 
 case class CashAccountStatementErrorResponse(errorDetail: ErrorDetail)
 

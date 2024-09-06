@@ -155,6 +155,18 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
     configuration.getOptional[String]("microservice.services.acc37.host-header")
 
   lazy val sub09BearerToken: String = getConfString("sub09.bearer-token", "test")
+
+  lazy val acc44BearerToken: String = getConfString("acc44.bearer-token", "test")
+
+  lazy val acc44CashTransactionSearchEndpoint: String =
+    s"${
+      baseUrl("acc44")
+    }${
+      getConfString("acc44.context-base", "/")
+    }${
+      getConfString("acc44.endpoint", "/")
+    }"
+
   lazy val dbTimeToLiveInSeconds: Int =
     configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
 

@@ -18,8 +18,12 @@ package controllers
 
 import domain.CashDailyStatement._
 import domain._
-import models.requests.CashAccountStatementRequestDetail
-import models.responses.{Acc45ResponseCommon, ErrorDetail}
+import models.requests.SearchType.P
+import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails}
+import models.responses.ErrorCode.{code400, code500}
+import models.responses.EtmpErrorCode.code001
+import models.responses.PaymentType.Payment
+import models.responses._
 import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -30,6 +34,8 @@ import play.api.{Application, inject}
 import services.CashTransactionsService
 import utils.SpecBase
 import utils.TestData.{DAY_1, MONTH_1, MONTH_6, YEAR_2020}
+import models.requests.CashAccountStatementRequestDetail
+import models.responses.{Acc45ResponseCommon, ErrorDetail}
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,6 +45,9 @@ class CashTransactionsControllerSpec extends SpecBase {
   "CashTransactionControllerSpec.getSummary" should {
 
     "delegate to the service and return a list of cash daily statements with a 200 status code" in new Setup {
+
+      import domain.Declaration
+
       val aListOfCashDailyStatements: Seq[CashDailyStatement] =
         Seq(
           CashDailyStatement("date",
@@ -89,6 +98,9 @@ class CashTransactionsControllerSpec extends SpecBase {
 
   "CashTransactionControllerSpec.getDetail" should {
     "delegate to the service and return a list of cash daily statements with a 200 status code" in new Setup {
+
+      import domain.{Declaration, TaxGroup}
+
       val expectedTaxGroups: Seq[TaxGroup] = Seq(
         TaxGroup("VAT", "-456.78"),
         TaxGroup("Excise", "-789.01"))
@@ -153,6 +165,81 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
   }
 
+  "retrieveCashAccountTransactions" should {
+
+    "return CashAccountTransactionSearchResponseDetail for the successful response" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+        .thenReturn(Future.successful(Right(cashAccountTransactionSearchResponseDetailOb)))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.toJson(cashAccountTransactionSearchResponseDetailOb)
+      }
+    }
+
+    "return error response for 400 error code" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+        .thenReturn(Future.successful(Left(errorDetails)))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsJson(result) mustBe Json.toJson(errorDetails)
+      }
+    }
+
+    "return error response for 500 error code" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+        .thenReturn(
+          Future.successful(
+            Left(errorDetails.copy(errorCode = code500, errorMessage = "Error connecting to the server"))))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsJson(result) mustBe
+          Json.toJson(errorDetails.copy(errorCode = code500, errorMessage = "Error connecting to the server"))
+      }
+    }
+
+    "return error response for ETMP error codes" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+        .thenReturn(
+          Future.successful(
+            Left(errorDetails.copy(
+              errorCode = code001, errorMessage = "Invalid Cash Account"))))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe PRECONDITION_FAILED
+        contentAsJson(result) mustBe
+          Json.toJson(errorDetails.copy(
+            errorCode = code001, errorMessage = "Invalid Cash Account"))
+      }
+    }
+
+    "return error response for 503 error code" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+        .thenReturn(
+          Future.successful(
+            Left(errorDetails.copy(
+              errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server"))))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe SERVICE_UNAVAILABLE
+        contentAsJson(result) mustBe
+          Json.toJson(errorDetails.copy(
+            errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server"))
+      }
+    }
+  }
   "CashTransactionControllerSpec.submitCashAccStatementRequest" should {
 
     "return ResponseCommon for success scenario" in new Setup {
@@ -269,11 +356,46 @@ class CashTransactionsControllerSpec extends SpecBase {
   }
 
   trait Setup {
-
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockCashTransactionsService: CashTransactionsService = mock[CashTransactionsService]
+
+    val dateFromString = "2024-05-28"
+    val dateToString = "2024-05-28"
+
+    val can = "12345678901"
+    val ownerEORI = "test_eori"
+    val ownerEoriGB = "GB1234678900"
+    val amount = 999.90
+
+    val fromDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_1, DAY_1)
+    val toDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_6, DAY_1)
+
+    val dateFrom: LocalDate = LocalDate.now().minusDays(1)
+    val dateTo: LocalDate = LocalDate.now()
+
+    val eoriNumber = "GB123456789"
+    val dateString = "2024-05-28"
+    val eoriDataName = "test"
+    val paymentReference = "CDSC1234567890"
+    val bankAccount = "1234567890987"
+    val sortCode = "123456789"
+
+    val cashAccountPaymentDetailsOb: CashAccountPaymentDetails =
+      CashAccountPaymentDetails(amount, Some(dateFromString), Some(dateToString))
+
+    val cashTranSearchRequestDetailsWithSearchTypePOb: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, P, None, Some(cashAccountPaymentDetailsOb))
+
+    val errorDetails: ErrorDetail = ErrorDetail(
+      timestamp = "2024-01-17T09:30:47Z",
+      correlationId = "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+      errorCode = code400,
+      errorMessage = "Request could not be processed",
+      source = "Backend",
+      sourceFaultDetail = SourceFaultDetail(Seq())
+    )
 
     val getSummaryRequest: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.getSummary().url)
@@ -282,6 +404,10 @@ class CashTransactionsControllerSpec extends SpecBase {
     val getDetailRequest: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.getDetail().url)
         .withBody(Json.parse("""{"can":"can1", "from":"2020-01-01", "to":"2020-06-01"}"""))
+
+    val retrieveCashAccountTransactions: FakeRequest[JsValue] =
+      FakeRequest(POST, controllers.routes.CashTransactionsController.retrieveCashAccountTransactions().url)
+        .withBody(Json.toJson(cashTranSearchRequestDetailsWithSearchTypePOb))
 
     val cashAccSttRequest = CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
@@ -298,7 +424,25 @@ class CashTransactionsControllerSpec extends SpecBase {
       "auditing.enabled" -> false
     ).build()
 
-    val fromDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_1, DAY_1)
-    val toDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_6, DAY_1)
+    val cashAccountTransactionSearchResponseDetailOb: CashAccountTransactionSearchResponseDetail =
+      CashAccountTransactionSearchResponseDetail(
+        can,
+        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
+        declarations = None,
+        paymentsWithdrawalsAndTransfers =
+          Some(
+            Seq(
+              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+                dateString,
+                dateString,
+                paymentReference,
+                amount,
+                Payment,
+                Some(bankAccount),
+                Some(sortCode)
+              ))
+            ))
+      )
+
   }
 }
