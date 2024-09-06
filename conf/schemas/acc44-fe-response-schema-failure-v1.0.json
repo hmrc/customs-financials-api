@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Common Fault JSON Error Schema",
+  "type": "object",
+  "properties": {
+    "errorDetail": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 35
+        },
+        "correlationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36
+        },
+        "errorCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 35
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10
+        },
+        "sourceFaultDetail": {
+          "type": "object",
+          "properties": {
+            "detail": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "timestamp",
+        "correlationId",
+        "errorCode",
+        "source"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "errorDetail"
+  ],
+  "additionalProperties": false
+}

@@ -9,6 +9,7 @@ POST          /customs-financials-api/account/guarantee/open-transactions-detail
 
 POST          /customs-financials-api/account/cash/transactions                           controllers.CashTransactionsController.getSummary()
 POST          /customs-financials-api/account/cash/transactions-detail                    controllers.CashTransactionsController.getDetail()
+POST          /customs-financials-api/account/cash/transaction-search                     controllers.CashTransactionsController.retrieveCashAccountTransactions()
 
 GET           /customs-financials-api/:eori/account-authorities                           controllers.AccountAuthoritiesController.get(eori: models.EORI)
 POST          /customs-financials-api/:eori/account-authorities/grant                     controllers.AccountAuthoritiesController.grant(eori: models.EORI)
