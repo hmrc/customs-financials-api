@@ -87,6 +87,7 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
         cashAccTransSearchRequestContainer,
         headers = headers.headers(appConfig.acc44BearerToken, None)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
+
         res.status match {
           case OK => validateAndProcessIncomingSuccessResponse(res)
 
