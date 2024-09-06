@@ -18,6 +18,8 @@ package controllers
 
 import domain.CashDailyStatement._
 import domain._
+import models.requests.CashAccountStatementRequestDetail
+import models.responses.{Acc45ResponseCommon, ErrorDetail}
 import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -151,7 +153,123 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
   }
 
+  "CashTransactionControllerSpec.submitCashAccStatementRequest" should {
+
+    "return ResponseCommon for success scenario" in new Setup {
+
+      val acc45ResStr =
+        """
+          |{
+          |  "status": "OK",
+          |  "processingDate": "2021-12-17T09:30:47Z"
+          |}""".stripMargin
+
+      val response: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+        .thenReturn(Future.successful(Right(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
+    "return ResponseCommon for business error at ETMP" in new Setup {
+
+      val acc45ResStr =
+        """
+          |{
+          |  "status": "OK",
+          |  "statusText": "003-Request could not be processed",
+          |  "processingDate": "2021-12-17T09:30:47Z",
+          |  "returnParameters": [
+          |    {
+          |      "paramName": "POSITION",
+          |      "paramValue": "FAIL"
+          |    }
+          |  ]
+          |}""".stripMargin
+
+      val response = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+        .thenReturn(Future.successful(Right(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe CREATED
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
+    "return ErrorDetails for invalid Json being sent to ETMP" in new Setup {
+
+      val acc45ResStr =
+        """
+          |{
+          |  "timestamp": "2024-01-21T11:30:47Z",
+          |  "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+          |  "errorCode": "400",
+          |  "errorMessage": "Request could not be processed",
+          |  "source": "Backend",
+          |  "sourceFaultDetail": {
+          |    "detail": [
+          |      "Invalid JSON message content used"
+          |    ]
+          |  }
+          |}""".stripMargin
+
+      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+        .thenReturn(Future.successful(Left(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
+    "return ErrorDetails for business error in EIS" in new Setup {
+
+      val acc45ResStr =
+        """
+          |{
+          |  "timestamp": "2024-01-21T11:30:47Z",
+          |  "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+          |  "errorCode": "500",
+          |  "errorMessage": "Internal Server Error",
+          |  "source": "Backend",
+          |  "sourceFaultDetail": {
+          |    "detail": [
+          |      "Failure in backend System"
+          |    ]
+          |  }
+          |}""".stripMargin
+
+      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+        .thenReturn(Future.successful(Left(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
+  }
+
   trait Setup {
+
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
@@ -164,6 +282,12 @@ class CashTransactionsControllerSpec extends SpecBase {
     val getDetailRequest: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.getDetail().url)
         .withBody(Json.parse("""{"can":"can1", "from":"2020-01-01", "to":"2020-06-01"}"""))
+
+    val cashAccSttRequest = CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
+
+    val submitCashAccStatementRequest: FakeRequest[JsValue] =
+      FakeRequest(POST, controllers.routes.CashTransactionsController.submitCashAccStatementRequest().url)
+        .withBody(Json.toJson(cashAccSttRequest))
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
