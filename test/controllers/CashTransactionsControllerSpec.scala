@@ -96,7 +96,9 @@ class CashTransactionsControllerSpec extends SpecBase {
 
   "CashTransactionControllerSpec.getDetail" should {
     "delegate to the service and return a list of cash daily statements with a 200 status code" in new Setup {
-      
+
+      import domain.{Declaration, TaxGroup}
+
       val expectedTaxGroups: Seq[TaxGroup] = Seq(
         TaxGroup("VAT", fourHundred,
           Seq(
@@ -143,7 +145,9 @@ class CashTransactionsControllerSpec extends SpecBase {
             Some("pendingDeclarantReference"),
             "pendingPostingDate",
             "pendingAmount",
-            Nil))
+            expectedTaxGroups
+          )
+        )
 
       val expectedCashTransactions: CashTransactions =
         CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
@@ -256,6 +260,7 @@ class CashTransactionsControllerSpec extends SpecBase {
   }
 
   trait Setup {
+
     val sevenHundred: Double = -789.01
     val fourHundred: Double = -456.78
     val tenThousand = 10000.00
