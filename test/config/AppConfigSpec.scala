@@ -65,6 +65,19 @@ class AppConfigSpec extends SpecBase {
     }
   }
 
+  "acc44BearerToken" should {
+    "return correct value" in new Setup {
+      appConfig.acc44BearerToken mustBe "test1234567"
+    }
+  }
+
+  "acc44CashTransactionSearchEndpoint" should {
+    "return correct endpoint url" in new Setup {
+      appConfig.acc44CashTransactionSearchEndpoint mustBe
+        "http://localhost:9753/customs-financials-hods-stub/accounts/cashaccounttransactionsearch/v1"
+    }
+  }
+
   trait Setup {
     val app: Application = application().build()
     val appConfig: AppConfig = app.injector.instanceOf[AppConfig]

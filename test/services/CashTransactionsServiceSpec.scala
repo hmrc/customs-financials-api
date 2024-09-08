@@ -16,15 +16,18 @@
 
 package services
 
-import connectors.Acc31Connector
-import domain._
+import connectors.{Acc31Connector, Acc44Connector}
+import domain.{Declaration, TaxGroup, _}
 import models._
+import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.responses.PaymentType.Payment
 import models.responses._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -182,10 +185,58 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Right(None))
       )
+
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(Nil, Nil)
         result mustBe Right(expectedResult)
+      }
+    }
+  }
+
+  "retrieveCashAccountTransactions" should {
+
+    "return successful response" in new Setup {
+      when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+        .thenReturn(Future.successful(Right(cashAccTranSearchResponseContainerOb)))
+
+      running(app) {
+        val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
+
+        result.map {
+          response =>
+            response mustBe
+              Right(cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.responseDetail.get)
+        }
+      }
+    }
+
+    "return Left[ErrorDetails] when business error occurs and response details is not present" in new Setup {
+      when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+        .thenReturn(
+          Future.successful(
+            Right(cashAccTranSearchResponseContainerOb.copy(
+              cashAccountTransactionSearchResponse =
+                cashAccountTransactionSearchResponseOb.copy(
+                  responseDetail = None,
+                  responseCommon = resCommonOb.copy(statusText = Some("001-Invalid Cash Account"))))
+            )))
+
+      running(app) {
+        val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
+
+        result.map {
+          response =>
+            response mustBe
+              Left(ErrorDetail(
+                timestamp = cashAccountTransactionSearchResponseOb.responseCommon.processingDate,
+                correlationId = "NA",
+                errorCode = "001",
+                errorMessage = "Invalid Cash Account",
+                source = "Backend",
+                sourceFaultDetail = SourceFaultDetail(Seq())
+              ))
+        }
       }
     }
   }
@@ -198,7 +249,11 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
     val dateTo: LocalDate = LocalDate.now()
+    val eoriNumber = "GB123456789"
+    val processingDate = "2001-12-17T09:30:47Z"
+
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
+    val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
       DailyStatementDetail(
@@ -264,8 +319,50 @@ class CashTransactionsServiceSpec extends SpecBase {
       Some(Seq(dailyStatement)),
       Some(pending))
 
+    val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(
+        CAN,
+        eoriNumber,
+        SearchType.P,
+        declarationDetails = None,
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
+
+    val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
+      status = "OK",
+      statusText = None,
+      processingDate = processingDate,
+      maxTransactionsExceeded = None,
+      returnParameters = None)
+
+    val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =
+      CashAccountTransactionSearchResponseDetail(
+        CAN,
+        eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, EORI_DATA_NAME))),
+        declarations = None,
+        paymentsWithdrawalsAndTransfers =
+          Some(
+            Seq(
+              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+                DATE_STRING,
+                DATE_STRING,
+                PAYMENT_REFERENCE,
+                AMOUNT,
+                Payment,
+                Some(BANK_ACCOUNT),
+                Some(SORT_CODE)
+              ))
+            ))
+      )
+
+    val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
+      CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccTranSearchResponseDetailWithPaymentWithdrawalOb))
+
+    val cashAccTranSearchResponseContainerOb: CashAccountTransactionSearchResponseContainer =
+      CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseOb)
+
     val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc31Connector].toInstance(mockAcc31Connector)
+      inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
+      inject.bind[Acc44Connector].toInstance(mockAcc44Connector)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

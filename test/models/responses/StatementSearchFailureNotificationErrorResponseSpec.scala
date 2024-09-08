@@ -16,7 +16,8 @@
 
 package models.responses
 
-import play.api.libs.json.Json
+import models.responses.ErrorCode.code500
+import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.BadRequestException
 import utils.Utils.emptyString
 import utils.{SpecBase, Utils}
@@ -289,6 +290,20 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
     }
   }
 
+  "ErrorDetailContainer" should {
+
+    "generate correct output for Json Reads" in new Setup {
+
+      import models.responses.ErrorDetailContainer.format
+
+      Json.fromJson(Json.parse(errorDetailContainerJsString)) mustBe JsSuccess(errorDetailContainerOb)
+    }
+
+    "generate correct output for Json Writes" in new Setup {
+      Json.toJson(errorDetailContainerOb) mustBe Json.parse(errorDetailContainerJsString)
+    }
+  }
+
   trait Setup {
     val ssfnNotErrorResJsValue1: String =
       """{
@@ -352,5 +367,30 @@ class StatementSearchFailureNotificationErrorResponseSpec extends SpecBase {
 
     val ssfnNotErrorResOb2: StatementSearchFailureNotificationErrorResponse =
       StatementSearchFailureNotificationErrorResponse(errorDetail2)
+
+    val errorDetailContainerOb: ErrorDetailContainer = ErrorDetailContainer(ErrorDetail(
+      "2024-01-21T11:30:47Z",
+      "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+      code500,
+      "Internal Server Error",
+      "Backend",
+      SourceFaultDetail(Seq("Failure in backend System"))
+    ))
+
+    val errorDetailContainerJsString: String =
+      """{
+        |"errorDetail": {
+        |"timestamp": "2024-01-21T11:30:47Z",
+        |"correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+        |"errorCode": "500",
+        |"errorMessage": "Internal Server Error",
+        |"source": "Backend",
+        |"sourceFaultDetail": {
+        |"detail": [
+        |"Failure in backend System"
+        |]
+        |}
+        |}
+        |}""".stripMargin
   }
 }
