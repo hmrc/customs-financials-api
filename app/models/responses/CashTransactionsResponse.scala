@@ -58,21 +58,7 @@ case class TaxGroupDetail(taxGroupDescription: String, amount: BigDecimal, taxTy
 
 case class TaxTypeContainer(taxType: TaxTypeDetail)
 
-case class TaxTypeDetail(reasonForSecurity: String, taxTypeID: String, amount: String)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+case class TaxTypeDetail(reasonForSecurity: String, taxTypeID: String, amount: BigDecimal)
 
 case class PaymentAndWithdrawalContainer(paymentAndWithdrawal: PaymentAndWithdrawalDetail)
 
@@ -82,10 +68,6 @@ case class PaymentAndWithdrawalDetail(amount: String,
 
 object CashTransactionsResponse {
 
-  implicit val taxTypeDetailFormat: OFormat[TaxTypeDetail] = Json.format[TaxTypeDetail]
-
-  implicit val taxTypeContainerFormat: OFormat[TaxTypeContainer] = Json.format[TaxTypeContainer]
-
   implicit val responseCommonFormat: OFormat[CashTransactionsResponseCommon] =
     Json.format[CashTransactionsResponseCommon]
 
@@ -94,6 +76,10 @@ object CashTransactionsResponse {
 
   implicit val paymentAndWithdrawalContainerFormat: OFormat[PaymentAndWithdrawalContainer] =
     Json.format[PaymentAndWithdrawalContainer]
+
+  implicit val taxTypeDetailFormat: OFormat[TaxTypeDetail] = Json.format[TaxTypeDetail]
+
+  implicit val taxTypeContainerFormat: OFormat[TaxTypeContainer] = Json.format[TaxTypeContainer]
 
   implicit val taxGroupFormat: OFormat[TaxGroupDetail] = Json.format[TaxGroupDetail]
 

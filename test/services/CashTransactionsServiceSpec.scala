@@ -44,23 +44,50 @@ class CashTransactionsServiceSpec extends SpecBase {
     }
 
     "return Right with the Cash transactions on a successful response from the API" in new Setup {
+
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
         .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail))))
 
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
+
         val expectedResult = CashTransactions(
-          List(Declaration("someId", Some(EORI("someImporterEORI")),
-            EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
+          List(Declaration(
+            "someId",
+            Some(EORI("someImporterEORI")),
+            EORI("someEori"),
+            Some("reference"),
+            dateTo.toString,
+            "10000",
+            List(TaxGroup(
+              "something",
+              thousand,
+              List(TaxTypeHolder("a", "b", thousand))
+            ))
+          )),
+
           List(CashDailyStatement(
             dateFrom.toString,
             "10000",
             "9000",
-            List(Declaration("someId", Some(EORI("someImporterEORI")),
-              EORI("someEori"), Some("reference"), dateTo.toString, "10000", List.empty)),
-            List(Transaction("10000", "A21", Some("Bank"))))
-          )
+            List(Declaration(
+              "someId",
+              Some(EORI("someImporterEORI")),
+              EORI("someEori"),
+              Some("reference"),
+              dateTo.toString,
+              "10000",
+              List(TaxGroup(
+                "something",
+                thousand,
+                List(TaxTypeHolder("a", "b", thousand))
+              ))
+            )),
+
+            List(Transaction("10000", "A21", Some("Bank")))
+          ))
         )
+
         result mustBe Right(expectedResult)
       }
     }
@@ -91,28 +118,60 @@ class CashTransactionsServiceSpec extends SpecBase {
     }
 
     "return Right with the Cash transactions on a successful response from the API" in new Setup {
+
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Right(Some(cashTransactionsResponseDetail)))
       )
+
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
 
         val expectedResult = CashTransactions(
-          List(Declaration("someId", Some(EORI("someImporterEORI")), EORI("someEori"),
-            Some("reference"), dateTo.toString, "10000", List.empty)),
+          List(Declaration(
+            movementReferenceNumber = "someId",
+            importerEori = Some(EORI("someImporterEORI")),
+            declarantEori = EORI("someEori"),
+            declarantReference = Some("reference"),
+            date = dateTo.toString,
+            amount = "10000",
+            taxGroups = List(TaxGroup(
+              taxGroupDescription = "something",
+              amount = 1000.0,
+              taxTypes = Seq(TaxTypeHolder(
+                reasonForSecurity = "a",
+                taxTypeID = "b",
+                amount = 1000.0
+              ))
+            ))
+          )),
+
           List(CashDailyStatement(
-            dateFrom.toString,
-            "10000",
-            "9000",
-            List(Declaration("someId",
-              Some(EORI("someImporterEORI")),
-              EORI("someEori"),
-              Some("reference"),
-              dateTo.toString,
-              "10000",
-              List(TaxGroup("something", "10000")))),
-            List(Transaction("10000", "A21", Some("Bank"))))
-          )
+            date = dateFrom.toString,
+            openingBalance = "10000",
+            closingBalance = "9000",
+            declarations = List(Declaration(
+              movementReferenceNumber = "someId",
+              importerEori = Some(EORI("someImporterEORI")),
+              declarantEori = EORI("someEori"),
+              declarantReference = Some("reference"),
+              date = dateTo.toString,
+              amount = "10000",
+              taxGroups = List(TaxGroup(
+                taxGroupDescription = "something",
+                amount = thousand,
+                taxTypes = Seq(TaxTypeHolder(
+                  reasonForSecurity = "a",
+                  taxTypeID = "b",
+                  amount = thousand
+                ))
+              ))
+            )),
+            otherTransactions = List(Transaction(
+              amount = "10000",
+              transactionType = "A21",
+              bankAccountNumber = Some("Bank")
+            ))
+          ))
         )
 
         result mustBe Right(expectedResult)
@@ -132,6 +191,8 @@ class CashTransactionsServiceSpec extends SpecBase {
   }
 
   trait Setup {
+    val thousand = 1000.00
+
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
@@ -152,9 +213,19 @@ class CashTransactionsServiceSpec extends SpecBase {
             Some("reference"),
             dateTo.toString,
             "10000",
-            Seq(TaxGroupContainer(
-              TaxGroupDetail("something", "10000")
-            ))
+            Seq(
+              TaxGroupContainer(
+                TaxGroupDetail("something", thousand,
+                  Seq(
+                    TaxTypeContainer(
+                      TaxTypeDetail(
+                        reasonForSecurity = "a", taxTypeID = "b", amount = thousand
+                      )
+                    )
+                  )
+                )
+              )
+            )
           )
         ))),
         Some(Seq(PaymentAndWithdrawalContainer(
@@ -172,9 +243,19 @@ class CashTransactionsServiceSpec extends SpecBase {
           Some("reference"),
           dateTo.toString,
           "10000",
-          Seq(TaxGroupContainer(
-            TaxGroupDetail("something", "10000")
-          ))
+          Seq(
+            TaxGroupContainer(
+              TaxGroupDetail("something", thousand,
+                Seq(
+                  TaxTypeContainer(
+                    TaxTypeDetail(
+                      reasonForSecurity = "a", taxTypeID = "b", amount = thousand
+                    )
+                  )
+                )
+              )
+            )
+          )
         )
       ))
     )

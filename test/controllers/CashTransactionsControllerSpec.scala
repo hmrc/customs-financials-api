@@ -87,9 +87,28 @@ class CashTransactionsControllerSpec extends SpecBase {
 
   "CashTransactionControllerSpec.getDetail" should {
     "delegate to the service and return a list of cash daily statements with a 200 status code" in new Setup {
+
       val expectedTaxGroups: Seq[TaxGroup] = Seq(
-        TaxGroup("VAT", "-456.78"),
-        TaxGroup("Excise", "-789.01"))
+        TaxGroup("VAT", fourHundred,
+          Seq(
+            TaxTypeHolder(
+              reasonForSecurity = "a",
+              taxTypeID = "b",
+              amount = tenThousand
+            )
+          )
+        ),
+
+        TaxGroup("Excise", sevenHundred,
+          Seq(
+            TaxTypeHolder(
+              reasonForSecurity = "a",
+              taxTypeID = "b",
+              amount = tenThousand
+            )
+          )
+        )
+      )
 
       val aListOfCashDailyStatements: Seq[CashDailyStatement] =
         Seq(
@@ -152,6 +171,10 @@ class CashTransactionsControllerSpec extends SpecBase {
   }
 
   trait Setup {
+    val sevenHundred: Double = -789.01
+    val fourHundred: Double = -456.78
+    val tenThousand = 10000.00
+
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
