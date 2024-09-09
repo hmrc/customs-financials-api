@@ -16,7 +16,7 @@
 
 package services
 
-import domain.{Declaration, GuaranteeTransaction, CashTransactions, CashDailyStatement, Amounts, Transaction, TaxGroup}
+import domain._
 import models.responses
 import models.responses._
 
@@ -44,6 +44,7 @@ class DomainService {
         .map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty))
   }
 
+  import domain.Declaration
   private def toDomain(declaration: DeclarationDetail): domain.Declaration = {
     Declaration(declaration.declarationID,
       declaration.importerEORINumber,
@@ -51,7 +52,7 @@ class DomainService {
       declaration.declarantReference,
       declaration.postingDate,
       declaration.amount,
-      Nil)
+      declaration.taxGroups.map(container => toDomainTaxGroup(container.taxGroup)))
   }
 
   def toDomainDetail(cashTransactionsResponseDetail: CashTransactionsResponseDetail): domain.CashTransactions = {
@@ -80,7 +81,6 @@ class DomainService {
         .map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
   }
 
-
   def toDomainDetail(declaration: DeclarationDetail): domain.Declaration = {
     Declaration(declaration.declarationID,
       declaration.importerEORINumber,
@@ -88,13 +88,25 @@ class DomainService {
       declaration.declarantReference,
       declaration.postingDate,
       declaration.amount,
-      declaration.taxGroups.map(container => toDomain(container.taxGroup)))
+      declaration.taxGroups.map(container => toDomainTaxGroup(container.taxGroup)))
   }
 
-  private def toDomain(taxGroupDetail: TaxGroupDetail): domain.TaxGroup = {
-    TaxGroup(taxGroupDetail.taxGroupDescription, taxGroupDetail.amount)
-  }
+  import domain.TaxGroup
+  private def toDomainTaxGroup(taxGroupDetail: TaxGroupDetail): domain.TaxGroup = {
+    TaxGroup(
+      taxGroupDetail.taxGroupDescription,
+      taxGroupDetail.amount,
+      taxGroupDetail.taxTypes.map { taxTypeContainer =>
+        val taxType = taxTypeContainer.taxType
 
+        TaxTypeHolder(
+          reasonForSecurity = taxType.reasonForSecurity,
+          taxTypeID = taxType.taxTypeID,
+          amount = taxType.amount
+        )
+      }
+    )
+  }
 
   private def toDomain(tt: responses.TaxType): domain.TaxType = {
     domain.TaxType(tt.taxType, toDomain(tt.defAmounts))

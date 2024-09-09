@@ -100,8 +100,26 @@ class CashTransactionsControllerSpec extends SpecBase {
       import domain.{Declaration, TaxGroup}
 
       val expectedTaxGroups: Seq[TaxGroup] = Seq(
-        TaxGroup("VAT", "-456.78"),
-        TaxGroup("Excise", "-789.01"))
+        TaxGroup("VAT", fourHundred,
+          Seq(
+            TaxTypeHolder(
+              reasonForSecurity = "a",
+              taxTypeID = "b",
+              amount = tenThousand
+            )
+          )
+        ),
+
+        TaxGroup("Excise", sevenHundred,
+          Seq(
+            TaxTypeHolder(
+              reasonForSecurity = "a",
+              taxTypeID = "b",
+              amount = tenThousand
+            )
+          )
+        )
+      )
 
       val aListOfCashDailyStatements: Seq[CashDailyStatement] =
         Seq(
@@ -127,7 +145,9 @@ class CashTransactionsControllerSpec extends SpecBase {
             Some("pendingDeclarantReference"),
             "pendingPostingDate",
             "pendingAmount",
-            Nil))
+            expectedTaxGroups
+          )
+        )
 
       val expectedCashTransactions: CashTransactions =
         CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
@@ -240,6 +260,11 @@ class CashTransactionsControllerSpec extends SpecBase {
   }
 
   trait Setup {
+
+    val sevenHundred: Double = -789.01
+    val fourHundred: Double = -456.78
+    val tenThousand = 10000.00
+
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
