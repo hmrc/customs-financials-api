@@ -310,7 +310,7 @@ class CashTransactionsControllerSpec extends SpecBase {
           |  }
           |}""".stripMargin
 
-      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+      val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
       when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
         .thenReturn(Future.successful(Left(response)))
