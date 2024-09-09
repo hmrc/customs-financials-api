@@ -39,6 +39,18 @@ class AppConfigSpec extends SpecBase {
     }
   }
 
+  "acc45" should {
+    "return correct BearerToken value" in new Setup {
+      appConfig.acc45BearerToken mustBe "test1234567"
+    }
+
+    "return correct endpoint" in new Setup {
+      appConfig.acc45CashAccountStatementRequestEndpoint mustBe
+        "http://localhost:9753/customs-financials-hods-stub/accounts/cashaccountstatementrequest/v1"
+    }
+
+  }
+
   "bearerTokenValuePrefix" should {
     "return correct value" in new Setup {
       appConfig.bearerTokenValuePrefix mustBe "Bearer"

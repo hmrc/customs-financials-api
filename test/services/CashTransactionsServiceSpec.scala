@@ -16,14 +16,18 @@
 
 package services
 
-import connectors.{Acc31Connector, Acc44Connector}
+import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.{Declaration, TaxGroup, _}
 import models._
-import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.requests.{
+  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails, SearchType
+}
 import models.responses.PaymentType.Payment
 import models.responses._
 import play.api._
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
@@ -240,6 +244,90 @@ class CashTransactionsServiceSpec extends SpecBase {
       }
     }
   }
+  "submitCashAccountStatementRequest" should {
+
+    "return Left with ErrorDetail if api request fails" in new Setup {
+
+      val casErrorDetailStr01: String =
+        """
+          |{
+          |  "timestamp": "2024-01-21T11:30:47Z",
+          |  "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+          |  "errorCode": "400",
+          |  "errorMessage": "Request could not be processed",
+          |  "source": "Backend",
+          |  "sourceFaultDetail": {
+          |    "detail": [
+          |      "Invalid JSON message content used"
+          |    ]
+          |  }
+          |}""".stripMargin
+
+      val casErrorResponseDetails01: ErrorDetail = Json.fromJson[ErrorDetail](
+        Json.parse(casErrorDetailStr01)).get
+
+      when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
+        Future.successful(Left(casErrorResponseDetails01))
+      )
+
+      running(app) {
+        val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
+        result mustBe Left(casErrorResponseDetails01)
+      }
+    }
+
+    "return Right with ResponseCommon if api request is successful" in new Setup {
+
+      val casResponseCommonStr01: String =
+        """
+          |{
+          |  "status": "OK",
+          |  "processingDate": "2021-12-17T09:30:47Z"
+          |}""".stripMargin
+
+      val casResponseCommon01: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](
+        Json.parse(casResponseCommonStr01)).get
+
+      when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
+        Future.successful(Right(casResponseCommon01))
+      )
+
+      running(app) {
+        val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
+        result mustBe Right(casResponseCommon01)
+      }
+    }
+
+    "return Right with ResponseCommon if api fails at ETMP" in new Setup {
+
+      val casResponseCommonStr01: String =
+        """
+          |{
+          |  "status": "OK",
+          |  "statusText": "003-Request could not be processed",
+          |  "processingDate": "2021-12-17T09:30:47Z",
+          |  "returnParameters": [
+          |    {
+          |      "paramName": "POSITION",
+          |      "paramValue": "FAIL"
+          |    }
+          |  ]
+          |}""".stripMargin
+
+      val casResponseCommon01: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](
+        Json.parse(casResponseCommonStr01)).get
+
+      when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
+        Future.successful(Right(casResponseCommon01))
+      )
+
+      running(app) {
+        val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
+        result mustBe Right(casResponseCommon01)
+      }
+    }
+
+  }
 
   trait Setup {
     val thousand = 1000.00
@@ -254,6 +342,10 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
     val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
+    val mockAcc45Connector: Acc45Connector = mock[Acc45Connector]
+
+    val cashAccSttReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
+      "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
       DailyStatementDetail(
@@ -362,7 +454,8 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
-      inject.bind[Acc44Connector].toInstance(mockAcc44Connector)
+      inject.bind[Acc44Connector].toInstance(mockAcc44Connector),
+      inject.bind[Acc45Connector].toInstance(mockAcc45Connector)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

@@ -121,6 +121,11 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   lazy val acc41BearerToken: String = getConfString("acc41.bearer-token", "test")
 
+  lazy val acc45CashAccountStatementRequestEndpoint: String =
+    s"${baseUrl("acc45")}${getConfString("acc45.context-base", "/")}/accounts/cashaccountstatementrequest/v1"
+
+  lazy val acc45BearerToken: String = getConfString("acc45.bearer-token", "test")
+
   lazy val acc37UpdateAccountContactDetailsEndpoint: String =
     baseUrl("acc37") +
       getConfString("acc37.context-base", "/") + "/accounts/amendcorrespondenceaddress/v1"

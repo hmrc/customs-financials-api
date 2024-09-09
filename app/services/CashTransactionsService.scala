@@ -16,9 +16,10 @@
 
 package services
 
-import connectors.{Acc31Connector, Acc44Connector}
+import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.CashTransactions
 import models.ErrorResponse
+import models.requests.CashAccountStatementRequestDetail
 import models.requests.CashAccountTransactionSearchRequestDetails
 import models.responses.ErrorSource.backEnd
 import models.responses.EtmpErrorCode.INVALID_CASH_ACCOUNT_STATUS_TEXT
@@ -31,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
                                         acc44Connector: Acc44Connector,
+                                        acc45Connector: Acc45Connector,
                                         domainService: DomainService)(implicit executionContext: ExecutionContext) {
   def retrieveCashTransactionsSummary(can: String,
                                       from: LocalDate,
@@ -67,6 +69,11 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
       case Right(resValue) => populateSuccessfulResponseDetail(resValue)
       case Left(errorDetails) => Left(errorDetails)
     }
+  }
+
+  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail): Future[Either[ErrorDetail,
+    Acc45ResponseCommon]] = {
+    acc45Connector.submitStatementRequest(request)
   }
 
   private def populateSuccessfulResponseDetail(resValue: CashAccountTransactionSearchResponseContainer): Either[ErrorDetail,
