@@ -244,7 +244,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     "return ResponseCommon for success scenario" in new Setup {
 
-      val acc45ResStr =
+      val acc45ResStr: String =
         """
           |{
           |  "status": "OK",
@@ -266,7 +266,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     "return ResponseCommon for business error at ETMP" in new Setup {
 
-      val acc45ResStr =
+      val acc45ResStr: String =
         """
           |{
           |  "status": "OK",
@@ -295,7 +295,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     "return ErrorDetails for invalid Json being sent to ETMP" in new Setup {
 
-      val acc45ResStr =
+      val acc45ResStr: String =
         """
           |{
           |  "timestamp": "2024-01-21T11:30:47Z",
@@ -325,7 +325,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     "return ErrorDetails for business error in EIS" in new Setup {
 
-      val acc45ResStr =
+      val acc45ResStr: String =
         """
           |{
           |  "timestamp": "2024-01-21T11:30:47Z",
@@ -355,7 +355,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     "return ErrorDetails for Service Unavailable scenarios as business error in EIS" in new Setup {
 
-      val acc45ResStr =
+      val acc45ResStr: String =
         """
           |{
           |  "timestamp": "2024-01-21T11:30:47Z",
