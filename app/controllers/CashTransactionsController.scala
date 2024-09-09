@@ -88,8 +88,7 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
   private def handleCashAccSttRequestSuccessCases(res: Acc45ResponseCommon): Result = {
     res.statusText match {
       case statusTxt if statusTxt.isEmpty => Ok(Json.toJson(res))
-      case statusTxt if statusTxt.isDefined => Created(Json.toJson(res))
-      case _ => BadRequest(Json.toJson(res))
+      case _ => Created(Json.toJson(res))
     }
   }
 

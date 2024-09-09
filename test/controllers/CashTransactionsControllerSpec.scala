@@ -353,6 +353,36 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
 
+    "return ErrorDetails with Service Unavailable Error as business error in EIS" in new Setup {
+
+      val acc45ResStr =
+        """
+          |{
+          |  "timestamp": "2024-01-21T11:30:47Z",
+          |  "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+          |  "errorCode": "503",
+          |  "errorMessage": "Service Unavailable",
+          |  "source": "Backend",
+          |  "sourceFaultDetail": {
+          |    "detail": [
+          |      "Failure in backend System"
+          |    ]
+          |  }
+          |}""".stripMargin
+
+      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+        .thenReturn(Future.successful(Left(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe SERVICE_UNAVAILABLE
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
   }
 
   trait Setup {
