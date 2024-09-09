@@ -35,13 +35,13 @@ class CashAccountStatementRequestContainerSpec extends SpecBase {
 
   trait Setup {
 
-    val casRequestCommon = CashAccountStatementRequestCommon(
+    val casRequestCommon: CashAccountStatementRequestCommon = CashAccountStatementRequestCommon(
       "MDTP", "2021-12-17T09:30:47Z", "601bb176b8e411ed8a9800001e3b1802")
 
-    val casRequestDetail = CashAccountStatementRequestDetail(
+    val casRequestDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "98765432103", "2024-05-10", "2024-05-20")
 
-    val casRequest = CashAccountStatementRequestContainer(
+    val casRequest: CashAccountStatementRequestContainer = CashAccountStatementRequestContainer(
       CashAccountStatementRequest(casRequestCommon, casRequestDetail))
 
     val validJson: String =

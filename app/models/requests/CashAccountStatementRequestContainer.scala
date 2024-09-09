@@ -25,7 +25,6 @@ object CashAccountStatementRequestContainer {
     Json.format[CashAccountStatementRequestContainer]
 }
 
-
 case class CashAccountStatementRequest(requestCommon: CashAccountStatementRequestCommon,
                                        requestDetail: CashAccountStatementRequestDetail)
 
@@ -33,7 +32,6 @@ object CashAccountStatementRequest {
   implicit val cashAccountStatementRequestFormat: OFormat[CashAccountStatementRequest] =
     Json.format[CashAccountStatementRequest]
 }
-
 
 case class CashAccountStatementRequestCommon(originatingSystem: String,
                                              receiptDate: String,
@@ -50,8 +48,3 @@ object CashAccountStatementRequestDetail {
   implicit val requestDetailFormat: OFormat[CashAccountStatementRequestDetail] =
     Json.format[CashAccountStatementRequestDetail]
 }
-
-
-
-
-

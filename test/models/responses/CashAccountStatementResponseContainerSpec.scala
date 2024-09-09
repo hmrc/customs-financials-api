@@ -46,7 +46,7 @@ class CashAccountStatementResponseSpec extends SpecBase {
 
   trait Setup {
 
-    val casJson01 =
+    val casJson01: String =
       """
         |{
         |  "cashAccountStatementResponse": {
@@ -64,7 +64,7 @@ class CashAccountStatementResponseSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-    val casJson02 =
+    val casJson02: String =
       """
         |{
         |  "cashAccountStatementResponse": {
@@ -76,7 +76,7 @@ class CashAccountStatementResponseSpec extends SpecBase {
         |}""".stripMargin
 
 
-    val casErrorJson01 =
+    val casErrorJson01: String =
       """
         |{
         |  "errorDetail": {
@@ -93,22 +93,23 @@ class CashAccountStatementResponseSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-    val returnParamObj = ReturnParameter("POSITION", "FAIL")
+    val returnParamObj: ReturnParameter = ReturnParameter("POSITION", "FAIL")
 
-    val responseCommonObj01 = Acc45ResponseCommon(
+    val responseCommonObj01: Acc45ResponseCommon = Acc45ResponseCommon(
       "OK", Some("003-Request could not be processed"),
       "2021-12-17T09:30:47Z", Some(Seq(returnParamObj))
     )
 
-    val casResponseObj01 = CashAccountStatementResponseContainer(CashAccountStatementResponse(responseCommonObj01))
+    val casResponseObj01: CashAccountStatementResponseContainer = CashAccountStatementResponseContainer(
+      CashAccountStatementResponse(responseCommonObj01))
 
-    val responseCommonObj02 = Acc45ResponseCommon("OK", None, "2021-12-17T09:30:47Z", None)
+    val responseCommonObj02: Acc45ResponseCommon = Acc45ResponseCommon("OK", None, "2021-12-17T09:30:47Z", None)
 
-    val casResponseContainerObj02 = CashAccountStatementResponseContainer(
+    val casResponseContainerObj02: CashAccountStatementResponseContainer = CashAccountStatementResponseContainer(
       CashAccountStatementResponse(responseCommonObj02)
     )
 
-    val errorDetailObj01 = ErrorDetail(
+    val errorDetailObj01: ErrorDetail = ErrorDetail(
       timestamp = "2017-02-14T12:58:44Z",
       correlationId = "f1af6020-8f04-4d05-94e7-8a8c7c317b73",
       errorCode = "400",
@@ -117,7 +118,7 @@ class CashAccountStatementResponseSpec extends SpecBase {
       sourceFaultDetail = SourceFaultDetail(Seq("object has missing required properties (['originatingSystem'])"))
     )
 
-    val casErrorResponse01 = CashAccountStatementErrorResponse(errorDetailObj01)
+    val casErrorResponse01: CashAccountStatementErrorResponse = CashAccountStatementErrorResponse(errorDetailObj01)
   }
 
 }

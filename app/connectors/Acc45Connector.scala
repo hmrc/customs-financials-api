@@ -18,14 +18,15 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.responses.{Acc45ResponseCommon, CashAccountStatementErrorResponse, CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import play.api.libs.json.{JsValue, Json}
-import models.requests.{CashAccountStatementRequest, CashAccountStatementRequestCommon, CashAccountStatementRequestContainer, CashAccountStatementRequestDetail}
+import models.requests._
+import models.responses._
+
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +39,8 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
 
   val log: LoggerLike = Logger(this.getClass)
 
-
-  def submitStatementRequest(reqDetail: CashAccountStatementRequestDetail
-                            ): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
+  def submitStatementRequest(reqDetail: CashAccountStatementRequestDetail): Future[Either[ErrorDetail,
+    Acc45ResponseCommon]] = {
 
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-statement-request") {
 
@@ -58,14 +58,21 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
         cashAccSttReqContainer,
         mdgHeaders.headers(appConfig.acc45BearerToken, appConfig.acc45HostHeader)
       )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
+
         log.info(s"submitCashAccountStatementResponse :  $response")
         response.status match {
           case OK | CREATED => Right(handleSuccessCase(response.json))
           case BAD_REQUEST | INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-          case _ => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, response.status.toString(), "Failure in backend System"))
+          case _ => Left(handleUnknownErrorCase(
+            SERVICE_UNAVAILABLE.toString,
+            response.status.toString(),
+            "Failure in backend System"))
         }
       }.recover {
-        case exception: Exception => Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, exception.toString, "Failure in backend System"))
+        case exception: Exception => Left(handleUnknownErrorCase(
+          SERVICE_UNAVAILABLE.toString,
+          exception.toString,
+          "Failure in backend System"))
       }
     }
   }
@@ -74,7 +81,10 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
     Json.fromJson[CashAccountStatementErrorResponse](jsonObject).get.errorDetail
   }
 
-  private def handleUnknownErrorCase(errorCode: String, exceptionDetails: String, sourceFaultDetail: String): ErrorDetail = {
+  private def handleUnknownErrorCase(errorCode: String,
+                                     exceptionDetails: String,
+                                     sourceFaultDetail: String): ErrorDetail = {
+
     ErrorDetail(dateTimeService.currentDateTimeAsIso8601, "MDTP_ID", errorCode, exceptionDetails, "MDTP",
       SourceFaultDetail(Seq(sourceFaultDetail)))
   }

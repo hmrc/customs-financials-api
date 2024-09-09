@@ -136,26 +136,28 @@ class Acc45ConnectorSpec extends SpecBase {
           errorDetail.errorMessage must not be empty
         }
       }
-
-
     }
-
   }
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
+
     val mockHttpClient: HttpClient = mock[HttpClient]
 
     val defaultErrorDetail: ErrorDetail = ErrorDetail(
       "2024-01-21T11:30:47Z", "f058ebd6", "500",
       "Internal Server Error", "MDTP", SourceFaultDetail(Seq("Failure in backend System"))
     )
-    val reqCommon = CashAccountStatementRequestCommon(MDTP, "2021-01-01T10:00:00Z", "601bb176b8e411e")
-    val reqDetail01 = CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
+    val reqCommon: CashAccountStatementRequestCommon = CashAccountStatementRequestCommon(MDTP,
+      "2021-01-01T10:00:00Z", "601bb176b8e411e")
+
+    val reqDetail01: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail("GB123456789012345",
+      "12345678910", "2024-05-10", "2024-05-20")
+
     val request01: CashAccountStatementRequestContainer =
       CashAccountStatementRequestContainer(CashAccountStatementRequest(reqCommon, reqDetail01))
 
-    val casResponseStr01 =
+    val casResponseStr01: String =
       """
         |{
         |    "cashAccountStatementResponse": {
@@ -166,7 +168,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |    }
         |}""".stripMargin
 
-    val casResponseStr02 =
+    val casResponseStr02: String =
       """
         |{
         |    "cashAccountStatementResponse": {
@@ -184,7 +186,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |    }
         |}""".stripMargin
 
-    val casResponseStr03 =
+    val casResponseStr03: String =
       """
         |{
         |    "cashAccountStatementResponse": {
@@ -202,7 +204,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |    }
         |}""".stripMargin
 
-    val casErrorResponseStr01 =
+    val casErrorResponseStr01: String =
       """
         |{
         |  "errorDetail": {
@@ -219,7 +221,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-    val casErrorResponseStr02 =
+    val casErrorResponseStr02: String =
       """
         |{
         |  "errorDetail": {
@@ -236,7 +238,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-    val casErrorResponseStr03 =
+    val casErrorResponseStr03: String =
       """
         |{
         |  "errorDetail": {
@@ -253,7 +255,7 @@ class Acc45ConnectorSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-    val casErrorResponseStr04 =
+    val casErrorResponseStr04: String =
       """
         |  "errorDetail": {
         |    "timestamp": "2024-01-21T11:30:47Z",

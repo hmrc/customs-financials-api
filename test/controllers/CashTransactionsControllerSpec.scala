@@ -353,7 +353,7 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
 
-    "return ErrorDetails with Service Unavailable Error as business error in EIS" in new Setup {
+    "return ErrorDetails for Service Unavailable scenarios as business error in EIS" in new Setup {
 
       val acc45ResStr =
         """
