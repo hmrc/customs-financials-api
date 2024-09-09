@@ -16,7 +16,7 @@
 
 package services
 
-import domain.{Amounts, CashDailyStatement, CashTransactions, Declaration, GuaranteeTransaction, TaxGroup, TaxTypeHolder, Transaction}
+import domain._
 import models.responses
 import models.responses._
 
@@ -44,6 +44,7 @@ class DomainService {
         .map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty))
   }
 
+  import domain.Declaration
   private def toDomain(declaration: DeclarationDetail): domain.Declaration = {
     Declaration(declaration.declarationID,
       declaration.importerEORINumber,
@@ -80,7 +81,6 @@ class DomainService {
         .map(_.map(pw => toDomain(pw.paymentAndWithdrawal))).getOrElse(Seq.empty))
   }
 
-
   def toDomainDetail(declaration: DeclarationDetail): domain.Declaration = {
     Declaration(declaration.declarationID,
       declaration.importerEORINumber,
@@ -91,6 +91,7 @@ class DomainService {
       declaration.taxGroups.map(container => toDomainTaxGroup(container.taxGroup)))
   }
 
+  import domain.TaxGroup
   private def toDomainTaxGroup(taxGroupDetail: TaxGroupDetail): domain.TaxGroup = {
     TaxGroup(
       taxGroupDetail.taxGroupDescription,
