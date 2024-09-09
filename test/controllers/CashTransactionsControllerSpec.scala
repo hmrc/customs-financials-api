@@ -240,7 +240,7 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
   }
-  "CashTransactionControllerSpec.submitCashAccStatementRequest" should {
+  "submitCashAccStatementRequest" should {
 
     "return ResponseCommon for success scenario" in new Setup {
 
@@ -280,7 +280,7 @@ class CashTransactionsControllerSpec extends SpecBase {
           |  ]
           |}""".stripMargin
 
-      val response = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
+      val response: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
 
       when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
         .thenReturn(Future.successful(Right(response)))
@@ -340,7 +340,7 @@ class CashTransactionsControllerSpec extends SpecBase {
           |  }
           |}""".stripMargin
 
-      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+      val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
       when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
         .thenReturn(Future.successful(Left(response)))
@@ -370,7 +370,7 @@ class CashTransactionsControllerSpec extends SpecBase {
           |  }
           |}""".stripMargin
 
-      val response = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+      val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
       when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
         .thenReturn(Future.successful(Left(response)))
@@ -439,7 +439,8 @@ class CashTransactionsControllerSpec extends SpecBase {
       FakeRequest(POST, controllers.routes.CashTransactionsController.retrieveCashAccountTransactions().url)
         .withBody(Json.toJson(cashTranSearchRequestDetailsWithSearchTypePOb))
 
-    val cashAccSttRequest = CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
+    val cashAccSttRequest: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
+      "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val submitCashAccStatementRequest: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.submitCashAccStatementRequest().url)

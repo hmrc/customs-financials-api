@@ -34,6 +34,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundExcept
 import utils.SpecBase
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class Acc45ConnectorSpec extends SpecBase {
 
@@ -47,8 +48,9 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(OK, casResponseStr01)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Right(responseCommon01)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Right(responseCommon01)
+          }
         }
       }
 
@@ -58,8 +60,10 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr02)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Right(responseCommon02)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Right(responseCommon02)
+          }
+
         }
       }
 
@@ -69,8 +73,10 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr03)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Right(responseCommon03)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Right(responseCommon03)
+          }
+
         }
       }
 
@@ -84,8 +90,9 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr01)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Left(errorResponseDetails01)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Left(errorResponseDetails01)
+          }
         }
       }
 
@@ -95,8 +102,9 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr02)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Left(errorResponseDetails02)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Left(errorResponseDetails02)
+          }
         }
       }
 
@@ -106,8 +114,10 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, casErrorResponseStr03)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          result mustBe Left(errorResponseDetails03)
+          connector.submitStatementRequest(reqDetail01).map {
+            response => response mustBe Left(errorResponseDetails03)
+          }
+
         }
       }
 
@@ -117,10 +127,12 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03)))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
-          errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
-          errorDetail.errorMessage must not be empty
+          connector.submitStatementRequest(reqDetail01).map {
+            response =>
+              val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
+              errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+              errorDetail.errorMessage must not be empty
+          }
         }
       }
 
@@ -130,10 +142,13 @@ class Acc45ConnectorSpec extends SpecBase {
           .thenReturn(Future.failed(new NotFoundException("error")))
 
         running(app) {
-          val result = await(connector.submitStatementRequest(reqDetail01))
-          val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
-          errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
-          errorDetail.errorMessage must not be empty
+          connector.submitStatementRequest(reqDetail01).map {
+            response =>
+              val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
+              errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+              errorDetail.errorMessage must not be empty
+          }
+
         }
       }
     }

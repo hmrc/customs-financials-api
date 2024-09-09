@@ -38,6 +38,7 @@ class JSONSchemaValidator {
   val ssfnSecureMessageRequestSchema = "/schemas/secure-message-request-schema.json"
   val acc44RequestSchema = "/schemas/acc44-fe-request-schema-v1.0.json"
   val acc44ResponseSchema = "/schemas/acc44-fe-response-schema-success-v1.0.json"
+  val acc45RequestSchema = "/schemas/acc45-fe-request-schema-v1.0.json"
 
   def validatePayload(data: JsValue, apiSchemaPath: String): Try[Unit] = {
     validateJsonPayload(apiSchemaPath, data) match {

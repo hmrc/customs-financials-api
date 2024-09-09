@@ -121,12 +121,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   lazy val acc41BearerToken: String = getConfString("acc41.bearer-token", "test")
 
-  lazy val acc45SubmitCashAccountStatementRequestEndpoint: String =
-    baseUrl("acc45") +
-      getConfString("acc45.context-base", "/") + "/accounts/cashaccountstatementrequest/v1"
-
-  lazy val acc45HostHeader: Option[String] =
-    configuration.getOptional[String]("microservice.services.acc45.host-header")
+  lazy val acc45CashAccountStatementRequestEndpoint: String =
+    s"${baseUrl("acc45")}${getConfString("acc45.context-base", "/")}/accounts/cashaccountstatementrequest/v1"
 
   lazy val acc45BearerToken: String = getConfString("acc45.bearer-token", "test")
 

@@ -19,10 +19,11 @@ package models.requests
 import play.api.libs.json.Json
 import utils.SpecBase
 import CashAccountStatementRequestContainer.cashAccountStatementRequestContainerFormat
+import config.MetaConfig.Platform.MDTP
 
 class CashAccountStatementRequestContainerSpec extends SpecBase {
 
-  "CashAccountStatementRequest Reads" should {
+  "Json Reads" should {
 
     "read the JsValue and create the object correctly" in new Setup {
       Json.fromJson(Json.parse(validJson)).get mustBe casRequest
@@ -33,10 +34,17 @@ class CashAccountStatementRequestContainerSpec extends SpecBase {
     }
   }
 
+  "Json Writes" should {
+
+    "create a valid json for request object" in new Setup {
+      Json.toJson(casRequest) mustBe Json.parse(validJson)
+    }
+  }
+
   trait Setup {
 
     val casRequestCommon: CashAccountStatementRequestCommon = CashAccountStatementRequestCommon(
-      "MDTP", "2021-12-17T09:30:47Z", "601bb176b8e411ed8a9800001e3b1802")
+      MDTP, "2021-12-17T09:30:47Z", "601bb176b8e411ed8a9800001e3b1802")
 
     val casRequestDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "98765432103", "2024-05-10", "2024-05-20")

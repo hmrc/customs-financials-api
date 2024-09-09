@@ -45,7 +45,7 @@ class AppConfigSpec extends SpecBase {
     }
 
     "return correct endpoint" in new Setup {
-      appConfig.acc45SubmitCashAccountStatementRequestEndpoint mustBe
+      appConfig.acc45CashAccountStatementRequestEndpoint mustBe
         "http://localhost:9753/customs-financials-hods-stub/accounts/cashaccountstatementrequest/v1"
     }
 

@@ -16,31 +16,59 @@
 
 package models.responses
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
 
+class CashAccountStatementResponseContainerSpec extends SpecBase {
 
-class CashAccountStatementResponseSpec extends SpecBase {
+  "CashAccountStatementResponseContainer Writes" should {
 
-  "CashAccountStatementResponseContainer" should {
+    "create a valid json for response object with statusText" in new Setup {
 
-    "create a valid json format for object with statusText" in new Setup {
       Json.toJson(casResponseObj01) mustBe Json.parse(casJson01)
       casResponseObj01.cashAccountStatementResponse.responseCommon.statusText mustBe
         Some("003-Request could not be processed")
     }
 
-    "create a valid json format for object without statusText" in new Setup {
+    "create a valid json for response object without statusText" in new Setup {
+
       Json.toJson(casResponseContainerObj02) mustBe Json.parse(casJson02)
-      casResponseContainerObj02.cashAccountStatementResponse.responseCommon.statusText mustBe
-        None
+      casResponseContainerObj02.cashAccountStatementResponse.responseCommon.statusText mustBe None
     }
   }
 
-  "CashAccountStatementErrorResponse" should {
+  "CashAccountStatementResponseContainer Reads" should {
 
-    "create a valid json format for object" in new Setup {
+    "create a response Object with statusText from json" in new Setup {
+
+      import CashAccountStatementResponseContainer.cashAccountStatementResponseWrapperFormat
+
+      Json.fromJson(Json.parse(casJson01)) mustBe JsSuccess(casResponseObj01)
+    }
+
+    "create a response Object without statusText from json" in new Setup {
+
+      import CashAccountStatementResponseContainer.cashAccountStatementResponseWrapperFormat
+
+      Json.fromJson(Json.parse(casJson02)) mustBe JsSuccess(casResponseContainerObj02)
+    }
+  }
+
+  "CashAccountStatementErrorResponse Writes" should {
+
+    "create a valid json format for Error Response object" in new Setup {
+
       Json.toJson(casErrorResponse01) mustBe Json.parse(casErrorJson01)
+    }
+  }
+
+  "CashAccountStatementErrorResponse Reads" should {
+
+    "create an Error Response object from json" in new Setup {
+
+      import CashAccountStatementErrorResponse.cashAccountStatementErrorResponseFormat
+
+      Json.fromJson(Json.parse(casErrorJson01)) mustBe JsSuccess(casErrorResponse01)
     }
   }
 

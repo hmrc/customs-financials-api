@@ -187,9 +187,9 @@ class CashTransactionsServiceSpec extends SpecBase {
   }
   "submitCashAccountStatementRequest" should {
 
-    "return Left with ErrorDetail if api request failed" in new Setup {
+    "return Left with ErrorDetail if api request fails" in new Setup {
 
-      val casErrorDetailStr01 =
+      val casErrorDetailStr01: String =
         """
           |{
           |  "timestamp": "2024-01-21T11:30:47Z",
@@ -217,9 +217,9 @@ class CashTransactionsServiceSpec extends SpecBase {
       }
     }
 
-    "return Right with ResponseCommon if api request successful" in new Setup {
+    "return Right with ResponseCommon if api request is successful" in new Setup {
 
-      val casResponseCommonStr01 =
+      val casResponseCommonStr01: String =
         """
           |{
           |  "status": "OK",
@@ -241,7 +241,7 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     "return Right with ResponseCommon if api fails at ETMP" in new Setup {
 
-      val casResponseCommonStr01 =
+      val casResponseCommonStr01: String =
         """
           |{
           |  "status": "OK",
@@ -283,7 +283,7 @@ class CashTransactionsServiceSpec extends SpecBase {
     val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
     val mockAcc45Connector: Acc45Connector = mock[Acc45Connector]
 
-    val cashAccSttReqDetail = CashAccountStatementRequestDetail(
+    val cashAccSttReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
