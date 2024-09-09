@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import play.api.libs.json.{JsValue, Json}
 import models.requests._
 import models.responses._
+import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
 import utils.JSONSchemaValidator
 
 import javax.inject.Inject
@@ -62,7 +63,7 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
       case Failure(exception) =>
         log.error(s"Request validation failed against the schema and error is ::::: ${exception.getMessage}")
         Future(Left(handleUnknownErrorCase(
-          BAD_REQUEST.toString, exception.toString, "Failure in backend System")))
+          BAD_REQUEST.toString, exception.toString, BACK_END_FAILURE)))
     }
   }
 
@@ -84,13 +85,13 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
             Left(handleUnknownErrorCase(
               SERVICE_UNAVAILABLE.toString,
               response.status.toString,
-              "Failure in backend System"))
+              BACK_END_FAILURE))
         }
       }.recover {
         case exception: Exception => Left(handleUnknownErrorCase(
           SERVICE_UNAVAILABLE.toString,
           exception.toString,
-          "Failure in backend System"))
+          BACK_END_FAILURE))
       }
     }
   }
