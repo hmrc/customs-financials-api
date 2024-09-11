@@ -35,7 +35,7 @@ case class Declaration(movementReferenceNumber: String,
                        amount: String,
                        taxGroups: Seq[TaxGroup])
 
-case class TaxGroup(taxGroupDescription: String, amount: BigDecimal, taxTypes: Seq[TaxTypeHolder])
+case class TaxGroup(taxGroupDescription: String, amount: String, taxTypes: Seq[TaxTypeHolder])
 
 case class TaxTypeHolder(reasonForSecurity: String, taxTypeID: String, amount: BigDecimal)
 
