@@ -62,7 +62,7 @@ class DomainServiceSpec extends SpecBase {
     val domainService = new DomainService()
 
     val twoHundred = "200.00"
-    val hundred: BigDecimal = BigDecimal(100.00)
+    val hundred = "100.00"
 
     val taxTypeDetail: TaxTypeDetail =
       TaxTypeDetail(reasonForSecurity = "b", taxTypeID = "a", amount = hundred)

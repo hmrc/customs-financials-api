@@ -147,7 +147,7 @@ class CashTransactionsServiceSpec extends SpecBase {
               taxTypes = Seq(TaxTypeHolder(
                 reasonForSecurity = "a",
                 taxTypeID = "b",
-                amount = 1000.0
+                amount = thousand
               ))
             ))
           )),
@@ -332,7 +332,7 @@ class CashTransactionsServiceSpec extends SpecBase {
   trait Setup {
 
     val twoThousand = "2000.00"
-    val thousand: BigDecimal = BigDecimal(1000.00)
+    val thousand = "1000.00"
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global

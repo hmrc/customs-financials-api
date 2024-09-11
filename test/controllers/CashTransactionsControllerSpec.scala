@@ -409,7 +409,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     val sevenHundred = "-789.01"
     val fourHundred = "-456.78"
-    val tenThousand = 10000.00
+    val tenThousand = "10000.00"
 
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
