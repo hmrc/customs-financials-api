@@ -79,6 +79,9 @@ class SecureMessageConnectorSpec extends SpecBase {
 
         when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
+        when(mockHttpClient.POST[Request, Response](any, any, any)(any, any, any, any))
+          .thenReturn(Future.successful(response))
+
         running(app) {
           connector.sendSecureMessage(histDoc = doc).map {
             result => result mustBe Right(Response(eori.value))
