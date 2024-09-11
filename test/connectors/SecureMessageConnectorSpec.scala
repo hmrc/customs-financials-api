@@ -20,6 +20,7 @@ import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 import domain.secureMessage
 import domain.secureMessage._
 import models._
+import org.mockito.Mockito.lenient
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -79,7 +80,7 @@ class SecureMessageConnectorSpec extends SpecBase {
 
         when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
-        when(mockHttpClient.POST[Request, Response](any, any, any)(any, any, any, any))
+        lenient().when(mockHttpClient.POST[Request, Response](any, any, any)(any, any, any, any))
           .thenReturn(Future.successful(response))
 
         running(app) {
