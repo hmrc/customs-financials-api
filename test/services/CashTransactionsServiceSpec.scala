@@ -68,7 +68,7 @@ class CashTransactionsServiceSpec extends SpecBase {
             "10000",
             List(TaxGroup(
               "something",
-              thousand,
+              twoThousand,
               List(TaxTypeHolder("a", "b", thousand))
             ))
           )),
@@ -86,7 +86,7 @@ class CashTransactionsServiceSpec extends SpecBase {
               "10000",
               List(TaxGroup(
                 "something",
-                thousand,
+                twoThousand,
                 List(TaxTypeHolder("a", "b", thousand))
               ))
             )),
@@ -143,11 +143,11 @@ class CashTransactionsServiceSpec extends SpecBase {
             amount = "10000",
             taxGroups = List(TaxGroup(
               taxGroupDescription = "something",
-              amount = 1000.0,
+              amount = twoThousand,
               taxTypes = Seq(TaxTypeHolder(
                 reasonForSecurity = "a",
                 taxTypeID = "b",
-                amount = 1000.0
+                amount = thousand
               ))
             ))
           )),
@@ -165,7 +165,7 @@ class CashTransactionsServiceSpec extends SpecBase {
               amount = "10000",
               taxGroups = List(TaxGroup(
                 taxGroupDescription = "something",
-                amount = thousand,
+                amount = twoThousand,
                 taxTypes = Seq(TaxTypeHolder(
                   reasonForSecurity = "a",
                   taxTypeID = "b",
@@ -330,7 +330,9 @@ class CashTransactionsServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    val thousand = 1000.00
+
+    val twoThousand = "2000.00"
+    val thousand = "1000.00"
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -362,7 +364,7 @@ class CashTransactionsServiceSpec extends SpecBase {
             "10000",
             Seq(
               TaxGroupContainer(
-                TaxGroupDetail("something", thousand,
+                TaxGroupDetail("something", twoThousand,
                   Seq(
                     TaxTypeContainer(
                       TaxTypeDetail(
@@ -392,7 +394,7 @@ class CashTransactionsServiceSpec extends SpecBase {
           "10000",
           Seq(
             TaxGroupContainer(
-              TaxGroupDetail("something", thousand,
+              TaxGroupDetail("something", twoThousand,
                 Seq(
                   TaxTypeContainer(
                     TaxTypeDetail(

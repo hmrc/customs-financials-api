@@ -62,11 +62,11 @@ case class DeclarationDetail(declarationID: String,
 
 case class TaxGroupContainer(taxGroup: TaxGroupDetail)
 
-case class TaxGroupDetail(taxGroupDescription: String, amount: BigDecimal, taxTypes: Seq[TaxTypeContainer])
+case class TaxGroupDetail(taxGroupDescription: String, amount: String, taxTypes: Seq[TaxTypeContainer])
 
 case class TaxTypeContainer(taxType: TaxTypeDetail)
 
-case class TaxTypeDetail(reasonForSecurity: String, taxTypeID: String, amount: BigDecimal)
+case class TaxTypeDetail(reasonForSecurity: String, taxTypeID: String, amount: String)
 
 case class PaymentAndWithdrawalContainer(paymentAndWithdrawal: PaymentAndWithdrawalDetail)
 
@@ -159,6 +159,7 @@ case class Declaration(declarationID: String,
                        acceptanceDate: String,
                        amount: Double,
                        taxGroups: Seq[TaxGroupWrapper])
+
 object Declaration {
   implicit val format: OFormat[Declaration] = Json.format[Declaration]
 }
