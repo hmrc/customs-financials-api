@@ -105,7 +105,7 @@ class CashTransactionsControllerSpec extends SpecBase {
         TaxGroup("VAT", fourHundred,
           Seq(
             TaxTypeHolder(
-              reasonForSecurity = "a",
+              reasonForSecurity = Some("a"),
               taxTypeID = "b",
               amount = tenThousand
             )
@@ -115,7 +115,7 @@ class CashTransactionsControllerSpec extends SpecBase {
         TaxGroup("Excise", sevenHundred,
           Seq(
             TaxTypeHolder(
-              reasonForSecurity = "a",
+              reasonForSecurity = Some("a"),
               taxTypeID = "b",
               amount = tenThousand
             )

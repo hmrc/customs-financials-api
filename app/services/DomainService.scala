@@ -45,6 +45,7 @@ class DomainService {
   }
 
   import domain.Declaration
+
   private def toDomain(declaration: DeclarationDetail): domain.Declaration = {
     Declaration(declaration.declarationID,
       declaration.importerEORINumber,
@@ -92,6 +93,7 @@ class DomainService {
   }
 
   import domain.TaxGroup
+
   private def toDomainTaxGroup(taxGroupDetail: TaxGroupDetail): domain.TaxGroup = {
     TaxGroup(
       taxGroupDetail.taxGroupDescription,
