@@ -69,7 +69,7 @@ class CashTransactionsServiceSpec extends SpecBase {
             List(TaxGroup(
               "something",
               twoThousand,
-              List(TaxTypeHolder("a", "b", thousand))
+              List(TaxTypeHolder(Some("a"), "b", thousand))
             ))
           )),
 
@@ -87,7 +87,7 @@ class CashTransactionsServiceSpec extends SpecBase {
               List(TaxGroup(
                 "something",
                 twoThousand,
-                List(TaxTypeHolder("a", "b", thousand))
+                List(TaxTypeHolder(Some("a"), "b", thousand))
               ))
             )),
 
@@ -145,7 +145,7 @@ class CashTransactionsServiceSpec extends SpecBase {
               taxGroupDescription = "something",
               amount = twoThousand,
               taxTypes = Seq(TaxTypeHolder(
-                reasonForSecurity = "a",
+                reasonForSecurity = Some("a"),
                 taxTypeID = "b",
                 amount = thousand
               ))
@@ -167,7 +167,7 @@ class CashTransactionsServiceSpec extends SpecBase {
                 taxGroupDescription = "something",
                 amount = twoThousand,
                 taxTypes = Seq(TaxTypeHolder(
-                  reasonForSecurity = "a",
+                  reasonForSecurity = Some("a"),
                   taxTypeID = "b",
                   amount = thousand
                 ))
@@ -368,7 +368,7 @@ class CashTransactionsServiceSpec extends SpecBase {
                   Seq(
                     TaxTypeContainer(
                       TaxTypeDetail(
-                        reasonForSecurity = "a", taxTypeID = "b", amount = thousand
+                        reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand
                       )
                     )
                   )
@@ -398,7 +398,7 @@ class CashTransactionsServiceSpec extends SpecBase {
                 Seq(
                   TaxTypeContainer(
                     TaxTypeDetail(
-                      reasonForSecurity = "a", taxTypeID = "b", amount = thousand
+                      reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand
                     )
                   )
                 )

@@ -66,7 +66,7 @@ case class TaxGroupDetail(taxGroupDescription: String, amount: String, taxTypes:
 
 case class TaxTypeContainer(taxType: TaxTypeDetail)
 
-case class TaxTypeDetail(reasonForSecurity: String, taxTypeID: String, amount: String)
+case class TaxTypeDetail(reasonForSecurity: Option[String], taxTypeID: String, amount: String)
 
 case class PaymentAndWithdrawalContainer(paymentAndWithdrawal: PaymentAndWithdrawalDetail)
 

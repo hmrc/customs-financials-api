@@ -37,7 +37,7 @@ case class Declaration(movementReferenceNumber: String,
 
 case class TaxGroup(taxGroupDescription: String, amount: String, taxTypes: Seq[TaxTypeHolder])
 
-case class TaxTypeHolder(reasonForSecurity: String, taxTypeID: String, amount: String)
+case class TaxTypeHolder(reasonForSecurity: Option[String], taxTypeID: String, amount: String)
 
 case class Transaction(amount: String, transactionType: String, bankAccountNumber: Option[String])
 

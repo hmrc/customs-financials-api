@@ -38,7 +38,7 @@ class DomainServiceSpec extends SpecBase {
       result.taxGroups.head.taxGroupDescription mustBe "Customs"
       result.taxGroups.head.amount mustBe twoHundred
       result.taxGroups.head.taxTypes.head.taxTypeID mustBe "a"
-      result.taxGroups.head.taxTypes.head.reasonForSecurity mustBe "b"
+      result.taxGroups.head.taxTypes.head.reasonForSecurity mustBe Some("b")
       result.taxGroups.head.taxTypes.head.amount mustBe hundred
     }
 
@@ -65,7 +65,7 @@ class DomainServiceSpec extends SpecBase {
     val hundred = "100.00"
 
     val taxTypeDetail: TaxTypeDetail =
-      TaxTypeDetail(reasonForSecurity = "b", taxTypeID = "a", amount = hundred)
+      TaxTypeDetail(reasonForSecurity = Some("b"), taxTypeID = "a", amount = hundred)
 
     val taxTypeContainer: Seq[TaxTypeContainer] = Seq(TaxTypeContainer(taxTypeDetail))
 
