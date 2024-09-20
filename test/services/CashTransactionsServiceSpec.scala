@@ -97,6 +97,66 @@ class CashTransactionsServiceSpec extends SpecBase {
         )
 
         result mustBe Right(expectedResult)
+        result match {
+          case Right(cashTransactions) => cashTransactions.maxTransactionsExceeded mustBe Some(false)
+          case Left(errorRsp) => fail(s"Expected CashTransactions but got ErrorResponse : $errorRsp")
+        }
+      }
+    }
+
+    "return Right with the Cash transactions on a successful response from the API " +
+      "with maxTransactionsExceeded Flag" in new Setup {
+
+      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
+        .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail02))))
+
+      running(app) {
+        val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
+
+        val expectedResult = CashTransactions(
+          List(Declaration(
+            "someId",
+            Some(EORI("someImporterEORI")),
+            EORI("someEori"),
+            Some("reference"),
+            dateTo.toString,
+            "10000",
+            List(TaxGroup(
+              "something",
+              twoThousand,
+              List(TaxTypeHolder(Some("a"), "b", thousand))
+            ))
+          )),
+
+          List(CashDailyStatement(
+            dateFrom.toString,
+            "10000",
+            "9000",
+            List(Declaration(
+              "someId",
+              Some(EORI("someImporterEORI")),
+              EORI("someEori"),
+              Some("reference"),
+              dateTo.toString,
+              "10000",
+              List(TaxGroup(
+                "something",
+                twoThousand,
+                List(TaxTypeHolder(Some("a"), "b", thousand))
+              ))
+            )),
+
+            List(Transaction("10000", "A21", Some("Bank")))
+          )),
+          Some(true)
+        )
+
+        result mustBe Right(expectedResult)
+        result match {
+          case Right(cashTransactions) => cashTransactions.maxTransactionsExceeded mustBe Some(true)
+          case Left(errorRsp) => fail(s"Expected CashTransactions but got ErrorResponse : $errorRsp")
+        }
+
       }
     }
 
@@ -415,6 +475,11 @@ class CashTransactionsServiceSpec extends SpecBase {
       Some(Seq(dailyStatement)),
       Some(pending),
       Some(false))
+
+    val cashTransactionsResponseDetail02: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
+      Some(Seq(dailyStatement)),
+      Some(pending),
+      Some(true))
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(

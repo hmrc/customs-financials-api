@@ -18,7 +18,9 @@ package services
 
 import models.EORI
 import models.responses._
+import domain.CashTransactions
 import utils.SpecBase
+import java.time.LocalDate
 
 class DomainServiceSpec extends SpecBase {
 
@@ -55,6 +57,23 @@ class DomainServiceSpec extends SpecBase {
 
       result.taxGroups mustBe empty
     }
+
+    "toDomainSummary correctly handles maps CashTransactionsResponseDetail to CashTransactions" in new Setup {
+
+      val result: CashTransactions = domainService.toDomainSummary(cashTransactionsResponseDetail)
+
+      result.maxTransactionsExceeded mustBe Some(true)
+      result.pendingTransactions.size mustBe 1
+      result.pendingTransactions.head.movementReferenceNumber mustBe "someId"
+      result.pendingTransactions.head.declarantEori mustBe EORI("someEori")
+      result.pendingTransactions.head.declarantReference mustBe Some("reference")
+      result.cashDailyStatements.size mustBe 1
+      result.cashDailyStatements.head.date mustBe "2024-09-19"
+      result.cashDailyStatements.head.declarations.size mustBe 1
+      result.cashDailyStatements.head.openingBalance mustBe "10000"
+
+    }
+
   }
 
   trait Setup {
@@ -96,5 +115,65 @@ class DomainServiceSpec extends SpecBase {
       amount = "0",
       taxGroups = Seq.empty
     )
+
+    val dateFrom: LocalDate = LocalDate.now().minusDays(1)
+    val dateTo: LocalDate = LocalDate.now()
+    val twoThousand = "2000.00"
+    val thousand = "1000.00"
+
+    val dailyStatement: DailyStatementContainer = DailyStatementContainer(
+      DailyStatementDetail(
+        dateFrom.toString,
+        "10000",
+        "9000",
+        Some(Seq(DeclarationContainer(
+          DeclarationDetail(
+            "someId",
+            Some(EORI("someImporterEORI")),
+            EORI("someEori"),
+            Some("reference"),
+            dateTo.toString,
+            "10000",
+            Seq(
+              TaxGroupContainer(
+                TaxGroupDetail("something", twoThousand,
+                  Seq(
+                    TaxTypeContainer(TaxTypeDetail(reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand))
+                  )
+                )
+              )
+            )
+          )
+        ))),
+        Some(Seq(PaymentAndWithdrawalContainer(PaymentAndWithdrawalDetail("10000", "A21", Some("Bank"))
+        )))
+      )
+    )
+
+    val pending: PendingTransactions = PendingTransactions(
+      Seq(DeclarationContainer(
+        DeclarationDetail(
+          "someId",
+          Some(EORI("someImporterEORI")),
+          EORI("someEori"),
+          Some("reference"),
+          dateTo.toString,
+          "10000",
+          Seq(
+            TaxGroupContainer(
+              TaxGroupDetail("something", twoThousand,
+                Seq(TaxTypeContainer(TaxTypeDetail(reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand)))
+              )
+            )
+          )
+        )
+      ))
+    )
+
+    val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
+      Some(Seq(dailyStatement)),
+      Some(pending),
+      Some(true))
+
   }
 }
