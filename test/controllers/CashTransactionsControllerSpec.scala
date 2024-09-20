@@ -72,7 +72,7 @@ class CashTransactionsControllerSpec extends SpecBase {
           Nil))
 
       val expectedCashTransactions: CashTransactions =
-        CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
+        CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements, Some(false))
 
       when(mockCashTransactionsService.retrieveCashTransactionsSummary(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Right(expectedCashTransactions)))
@@ -152,7 +152,7 @@ class CashTransactionsControllerSpec extends SpecBase {
         )
 
       val expectedCashTransactions: CashTransactions =
-        CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements)
+        CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements, Some(false))
 
       when(mockCashTransactionsService.retrieveCashTransactionsDetail(is("can1"), is(fromDate), is(toDate)))
         .thenReturn(Future.successful(Right(expectedCashTransactions)))

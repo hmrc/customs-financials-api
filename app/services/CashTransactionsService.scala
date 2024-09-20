@@ -41,7 +41,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainSummary(responseDetail))
-          case None => Right(CashTransactions(Nil, Nil))
+          case None => Right(CashTransactions(Nil, Nil, None))
         }
 
       case Left(errorValue) => Left(errorValue)
@@ -55,7 +55,7 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainDetail(responseDetail))
-          case None => Right(CashTransactions(Nil, Nil))
+          case None => Right(CashTransactions(Nil, Nil, None))
         }
 
       case Left(errorValue) => Left(errorValue)

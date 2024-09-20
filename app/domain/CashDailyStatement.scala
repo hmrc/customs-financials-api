@@ -19,7 +19,9 @@ package domain
 import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
-case class CashTransactions(pendingTransactions: Seq[Declaration], cashDailyStatements: Seq[CashDailyStatement])
+case class CashTransactions(pendingTransactions: Seq[Declaration],
+                            cashDailyStatements: Seq[CashDailyStatement],
+                            maxTransactionsExceeded: Option[Boolean])
 
 case class CashDailyStatement(date: String,
                               openingBalance: String,

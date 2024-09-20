@@ -92,7 +92,8 @@ class CashTransactionsServiceSpec extends SpecBase {
             )),
 
             List(Transaction("10000", "A21", Some("Bank")))
-          ))
+          )),
+          Some(false)
         )
 
         result mustBe Right(expectedResult)
@@ -105,7 +106,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       )
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
-        val expectedResult = CashTransactions(Nil, Nil)
+        val expectedResult = CashTransactions(Nil, Nil, None)
 
         result mustBe Right(expectedResult)
       }
@@ -178,7 +179,8 @@ class CashTransactionsServiceSpec extends SpecBase {
               transactionType = "A21",
               bankAccountNumber = Some("Bank")
             ))
-          ))
+          )),
+          Some(false)
         )
 
         result mustBe Right(expectedResult)
@@ -192,7 +194,7 @@ class CashTransactionsServiceSpec extends SpecBase {
 
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
-        val expectedResult = CashTransactions(Nil, Nil)
+        val expectedResult = CashTransactions(Nil, Nil, None)
         result mustBe Right(expectedResult)
       }
     }
@@ -412,7 +414,7 @@ class CashTransactionsServiceSpec extends SpecBase {
     val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
       Some(Seq(dailyStatement)),
       Some(pending),
-      None)
+      Some(false))
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
