@@ -411,7 +411,8 @@ class CashTransactionsServiceSpec extends SpecBase {
 
     val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
       Some(Seq(dailyStatement)),
-      Some(pending))
+      Some(pending),
+      None)
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
@@ -425,7 +426,6 @@ class CashTransactionsServiceSpec extends SpecBase {
       status = "OK",
       statusText = None,
       processingDate = processingDate,
-      maxTransactionsExceeded = None,
       returnParameters = None)
 
     val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =

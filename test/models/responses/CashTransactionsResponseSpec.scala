@@ -259,7 +259,6 @@ class CashTransactionsResponseSpec extends SpecBase {
       status = "OK",
       statusText = None,
       processingDate = processingDate,
-      maxTransactionsExceeded = None,
       returnParameters = None)
 
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
@@ -341,7 +340,6 @@ class CashTransactionsResponseSpec extends SpecBase {
       status = "OK",
       statusText = Some("001-Invalid Cash Account"),
       processingDate = "2024-01-17T09:30:47Z",
-      maxTransactionsExceeded = None,
       returnParameters = Some(Seq(ReturnParameter("POSITION", "FAIL")).toArray))
 
     val cashAccTransResponseObForETMP422AndMDTP201: CashAccountTransactionSearchResponse =

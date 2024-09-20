@@ -290,14 +290,12 @@ class Acc44ConnectorSpec extends SpecBase {
       status = "OK",
       statusText = None,
       processingDate = PROCESSING_DATE,
-      maxTransactionsExceeded = None,
       returnParameters = None)
 
     val resCommonEIS201CodeOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
       statusText = Some("001-Invalid Cash Account"),
       processingDate = PROCESSING_DATE,
-      maxTransactionsExceeded = None,
       returnParameters = Some(Seq(ReturnParameter("POSITION", "FAIL")).toArray))
 
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
