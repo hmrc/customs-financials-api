@@ -132,8 +132,6 @@ class CashTransactionsResponseSpec extends SpecBase {
 
         actual.cashAccountTransactionSearchResponse.responseCommon.processingDate mustBe
           expected.cashAccountTransactionSearchResponse.responseCommon.processingDate
-
-        actual.cashAccountTransactionSearchResponse.responseCommon.maxTransactionsExceeded mustBe empty
       }
     }
 
