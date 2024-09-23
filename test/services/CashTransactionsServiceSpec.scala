@@ -254,7 +254,7 @@ class CashTransactionsServiceSpec extends SpecBase {
 
       running(app) {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
-        val expectedResult = CashTransactions(Nil, Nil, None)
+        val expectedResult = CashTransactions(Nil, Nil)
         result mustBe Right(expectedResult)
       }
     }
