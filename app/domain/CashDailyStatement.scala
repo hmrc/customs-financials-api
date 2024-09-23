@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class CashTransactions(pendingTransactions: Seq[Declaration],
                             cashDailyStatements: Seq[CashDailyStatement],
-                            maxTransactionsExceeded: Option[Boolean])
+                            maxTransactionsExceeded: Option[Boolean] = None)
 
 case class CashDailyStatement(date: String,
                               openingBalance: String,

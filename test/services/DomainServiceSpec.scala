@@ -68,7 +68,7 @@ class DomainServiceSpec extends SpecBase {
       result.pendingTransactions.head.declarantEori mustBe EORI("someEori")
       result.pendingTransactions.head.declarantReference mustBe Some("reference")
       result.cashDailyStatements.size mustBe 1
-      result.cashDailyStatements.head.date mustBe "2024-09-19"
+      result.cashDailyStatements.head.date mustBe dateFrom.toString
       result.cashDailyStatements.head.declarations.size mustBe 1
       result.cashDailyStatements.head.openingBalance mustBe "10000"
 
