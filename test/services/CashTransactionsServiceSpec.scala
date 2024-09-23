@@ -97,15 +97,15 @@ class CashTransactionsServiceSpec extends SpecBase {
         )
 
         result mustBe Right(expectedResult)
-        result match {
-          case Right(cashTransactions) => cashTransactions.maxTransactionsExceeded mustBe Some(false)
-          case Left(errorRsp) => fail(s"Expected CashTransactions but got ErrorResponse : $errorRsp")
+
+        result.map {
+          cashTransactions => cashTransactions.maxTransactionsExceeded mustBe Some(false)
         }
       }
     }
 
     "return Right with the Cash transactions on a successful response from the API " +
-      "with maxTransactionsExceeded Flag" in new Setup {
+      "with maxTransactionsExceeded Flag as true" in new Setup {
 
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
         .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail02))))
@@ -152,9 +152,9 @@ class CashTransactionsServiceSpec extends SpecBase {
         )
 
         result mustBe Right(expectedResult)
-        result match {
-          case Right(cashTransactions) => cashTransactions.maxTransactionsExceeded mustBe Some(true)
-          case Left(errorRsp) => fail(s"Expected CashTransactions but got ErrorResponse : $errorRsp")
+
+        result.map {
+          cashTransactions => cashTransactions.maxTransactionsExceeded mustBe Some(true)
         }
 
       }
@@ -166,7 +166,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       )
       running(app) {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
-        val expectedResult = CashTransactions(Nil, Nil, None)
+        val expectedResult = CashTransactions(Nil, Nil)
 
         result mustBe Right(expectedResult)
       }

@@ -71,7 +71,6 @@ class DomainServiceSpec extends SpecBase {
       result.cashDailyStatements.head.date mustBe dateFrom.toString
       result.cashDailyStatements.head.declarations.size mustBe 1
       result.cashDailyStatements.head.openingBalance mustBe "10000"
-
     }
 
   }
