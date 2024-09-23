@@ -41,7 +41,9 @@ class DomainService {
       cashTransactionsResponseDetail.pendingTransactions
         .map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
       cashTransactionsResponseDetail.dailyStatements
-        .map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty))
+        .map(_.map(ds => toDomain(ds.dailyStatement))).getOrElse(Seq.empty),
+      cashTransactionsResponseDetail.maxTransactionsExceeded
+    )
   }
 
   import domain.Declaration
@@ -61,7 +63,8 @@ class DomainService {
       cashTransactionsResponseDetail.pendingTransactions
         .map(_.declarations.map(pt => toDomain(pt.declaration))).getOrElse(Seq.empty),
       cashTransactionsResponseDetail.dailyStatements
-        .map(_.map(ds => toDomainDetail(ds.dailyStatement))).getOrElse(Seq.empty))
+        .map(_.map(ds => toDomainDetail(ds.dailyStatement))).getOrElse(Seq.empty),
+      cashTransactionsResponseDetail.maxTransactionsExceeded)
   }
 
   private def toDomain(dailyStatementDetail: DailyStatementDetail): domain.CashDailyStatement = {

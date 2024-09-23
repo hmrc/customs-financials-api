@@ -34,11 +34,11 @@ object ReturnParameter {
 case class CashTransactionsResponseCommon(status: String,
                                           statusText: Option[String],
                                           processingDate: String,
-                                          maxTransactionsExceeded: Option[Boolean],
                                           returnParameters: Option[Array[ReturnParameter]] = None)
 
 case class CashTransactionsResponseDetail(dailyStatements: Option[Seq[DailyStatementContainer]],
-                                          pendingTransactions: Option[PendingTransactions])
+                                          pendingTransactions: Option[PendingTransactions],
+                                          maxTransactionsExceeded: Option[Boolean])
 
 case class DailyStatementContainer(dailyStatement: DailyStatementDetail)
 

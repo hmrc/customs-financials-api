@@ -42,7 +42,7 @@ class Acc31ConnectorSpec extends SpecBase {
 
       running(app) {
         val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Right(Some(CashTransactionsResponseDetail(None, None)))
+        result mustBe Right(Some(CashTransactionsResponseDetail(None, None, None)))
       }
     }
 
@@ -100,35 +100,35 @@ class Acc31ConnectorSpec extends SpecBase {
     val response: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
         CashTransactionsResponseCommon("OK", None, LocalDate.now().toString, None),
-        Some(CashTransactionsResponseDetail(None, None))
+        Some(CashTransactionsResponseDetail(None, None, None))
       )
     )
 
     val noDataResponse: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
         CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, None),
-        Some(CashTransactionsResponseDetail(None, None))
+        Some(CashTransactionsResponseDetail(None, None, None))
       )
     )
 
     val noDataResponse02: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString, Some(true)),
-        Some(CashTransactionsResponseDetail(None, None))
+        CashTransactionsResponseCommon("OK", Some(noAssociatedDataMessage), LocalDate.now().toString),
+        Some(CashTransactionsResponseDetail(None, None, None))
       )
     )
 
     val tooMuchDataRequestedResponse: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
         CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, None),
-        Some(CashTransactionsResponseDetail(None, None))
+        Some(CashTransactionsResponseDetail(None, None, None))
       )
     )
 
     val tooMuchDataRequestedResponse02: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
-        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString, Some(false)),
-        Some(CashTransactionsResponseDetail(None, None))
+        CashTransactionsResponseCommon("OK", Some(exceedsThresholdMessage), LocalDate.now().toString),
+        Some(CashTransactionsResponseDetail(None, None, None))
       )
     )
 
