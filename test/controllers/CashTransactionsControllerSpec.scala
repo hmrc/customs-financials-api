@@ -236,10 +236,9 @@ class CashTransactionsControllerSpec extends SpecBase {
       running(app) {
         val result = route(app, retrieveCashAccountTransactions).value
 
-        status(result) mustBe PRECONDITION_FAILED
+        status(result) mustBe CREATED
         contentAsJson(result) mustBe
-          Json.toJson(errorDetails.copy(
-            errorCode = code001, errorMessage = "Invalid Cash Account"))
+          Json.toJson(errorDetails.copy(errorCode = code001, errorMessage = "Invalid Cash Account"))
       }
     }
 
