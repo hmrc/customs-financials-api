@@ -19,10 +19,7 @@ package services
 import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.{Declaration, TaxGroup, _}
 import models._
-import models.requests.{
-  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails, SearchType
-}
+import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.PaymentType.Payment
 import models.responses._
 import play.api._
@@ -31,7 +28,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
-import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
+import utils.TestData._
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -266,6 +263,8 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
         .thenReturn(Future.successful(Right(cashAccTranSearchResponseContainerOb)))
 
+      when(mockAuditingService.)
+
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
 
@@ -407,6 +406,7 @@ class CashTransactionsServiceSpec extends SpecBase {
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
     val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
     val mockAcc45Connector: Acc45Connector = mock[Acc45Connector]
+    val mockAuditingService: AuditingService = mock[AuditingService]
 
     val cashAccSttReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")

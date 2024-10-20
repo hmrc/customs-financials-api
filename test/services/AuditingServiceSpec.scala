@@ -416,6 +416,14 @@ class AuditingServiceSpec extends SpecBase {
         result.tags.get("transactionName") mustBe Some("Request Authorities CSV")
       }
     }
+
+    "audit the ACC44 Record cash account transactions search request (eventId EXPA021)" in new Setup {
+
+    }
+
+    "audit the ACC45 Record cash account statements request (eventId EXPA022)" in new Setup {
+
+    }
   }
 
   trait Setup {
