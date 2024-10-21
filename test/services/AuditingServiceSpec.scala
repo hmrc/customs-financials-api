@@ -464,7 +464,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditCashAccountStatementsRequestACC45(cashAccStatementReqDetail)
+        service.auditCashAccountStatementsRequest(cashAccStatementReqDetail)
 
         val result = extendedDataEventCaptor.getValue
 

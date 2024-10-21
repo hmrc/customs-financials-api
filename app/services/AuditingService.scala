@@ -180,8 +180,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
     )
   }
 
-  def auditCashAccountStatementsRequestACC45(cashAccountStatementRequest: CashAccountStatementRequestDetail)
-                                            (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditCashAccountStatementsRequest(cashAccountStatementRequest: CashAccountStatementRequestDetail)
+                                       (implicit hc: HeaderCarrier): Future[AuditResult] = {
     val auditJson = Json.toJson(cashAccountStatementRequest)
 
     audit(
