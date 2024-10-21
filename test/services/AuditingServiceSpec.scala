@@ -18,8 +18,9 @@ package services
 
 import domain.{Notification, StandingAuthority, acc41}
 import models._
-import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest, SearchType}
+import models.requests.ParamName.UCR
 import models.requests.manageAuthorities._
+import models.requests._
 import org.mockito.ArgumentCaptor
 import org.scalatest.matchers.should.Matchers._
 import play.api._
@@ -417,9 +418,11 @@ class AuditingServiceSpec extends SpecBase {
       }
     }
 
-    "audit the ACC44 cash account transactions search request (eventId EXPA021)" in new Setup {
-      val auditRequest =
-        """{
+    "audit the ACC44 cash account transactions search request (eventId EXPA021)" when {
+
+      "request is of searchType P" in new Setup {
+        val auditRequest =
+          """{
             "can": "12345678909",
             "ownerEORI": "GB123456789",
             "searchType": "P",
@@ -430,21 +433,52 @@ class AuditingServiceSpec extends SpecBase {
             }
         }"""
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
-        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+        val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+          ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      running(app) {
-        when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
-          .thenReturn(Future.successful(AuditResult.Success))
+        running(app) {
+          when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+            .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditCashAccountTransactionsSearch(cashAccTransactionSearchRequestDetails)
+          service.auditCashAccountTransactionsSearch(cashAccTransactionPaymentSearchRequestDetails)
 
-        val result = extendedDataEventCaptor.getValue
+          val result = extendedDataEventCaptor.getValue
 
-        result.detail mustBe Json.parse(auditRequest)
-        result.auditType mustBe "SearchCashAccountTransactions"
-        result.auditSource mustBe "customs-financials-api"
-        result.tags.get("transactionName") mustBe Some("Search cash account transactions")
+          result.detail mustBe Json.parse(auditRequest)
+          result.auditType mustBe "SearchCashAccountTransactions"
+          result.auditSource mustBe "customs-financials-api"
+          result.tags.get("transactionName") mustBe Some("Search cash account transactions")
+        }
+      }
+
+      "request is of searchType D" in new Setup {
+        val auditRequest =
+          """{
+            "can": "12345678909",
+            "ownerEORI": "GB123456789",
+            "searchType": "D",
+            "declarationDetails": {
+                  "paramName": "UCR",
+                  "paramValue": "123456789abcd"
+              }
+        }"""
+
+        val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+          ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+        running(app) {
+          when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
+            .thenReturn(Future.successful(AuditResult.Success))
+
+          service.auditCashAccountTransactionsSearch(cashAccTransactionDeclarationSearchRequestDetails)
+
+          val result = extendedDataEventCaptor.getValue
+
+          result.detail mustBe Json.parse(auditRequest)
+          result.auditType mustBe "SearchCashAccountTransactions"
+          result.auditSource mustBe "customs-financials-api"
+          result.tags.get("transactionName") mustBe Some("Search cash account transactions")
+        }
       }
     }
 
@@ -489,13 +523,21 @@ class AuditingServiceSpec extends SpecBase {
     val service: AuditingService = app.injector.instanceOf[AuditingService]
     val eoriNumber = "GB123456789"
 
-    val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
+    val cashAccTransactionPaymentSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
         CAN,
         eoriNumber,
         SearchType.P,
         declarationDetails = None,
         cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
+
+    val cashAccTransactionDeclarationSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
+      CashAccountTransactionSearchRequestDetails(
+        CAN,
+        eoriNumber,
+        SearchType.D,
+        declarationDetails = Some(DeclarationDetails(UCR, "123456789abcd")),
+        cashAccountPaymentDetails = None)
 
     val cashAccStatementReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       eoriNumber, CAN, DATE_STRING, DATE_STRING)
