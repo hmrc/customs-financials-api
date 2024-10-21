@@ -71,8 +71,8 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
     }
   }
 
-  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail): Future[Either[ErrorDetail,
-    Acc45ResponseCommon]] = {
+  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail
+                                       ): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
     acc45Connector.submitStatementRequest(request)
   }
 

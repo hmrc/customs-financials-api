@@ -19,9 +19,9 @@ package services
 import config.AppConfig
 import domain._
 import domain.acc40.ResponseDetail
-import models.requests.HistoricDocumentRequest
+import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest}
 import models.requests.manageAuthorities._
-import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
+import models._
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
@@ -54,6 +54,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
   private val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
   private val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
   private val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
+  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME = "Search cash account transactions"
+  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE = "SearchCashAccountTransactions"
 
   private val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold(hyphen)(_._2)
 
@@ -164,6 +166,30 @@ class AuditingService @Inject()(appConfig: AppConfig,
       "%02d".format(historicDocumentRequest.periodEndMonth)))
 
     audit(AuditModel(HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME, auditJson, HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE))
+  }
+
+  def auditCashAccountTransactionsSearch(cashAccountTransSearchRequest: CashAccountTransactionSearchRequestDetails)
+                                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    val auditJson = Json.toJson(cashAccountTransSearchRequest)
+
+    audit(
+      AuditModel(
+        CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME,
+        auditJson,
+        CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE)
+    )
+  }
+
+  def auditCashAccountStatementsRequestACC45(cashAccountStatementRequest: CashAccountStatementRequestDetail)
+                                            (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    val auditJson = Json.toJson(cashAccountStatementRequest)
+
+    audit(
+      AuditModel(
+        CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME,
+        auditJson,
+        CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE)
+    )
   }
 
   private def audit(auditModel: AuditModel)(implicit hc: HeaderCarrier): Future[AuditResult] = {

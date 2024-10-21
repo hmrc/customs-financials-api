@@ -28,7 +28,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
 
 import java.time.LocalDate
 import scala.concurrent._
@@ -263,7 +263,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
         .thenReturn(Future.successful(Right(cashAccTranSearchResponseContainerOb)))
 
-      when(mockAuditingService.)
+      //when(mockAuditingService.)
 
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
