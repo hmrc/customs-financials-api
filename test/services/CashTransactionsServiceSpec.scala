@@ -19,7 +19,10 @@ package services
 import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.{Declaration, TaxGroup, _}
 import models._
-import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.requests.{
+  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails, SearchType
+}
 import models.responses.PaymentType.Payment
 import models.responses._
 import play.api._
@@ -29,7 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
 
 import java.time.LocalDate
 import scala.concurrent._
