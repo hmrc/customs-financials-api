@@ -19,9 +19,13 @@ package services
 import config.AppConfig
 import domain._
 import domain.acc40.ResponseDetail
-import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest}
+import models.requests.{
+  CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails,
+  HistoricDocumentRequest
+}
 import models.requests.manageAuthorities._
-import models._
+import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
