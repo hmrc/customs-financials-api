@@ -36,6 +36,7 @@ import utils.SpecBase
 import utils.TestData.{DAY_1, MONTH_1, MONTH_6, YEAR_2020}
 import models.requests.CashAccountStatementRequestDetail
 import models.responses.{Acc45ResponseCommon, ErrorDetail}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -411,6 +412,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     val tenThousand = "10000.00"
 
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockCashTransactionsService: CashTransactionsService = mock[CashTransactionsService]
