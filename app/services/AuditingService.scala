@@ -170,6 +170,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
 
   def auditCashAccountTransactionsSearch(cashAccountTransSearchRequest: CashAccountTransactionSearchRequestDetails)
                                         (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    log.info("audit event for ACC44 api call")
+
     val auditJson = Json.toJson(cashAccountTransSearchRequest)
 
     audit(
@@ -182,6 +184,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
 
   def auditCashAccountStatementsRequest(cashAccountStatementRequest: CashAccountStatementRequestDetail)
                                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+    log.info("audit event for ACC45 api call")
+
     val auditJson = Json.toJson(cashAccountStatementRequest)
 
     audit(
