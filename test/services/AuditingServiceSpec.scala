@@ -18,9 +18,12 @@ package services
 
 import domain.{Notification, StandingAuthority, acc41}
 import models._
+import models.requests.{
+  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails, DeclarationDetails, HistoricDocumentRequest, SearchType
+}
 import models.requests.ParamName.UCR
 import models.requests.manageAuthorities._
-import models.requests._
 import org.mockito.ArgumentCaptor
 import org.scalatest.matchers.should.Matchers._
 import play.api._
