@@ -30,6 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
 import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
 
@@ -266,6 +267,9 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
         .thenReturn(Future.successful(Right(cashAccTranSearchResponseContainerOb)))
 
+      when(mockAuditingService.auditCashAccountTransactionsSearch(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
+
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
 
@@ -287,6 +291,9 @@ class CashTransactionsServiceSpec extends SpecBase {
                   responseDetail = None,
                   responseCommon = resCommonOb.copy(statusText = Some("001-Invalid Cash Account"))))
             )))
+
+      when(mockAuditingService.auditCashAccountTransactionsSearch(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
 
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
@@ -332,6 +339,9 @@ class CashTransactionsServiceSpec extends SpecBase {
         Future.successful(Left(casErrorResponseDetails01))
       )
 
+      when(mockAuditingService.auditCashAccountStatementsRequest(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
+
       running(app) {
         val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
         result mustBe Left(casErrorResponseDetails01)
@@ -353,6 +363,9 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
         Future.successful(Right(casResponseCommon01))
       )
+
+      when(mockAuditingService.auditCashAccountStatementsRequest(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
 
       running(app) {
         val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
@@ -383,6 +396,9 @@ class CashTransactionsServiceSpec extends SpecBase {
         Future.successful(Right(casResponseCommon01))
       )
 
+      when(mockAuditingService.auditCashAccountStatementsRequest(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
+
       running(app) {
         val result = await(service.submitCashAccountStatementRequest(cashAccSttReqDetail))
         result mustBe Right(casResponseCommon01)
@@ -407,6 +423,7 @@ class CashTransactionsServiceSpec extends SpecBase {
     val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
     val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
     val mockAcc45Connector: Acc45Connector = mock[Acc45Connector]
+    val mockAuditingService: AuditingService = mock[AuditingService]
 
     val cashAccSttReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
@@ -524,7 +541,8 @@ class CashTransactionsServiceSpec extends SpecBase {
     val app: Application = GuiceApplicationBuilder().overrides(
       inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
       inject.bind[Acc44Connector].toInstance(mockAcc44Connector),
-      inject.bind[Acc45Connector].toInstance(mockAcc45Connector)
+      inject.bind[Acc45Connector].toInstance(mockAcc45Connector),
+      inject.bind[AuditingService].toInstance(mockAuditingService)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

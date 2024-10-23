@@ -24,6 +24,7 @@ import models.requests.CashAccountTransactionSearchRequestDetails
 import models.responses.ErrorSource.backEnd
 import models.responses.EtmpErrorCode.INVALID_CASH_ACCOUNT_STATUS_TEXT
 import models.responses._
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.Utils.hyphen
 
 import java.time.LocalDate
@@ -33,7 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
                                         acc44Connector: Acc44Connector,
                                         acc45Connector: Acc45Connector,
-                                        domainService: DomainService)(implicit executionContext: ExecutionContext) {
+                                        domainService: DomainService,
+                                        auditingService: AuditingService)(implicit executionContext: ExecutionContext) {
   def retrieveCashTransactionsSummary(can: String,
                                       from: LocalDate,
                                       to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
@@ -62,8 +64,11 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
     }
   }
 
-  def retrieveCashAccountTransactions(request: CashAccountTransactionSearchRequestDetails): Future[Either[ErrorDetail,
+  def retrieveCashAccountTransactions(request: CashAccountTransactionSearchRequestDetails)
+                                     (implicit hc: HeaderCarrier): Future[Either[ErrorDetail,
     CashAccountTransactionSearchResponseDetail]] = {
+
+    auditingService.auditCashAccountTransactionsSearch(request)
 
     acc44Connector.cashAccountTransactionSearch(request).map {
       case Right(resValue) => populateSuccessfulResponseDetail(resValue)
@@ -71,8 +76,10 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
     }
   }
 
-  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail): Future[Either[ErrorDetail,
-    Acc45ResponseCommon]] = {
+  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail)
+                                       (implicit hc: HeaderCarrier): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
+    auditingService.auditCashAccountStatementsRequest(request)
+
     acc45Connector.submitStatementRequest(request)
   }
 

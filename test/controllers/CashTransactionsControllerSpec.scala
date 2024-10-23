@@ -36,6 +36,8 @@ import utils.SpecBase
 import utils.TestData.{DAY_1, MONTH_1, MONTH_6, YEAR_2020}
 import models.requests.CashAccountStatementRequestDetail
 import models.responses.{Acc45ResponseCommon, ErrorDetail}
+import org.mockito.ArgumentMatchers
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -188,7 +190,7 @@ class CashTransactionsControllerSpec extends SpecBase {
   "retrieveCashAccountTransactions" should {
 
     "return CashAccountTransactionSearchResponseDetail for the successful response" in new Setup {
-      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(Future.successful(Right(cashAccountTransactionSearchResponseDetailOb)))
 
       running(app) {
@@ -200,7 +202,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "return error response for 400 error code" in new Setup {
-      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(Future.successful(Left(errorDetails)))
 
       running(app) {
@@ -212,7 +214,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "return error response for 500 error code" in new Setup {
-      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
           Future.successful(
             Left(errorDetails.copy(errorCode = code500, errorMessage = "Error connecting to the server"))))
@@ -227,7 +229,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "return error response for ETMP error codes" in new Setup {
-      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
           Future.successful(
             Left(errorDetails.copy(
@@ -243,7 +245,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     }
 
     "return error response for 503 error code" in new Setup {
-      when(mockCashTransactionsService.retrieveCashAccountTransactions(any))
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
           Future.successful(
             Left(errorDetails.copy(
@@ -272,7 +274,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val response: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
 
-      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
         .thenReturn(Future.successful(Right(response)))
 
       running(app) {
@@ -301,7 +303,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val response: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](Json.parse(acc45ResStr)).get
 
-      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
         .thenReturn(Future.successful(Right(response)))
 
       running(app) {
@@ -331,7 +333,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
-      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
         .thenReturn(Future.successful(Left(response)))
 
       running(app) {
@@ -361,7 +363,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
-      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
         .thenReturn(Future.successful(Left(response)))
 
       running(app) {
@@ -391,7 +393,7 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
 
-      when(mockCashTransactionsService.submitCashAccountStatementRequest(cashAccSttRequest))
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
         .thenReturn(Future.successful(Left(response)))
 
       running(app) {
@@ -411,6 +413,7 @@ class CashTransactionsControllerSpec extends SpecBase {
     val tenThousand = "10000.00"
 
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
     val mockCashTransactionsService: CashTransactionsService = mock[CashTransactionsService]
