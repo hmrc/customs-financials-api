@@ -60,6 +60,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
   private val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
   private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME = "Search cash account transactions"
   private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE = "SearchCashAccountTransactions"
+  private val CASH_ACCOUNT_TRANSACTIONS_REQUEST_TRANSACTION_NAME = "Request cash account transactions"
+  private val CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE = "RequestCashAccountTransactions"
 
   private val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold(hyphen)(_._2)
 
@@ -194,9 +196,9 @@ class AuditingService @Inject()(appConfig: AppConfig,
 
     audit(
       AuditModel(
-        CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME,
+        CASH_ACCOUNT_TRANSACTIONS_REQUEST_TRANSACTION_NAME,
         auditJson,
-        CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE)
+        CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE)
     )
   }
 
