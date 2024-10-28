@@ -506,9 +506,9 @@ class AuditingServiceSpec extends SpecBase {
         val result = extendedDataEventCaptor.getValue
 
         result.detail mustBe Json.parse(auditRequest)
-        result.auditType mustBe "SearchCashAccountTransactions"
+        result.auditType mustBe "RequestCashAccountTransactions"
         result.auditSource mustBe "customs-financials-api"
-        result.tags.get("transactionName") mustBe Some("Search cash account transactions")
+        result.tags.get("transactionName") mustBe Some("Request cash account transactions")
       }
     }
   }
