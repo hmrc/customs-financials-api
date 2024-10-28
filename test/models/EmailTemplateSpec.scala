@@ -133,14 +133,14 @@ class EmailTemplateSpec extends SpecBase {
         ) mustBe expectedEmailTemplate
       }
 
-      "file role is StandingAuthority" in new Setup {
-        val expectedEmailTemplate: Option[AuthoritiesStatementEmail] =
+      "file role is CDSCashAccount" in new Setup {
+        val expectedEmailTemplate: Option[CDSCashAccountEmail] =
           Some(
-            AuthoritiesStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+            CDSCashAccountEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
-          standingAuthNotification,
+          cdsCashAccountNotification,
           companyName
         ) mustBe expectedEmailTemplate
       }
@@ -167,6 +167,7 @@ class EmailTemplateSpec extends SpecBase {
     val fileRoleSecurityStatement = "SecurityStatement"
     val fileRolePostponedVATStatement = "PostponedVATStatement"
     val fileRoleStandingAuthority = "StandingAuthority"
+    val fileRoleCDSCashAccount = "CDSCashAccount"
     val fileRoleUnknown = "Unknown"
 
     val fileNameValue = "test_file"
@@ -265,6 +266,14 @@ class EmailTemplateSpec extends SpecBase {
     val standingAuthNotification: Notification = Notification(
       eori = EORI(eoriNumber),
       fileRole = FileRole(fileRoleStandingAuthority),
+      fileName = fileNameValue,
+      fileSize = fileSizeValue,
+      created = Some(date),
+      metadata = params)
+
+    val cdsCashAccountNotification: Notification = Notification(
+      eori = EORI(eoriNumber),
+      fileRole = FileRole(fileRoleCDSCashAccount),
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
