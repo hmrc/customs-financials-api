@@ -133,6 +133,18 @@ class EmailTemplateSpec extends SpecBase {
         ) mustBe expectedEmailTemplate
       }
 
+      "file role is StandingAuthority" in new Setup {
+        val expectedEmailTemplate: Option[AuthoritiesStatementEmail] =
+          Some(
+            AuthoritiesStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+
+        EmailTemplate.fromNotification(
+          emailAddress,
+          standingAuthNotification,
+          companyName
+        ) mustBe expectedEmailTemplate
+      }
+
       "file role is CDSCashAccount" in new Setup {
         val expectedEmailTemplate: Option[CDSCashAccountEmail] =
           Some(
