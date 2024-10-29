@@ -58,6 +58,9 @@ object EmailTemplate {
         emailTemplateForPVATStatement(emailAddress, notification, companyName, isHistoricStat)
 
       case "StandingAuthority" => emailTemplateForStandingAuthority(emailAddress, notification, companyName)
+
+      case "CDSCashAccount" => emailTemplateForCDSCashAccount(emailAddress, notification, companyName)
+
       case _ => Some(Unknown(emailAddress, notification.eori.value))
     }
   }
@@ -113,9 +116,19 @@ object EmailTemplate {
   }
 
   private def emailTemplateForStandingAuthority(emailAddress: EmailAddress,
-                                                 notification: Notification,
-                                                 companyName: String): Option[AuthoritiesStatementEmail] = {
+                                                notification: Notification,
+                                                companyName: String): Option[AuthoritiesStatementEmail] = {
     Some(AuthoritiesStatementEmail(
+      emailAddress,
+      notification.eori.value,
+      Map("recipientName_line1" -> companyName))
+    )
+  }
+
+  private def emailTemplateForCDSCashAccount(emailAddress: EmailAddress,
+                                             notification: Notification,
+                                             companyName: String): Option[CDSCashAccountEmail] = {
+    Some(CDSCashAccountEmail(
       emailAddress,
       notification.eori.value,
       Map("recipientName_line1" -> companyName))
@@ -238,4 +251,10 @@ case class AuthoritiesStatementEmail(email: EmailAddress,
                                      eori: String,
                                      override val params: Map[String, String]) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_for_standing_authorities"
+}
+
+case class CDSCashAccountEmail(email: EmailAddress,
+                               eori: String,
+                               override val params: Map[String, String]) extends EmailTemplate {
+  override val templateId: String = "customs_financials_requested_cash_account_transactions"
 }
