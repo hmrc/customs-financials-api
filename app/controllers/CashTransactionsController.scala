@@ -17,11 +17,10 @@
 package controllers
 
 import domain.CashDailyStatement._
-import models.requests.CashAccountTransactionSearchRequestDetails
+import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails}
 import models.responses.EtmpErrorCode._
-import models.requests.CashAccountStatementRequestDetail
 import models.responses.{Acc45ResponseCommon, ErrorDetail}
-import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
+import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException, PersonDetails}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import services.CashTransactionsService
@@ -30,7 +29,7 @@ import utils.Utils.writable
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CashTransactionsController @Inject()(service: CashTransactionsService,
                                            cc: ControllerComponents)
@@ -73,6 +72,17 @@ class CashTransactionsController @Inject()(service: CashTransactionsService,
           case Left(errorDetail) => handleCashAccSttResFailures(errorDetail)
           case Right(cashAccSttResponse) => handleCashAccSttRequestSuccessCases(cashAccSttResponse)
         }
+      }
+    }
+  }
+
+  def retrieveNINumber(): Action[JsValue] = Action.async(parse.json) {
+    implicit request => {
+      withJsonBody[String] {
+        case "internalservererror" => Future.successful(InternalServerError("Internal Server Error occurred"))
+        case name if name.equalsIgnoreCase("Jamie") || name.equalsIgnoreCase("test") =>
+          Future.successful(Ok(PersonDetails(name, "QQ123456B")))
+        case _ => Future.successful(BadRequest("Invalid request"))
       }
     }
   }

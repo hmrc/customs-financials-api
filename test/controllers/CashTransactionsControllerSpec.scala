@@ -24,10 +24,10 @@ import models.responses.ErrorCode.{code400, code500}
 import models.responses.EtmpErrorCode.code001
 import models.responses.PaymentType.Payment
 import models.responses._
-import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
+import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException, PersonDetails}
 import org.mockito.ArgumentMatchers.{eq => is}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.{Application, inject}
@@ -261,6 +261,37 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
   }
+
+  "retrieveCashAccountTransactions" should {
+
+    "return correct response with OK for a name that exists in the list" in new Setup {
+      import models.PersonDetails.format
+
+      running(app) {
+        val result = route(app, retrieveNINumberRoute("Jamie")).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.toJson(PersonDetails("Jamie", "QQ123456B"))
+      }
+    }
+
+    "return BAD_REQUEST when name is not in the existing list" in new Setup {
+      running(app) {
+        val result = route(app, retrieveNINumberRoute("abc")).value
+
+        status(result) mustBe BAD_REQUEST
+      }
+    }
+
+    "return INTERNAL_SERVER when name is internalservererror" in new Setup {
+      running(app) {
+        val result = route(app, retrieveNINumberRoute("internalservererror")).value
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
   "submitCashAccStatementRequest" should {
 
     "return ResponseCommon for success scenario" in new Setup {
@@ -465,6 +496,10 @@ class CashTransactionsControllerSpec extends SpecBase {
     val retrieveCashAccountTransactions: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.retrieveCashAccountTransactions().url)
         .withBody(Json.toJson(cashTranSearchRequestDetailsWithSearchTypePOb))
+
+    def retrieveNINumberRoute(name: String) =
+      FakeRequest(POST, controllers.routes.CashTransactionsController.retrieveNINumber().url)
+      .withBody(JsString(name))
 
     val cashAccSttRequest: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
       "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
