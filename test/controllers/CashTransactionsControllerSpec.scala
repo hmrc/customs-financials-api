@@ -268,10 +268,14 @@ class CashTransactionsControllerSpec extends SpecBase {
       import models.PersonDetails.format
 
       running(app) {
-        val result = route(app, retrieveNINumberRoute("Jamie")).value
+        List("Jamie", "jamie", "test", "Test").foreach { name =>
+            
+          val result = route(app, retrieveNINumberRoute(name)).value
 
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(PersonDetails("Jamie", "QQ123456B"))
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.toJson(PersonDetails(name, "QQ123456B"))
+        }
+
       }
     }
 
