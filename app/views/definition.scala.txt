@@ -1,11 +1,4 @@
 {
-  "scopes": [
-    {
-      "key": "customs-financials-api",
-      "name": "Statement Notifications",
-      "description": "Send C79, PVAT and Security statement notifications for new statements"
-    }
-  ],
   "api": {
     "name": "CDS Financials Notifications",
     "description": "Notifications API sends requests to customs financials api service to display new statements notifications",
