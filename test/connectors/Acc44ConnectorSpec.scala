@@ -29,7 +29,11 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.{
+  AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_REF,
+  DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, INVALID_CAN, PAYMENT_REFERENCE, PROCESSING_DATE,
+  SORT_CODE
+}
 import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
