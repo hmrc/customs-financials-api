@@ -29,11 +29,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.SpecBase
-import utils.TestData.{
-  AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_REF,
-  DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, INVALID_CAN, PAYMENT_REFERENCE, PROCESSING_DATE,
-  SORT_CODE
-}
+import utils.TestData._
 import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -73,25 +69,30 @@ class Acc44ConnectorSpec extends SpecBase {
         val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
           await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetailsInvalid))
 
-        val canSchemaFieldPath = "/cashAccountTransactionSearchRequest/requestDetail/can"
+        val canFieldSchemaPath = "/cashAccountTransactionSearchRequest/requestDetail/can"
         val lengthErrorMsg = "length: 18, maximum allowed: 11"
 
         val expectedErrorMsg: String =
-          s"""($canSchemaFieldPath: string "123456789091234567" is too long ($lengthErrorMsg))""".stripMargin
+          s"""($canFieldSchemaPath: string "123456789091234567" is too long ($lengthErrorMsg))""".stripMargin
+
+        val sourceFaultDetail: SourceFaultDetail = SourceFaultDetail(Seq(REQUEST_SCHEMA_VALIDATION_ERROR))
+        val correlationId = "MDTP_ID"
 
         val defaultErrorDetails: ErrorDetail = ErrorDetail(
           emptyString,
-          "MDTP_ID",
+          correlationId,
           BAD_REQUEST.toString,
           emptyString,
           mdtp,
-          SourceFaultDetail(Seq(REQUEST_SCHEMA_VALIDATION_ERROR)))
+          sourceFaultDetail)
 
         val actualErrorDetails: ErrorDetail = result.swap.getOrElse(defaultErrorDetails)
 
         actualErrorDetails.errorMessage mustBe expectedErrorMsg
+        actualErrorDetails.correlationId mustBe correlationId
         actualErrorDetails.errorCode mustBe BAD_REQUEST.toString
         actualErrorDetails.source mustBe mdtp
+        actualErrorDetails.sourceFaultDetail mustBe sourceFaultDetail
       }
 
       "EIS returns 201 to MDTP without responseDetails in success response" in new Setup {
