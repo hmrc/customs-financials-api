@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "ACC44 JSON Response Schema",
 	"type": "object",
 	"properties": {
@@ -78,7 +78,7 @@
 												"type": "string",
 												"minLength": 1,
 												"maxLength": 17,
-												"pattern": "([A-Z]{2}[0-9A-Z]+)"
+												"pattern": "^([A-Z]{2}[0-9A-Z]+)$"
 											},
 											"name": {
 												"type": "string",
@@ -120,7 +120,7 @@
 												"type": "string",
 												"minLength": 1,
 												"maxLength": 17,
-												"pattern": "([A-Z]{2}[0-9A-Z]+)"
+												"pattern": "^([A-Z]{2}[0-9A-Z]+)$"
 											},
 											"declarantRef": {
 												"description": "DeclarantRef",
@@ -128,8 +128,8 @@
 												"minLength": 1,
 												"maxLength": 35
 											},
-											"c18OrOverpaymentReference ": {
-												"description": "C18/Overpayment Reference ",
+											"c18OrOverpaymentReference": {
+												"description": "C18/Overpayment Reference",
 												"type": "string",
 												"minLength": 1,
 												"maxLength": 32
@@ -139,17 +139,17 @@
 												"type": "string",
 												"minLength": 1,
 												"maxLength": 17,
-												"pattern": "([A-Z]{2}[0-9A-Z]+)"
+												"pattern": "^([A-Z]{2}[0-9A-Z]+)$"
 											},
 											"postingDate": {
 												"description": "Posting Date",
 												"type": "string",
-												"format": "date"
+												"pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
 											},
 											"acceptanceDate": {
 												"description": "Acceptance Date",
 												"type": "string",
-												"format": "date"
+												"pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
 											},
 											"amount": {
 												"description": "Amount",
@@ -269,12 +269,12 @@
 											"valueDate": {
 												"description": "Value Date",
 												"type": "string",
-												"format": "date"
+												"pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
 											},
 											"postingDate": {
 												"description": "Posting Date",
 												"type": "string",
-												"format": "date"
+												"pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
 											},
 											"paymentReference": {
 												"description": "Payment Reference",
@@ -334,8 +334,7 @@
 				}
 			},
 			"required": [
-				"responseCommon",
-				"responseDetail"
+				"responseCommon"
 			],
 			"additionalProperties": false
 		}

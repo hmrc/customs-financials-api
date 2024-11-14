@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-04/schema#",
 	"description": "ACC45 JSON Request Schema",
 	"type": "object",
 	"properties": {
@@ -40,7 +40,7 @@
 							"type": "string",
 							"minLength": 1,
 							"maxLength": 17,
-							"pattern": "([A-Z]{2}[0-9A-Z]+)"
+							"pattern": "^([A-Z]{2}[0-9A-Z]+)$"
 						},
 						"can": {
 							"description": "CAN",
@@ -80,7 +80,7 @@
 	"definitions": {
 		"date_type": {
 			"type": "string",
-			"format": "date"
+			"pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
 		}
 	}
 }

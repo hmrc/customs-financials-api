@@ -18,7 +18,9 @@ package connectors
 
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.ErrorCode.{code400, code500}
+import models.responses.ErrorSource.mdtp
 import models.responses.PaymentType.Payment
+import models.responses.SourceFaultDetailMsg.REQUEST_SCHEMA_VALIDATION_ERROR
 import models.responses._
 import play.api.Application
 import play.api.http.Status._
@@ -27,9 +29,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import utils.SpecBase
-import utils.TestData.{AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_REF,
-  DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, INVALID_CAN, PAYMENT_REFERENCE, PROCESSING_DATE,
-  SORT_CODE}
+import utils.TestData._
+import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -64,12 +65,34 @@ class Acc44ConnectorSpec extends SpecBase {
 
     "return Error response" when {
 
-      "Request fails to validate against schema" in new Setup {
-        intercept[RuntimeException] {
-          connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetailsInvalid).map {
-            failureRes => failureRes
-          }
-        }
+      "Request fails to validate against schema for the invalid CAN" in new Setup {
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetailsInvalid))
+
+        val canFieldSchemaPath = "/cashAccountTransactionSearchRequest/requestDetail/can"
+        val lengthErrorMsg = "length: 18, maximum allowed: 11"
+
+        val expectedErrorMsg: String =
+          s"""($canFieldSchemaPath: string "123456789091234567" is too long ($lengthErrorMsg))""".stripMargin
+
+        val sourceFaultDetail: SourceFaultDetail = SourceFaultDetail(Seq(REQUEST_SCHEMA_VALIDATION_ERROR))
+        val correlationId = "MDTP_ID"
+
+        val defaultErrorDetails: ErrorDetail = ErrorDetail(
+          emptyString,
+          correlationId,
+          BAD_REQUEST.toString,
+          emptyString,
+          mdtp,
+          sourceFaultDetail)
+
+        val actualErrorDetails: ErrorDetail = result.swap.getOrElse(defaultErrorDetails)
+
+        actualErrorDetails.errorMessage mustBe expectedErrorMsg
+        actualErrorDetails.correlationId mustBe correlationId
+        actualErrorDetails.errorCode mustBe BAD_REQUEST.toString
+        actualErrorDetails.source mustBe mdtp
+        actualErrorDetails.sourceFaultDetail mustBe sourceFaultDetail
       }
 
       "EIS returns 201 to MDTP without responseDetails in success response" in new Setup {
