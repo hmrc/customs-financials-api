@@ -16,11 +16,17 @@
 
 package models.requests.manageAuthorities
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{JsValue, Json, OWrites, Writes}
+import play.api.libs.ws.BodyWritable
 
 case class ManageStandingAuthoritiesRequestContainer(manageStandingAuthoritiesRequest: ManageStandingAuthoritiesRequest)
 
 object ManageStandingAuthoritiesRequestContainer {
   implicit val writes: OWrites[ManageStandingAuthoritiesRequestContainer] =
     Json.writes[ManageStandingAuthoritiesRequestContainer]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

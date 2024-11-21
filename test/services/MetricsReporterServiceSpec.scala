@@ -17,11 +17,13 @@
 package services
 
 import com.codahale.metrics.{Histogram, MetricRegistry}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import utils.SpecBase
 

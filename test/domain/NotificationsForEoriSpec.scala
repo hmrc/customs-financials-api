@@ -19,7 +19,7 @@ package domain
 import models.EORI
 import play.api.libs.json.{JsSuccess, Json}
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.*
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, LocalDateTime}

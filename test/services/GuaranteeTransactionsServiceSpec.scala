@@ -21,8 +21,9 @@ import domain.{Amounts, GuaranteeTransaction}
 import models.requests.GuaranteeAccountTransactionsRequest
 import models.responses.{DefAmounts, GuaranteeTransactionDeclaration, TaxType, TaxTypeGroup}
 import models.{AccountNumber, EORI}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase

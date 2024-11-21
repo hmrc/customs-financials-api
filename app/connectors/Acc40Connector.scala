@@ -18,18 +18,20 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
-import domain._
+import domain.*
 import domain.acc40.{ResponseDetail, SearchAuthoritiesRequest, SearchAuthoritiesResponse}
 import models.EORI
+import play.api.libs.ws.writeableOf_JsValue
 import services.{AuditingService, DateTimeService}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import utils.Utils.{gbEoriPrefix, xIEoriPrefix}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import utils.Utils.{gbEoriPrefix, xIEoriPrefix}
 
-class Acc40Connector @Inject()(httpClient: HttpClient,
+class Acc40Connector @Inject()(httpClient: HttpClientV2,
                                auditingService: AuditingService,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
@@ -56,11 +58,11 @@ class Acc40Connector @Inject()(httpClient: HttpClient,
       requestDetail
     ))
 
-    val result: Future[SearchAuthoritiesResponse] = httpClient.POST[SearchAuthoritiesRequest, SearchAuthoritiesResponse](
-      appConfig.acc40SearchAuthoritiesEndpoint,
-      request,
-      headers = mdgHeaders.headers(appConfig.acc40BearerToken, appConfig.acc40HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    val result: Future[SearchAuthoritiesResponse] = httpClient.post(
+      url"${appConfig.acc40SearchAuthoritiesEndpoint}")(HeaderCarrier())
+      .withBody[SearchAuthoritiesRequest](request)
+      .setHeader(mdgHeaders.headers(appConfig.acc40BearerToken, appConfig.acc40HostHeader): _*)
+      .execute[SearchAuthoritiesResponse]
 
     result.map {
       res =>

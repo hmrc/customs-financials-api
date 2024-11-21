@@ -18,13 +18,19 @@ package domain.acc37
 
 import models.requests.UpdateContactDetailsRequest
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat, Writes}
+import play.api.libs.ws.BodyWritable
 import utils.Utils.emptyString
 
 case class Request(amendCorrespondenceAddressRequest: AmendCorrespondenceAddressRequest)
 
 object Request {
   implicit val format: OFormat[Request] = Json.format[Request]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 case class AmendCorrespondenceAddressRequest(requestCommon: RequestCommon,

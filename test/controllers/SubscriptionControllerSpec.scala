@@ -19,11 +19,12 @@ package controllers
 import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain.sub09.{EmailUnverifiedResponse, EmailVerifiedResponse}
 import models.{EORI, EmailAddress}
-import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.ArgumentMatchers.{any, eq => is}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.SubscriptionService
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}

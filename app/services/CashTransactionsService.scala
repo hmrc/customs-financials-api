@@ -19,11 +19,10 @@ package services
 import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.CashTransactions
 import models.ErrorResponse
-import models.requests.CashAccountStatementRequestDetail
-import models.requests.CashAccountTransactionSearchRequestDetails
+import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails}
+import models.responses.*
 import models.responses.ErrorSource.backEnd
 import models.responses.EtmpErrorCode.INVALID_CASH_ACCOUNT_STATUS_TEXT
-import models.responses._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Utils.hyphen
 

@@ -16,7 +16,7 @@
 
 package services
 
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.should
 import utils.SpecBase
 
 import java.time.LocalDateTime

@@ -16,8 +16,8 @@
 
 package controllers
 
-import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import models.requests.GuaranteeAccountTransactionsRequest
+import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import services.GuaranteeTransactionsService
@@ -53,6 +53,5 @@ class GuaranteeTransactionsController @Inject()(service: GuaranteeTransactionsSe
   private def failedResponse(errorResponse: ErrorResponse): Result = errorResponse match {
     case NoAssociatedDataException => NotFound
     case ExceededThresholdErrorException => EntityTooLarge
-    case _ => ServiceUnavailable
   }
 }

@@ -16,10 +16,10 @@
 
 package models.requests
 
+import config.MetaConfig.Platform.MDTP
+import models.requests.CashAccountStatementRequestContainer.cashAccountStatementRequestContainerFormat
 import play.api.libs.json.Json
 import utils.SpecBase
-import CashAccountStatementRequestContainer.cashAccountStatementRequestContainerFormat
-import config.MetaConfig.Platform.MDTP
 
 class CashAccountStatementRequestContainerSpec extends SpecBase {
 

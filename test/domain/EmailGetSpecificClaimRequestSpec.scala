@@ -19,7 +19,7 @@ package domain
 import models.requests.EmailRequest
 import models.{EORI, EmailAddress, EmailTemplate, FileRole}
 import utils.SpecBase
-import utils.TestData.{CSV_FILE_NAME, EORI_VALUE_1, FILE_SIZE_1024L, TEST_COMPANY, TEST_EMAIL}
+import utils.TestData.*
 
 import scala.collection.immutable.HashMap
 

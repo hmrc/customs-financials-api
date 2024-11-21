@@ -19,15 +19,17 @@ package connectors
 import config.AppConfig
 import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
 import play.api.http.Status
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc24Connector @Inject()(httpClient: HttpClient,
+class Acc24Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                metricsReporterService: MetricsReporterService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
@@ -37,11 +39,13 @@ class Acc24Connector @Inject()(httpClient: HttpClient,
   def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] = {
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
 
-      httpClient.POST[HistoricStatementRequest, HttpResponse](
-        appConfig.acc24HistoricalStatementRetrievalEndpoint,
-        HistoricStatementRequest.from(historicDocumentRequest),
-        mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
+      val acc24Url = url"${appConfig.acc24HistoricalStatementRetrievalEndpoint}"
+
+      httpClient.post(acc24Url)(HeaderCarrier())
+        .withBody[HistoricStatementRequest](HistoricStatementRequest.from(historicDocumentRequest))
+        .setHeader(mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader): _*)
+        .execute[HttpResponse]
+        .map { response =>
         log.info(s"HistoricDocumentResponse :  $response")
         response.status match {
           case Status.NO_CONTENT => true

@@ -18,17 +18,19 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
-import domain._
+import domain.*
 import domain.acc41.StandingAuthoritiesForEORIResponse
 import models.EORI
+import play.api.libs.ws.writeableOf_JsValue
 import services.{AuditingService, DateTimeService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc41Connector @Inject()(httpClient: HttpClient,
+class Acc41Connector @Inject()(httpClient: HttpClientV2,
                                auditingService: AuditingService,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
@@ -56,11 +58,10 @@ class Acc41Connector @Inject()(httpClient: HttpClient,
     ))
 
     val result: Future[StandingAuthoritiesForEORIResponse] =
-      httpClient.POST[acc41.StandingAuthoritiesForEORIRequest, acc41.StandingAuthoritiesForEORIResponse](
-        appConfig.acc41AuthoritiesCsvGenerationEndpoint,
-        request,
-        headers = mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly)
+      httpClient.post(url"${appConfig.acc41AuthoritiesCsvGenerationEndpoint}")(HeaderCarrier())
+        .withBody[acc41.StandingAuthoritiesForEORIRequest](request)
+        .setHeader(mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader): _*)
+        .execute[acc41.StandingAuthoritiesForEORIResponse]
 
     result.map {
       res =>

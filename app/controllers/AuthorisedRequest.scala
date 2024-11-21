@@ -16,14 +16,15 @@
 
 package controllers
 
+import _root_.config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import config.AppConfig
 import models.EORI
-import play.api.mvc._
-import _root_.config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
-import uk.gov.hmrc.auth.core._
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
@@ -59,10 +60,10 @@ class AuthorisedRequest @Inject()(override val authConnector: CustomAuthConnecto
 class RequestWithEori[+A](val eori: EORI, request: Request[A]) extends WrappedRequest[A](request)
 
 class CustomAuthConnector @Inject()(appConfig: AppConfig,
-                                    httpPost: HttpClient) extends PlayAuthConnector {
+                                    httpPost: HttpClientV2) extends PlayAuthConnector {
   val serviceUrl: String = appConfig.authUrl
 
-  def http: CorePost = httpPost
+  def httpClientV2: HttpClientV2 = httpPost
 }
 
 trait ControllerChecks extends Results {

@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent._
+import scala.concurrent.*
 
 class HistoricDocumentRequestController @Inject()(service: HistoricDocumentService,
                                                   dataStoreService: DataStoreConnector,

@@ -18,26 +18,30 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountTransactionSearchRequest, CashAccountTransactionSearchRequestContainer,
-  CashAccountTransactionSearchRequestDetails, CashTransactionsRequestCommon}
+import models.requests.{CashAccountTransactionSearchRequest,
+  CashAccountTransactionSearchRequestContainer,
+  CashAccountTransactionSearchRequestDetails,
+  CashTransactionsRequestCommon
+}
 import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
-import models.responses.SourceFaultDetailMsg._
+import models.responses.SourceFaultDetailMsg.*
 import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import utils.JSONSchemaValidator
 
 import javax.inject.Inject
-import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class Acc44Connector @Inject()(httpClient: HttpClient,
+class Acc44Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                jsonSchemaValidator: JSONSchemaValidator,
@@ -82,11 +86,12 @@ class Acc44Connector @Inject()(httpClient: HttpClient,
   Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
 
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-transaction-search") {
-      httpClient.POST[CashAccountTransactionSearchRequestContainer, HttpResponse](
-        appConfig.acc44CashTransactionSearchEndpoint,
-        cashAccTransSearchRequestContainer,
-        headers = headers.headers(appConfig.acc44BearerToken, None)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map { res =>
+      httpClient.post(
+        url"${appConfig.acc44CashTransactionSearchEndpoint}")(HeaderCarrier())
+        .withBody[CashAccountTransactionSearchRequestContainer](cashAccTransSearchRequestContainer)
+        .setHeader(headers.headers(appConfig.acc44BearerToken, None): _*)
+        .execute[HttpResponse]
+        .map { res =>
 
         res.status match {
           case OK => validateAndProcessIncomingSuccessResponse(res)

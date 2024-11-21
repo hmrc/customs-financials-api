@@ -16,9 +16,9 @@
 
 package services
 
-import domain._
+import domain.*
 import models.responses
-import models.responses._
+import models.responses.*
 
 class DomainService {
 

@@ -16,28 +16,27 @@
 
 package controllers
 
-import domain.CashDailyStatement._
-import domain._
+import domain.*
+import domain.CashDailyStatement.*
 import models.requests.SearchType.P
-import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails}
+import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails}
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.EtmpErrorCode.code001
 import models.responses.PaymentType.Payment
-import models.responses._
+import models.responses.{Acc45ResponseCommon, ErrorDetail, *}
 import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
-import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.{any, eq => is}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.CashTransactionsService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
 import utils.TestData.{DAY_1, MONTH_1, MONTH_6, YEAR_2020}
-import models.requests.CashAccountStatementRequestDetail
-import models.responses.{Acc45ResponseCommon, ErrorDetail}
-import org.mockito.ArgumentMatchers
-import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}

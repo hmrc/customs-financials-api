@@ -18,15 +18,16 @@ package controllers
 
 import connectors.Acc27Connector
 import org.mockito.ArgumentMatchers.{eq => meq}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.mvc.AnyContentAsJson
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import utils.SpecBase
 
-import scala.concurrent._
+import scala.concurrent.*
 
 class CustomsAccountsControllerSpec extends SpecBase {
 

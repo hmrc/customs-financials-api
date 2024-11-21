@@ -17,27 +17,26 @@
 package services
 
 import domain.{Notification, StandingAuthority, acc41}
-import models._
-import models.requests.{
-  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails, DeclarationDetails, HistoricDocumentRequest, SearchType
-}
+import models.*
 import models.requests.ParamName.UCR
-import models.requests.manageAuthorities._
+import models.requests.manageAuthorities.*
+import models.requests.*
 import org.mockito.ArgumentCaptor
-import org.scalatest.matchers.should.Matchers._
-import play.api._
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.matchers.should.Matchers.*
+import play.api.*
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector._
+import uk.gov.hmrc.play.audit.http.connector.*
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.*
 import utils.Utils.emptyString
 
-import scala.concurrent._
+import scala.concurrent.*
 
 class AuditingServiceSpec extends SpecBase {
 

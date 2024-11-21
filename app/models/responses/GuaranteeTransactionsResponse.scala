@@ -17,7 +17,7 @@
 package models.responses
 
 import models.{EORI, ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
-import play.api.libs.json.{JsError, JsObject, Json, OFormat, OWrites, Reads, JsSuccess}
+import play.api.libs.json.*
 
 case class GuaranteeTransactionsResponse(getGGATransactionResponse: GetGGATransactionResponse)
 

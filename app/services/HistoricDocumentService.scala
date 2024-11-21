@@ -16,7 +16,7 @@
 
 package services
 
-import connectors._
+import connectors.*
 import models.requests.HistoricDocumentRequest
 import uk.gov.hmrc.http.HeaderCarrier
 

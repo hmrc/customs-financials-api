@@ -17,19 +17,22 @@
 package connectors
 
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.responses.*
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.ErrorSource.mdtp
 import models.responses.PaymentType.Payment
 import models.responses.SourceFaultDetailMsg.REQUEST_SCHEMA_VALIDATION_ERROR
-import models.responses._
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.*
 import utils.Utils.emptyString
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,9 +45,10 @@ class Acc44ConnectorSpec extends SpecBase {
     "return success response" when {
 
       "response has declarations" in new Setup {
-        when[Future[CashAccountTransactionSearchResponseContainer]](
-          mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(cashAccTranSearchResponseContainerWithDeclarationOb))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(cashAccTranSearchResponseContainerWithDeclarationOb))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Right(cashAccTranSearchResponseContainerWithDeclarationOb)
@@ -52,9 +56,10 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "response has paymentsWithdrawalsAndTransfers" in new Setup {
-        when[Future[CashAccountTransactionSearchResponseContainer]](
-          mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(cashAccTranSearchResponseContainerOb))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(cashAccTranSearchResponseContainerOb))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Right(cashAccTranSearchResponseContainerOb)
@@ -96,10 +101,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "EIS returns 201 to MDTP without responseDetails in success response" in new Setup {
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(CREATED, Json.toJson(cashAccTranSearchResponseContainerWith201EISCodeOb), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(CREATED, Json.toJson(cashAccTranSearchResponseContainerWith201EISCodeOb), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
@@ -107,10 +113,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "EIS returns 201 to MDTP with errorDetails" in new Setup {
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(CREATED, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(CREATED, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           successResponse => successResponse mustBe Left(errorDetails)
@@ -118,10 +125,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "api call produces Http status 500 due to backEnd error" in new Setup {
-
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes =>
@@ -142,8 +150,10 @@ class Acc44ConnectorSpec extends SpecBase {
 
         val errorDetailJsString: JsValue = Json.toJson(errorDetails)
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
@@ -163,8 +173,10 @@ class Acc44ConnectorSpec extends SpecBase {
 
         val errorDetailJsString: JsValue = Json.toJson(errorDetails)
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
@@ -172,10 +184,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "INTERNAL_SERVER_ERROR is returned from ETMP" in new Setup {
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(INTERNAL_SERVER_ERROR, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(INTERNAL_SERVER_ERROR, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
@@ -183,9 +196,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "4xx error is returned from ETMP" in new Setup {
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(
+          Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes => failureRes mustBe Left(errorDetails)
@@ -193,11 +208,11 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with errorDetails" in new Setup {
-
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(SERVICE_UNAVAILABLE, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(SERVICE_UNAVAILABLE, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes =>
@@ -214,12 +229,13 @@ class Acc44ConnectorSpec extends SpecBase {
               cashAccTranSearchResponseContainerOb
                 .cashAccountTransactionSearchResponse.copy(responseDetail = None))
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                Json.toJson(cashAccTranSearchResponseContainerWithNoResponseDetailsOb), Map())))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+          HttpResponse(
+            SERVICE_UNAVAILABLE,
+            Json.toJson(cashAccTranSearchResponseContainerWithNoResponseDetailsOb), Map())))
 
         connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map {
           failureRes =>
@@ -232,10 +248,12 @@ class Acc44ConnectorSpec extends SpecBase {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

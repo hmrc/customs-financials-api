@@ -18,6 +18,7 @@ package services
 
 import domain.{Notification, NotificationsForEori}
 import models.{EORI, FileRole}
+import org.mongodb.scala.SingleObservableFuture
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running

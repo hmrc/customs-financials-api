@@ -18,15 +18,17 @@ package connectors
 
 import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 import domain.secureMessage
-import domain.secureMessage._
-import models._
-import org.mockito.Mockito.lenient
+import domain.secureMessage.*
+import models.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 import utils.TestData.{COUNTRY_CODE_GB, ERROR_MSG, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
@@ -80,8 +82,10 @@ class SecureMessageConnectorSpec extends SpecBase {
 
         when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
-        lenient().when(mockHttpClient.POST[Request, Response](any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(response))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
         running(app) {
           connector.sendSecureMessage(histDoc = doc).map {
@@ -112,7 +116,8 @@ class SecureMessageConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
     val eori: EORI = EORI("GB333186811543")
     val id: String = "abcd12345"
 
@@ -195,7 +200,8 @@ class SecureMessageConnectorSpec extends SpecBase {
     val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient),
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder),
       inject.bind[DataStoreConnector].toInstance(mockDataStoreService)
     ).configure(
       "microservice.metrics.enabled" -> false,

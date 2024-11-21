@@ -17,9 +17,9 @@
 package domain
 
 import models.{EORI, FileRole}
-import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
+import play.api.libs.json.Reads.*
 
 import java.time.LocalDate
 

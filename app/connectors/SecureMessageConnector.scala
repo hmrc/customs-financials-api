@@ -20,9 +20,11 @@ import config.AppConfig
 import domain.secureMessage.{Request, Response}
 import models.{EORI, EmailAddress, HistoricDocumentRequestSearch}
 import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.JSONSchemaValidator
 import utils.Utils.emptyString
 
@@ -30,7 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class SecureMessageConnector @Inject()(httpClient: HttpClient,
+class SecureMessageConnector @Inject()(httpClient: HttpClientV2,
                                        appConfig: AppConfig,
                                        jsonSchemaValidator: JSONSchemaValidator,
                                        mdgHeaders: MdgHeaders,
@@ -60,13 +62,14 @@ class SecureMessageConnector @Inject()(httpClient: HttpClient,
       jsonSchemaValidator.validatePayload(
         requestBody(request), jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
         case Success(_) =>
-          val result: Future[Response] = httpClient.POST[Request, Response](
-            appConfig.secureMessageEndpoint,
-            request,
-            headers = mdgHeaders.headers(
+          val result: Future[Response] = httpClient.post(
+            url"${appConfig.secureMessageEndpoint}")
+            .withBody[Request](request)
+            .setHeader(mdgHeaders.headers(
               appConfig.secureMessageBearerToken,
-              appConfig.secureMessageHostHeader)
-          )(implicitly, implicitly, HeaderCarrier(), implicitly).recover {
+              appConfig.secureMessageHostHeader): _*)
+            .execute[Response]
+            .recover {
             case exception =>
               log.error(exception.getMessage)
               log.error(s"error occurred for " +

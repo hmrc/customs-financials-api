@@ -19,7 +19,9 @@ package services
 import connectors.Acc24Connector
 import models.requests.HistoricDocumentRequest
 import models.{EORI, FileRole}
-import org.mockito._
+import org.mockito.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
@@ -28,7 +30,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
 import utils.TestData.{MONTH_1, MONTH_3, YEAR_2019}
 
-import scala.concurrent._
+import scala.concurrent.*
 
 class HistoricDocumentServiceSpec extends SpecBase {
 

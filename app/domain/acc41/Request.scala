@@ -17,12 +17,18 @@
 package domain.acc41
 
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat, Writes}
+import play.api.libs.ws.BodyWritable
 
 case class StandingAuthoritiesForEORIRequest(standingAuthoritiesForEORIRequest: Request)
 
 object StandingAuthoritiesForEORIRequest {
   implicit val format: OFormat[StandingAuthoritiesForEORIRequest] = Json.format[StandingAuthoritiesForEORIRequest]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)

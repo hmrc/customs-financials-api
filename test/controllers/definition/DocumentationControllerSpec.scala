@@ -19,7 +19,7 @@ package controllers.definition
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import utils.SpecBase
 
 class DocumentationControllerSpec extends SpecBase {

@@ -17,8 +17,8 @@
 package models
 
 import models.AddressInformation.format
-import utils.SpecBase
 import play.api.libs.json.{JsSuccess, Json}
+import utils.SpecBase
 import utils.TestData.COUNTRY_CODE_GB
 
 class AddressInformationSpec extends SpecBase {

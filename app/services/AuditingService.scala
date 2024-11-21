@@ -17,15 +17,11 @@
 package services
 
 import config.AppConfig
-import domain._
+import domain.*
 import domain.acc40.ResponseDetail
-import models.requests.{
-  CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails,
-  HistoricDocumentRequest
-}
-import models.requests.manageAuthorities._
-import models.{AccountNumber, AccountType, EORI, FileRole, FileType}
+import models.requests.manageAuthorities.*
+import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest}
+import models.*
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Logger, LoggerLike}
@@ -157,7 +153,7 @@ class AuditingService @Inject()(appConfig: AppConfig,
 
   def auditHistoricStatementRequest(historicDocumentRequest: HistoricDocumentRequest)
                                    (implicit hc: HeaderCarrier): Future[AuditResult] = {
-    import domain.HistoricDocumentRequestAuditDetail._
+    import domain.HistoricDocumentRequestAuditDetail.*
     val auditJson = Json.toJson(HistoricDocumentRequestAuditDetail(
       historicDocumentRequest.eori,
       historicDocumentRequest.documentType.value match {

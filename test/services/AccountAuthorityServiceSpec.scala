@@ -17,9 +17,11 @@
 package services
 
 import connectors.{Acc29Connector, Acc30Connector}
-import domain._
-import models.requests.manageAuthorities._
+import domain.*
+import models.requests.manageAuthorities.*
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}
@@ -27,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
 
-import scala.concurrent._
+import scala.concurrent.*
 
 class AccountAuthorityServiceSpec extends SpecBase {
 

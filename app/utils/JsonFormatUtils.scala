@@ -16,7 +16,7 @@
 
 package utils
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 object JsonFormatUtils {
   def stringFormat[A](fromString: String => A)(makeString: A => String): Format[A] = new Format[A] {

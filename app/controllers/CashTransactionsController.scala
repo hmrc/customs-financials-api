@@ -16,10 +16,9 @@
 
 package controllers
 
-import domain.CashDailyStatement._
-import models.requests.CashAccountTransactionSearchRequestDetails
-import models.responses.EtmpErrorCode._
-import models.requests.CashAccountStatementRequestDetail
+import domain.CashDailyStatement.*
+import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails}
+import models.responses.EtmpErrorCode.*
 import models.responses.{Acc45ResponseCommon, ErrorDetail}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.json.{JsValue, Json, OFormat}

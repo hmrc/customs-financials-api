@@ -18,21 +18,22 @@ package connectors
 
 import config.AppConfig
 import play.api.libs.json.{JsObject, JsValue}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc27Connector @Inject()(httpClient: HttpClient,
+class Acc27Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
 
   def getAccounts(requestBody: JsValue): Future[JsObject] = {
-    httpClient.POST[JsValue, JsObject](
-      appConfig.hodsEndpoint,
-      requestBody,
-      headers = mdgHeaders.headers(appConfig.bearerToken, None)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    httpClient.post(url"${appConfig.hodsEndpoint}")(HeaderCarrier())
+      .withBody[JsValue](requestBody)
+      .setHeader(mdgHeaders.headers(appConfig.bearerToken, None): _*)
+      .execute[JsObject]
   }
 }

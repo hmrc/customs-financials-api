@@ -17,15 +17,17 @@
 package controllers
 
 import connectors.SecureMessageConnector
+import models.*
 import models.SearchResultStatus.inProcess
-import models._
 import models.requests.StatementSearchFailureNotificationRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
 import models.responses.{ErrorCode, ErrorMessage, StatementSearchFailureNotificationErrorResponse}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, route, running, status}

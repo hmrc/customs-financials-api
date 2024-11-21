@@ -16,13 +16,12 @@
 
 package domain.secureMessage
 
-import domain.secureMessage.SecureMessage._
+import domain.secureMessage.SecureMessage.*
 import models.Params
 import play.api.libs.json.{JsSuccess, Json}
 import utils.TestData.{REGIME, TEST_COMPANY, TEST_EMAIL}
+import utils.Utils.*
 import utils.{SpecBase, Utils}
-import utils.Utils._
-import utils.Utils.emptyString
 
 class BodySpec extends SpecBase {
 

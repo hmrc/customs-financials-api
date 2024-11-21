@@ -17,12 +17,14 @@
 package controllers
 
 import connectors.Sub09Connector
-import domain.sub09._
+import domain.sub09.*
 import models.EORI
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import utils.SpecBase
 import utils.TestData.COUNTRY_CODE_GB

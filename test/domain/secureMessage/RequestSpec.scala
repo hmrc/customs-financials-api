@@ -18,8 +18,8 @@ package domain.secureMessage
 
 import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
 import domain.secureMessage
-import domain.secureMessage.SecureMessage._
-import models._
+import domain.secureMessage.SecureMessage.*
+import models.*
 import utils.SpecBase
 import utils.TestData.{REGIME, TEST_EMAIL}
 import utils.Utils.{emptyString, encodeToUTF8Charsets, englishLangKey, welshLangKey}

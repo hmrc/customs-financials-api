@@ -17,24 +17,21 @@
 package connectors
 
 import config.MetaConfig.Platform.MDTP
-import models.requests.{
-  CashAccountStatementRequest, CashAccountStatementRequestCommon,
-  CashAccountStatementRequestContainer, CashAccountStatementRequestDetail
-}
-import models.responses.{
-  Acc45ResponseCommon, CashAccountStatementErrorResponse,
-  CashAccountStatementResponseContainer, ErrorDetail, SourceFaultDetail
-}
+import models.requests.{CashAccountStatementRequest, CashAccountStatementRequestCommon, CashAccountStatementRequestContainer, CashAccountStatementRequestDetail}
+import models.responses.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import utils.SpecBase
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class Acc45ConnectorSpec extends SpecBase {
 
@@ -44,9 +41,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "request is successfully processed" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(OK, casResponseStr01)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, casResponseStr01)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon01)
@@ -56,9 +54,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "request is not successful due to business error - 'Request could not be processed'" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr02)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr02)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon02)
@@ -69,9 +68,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "request is not successful due to business error - 'Exceeded maximum threshold of transactions'" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr03)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr03)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon03)
@@ -86,9 +86,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "requests could not be processed at EIS" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr01)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr01)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails01)
@@ -98,9 +99,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "requests has missing required properties" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr02)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr02)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails02)
@@ -110,9 +112,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "Backend system faces Internal Server Error" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, casErrorResponseStr03)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, casErrorResponseStr03)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails03)
@@ -123,9 +126,10 @@ class Acc45ConnectorSpec extends SpecBase {
 
       "Backend system sends ServiceUnavailable error" in new Setup {
 
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03)))
-
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03)))
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response =>
@@ -137,9 +141,10 @@ class Acc45ConnectorSpec extends SpecBase {
       }
 
       "Not Found Error is thrown from API call" in new Setup {
-
-        when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-          .thenReturn(Future.failed(new NotFoundException("error")))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
@@ -157,7 +162,8 @@ class Acc45ConnectorSpec extends SpecBase {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val defaultErrorDetail: ErrorDetail = ErrorDetail(
       "2024-01-21T11:30:47Z", "f058ebd6", "500",
@@ -303,7 +309,8 @@ class Acc45ConnectorSpec extends SpecBase {
       Json.parse(casErrorResponseStr03)).get.errorDetail
 
     val app: Application = GuiceApplicationBuilder()
-      .overrides(bind[HttpClient].toInstance(mockHttpClient))
+      .overrides(bind[HttpClientV2].toInstance(mockHttpClient),
+bind[RequestBuilder].toInstance(requestBuilder))
       .configure(
         "microservice.metrics.enabled" -> false,
         "metrics.enabled" -> false,

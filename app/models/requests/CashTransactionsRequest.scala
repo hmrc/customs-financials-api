@@ -17,7 +17,8 @@
 package models.requests
 
 import models.requests
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.BodyWritable
 
 case class CashTransactionsRequest(getCashAccountTransactionListingRequest: GetCashAccountTransactionListingRequest)
 
@@ -44,6 +45,11 @@ object CashTransactionsRequest {
     Json.writes[GetCashAccountTransactionListingRequest]
 
   implicit val cashTransactionsRequestWrites: OWrites[CashTransactionsRequest] = Json.writes[CashTransactionsRequest]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 object SearchType extends Enumeration {
@@ -110,4 +116,9 @@ case class CashAccountTransactionSearchRequestContainer(cashAccountTransactionSe
 object CashAccountTransactionSearchRequestContainer {
   implicit val format: OFormat[CashAccountTransactionSearchRequestContainer] =
     Json.format[CashAccountTransactionSearchRequestContainer]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

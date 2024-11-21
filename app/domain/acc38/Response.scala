@@ -18,7 +18,7 @@ package domain.acc38
 
 import config.MetaConfig.RETURN_PARAM_POSITION
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class Response(getCorrespondenceAddressResponse: GetCorrespondenceAddressResponse) {
   val mdtpError: Boolean = getCorrespondenceAddressResponse

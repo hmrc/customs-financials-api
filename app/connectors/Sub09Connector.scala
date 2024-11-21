@@ -19,25 +19,25 @@ package connectors
 import config.AppConfig
 import domain.sub09.SubscriptionResponse
 import models.EORI
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Sub09Connector @Inject()(httpClient: HttpClient,
+class Sub09Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
   def getSubscriptions(eori: EORI): Future[SubscriptionResponse] = {
 
-    val url = s"${appConfig.sub09GetSubscriptionsEndpoint}?" +
+    val sub09Url = s"${appConfig.sub09GetSubscriptionsEndpoint}?" +
       s"EORI=${eori.value}&" +
       s"acknowledgementReference=${mdgHeaders.acknowledgementReference}&" +
       s"regime=CDS"
 
-    httpClient.GET[SubscriptionResponse](
-      url,
-      headers = mdgHeaders.headers(appConfig.sub09BearerToken, appConfig.sub09HostHeader)
-    )(implicitly, HeaderCarrier(), implicitly)
+    httpClient.get(url"$sub09Url")(HeaderCarrier())
+      .setHeader(mdgHeaders.headers(appConfig.sub09BearerToken, appConfig.sub09HostHeader): _*)
+      .execute[SubscriptionResponse]
   }
 }

@@ -19,14 +19,11 @@ package domain
 import models.{EORI, FileRole}
 import play.api.libs.json.{JsValue, Json}
 import utils.SpecBase
-import utils.TestData.{
-  CURRENT_LOCAL_DATE, EORI_VALUE, EORI_VALUE_1, FILE_ROLE_C79_CERTIFICATE,
-  FILE_ROLE_SECURITY_STATEMENT, FILE_SIZE_2417804L, FILE_SIZE_75251L
-}
+import utils.TestData.*
 
 class NotificationSpec extends SpecBase {
 
-  import SDESInputFormats._
+  import SDESInputFormats.*
 
   val sdesMessage: JsValue = Json.parse(
     """

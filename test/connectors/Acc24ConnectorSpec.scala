@@ -18,11 +18,14 @@ package connectors
 
 import models.EORI
 import models.requests.HistoricDocumentRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import utils.SpecBase
 import utils.TestData.{FILE_ROLE_C79_CERTIFICATE, MONTH_10, YEAR_2019}
 import utils.Utils.emptyString
@@ -33,8 +36,10 @@ class Acc24ConnectorSpec extends SpecBase {
 
   "sendHistoricDocumentRequest" should {
     "return true when a successful request has been made" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
       running(app) {
         val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
@@ -43,8 +48,10 @@ class Acc24ConnectorSpec extends SpecBase {
     }
 
     "return false if any other 2xx status code is returned" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
       running(app) {
         val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
@@ -53,8 +60,10 @@ class Acc24ConnectorSpec extends SpecBase {
     }
 
     "return false if an exception from Acc24 is returned" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
         val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
@@ -65,7 +74,9 @@ class Acc24ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+
     val historicDocumentRequest: HistoricDocumentRequest =
       HistoricDocumentRequest(EORI("someEori"),
         FILE_ROLE_C79_CERTIFICATE,
@@ -75,7 +86,8 @@ class Acc24ConnectorSpec extends SpecBase {
         MONTH_10, Some("dan"))
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

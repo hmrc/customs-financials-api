@@ -17,12 +17,15 @@
 package connectors
 
 import models.EORI
-import models.responses._
+import models.responses.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 import utils.Utils.emptyString
 
@@ -32,8 +35,10 @@ class Sub21ConnectorSpec extends SpecBase {
 
   "getEoriHistory" should {
     "return a json on a successful response" in new Setup {
-      when[Future[HistoricEoriResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(response))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
       running(app) {
         val result = await(connector.getEORIHistory(EORI("someEori")))
@@ -44,7 +49,8 @@ class Sub21ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
     val responseCommon: EORIHistoryResponseCommon = EORIHistoryResponseCommon("OK", emptyString)
     val eoriHistory: EORIHistory = EORIHistory(EORI("1212"), Some("1211"), Some("12121"))
     val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory).toIndexedSeq)
@@ -53,7 +59,8 @@ class Sub21ConnectorSpec extends SpecBase {
       HistoricEoriResponse(GetEORIHistoryResponse(responseCommon, eoriHistoryResponseDetail))
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

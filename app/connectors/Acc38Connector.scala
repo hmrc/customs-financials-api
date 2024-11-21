@@ -21,14 +21,16 @@ import config.MetaConfig.Platform.DIGITAL
 import domain.acc38
 import domain.acc38.GetCorrespondenceAddressRequest
 import models.{AccountNumber, AccountType, EORI}
+import play.api.libs.ws.writeableOf_JsValue
 import services.DateTimeService
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc38Connector @Inject()(httpClient: HttpClient,
+class Acc38Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
@@ -52,10 +54,10 @@ class Acc38Connector @Inject()(httpClient: HttpClient,
       )
     )
 
-    httpClient.POST[acc38.Request, acc38.Response](
-      appConfig.acc38DutyDefermentContactDetailsEndpoint,
-      request,
-      headers = mdgHeaders.headers(appConfig.acc38BearerToken, appConfig.acc38HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    httpClient.post(
+      url"${appConfig.acc38DutyDefermentContactDetailsEndpoint}")(HeaderCarrier())
+      .withBody[acc38.Request](request)
+      .setHeader(mdgHeaders.headers(appConfig.acc38BearerToken, appConfig.acc38HostHeader): _*)
+      .execute[acc38.Response]
   }
 }

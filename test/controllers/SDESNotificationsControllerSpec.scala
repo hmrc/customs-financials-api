@@ -20,17 +20,19 @@ import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import domain.{Notification, NotificationsForEori}
 import models.EORI
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.{DateTimeService, NotificationCache}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
-import utils.TestData._
+import utils.TestData.*
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

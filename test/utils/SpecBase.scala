@@ -18,13 +18,13 @@ package utils
 
 import com.codahale.metrics.MetricRegistry
 import models.claims.responses.{SctyClaimDetails, Goods => GoodsResponse, Reimbursement => ReimbursementResponse}
-import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
-import play.api.inject.bind
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 trait SpecBase

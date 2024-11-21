@@ -16,11 +16,10 @@
 
 package models.responses
 
-import models.responses.PaymentType._
+import models.responses.PaymentType.*
 import play.api.libs.json.{JsString, JsSuccess, Json}
 import utils.SpecBase
-import utils.TestData.{AMOUNT, BANK_ACCOUNT, C18_OR_OVER_PAYMENT_REFERENCE, CAN, DATE_STRING, DECLARANT_EORI_NUMBER,
-  DECLARANT_REF, DECLARATION_ID, EORI_DATA_NAME, EORI_NUMBER, IMPORTERS_EORI_NUMBER, PAYMENT_REFERENCE, SORT_CODE}
+import utils.TestData.*
 
 class CashTransactionsResponseSpec extends SpecBase {
 

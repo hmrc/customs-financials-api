@@ -20,14 +20,16 @@ import config.AppConfig
 import config.MetaConfig.Platform.DIGITAL
 import domain.acc37.{AccountDetails, AmendCorrespondenceAddressRequest}
 import models.{AccountNumber, AccountType, EORI}
+import play.api.libs.ws.writeableOf_JsValue
 import services.DateTimeService
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc37Connector @Inject()(httpClient: HttpClient,
+class Acc37Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                headers: MdgHeaders)(implicit executionContext: ExecutionContext) {
@@ -42,10 +44,9 @@ class Acc37Connector @Inject()(httpClient: HttpClient,
         domain.acc37.RequestDetail(eori, AccountDetails(AccountType("DutyDeferment"), dan), contactInformation, None)
       ))
 
-    httpClient.POST[domain.acc37.Request, domain.acc37.Response](
-      appConfig.acc37UpdateAccountContactDetailsEndpoint,
-      request,
-      headers = headers.headers(appConfig.acc37BearerToken, appConfig.acc37HostHeader)
-    )(implicitly, implicitly, HeaderCarrier(), implicitly)
+    httpClient.post(url"${appConfig.acc37UpdateAccountContactDetailsEndpoint}")(HeaderCarrier())
+      .withBody[domain.acc37.Request](request)
+      .setHeader(headers.headers(appConfig.acc37BearerToken, appConfig.acc37HostHeader): _*)
+      .execute[domain.acc37.Response]
   }
 }

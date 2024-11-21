@@ -17,11 +17,14 @@
 package connectors
 
 import models.{AddressInformation, CompanyInformation, EORI, EmailAddress}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import utils.SpecBase
 import utils.TestData.COUNTRY_CODE_GB
 
@@ -33,8 +36,10 @@ class DataStoreConnectorSpec extends SpecBase {
   "getVerifiedEmail" should {
 
     "return the email from the data-store response" in new Setup {
-      when[Future[EmailResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(emailResponse))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(emailResponse))
 
       running(app) {
         val result = await(connector.getVerifiedEmail(EORI("someEori")))
@@ -43,8 +48,10 @@ class DataStoreConnectorSpec extends SpecBase {
     }
 
     "return None when an unknown exception happens from the data-store" in new Setup {
-      when[Future[EmailResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
         val result = await(connector.getVerifiedEmail(EORI("someEori")))
@@ -56,8 +63,10 @@ class DataStoreConnectorSpec extends SpecBase {
   "getEoriHistory" should {
 
     "return EORIHistory on a successful response from the data-store" in new Setup {
-      when[Future[EoriHistoryResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(eoriHistoryResponse))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(eoriHistoryResponse))
 
       running(app) {
         val result = await(connector.getEoriHistory(EORI("someEori")))
@@ -66,8 +75,10 @@ class DataStoreConnectorSpec extends SpecBase {
     }
 
     "return an empty sequence if an exception was thrown from the data-store" in new Setup {
-      when[Future[EoriHistoryResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
         val result = await(connector.getEoriHistory(EORI("someEori")))
@@ -79,8 +90,11 @@ class DataStoreConnectorSpec extends SpecBase {
   "getCompanyName" should {
 
     "return companyName on a successful response from the data-store" in new Setup {
-      when[Future[CompanyInformation]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(companyNameResponse))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(companyNameResponse))
+
       running(app) {
         connector.getCompanyName(EORI("someEori")).map {
           cname => cname mustBe Some("test_company")
@@ -89,8 +103,11 @@ class DataStoreConnectorSpec extends SpecBase {
     }
 
     "return None when consent returned is other than 1" in new Setup {
-      when[Future[CompanyInformation]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(companyNameResponse.copy(consent = "2")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(companyNameResponse.copy(consent = "2")))
+
       running(app) {
         connector.getCompanyName(EORI("someEori")).map {
           cname => cname mustBe None
@@ -99,8 +116,11 @@ class DataStoreConnectorSpec extends SpecBase {
     }
 
     "return None when an unknown exception happens from the data-store" in new Setup {
-      when[Future[CompanyInformation]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+
       running(app) {
         connector.getCompanyName(EORI("someEori")).map {
           cname => cname mustBe None
@@ -111,7 +131,8 @@ class DataStoreConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val emailResponse: EmailResponse = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI("someEori"), None, None)))
@@ -120,7 +141,8 @@ class DataStoreConnectorSpec extends SpecBase {
       CompanyInformation("test_company", "1", AddressInformation("1", "Kailash", None, COUNTRY_CODE_GB))
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

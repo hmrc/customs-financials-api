@@ -19,11 +19,13 @@ package controllers
 import connectors.Acc40Connector
 import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound, RequestDetail}
 import models.EORI
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import utils.SpecBase
 

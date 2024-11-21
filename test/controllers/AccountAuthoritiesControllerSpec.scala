@@ -17,17 +17,19 @@
 package controllers
 
 import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
-import domain._
-import models.requests.manageAuthorities._
+import domain.*
+import models.requests.manageAuthorities.*
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Result}
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
-import services._
-import uk.gov.hmrc.auth.core._
+import services.*
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import utils.SpecBase
 

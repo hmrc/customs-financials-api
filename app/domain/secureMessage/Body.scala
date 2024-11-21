@@ -18,7 +18,7 @@ package domain.secureMessage
 
 import models.Params
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils._
+import utils.Utils.*
 
 case class Body(eori: String)
 

@@ -18,11 +18,13 @@ package controllers
 
 import domain.GuaranteeTransaction
 import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.GuaranteeTransactionsService
 import utils.SpecBase
@@ -70,7 +72,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),List()))))"
+          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
@@ -100,7 +102,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
   "return a list of open guarantee transactions details" in new Setup {
 
-    import domain._
+    import domain.*
 
     val amountTaxType: Amounts = Amounts(openAmount = Some("600.00"),
       totalAmount = "800.00",
@@ -177,7 +179,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),List()))))"
+          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
