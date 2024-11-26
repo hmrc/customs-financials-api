@@ -19,7 +19,12 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.requests.*
-import models.responses.{CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail, GetCashAccountTransactionListingResponse}
+import models.responses.{
+  CashTransactionsResponse,
+  CashTransactionsResponseCommon,
+  CashTransactionsResponseDetail,
+  GetCashAccountTransactionListingResponse
+}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}

@@ -20,7 +20,11 @@ import config.AppConfig
 import domain.*
 import domain.acc40.ResponseDetail
 import models.requests.manageAuthorities.*
-import models.requests.{CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest}
+import models.requests.{
+  CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails,
+  HistoricDocumentRequest
+}
 import models.*
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsValue, Json}

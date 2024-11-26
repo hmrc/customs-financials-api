@@ -19,7 +19,12 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.REGIME_CDS
 import models.requests.*
-import models.responses.{GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon}
+import models.responses.{
+  GetGGATransactionResponse,
+  GuaranteeTransactionDeclaration,
+  GuaranteeTransactionsResponse,
+  ResponseCommon
+}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}

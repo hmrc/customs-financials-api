@@ -19,7 +19,12 @@ package services
 import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.{Declaration, TaxGroup, *}
 import models.*
-import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, SearchType}
+import models.requests.{
+  CashAccountPaymentDetails,
+  CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails,
+  SearchType
+}
 import models.responses.*
 import models.responses.PaymentType.Payment
 import org.mockito.ArgumentMatchers.any

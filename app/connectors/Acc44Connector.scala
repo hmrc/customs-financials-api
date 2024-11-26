@@ -18,7 +18,8 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountTransactionSearchRequest,
+import models.requests.{
+  CashAccountTransactionSearchRequest,
   CashAccountTransactionSearchRequestContainer,
   CashAccountTransactionSearchRequestDetails,
   CashTransactionsRequestCommon
@@ -26,7 +27,12 @@ import models.requests.{CashAccountTransactionSearchRequest,
 import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
 import models.responses.SourceFaultDetailMsg.*
-import models.responses.{CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail}
+import models.responses.{
+  CashAccountTransactionSearchResponseContainer,
+  ErrorDetail,
+  ErrorDetailContainer,
+  SourceFaultDetail
+}
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.*
 import play.api.libs.ws.writeableOf_JsValue

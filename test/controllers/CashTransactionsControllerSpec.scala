@@ -19,7 +19,11 @@ package controllers
 import domain.*
 import domain.CashDailyStatement.*
 import models.requests.SearchType.P
-import models.requests.{CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails}
+import models.requests.{
+  CashAccountPaymentDetails,
+  CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails
+}
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.EtmpErrorCode.code001
 import models.responses.PaymentType.Payment

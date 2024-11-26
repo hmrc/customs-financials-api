@@ -42,7 +42,9 @@ class Acc41ConnectorSpec extends SpecBase {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
       when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None))))
+      when(requestBuilder.execute(any, any)).thenReturn(
+        Future.successful(StandingAuthoritiesForEORIResponse(response(Some("Request failed"), None)))
+      )
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
@@ -66,7 +68,9 @@ class Acc41ConnectorSpec extends SpecBase {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
       when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
+      when(requestBuilder.execute(any, any)).thenReturn(
+        Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z"))))
+      )
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI(emptyString))))
@@ -79,7 +83,9 @@ class Acc41ConnectorSpec extends SpecBase {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
       when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z")))))
+      when(requestBuilder.execute(any, any)).thenReturn(
+        Future.successful(StandingAuthoritiesForEORIResponse(response(None, Some("020-06-09T21:59:56Z"))))
+      )
 
       running(app) {
         val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))

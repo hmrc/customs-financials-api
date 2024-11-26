@@ -38,7 +38,10 @@ class EmailThrottlerConnector @Inject()(http: HttpClientV2,
   def sendEmail(request: EmailRequest)(implicit hc: HeaderCarrier): Future[Boolean] = {
     metricsReporter.withResponseTimeLogging(s"email.post.${request.templateId}") {
 
-      http.post(url"${appConfig.sendEmailEndpoint}").withBody[EmailRequest](request).execute[HttpResponse].collect {
+      http.post(url"${appConfig.sendEmailEndpoint}")
+        .withBody[EmailRequest](request)
+        .execute[HttpResponse]
+        .collect {
         case response if response.status == Status.ACCEPTED =>
           log.info(s"successfuly sent email notification for ${request.templateId}")
           true

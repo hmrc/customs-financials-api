@@ -16,7 +16,12 @@
 
 package connectors
 
-import models.responses.{CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail, GetCashAccountTransactionListingResponse}
+import models.responses.{
+  CashTransactionsResponse,
+  CashTransactionsResponseCommon,
+  CashTransactionsResponseDetail,
+  GetCashAccountTransactionListingResponse
+}
 import models.{ExceededThresholdErrorException, NoAssociatedDataException}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

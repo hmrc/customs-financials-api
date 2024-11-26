@@ -17,7 +17,12 @@
 package connectors
 
 import config.MetaConfig.Platform.MDTP
-import models.requests.{CashAccountStatementRequest, CashAccountStatementRequestCommon, CashAccountStatementRequestContainer, CashAccountStatementRequestDetail}
+import models.requests.{
+  CashAccountStatementRequest,
+  CashAccountStatementRequestCommon,
+  CashAccountStatementRequestContainer,
+  CashAccountStatementRequestDetail
+}
 import models.responses.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -45,6 +50,7 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, casResponseStr01)))
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon01)
@@ -58,6 +64,7 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr02)))
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon02)
@@ -72,6 +79,7 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr03)))
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Right(responseCommon03)
@@ -89,7 +97,10 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr01)))
+        when(requestBuilder.execute(any, any)).thenReturn(
+          Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr01))
+        )
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails01)
@@ -102,7 +113,10 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr02)))
+        when(requestBuilder.execute(any, any)).thenReturn(
+          Future.successful(HttpResponse(BAD_REQUEST, casErrorResponseStr02))
+        )
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails02)
@@ -115,7 +129,10 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, casErrorResponseStr03)))
+        when(requestBuilder.execute(any, any)).thenReturn(
+          Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, casErrorResponseStr03))
+        )
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response => response mustBe Left(errorResponseDetails03)
@@ -129,7 +146,10 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
         when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
         when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03)))
+        when(requestBuilder.execute(any, any)).thenReturn(
+          Future.successful(HttpResponse(SERVICE_UNAVAILABLE, casErrorResponseStr03))
+        )
+
         running(app) {
           connector.submitStatementRequest(reqDetail01).map {
             response =>
@@ -308,10 +328,10 @@ class Acc45ConnectorSpec extends SpecBase {
     val errorResponseDetails03: ErrorDetail = Json.fromJson[CashAccountStatementErrorResponse](
       Json.parse(casErrorResponseStr03)).get.errorDetail
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(bind[HttpClientV2].toInstance(mockHttpClient),
-bind[RequestBuilder].toInstance(requestBuilder))
-      .configure(
+    val app: Application = GuiceApplicationBuilder().overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      ).configure(
         "microservice.metrics.enabled" -> false,
         "metrics.enabled" -> false,
         "auditing.enabled" -> false)
