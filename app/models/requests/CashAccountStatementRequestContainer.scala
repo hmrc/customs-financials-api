@@ -16,13 +16,19 @@
 
 package models.requests
 
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.BodyWritable
 
 case class CashAccountStatementRequestContainer(cashAccountStatementRequest: CashAccountStatementRequest)
 
 object CashAccountStatementRequestContainer {
   implicit val cashAccountStatementRequestContainerFormat: OFormat[CashAccountStatementRequestContainer] =
     Json.format[CashAccountStatementRequestContainer]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 case class CashAccountStatementRequest(requestCommon: CashAccountStatementRequestCommon,

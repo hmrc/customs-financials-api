@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess, Json}
+import play.api.libs.json.*
 import utils.SpecBase
 import utils.Utils.emptyString
 

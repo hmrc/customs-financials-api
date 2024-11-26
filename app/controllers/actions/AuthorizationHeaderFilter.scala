@@ -17,8 +17,8 @@
 package controllers.actions
 
 import config.AppConfig
+import play.api.mvc.*
 import play.api.mvc.Results.Unauthorized
-import play.api.mvc._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

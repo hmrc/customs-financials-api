@@ -17,8 +17,8 @@
 package controllers.actions
 
 import _root_.config.AppConfig
+import play.api.mvc.*
 import play.api.mvc.Results.{BadRequest, Unauthorized}
-import play.api.mvc._
 import utils.Utils.{comma, emptyString, iso8601DateFormatter}
 
 import javax.inject.Inject

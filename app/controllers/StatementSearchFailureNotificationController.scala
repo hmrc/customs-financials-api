@@ -22,11 +22,11 @@ import models.FailureReason.NO_DOCUMENTS_FOUND
 import models.FailureRetryCount.FINAL_RETRY
 import models.requests.HistoricDocumentRequest
 import models.requests.StatementSearchFailureNotificationRequest.ssfnRequestFormat
+import models.responses.*
 import models.responses.ErrorMessage.technicalErrorDetail
-import models.responses._
 import models.{HistoricDocumentRequestSearch, SearchResultStatus}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import play.api.mvc._
+import play.api.mvc.*
 import services.HistoricDocumentService
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.http.HeaderCarrier

@@ -17,8 +17,8 @@
 package utils
 
 import models.responses.StatementSearchFailureNotificationErrorResponse
-import utils.TestData.{DAY_11, DAY_14, HOUR_11, HOUR_16, MINUTES_10, MINUTES_30, MONTH_9, NUMBER_10, NUMBER_5, NUMBER_9, SECONDS_30, SECONDS_35, YEAR_2023}
-import utils.Utils._
+import utils.TestData.*
+import utils.Utils.*
 
 import java.time.LocalDateTime
 

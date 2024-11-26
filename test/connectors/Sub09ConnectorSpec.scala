@@ -16,13 +16,16 @@
 
 package connectors
 
-import domain.sub09._
+import domain.sub09.*
 import models.EORI
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 import utils.TestData.COUNTRY_CODE_GB
 
@@ -32,8 +35,10 @@ class Sub09ConnectorSpec extends SpecBase {
 
   "getSubscriptions" should {
     "return a json on a successful response" in new Setup {
-      when[Future[SubscriptionResponse]](mockHttpClient.GET(any, any, any)(any, any, any))
-        .thenReturn(Future.successful(response))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
       running(app) {
         val result = await(connector.getSubscriptions(EORI("someEori")))
@@ -44,7 +49,8 @@ class Sub09ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
     val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
       CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
@@ -64,7 +70,8 @@ class Sub09ConnectorSpec extends SpecBase {
       SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

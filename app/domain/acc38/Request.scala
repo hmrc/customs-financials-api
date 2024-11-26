@@ -17,12 +17,18 @@
 package domain.acc38
 
 import models.EORI
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat, Writes}
+import play.api.libs.ws.BodyWritable
 
 case class Request(getCorrespondenceAddressRequest: GetCorrespondenceAddressRequest)
 
 object Request {
   implicit val format: OFormat[Request] = Json.format[Request]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 case class GetCorrespondenceAddressRequest(requestCommon: RequestCommon,

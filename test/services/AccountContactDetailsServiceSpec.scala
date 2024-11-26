@@ -20,8 +20,9 @@ import connectors.{Acc37Connector, Acc38Connector}
 import domain.acc37.{AmendCorrespondenceAddressResponse, ContactDetails, Response, ResponseCommon}
 import domain.acc38.GetCorrespondenceAddressResponse
 import models.{AccountNumber, EORI, EmailAddress}
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase

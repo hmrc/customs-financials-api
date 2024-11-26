@@ -19,11 +19,14 @@ package connectors
 import models.requests.GuaranteeAccountTransactionsRequest
 import models.responses.{GetGGATransactionResponse, GuaranteeTransactionsResponse, ResponseCommon, ResponseDetail}
 import models.{AccountNumber, ExceededThresholdErrorException, NoAssociatedDataException}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 
 import java.time.LocalDate
@@ -33,8 +36,10 @@ class Acc28ConnectorSpec extends SpecBase {
 
   "retrieveGuaranteeTransactions" should {
     "return a list of declarations on a successful response" in new Setup {
-      when[Future[GuaranteeTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
       running(app) {
         val result = await(connector.retrieveGuaranteeTransactions(request))
@@ -43,8 +48,10 @@ class Acc28ConnectorSpec extends SpecBase {
     }
 
     "return NoAssociatedData error response when responded with no associated data" in new Setup {
-      when[Future[GuaranteeTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(noDataResponse))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse))
 
       running(app) {
         val result = await(connector.retrieveGuaranteeTransactions(request))
@@ -53,8 +60,10 @@ class Acc28ConnectorSpec extends SpecBase {
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
-      when[Future[GuaranteeTransactionsResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(tooMuchDataRequestedResponse))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse))
 
       running(app) {
         val result = await(connector.retrieveGuaranteeTransactions(request))
@@ -65,7 +74,8 @@ class Acc28ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val request: GuaranteeAccountTransactionsRequest = GuaranteeAccountTransactionsRequest(
       AccountNumber("GAN"),
@@ -97,7 +107,8 @@ class Acc28ConnectorSpec extends SpecBase {
     )
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

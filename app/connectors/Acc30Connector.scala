@@ -19,16 +19,18 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import models.EORI
-import models.requests.manageAuthorities._
+import models.requests.manageAuthorities.*
 import play.api.http.Status
+import play.api.libs.ws.writeableOf_JsValue
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc30Connector @Inject()(httpClient: HttpClient,
+class Acc30Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                metricsReporterService: MetricsReporterService,
@@ -57,11 +59,11 @@ class Acc30Connector @Inject()(httpClient: HttpClient,
       ManageStandingAuthoritiesRequest(requestCommon, detail))
 
     metricsReporterService.withResponseTimeLogging("hods.post.manage-standing-authority.grant") {
-      httpClient.POST[ManageStandingAuthoritiesRequestContainer, HttpResponse](
-        appConfig.acc30ManageAccountAuthoritiesEndpoint,
-        manageStandingAuthoritiesRequestContainer,
-        headers = mdgHeaders.headers(appConfig.acc30BearerToken, appConfig.acc30HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map {
+      httpClient.post(url"${appConfig.acc30ManageAccountAuthoritiesEndpoint}")(HeaderCarrier())
+        .withBody[ManageStandingAuthoritiesRequestContainer](manageStandingAuthoritiesRequestContainer)
+        .setHeader(mdgHeaders.headers(appConfig.acc30BearerToken, appConfig.acc30HostHeader): _*)
+        .execute[HttpResponse]
+        .map {
         _.status match {
           case Status.NO_CONTENT => true
           case _ => false

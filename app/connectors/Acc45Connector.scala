@@ -18,22 +18,24 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
+import models.requests.*
+import models.responses.*
+import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
+import play.api.http.Status.*
+import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-import play.api.libs.json.{JsValue, Json}
-import models.requests._
-import models.responses._
-import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import utils.JSONSchemaValidator
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class Acc45Connector @Inject()(httpClient: HttpClient,
+class Acc45Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                jsonSchemaValidator: JSONSchemaValidator,
@@ -71,11 +73,12 @@ class Acc45Connector @Inject()(httpClient: HttpClient,
   Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
 
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-statement-request") {
-      httpClient.POST[CashAccountStatementRequestContainer, HttpResponse](
-        appConfig.acc45CashAccountStatementRequestEndpoint,
-        cashAccSttRequestContainer,
-        mdgHeaders.headers(appConfig.acc45BearerToken, None)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map { response =>
+      httpClient.post(
+        url"${appConfig.acc45CashAccountStatementRequestEndpoint}")(HeaderCarrier())
+        .withBody[CashAccountStatementRequestContainer](cashAccSttRequestContainer)
+        .setHeader(mdgHeaders.headers(appConfig.acc45BearerToken, None): _*)
+        .execute[HttpResponse]
+        .map { response =>
 
         log.info(s"submitCashAccountStatementResponse :  $response")
         response.status match {

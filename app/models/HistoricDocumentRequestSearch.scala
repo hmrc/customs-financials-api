@@ -18,7 +18,7 @@ package models
 
 import config.MetaConfig.Platform.EXPIRE_TIME_STAMP_SECONDS
 import models.requests.HistoricDocumentRequest
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Utils.{emptyString, zeroPad}
 

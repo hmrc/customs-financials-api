@@ -19,7 +19,7 @@ package utils
 import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.core.report.ListProcessingReport
 import com.github.fge.jsonschema.main.JsonSchemaFactory
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.http.BadRequestException
 import utils.Utils.threeColons
 

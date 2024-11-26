@@ -17,25 +17,29 @@
 package services
 
 import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
-import domain.{Declaration, TaxGroup, _}
-import models._
+import domain.{Declaration, TaxGroup, *}
+import models.*
 import models.requests.{
-  CashAccountPaymentDetails, CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails, SearchType
+  CashAccountPaymentDetails,
+  CashAccountStatementRequestDetail,
+  CashAccountTransactionSearchRequestDetails,
+  SearchType
 }
+import models.responses.*
 import models.responses.PaymentType.Payment
-import models.responses._
-import play.api._
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import play.api.*
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
-import utils.TestData.{AMOUNT, BANK_ACCOUNT, CAN, DATE_STRING, EORI_DATA_NAME, PAYMENT_REFERENCE, SORT_CODE}
+import utils.TestData.*
 
 import java.time.LocalDate
-import scala.concurrent._
+import scala.concurrent.*
 
 class CashTransactionsServiceSpec extends SpecBase {
 

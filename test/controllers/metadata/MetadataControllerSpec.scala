@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
+// scalastyle:off file.size.limit
 package controllers.metadata
 
 import connectors.{DataStoreConnector, EmailThrottlerConnector}
 import controllers.CustomAuthConnector
+import models.*
 import models.SearchResultStatus.{inProcess, yes}
-import models._
 import models.requests.EmailRequest
-import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.ArgumentMatchers.{any, eq => is}
+import org.mockito.Mockito.{verify, when}
 import org.mockito.{ArgumentMatchers, Mockito}
 import play.api.http.Status.BAD_REQUEST
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.NotificationCache
 import services.cache.{HistoricDocumentRequestSearchCache, HistoricDocumentRequestSearchCacheService}
@@ -657,7 +659,7 @@ class MetadataControllerSpec extends SpecBase {
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
-        Future.successful(Option(histDocRequestSearch))).andThenAnswer(
+        Future.successful(Option(histDocRequestSearch))).thenReturn(
         Future.successful(Option(histDocRequestSearch.copy(resultsFound = yes))))
 
       when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any))

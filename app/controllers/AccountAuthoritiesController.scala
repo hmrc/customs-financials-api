@@ -41,7 +41,7 @@ class AccountAuthoritiesController @Inject()(service: AccountAuthorityService,
 
     service.getAccountAuthorities(eori)
       .map {
-        accountWithAuthorities: Seq[AccountWithAuthorities] => Ok(Json.toJson(accountWithAuthorities))
+        (accountWithAuthorities: Seq[AccountWithAuthorities]) => Ok(Json.toJson(accountWithAuthorities))
       }.recover {
       case UpstreamErrorResponse(msg, INTERNAL_SERVER_ERROR, _, _) if msg.contains("JSON validation") =>
         log.error(s"getAccountAuthorities failed: $msg")

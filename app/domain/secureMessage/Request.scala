@@ -17,9 +17,10 @@
 package domain.secureMessage
 
 import config.MetaConfig.Platform.{ENROLMENT_KEY, SOURCE_MDTP}
-import domain.secureMessage.SecureMessage._
+import domain.secureMessage.SecureMessage.*
 import models.{EmailAddress, HistoricDocumentRequestSearch, Params}
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat, Writes}
+import play.api.libs.ws.BodyWritable
 import play.api.{Logger, LoggerLike}
 import utils.Utils.{encodeToUTF8Charsets, englishLangKey, welshLangKey}
 
@@ -99,4 +100,9 @@ object Request {
   }
 
   implicit val requestFormat: OFormat[Request] = Json.format[Request]
+
+  implicit def jsonBodyWritable[T](implicit
+                                   writes: Writes[T],
+                                   jsValueBodyWritable: BodyWritable[JsValue]
+                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

@@ -17,7 +17,8 @@
 package models.requests
 
 import models.AccountNumber
-import play.api.libs.json._
+import play.api.libs.json.*
+import play.api.libs.ws.BodyWritable
 
 import java.time.LocalDate
 
@@ -52,4 +53,9 @@ object GuaranteeTransactionsRequest {
 
   implicit val guaranteeTransactionsRequestWrites: OWrites[GuaranteeTransactionsRequest] =
     Json.writes[GuaranteeTransactionsRequest]
+
+  implicit def jsonBodyWritable[T](implicit
+                                     writes: Writes[T],
+                                     jsValueBodyWritable: BodyWritable[JsValue]
+                                    ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

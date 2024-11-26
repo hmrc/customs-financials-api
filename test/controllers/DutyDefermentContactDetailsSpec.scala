@@ -17,19 +17,21 @@
 package controllers
 
 import config.MetaConfig.RETURN_PARAM_POSITION
-import domain.acc37._
+import domain.acc37.*
 import domain.acc38
 import domain.acc38.{GetCorrespondenceAddressResponse, ReturnParameter => ACC38ReturnParameter}
 import models.requests.{GetContactDetailsRequest, UpdateContactDetailsRequest}
 import models.responses.UpdateContactDetailsResponse
 import models.{AccountNumber, AccountType, EORI, EmailAddress}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.http.UpstreamErrorResponse

@@ -17,7 +17,7 @@
 package models.requests.manageAuthorities
 
 import models.AccountType
-import play.api.libs.json._
+import play.api.libs.json.*
 
 sealed trait RevokeAccountType
 

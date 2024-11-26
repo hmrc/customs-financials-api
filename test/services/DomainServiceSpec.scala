@@ -16,10 +16,11 @@
 
 package services
 
-import models.EORI
-import models.responses._
 import domain.CashTransactions
+import models.EORI
+import models.responses.*
 import utils.SpecBase
+
 import java.time.LocalDate
 
 class DomainServiceSpec extends SpecBase {

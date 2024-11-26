@@ -22,14 +22,16 @@ import domain.AccountWithAuthorities
 import models.EORI
 import models.requests.manageAuthorities.{AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest}
 import models.responses.StandingAuthoritiesResponse
+import play.api.libs.ws.writeableOf_JsValue
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc29Connector @Inject()(httpClient: HttpClient,
+class Acc29Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                metricsReporterService: MetricsReporterService,
@@ -46,11 +48,11 @@ class Acc29Connector @Inject()(httpClient: HttpClient,
       StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-standing-authority-details") {
-      httpClient.POST[StandingAuthoritiesRequest, StandingAuthoritiesResponse](
-        appConfig.acc29GetStandingAuthoritiesEndpoint,
-        standingAuthoritiesRequest,
-        headers = mdgHeaders.headers(appConfig.acc29BearerToken, appConfig.acc29HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map(_.accounts)
+      httpClient.post(url"${appConfig.acc29GetStandingAuthoritiesEndpoint}")(HeaderCarrier())
+        .withBody[StandingAuthoritiesRequest](standingAuthoritiesRequest)
+        .setHeader(mdgHeaders.headers(appConfig.acc29BearerToken, appConfig.acc29HostHeader): _*)
+        .execute[StandingAuthoritiesResponse]
+        .map(_.accounts)
     }
   }
 }

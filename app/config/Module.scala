@@ -17,9 +17,10 @@
 package config
 
 import com.google.inject.AbstractModule
-import controllers.actions.{
-  AuthorizationHeaderFilter, DefaultAuthorizationHeaderFilter,
-  MdgHeaderDefaultFilter, MdgHeaderFilter
+import controllers.actions.{AuthorizationHeaderFilter,
+  DefaultAuthorizationHeaderFilter,
+  MdgHeaderDefaultFilter,
+  MdgHeaderFilter
 }
 import services.{DefaultNotificationCache, NotificationCache}
 

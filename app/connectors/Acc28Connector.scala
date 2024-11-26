@@ -18,21 +18,25 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.REGIME_CDS
-import models.requests._
+import models.requests.*
 import models.responses.{
-  GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse,
+  GetGGATransactionResponse,
+  GuaranteeTransactionDeclaration,
+  GuaranteeTransactionsResponse,
   ResponseCommon
 }
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc28Connector @Inject()(httpClient: HttpClient,
+class Acc28Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                metricsReporterService: MetricsReporterService,
@@ -52,11 +56,11 @@ class Acc28Connector @Inject()(httpClient: HttpClient,
       GGATransactionListing(requestCommon, request.toRequestDetail()(appConfig)))
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-ggatransaction-listing") {
-      httpClient.POST[GuaranteeTransactionsRequest, GuaranteeTransactionsResponse](
-        appConfig.acc28GetGGATransactionEndpoint,
-        guaranteeTransactionsRequest,
-        headers = mdgHeaders.headers(appConfig.acc28BearerToken, appConfig.acc28HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly).map {
+      httpClient.post(url"${appConfig.acc28GetGGATransactionEndpoint}")(HeaderCarrier())
+        .withBody[GuaranteeTransactionsRequest](guaranteeTransactionsRequest)
+        .setHeader(mdgHeaders.headers(appConfig.acc28BearerToken, appConfig.acc28HostHeader): _*)
+        .execute[GuaranteeTransactionsResponse]
+        .map {
         gtr => transactions(gtr.getGGATransactionResponse)
       }
     }

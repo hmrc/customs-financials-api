@@ -21,16 +21,16 @@ import config.AppConfig
 import domain.NotificationsForEori
 import models.{EORI, FileRole}
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.*
+import org.mongodb.scala.model.Filters.*
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture, ToSingleObservablePublisher}
 import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
-
 import javax.inject.{Inject, Singleton}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -50,7 +50,7 @@ class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
       IndexModel(
         ascending("lastUpdated"),
         IndexOptions().name("lastUpdatedIndex")
-          .expireAfter(appConfig.dbTimeToLiveInSeconds, TimeUnit.SECONDS)
+          .expireAfter(appConfig.dbTimeToLiveInSeconds.toLong, TimeUnit.SECONDS)
       ))
   ) with NotificationCache {
 
@@ -103,7 +103,7 @@ class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
   }
 
   override def putNotifications(notificationsForEori: NotificationsForEori): Future[Unit] = {
-    import NotificationsForEori._
+    import NotificationsForEori.*
 
     val lastUpdated: Bson = Updates.set("lastUpdated", Codecs.toBson(notificationsForEori.lastUpdated))
     val records = notificationsForEori.notifications.map(Codecs.toBson(_))

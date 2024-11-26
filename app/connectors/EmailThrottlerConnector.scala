@@ -19,15 +19,17 @@ package connectors
 import config.AppConfig
 import models.requests.EmailRequest
 import play.api.http.Status
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EmailThrottlerConnector @Inject()(http: HttpClient,
+class EmailThrottlerConnector @Inject()(http: HttpClientV2,
                                         metricsReporter: MetricsReporterService)
                                        (implicit appConfig: AppConfig, ec: ExecutionContext) {
 
@@ -36,7 +38,10 @@ class EmailThrottlerConnector @Inject()(http: HttpClient,
   def sendEmail(request: EmailRequest)(implicit hc: HeaderCarrier): Future[Boolean] = {
     metricsReporter.withResponseTimeLogging(s"email.post.${request.templateId}") {
 
-      http.POST[EmailRequest, HttpResponse](appConfig.sendEmailEndpoint, request).collect {
+      http.post(url"${appConfig.sendEmailEndpoint}")
+        .withBody[EmailRequest](request)
+        .execute[HttpResponse]
+        .collect {
         case response if response.status == Status.ACCEPTED =>
           log.info(s"successfuly sent email notification for ${request.templateId}")
           true

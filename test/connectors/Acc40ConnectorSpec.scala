@@ -17,14 +17,17 @@
 package connectors
 
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
-import domain.acc40._
+import domain.acc40.*
 import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
 import models.EORI
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 import utils.TestData.{EORI_VALUE_1, ERROR_MSG}
 
@@ -35,8 +38,10 @@ class Acc40ConnectorSpec extends SpecBase {
   "searchAuthorities" should {
 
     "return Left no authorities when no authorities returned in the response" in new Setup {
-      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
@@ -45,8 +50,10 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "return Left with error response if the error message present in the response" in new Setup {
-      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
@@ -55,8 +62,10 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "return error response when exception occurs while making the POST call" in new Setup {
-      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
@@ -65,14 +74,15 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     "return Right if a valid response with authorities returned" in new Setup {
-      when[Future[SearchAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(
-          Future.successful(
-            response(None,
-              Some("1"),
-              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
-              None,
-              None)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
+        response(None,
+          Some("1"),
+          Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
+          None,
+          None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
@@ -113,7 +123,8 @@ class Acc40ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     def response(error: Option[String],
                  numberOfAuthorities: Option[String],
@@ -137,7 +148,8 @@ class Acc40ConnectorSpec extends SpecBase {
     }
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

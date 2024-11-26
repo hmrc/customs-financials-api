@@ -17,6 +17,8 @@
 package services.cache
 
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{times, verify, when}
 import play.api.{Application, inject}
 import utils.Utils.emptyString
 import utils.{SpecBase, Utils}

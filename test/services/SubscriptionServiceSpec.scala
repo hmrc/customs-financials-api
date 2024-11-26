@@ -17,8 +17,10 @@
 package services
 
 import connectors.Sub09Connector
-import domain.sub09.{EmailVerifiedResponse, _}
+import domain.sub09.*
 import models.{EORI, EmailAddress}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import play.api.{Application, inject}

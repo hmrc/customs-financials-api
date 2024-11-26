@@ -20,10 +20,11 @@ import domain.acc38.GetCorrespondenceAddressResponse
 import models.requests.{GetContactDetailsRequest, UpdateContactDetailsRequest}
 import models.responses.UpdateContactDetailsResponse
 import play.api.libs.json.Json
-import play.api.{Logger, LoggerLike}
 import play.api.mvc.{Action, ControllerComponents}
+import play.api.{Logger, LoggerLike}
 import services.AccountContactDetailsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 

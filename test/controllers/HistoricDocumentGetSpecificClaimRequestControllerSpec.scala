@@ -19,18 +19,19 @@ package controllers
 import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.DataStoreConnector
 import models.{EORI, FileRole}
-import org.mockito.ArgumentMatchers.{eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
+import org.mockito.Mockito.{times, verify, when}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, inject}
-import services._
+import services.*
 import services.cache.HistoricDocumentRequestSearchCacheService
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
-import utils.TestData.{DAY_15, DAY_16, EORI_VALUE, MONTH_1, MONTH_3, YEAR_2019}
+import utils.TestData.*
 
 import java.time.LocalDate
 import scala.concurrent.Future

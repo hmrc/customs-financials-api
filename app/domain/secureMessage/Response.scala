@@ -16,7 +16,7 @@
 
 package domain.secureMessage
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class Response(id: String)
 

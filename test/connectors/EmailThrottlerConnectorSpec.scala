@@ -17,11 +17,14 @@
 package connectors
 
 import models.requests.EmailRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import utils.SpecBase
 import utils.Utils.emptyString
 
@@ -30,8 +33,10 @@ import scala.concurrent.Future
 class EmailThrottlerConnectorSpec extends SpecBase {
 
   "return true when the api responds with 202" in new Setup {
-    when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-      .thenReturn(Future.successful(HttpResponse(ACCEPTED, emptyString)))
+    when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+    when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+    when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+    when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(ACCEPTED, emptyString)))
 
     running(app) {
       val result = await(connector.sendEmail(request))
@@ -40,8 +45,10 @@ class EmailThrottlerConnectorSpec extends SpecBase {
   }
 
   "return false when the api responds with a successful response that isn't 204" in new Setup {
-    when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-      .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
+    when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+    when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+    when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+    when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
     running(app) {
       val result = await(connector.sendEmail(request))
@@ -50,8 +57,10 @@ class EmailThrottlerConnectorSpec extends SpecBase {
   }
 
   "return false when the api fails" in new Setup {
-    when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-      .thenReturn(Future.failed(new NotFoundException("error")))
+    when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+    when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+    when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+    when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
     running(app) {
       val result = await(connector.sendEmail(request))
@@ -61,13 +70,15 @@ class EmailThrottlerConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
 
     val request: EmailRequest = EmailRequest(List.empty, emptyString, Map.empty, force = true, None, Some("eori"), None)
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

@@ -17,7 +17,7 @@
 package models.requests
 
 import models.{EORI, FileRole, HistoricDocumentRequestSearch, SearchRequest}
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.util.UUID
 

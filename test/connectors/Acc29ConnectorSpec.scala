@@ -18,11 +18,14 @@ package connectors
 
 import models.EORI
 import models.responses.StandingAuthoritiesResponse
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.SpecBase
 
 import scala.concurrent.Future
@@ -31,8 +34,10 @@ class Acc29ConnectorSpec extends SpecBase {
 
   "getStandingAuthorities" should {
     "return a list of authorities on a successful response" in new Setup {
-      when[Future[StandingAuthoritiesResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(response))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
       running(app) {
         val result = await(connector.getStandingAuthorities(EORI("someEori")))
@@ -43,12 +48,14 @@ class Acc29ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val response: StandingAuthoritiesResponse = StandingAuthoritiesResponse(EORI("someEORI"), List.empty)
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models._
+import models.*
 import utils.SpecBase
 import utils.TestData.{MONTH_2, MONTH_4, YEAR_2021}
 import utils.Utils.emptyString

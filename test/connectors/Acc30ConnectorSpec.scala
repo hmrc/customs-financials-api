@@ -17,13 +17,16 @@
 package connectors
 
 import domain.StandingAuthority
-import models.requests.manageAuthorities._
+import models.requests.manageAuthorities.*
 import models.{AccountNumber, EORI}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import utils.SpecBase
 import utils.Utils.emptyString
 
@@ -35,8 +38,10 @@ class Acc30ConnectorSpec extends SpecBase {
   "grantAccountAuthorities" should {
 
     "return true when the api responds with 204" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
       running(app) {
         val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
@@ -45,8 +50,10 @@ class Acc30ConnectorSpec extends SpecBase {
     }
 
     "return false when the api responds with a successful response that isn't 204" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
       running(app) {
         val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
@@ -55,8 +62,10 @@ class Acc30ConnectorSpec extends SpecBase {
     }
 
     "return false when the api fails" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
         val result = await(connector.grantAccountAuthorities(grantRequest, EORI("someEori")))
@@ -68,8 +77,10 @@ class Acc30ConnectorSpec extends SpecBase {
   "revokeAccountAuthorities" should {
 
     "return true when the api responds with 204" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
       running(app) {
         val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
@@ -78,8 +89,10 @@ class Acc30ConnectorSpec extends SpecBase {
     }
 
     "return false when the api responds with a successful response that isn't 204" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.successful(HttpResponse(OK, emptyString)))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
       running(app) {
         val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
@@ -88,8 +101,10 @@ class Acc30ConnectorSpec extends SpecBase {
     }
 
     "return false when the api fails" in new Setup {
-      when[Future[HttpResponse]](mockHttpClient.POST(any, any, any)(any, any, any, any))
-        .thenReturn(Future.failed(new NotFoundException("error")))
+      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
         val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI("someEori")))
@@ -100,7 +115,8 @@ class Acc30ConnectorSpec extends SpecBase {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClient = mock[HttpClient]
+    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val grantRequest: GrantAuthorityRequest = GrantAuthorityRequest(
       Accounts(None, Seq.empty, None),
@@ -115,7 +131,8 @@ class Acc30ConnectorSpec extends SpecBase {
       AuthorisedUser("someUser", "someRole"))
 
     val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClient].toInstance(mockHttpClient)
+      bind[HttpClientV2].toInstance(mockHttpClient),
+      bind[RequestBuilder].toInstance(requestBuilder)
     ).configure(
       "microservice.metrics.enabled" -> false,
       "metrics.enabled" -> false,

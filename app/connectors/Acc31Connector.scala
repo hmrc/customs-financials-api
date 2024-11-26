@@ -18,22 +18,26 @@ package connectors
 
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
-import models.requests._
+import models.requests.*
 import models.responses.{
-  CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
+  CashTransactionsResponse,
+  CashTransactionsResponseCommon,
+  CashTransactionsResponseDetail,
   GetCashAccountTransactionListingResponse
 }
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
 import services.{DateTimeService, MetricsReporterService}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc31Connector @Inject()(httpClient: HttpClient,
+class Acc31Connector @Inject()(httpClient: HttpClientV2,
                                appConfig: AppConfig,
                                dateTimeService: DateTimeService,
                                metricsReporterService: MetricsReporterService,
@@ -61,11 +65,11 @@ class Acc31Connector @Inject()(httpClient: HttpClient,
     )
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-cash-account-transaction-listing") {
-      val eventualResponse = httpClient.POST[CashTransactionsRequest, CashTransactionsResponse](
-        appConfig.acc31GetCashAccountTransactionListingEndpoint,
-        cashTransactionsRequest,
-        headers = mdgHeaders.headers(appConfig.acc31BearerToken, appConfig.acc31HostHeader)
-      )(implicitly, implicitly, HeaderCarrier(), implicitly)
+      val eventualResponse = httpClient.post(
+          url"${appConfig.acc31GetCashAccountTransactionListingEndpoint}")(HeaderCarrier())
+        .withBody[CashTransactionsRequest](cashTransactionsRequest)
+        .setHeader(mdgHeaders.headers(appConfig.acc31BearerToken, appConfig.acc31HostHeader): _*)
+        .execute[CashTransactionsResponse]
 
       eventualResponse.map { ctr => cashAccountTransactions(ctr.getCashAccountTransactionListingResponse) }
     }

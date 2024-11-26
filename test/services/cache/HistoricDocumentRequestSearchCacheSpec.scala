@@ -17,8 +17,10 @@
 package services.cache
 
 import config.AppConfig
-import models.SearchResultStatus._
+import models.SearchResultStatus.*
 import models.{HistoricDocumentRequestSearch, Params, SearchRequest, SearchResultStatus}
+import org.mockito.Mockito.when
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 import org.mongodb.scala.model.{Filters, Updates}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -45,7 +47,7 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(spanLength, Seconds), Span(1, Millis))
 
-  import HistoricDocumentRequestSearchCacheSpec._
+  import HistoricDocumentRequestSearchCacheSpec.*
 
   var historicDocumentRequestCache: HistoricDocumentRequestSearchCache = _
 

@@ -17,18 +17,19 @@
 package connectors
 
 import config.AppConfig
-import models.{EORI, EmailAddress, CompanyInformation}
-import play.api.libs.json._
+import models.{CompanyInformation, EORI, EmailAddress}
+import play.api.libs.json.*
 import play.api.{Logger, LoggerLike}
 import services.MetricsReporterService
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DataStoreConnector @Inject()(http: HttpClient,
+class DataStoreConnector @Inject()(http: HttpClientV2,
                                    metricsReporter: MetricsReporterService)
                                   (implicit appConfig: AppConfig, ec: ExecutionContext) {
 
@@ -36,9 +37,9 @@ class DataStoreConnector @Inject()(http: HttpClient,
 
   def getVerifiedEmail(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[EmailAddress]] = {
     metricsReporter.withResponseTimeLogging(resourceName = "customs-data-store.get.verified-email") {
-      val dataStoreEmailEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/verified-email"
+      val dataStoreEmailEndpoint = url"${appConfig.dataStoreEndpoint}/eori/${eori.value}/verified-email"
 
-      http.GET[EmailResponse](dataStoreEmailEndpoint)
+      http.get(dataStoreEmailEndpoint).execute[EmailResponse]
         .map(_.address)
         .recover {
           case e =>
@@ -49,10 +50,10 @@ class DataStoreConnector @Inject()(http: HttpClient,
   }
 
   def getEoriHistory(eori: EORI)(implicit hc: HeaderCarrier): Future[Seq[EORI]] = {
-    val dataStoreHistoryEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/eori-history"
+    val dataStoreHistoryEndpoint = url"${appConfig.dataStoreEndpoint}/eori/${eori.value}/eori-history"
 
     metricsReporter.withResponseTimeLogging("customs-data-store.get.eori-history") {
-      http.GET[EoriHistoryResponse](dataStoreHistoryEndpoint)
+      http.get(dataStoreHistoryEndpoint).execute[EoriHistoryResponse]
         .map(response => response.eoriHistory.map(_.eori))
     }.recover {
       case e =>
@@ -63,8 +64,8 @@ class DataStoreConnector @Inject()(http: HttpClient,
 
   def getCompanyName(eori: EORI)(implicit hc: HeaderCarrier): Future[Option[String]] = {
     metricsReporter.withResponseTimeLogging("customs-data-store.get.company-name") {
-      val dataStoreCorpEndpoint = appConfig.dataStoreEndpoint + s"/eori/${eori.value}/company-information"
-      http.GET[CompanyInformation](dataStoreCorpEndpoint).map(response => Some(response.name))
+      val dataStoreCorpEndpoint = url"${appConfig.dataStoreEndpoint}/eori/${eori.value}/company-information"
+      http.get(dataStoreCorpEndpoint).execute[CompanyInformation].map(response => Some(response.name))
     }.recover {
       case e =>
         log.error(s"Call to data stored failed for getCompanyName exception=$e")
