@@ -30,25 +30,25 @@ case object CdsGeneralGuaranteeAccount extends RevokeAccountType
 object RevokeAccountType {
 
   def toAuditLabel(accountType: RevokeAccountType): AccountType = accountType match {
-    case CdsCashAccount => AccountType("CDSCash")
-    case CdsDutyDefermentAccount => AccountType("DutyDeferment")
+    case CdsCashAccount             => AccountType("CDSCash")
+    case CdsDutyDefermentAccount    => AccountType("DutyDeferment")
     case CdsGeneralGuaranteeAccount => AccountType("GeneralGuarantee")
   }
 
-  implicit val reads: Reads[RevokeAccountType] = (json: JsValue) => {
+  implicit val reads: Reads[RevokeAccountType] = (json: JsValue) =>
     json.as[String] match {
-      case "CDSCash" => JsSuccess(CdsCashAccount)
-      case "DutyDeferment" => JsSuccess(CdsDutyDefermentAccount)
+      case "CDSCash"          => JsSuccess(CdsCashAccount)
+      case "DutyDeferment"    => JsSuccess(CdsDutyDefermentAccount)
       case "GeneralGuarantee" => JsSuccess(CdsGeneralGuaranteeAccount)
     }
-  }
 
-  implicit val writes: Writes[RevokeAccountType] = (obj: RevokeAccountType) => JsString(
-    obj match {
-      case CdsCashAccount => "CDSCash"
-      case CdsDutyDefermentAccount => "DutyDeferment"
-      case CdsGeneralGuaranteeAccount => "GeneralGuarantee"
-    }
-  )
+  implicit val writes: Writes[RevokeAccountType] = (obj: RevokeAccountType) =>
+    JsString(
+      obj match {
+        case CdsCashAccount             => "CDSCash"
+        case CdsDutyDefermentAccount    => "DutyDeferment"
+        case CdsGeneralGuaranteeAccount => "GeneralGuarantee"
+      }
+    )
 
 }

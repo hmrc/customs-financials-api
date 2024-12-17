@@ -47,7 +47,8 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = false)
+        editRequest = false
+      )
 
       val auditRequest =
         """{
@@ -88,7 +89,8 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = true)
+        editRequest = true
+      )
 
       val auditRequest: String =
         """{
@@ -133,7 +135,10 @@ class AuditingServiceSpec extends SpecBase {
           }"""
 
       val revokeAuthorityRequest: RevokeAuthorityRequest = RevokeAuthorityRequest(
-        AccountNumber("123"), CdsCashAccount, EORI("agentEORI"), AuthorisedUser("John Smith", "Managing Director")
+        AccountNumber("123"),
+        CdsCashAccount,
+        EORI("agentEORI"),
+        AuthorisedUser("John Smith", "Managing Director")
       )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
@@ -168,7 +173,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsDutyDefermentAccount,
         EORI("agentEORI"),
-        AuthorisedUser("John Smith", "Managing Director"))
+        AuthorisedUser("John Smith", "Managing Director")
+      )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
         ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
@@ -202,7 +208,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsGeneralGuaranteeAccount,
         EORI("agentEORI"),
-        AuthorisedUser("John Smith", "Managing Director"))
+        AuthorisedUser("John Smith", "Managing Director")
+      )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
         ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
@@ -243,7 +250,8 @@ class AuditingServiceSpec extends SpecBase {
           MONTH_4,
           YEAR_2020,
           MONTH_12,
-          Some("DAN123"))
+          Some("DAN123")
+        )
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -275,7 +283,14 @@ class AuditingServiceSpec extends SpecBase {
 
       val historicDocumentRequest: HistoricDocumentRequest =
         HistoricDocumentRequest(
-          EORI("testEORI"), FileRole("SecurityStatement"), YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
+          EORI("testEORI"),
+          FileRole("SecurityStatement"),
+          YEAR_2019,
+          MONTH_1,
+          YEAR_2019,
+          MONTH_3,
+          None
+        )
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -308,7 +323,14 @@ class AuditingServiceSpec extends SpecBase {
 
       val historicDocumentRequest: HistoricDocumentRequest =
         HistoricDocumentRequest(
-          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
+          EORI("testEORI"),
+          FILE_ROLE_C79_CERTIFICATE,
+          YEAR_2019,
+          MONTH_1,
+          YEAR_2019,
+          MONTH_3,
+          None
+        )
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -327,7 +349,14 @@ class AuditingServiceSpec extends SpecBase {
     "not throw an exception when failing to audit the events" in new Setup {
       val historicDocumentRequest: HistoricDocumentRequest =
         HistoricDocumentRequest(
-          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
+          EORI("testEORI"),
+          FILE_ROLE_C79_CERTIFICATE,
+          YEAR_2019,
+          MONTH_1,
+          YEAR_2019,
+          MONTH_3,
+          None
+        )
 
       running(app) {
         val auditResult = AuditResult.Failure("failed to audit", Some(new Exception("error")))
@@ -344,7 +373,14 @@ class AuditingServiceSpec extends SpecBase {
 
       val historicDocumentRequest: HistoricDocumentRequest =
         HistoricDocumentRequest(
-          EORI("testEORI"), FILE_ROLE_C79_CERTIFICATE, YEAR_2019, MONTH_1, YEAR_2019, MONTH_3, None)
+          EORI("testEORI"),
+          FILE_ROLE_C79_CERTIFICATE,
+          YEAR_2019,
+          MONTH_1,
+          YEAR_2019,
+          MONTH_3,
+          None
+        )
 
       running(app) {
         intercept[Exception] {
@@ -355,8 +391,8 @@ class AuditingServiceSpec extends SpecBase {
 
     "Audit the ACC41 audit Display Auth CSV Statement Request" in new Setup {
 
-      val display: Map[String, String] = Map("Name" -> "DISPLAY_STANDING_AUTHORITIES_NAME",
-        "Type" -> "DISPLAY_STANDING_AUTHORITIES_TYPE")
+      val display: Map[String, String] =
+        Map("Name" -> "DISPLAY_STANDING_AUTHORITIES_NAME", "Type" -> "DISPLAY_STANDING_AUTHORITIES_TYPE")
 
       val notification: Notification = Notification(
         EORI("GB123456789"),
@@ -364,7 +400,8 @@ class AuditingServiceSpec extends SpecBase {
         "file name",
         FILE_SIZE_1000L,
         Some(CURRENT_LOCAL_DATE),
-        display)
+        display
+      )
 
       val fileType: FileType = FileType("CSV")
 
@@ -377,8 +414,8 @@ class AuditingServiceSpec extends SpecBase {
         "fileType":"FileType(CSV)"
       }"""
 
-      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent]
-      = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
+        ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
       running(app) {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
@@ -395,7 +432,7 @@ class AuditingServiceSpec extends SpecBase {
 
     "Audit the ACC41 audit Request Auth CSV Statement Request" in new Setup {
       val response: acc41.ResponseDetail = acc41.ResponseDetail(Some(emptyString), Some(emptyString))
-      val request: acc41.RequestDetail = domain.acc41.RequestDetail(EORI("GB123456789"), Some(EORI("someAltEori")))
+      val request: acc41.RequestDetail   = domain.acc41.RequestDetail(EORI("GB123456789"), Some(EORI("someAltEori")))
 
       val auditRequest =
         """{
@@ -513,17 +550,19 @@ class AuditingServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier                  = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[AuditConnector].toInstance(mockAuditConnector)
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[AuditConnector].toInstance(mockAuditConnector)
+      )
+      .build()
 
     val service: AuditingService = app.injector.instanceOf[AuditingService]
-    val eoriNumber = "GB123456789"
+    val eoriNumber               = "GB123456789"
 
     val cashAccTransactionPaymentSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
@@ -531,7 +570,8 @@ class AuditingServiceSpec extends SpecBase {
         eoriNumber,
         SearchType.P,
         declarationDetails = None,
-        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING)))
+      )
 
     val cashAccTransactionDeclarationSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
@@ -539,9 +579,10 @@ class AuditingServiceSpec extends SpecBase {
         eoriNumber,
         SearchType.D,
         declarationDetails = Some(DeclarationDetails(UCR, "123456789abcd")),
-        cashAccountPaymentDetails = None)
+        cashAccountPaymentDetails = None
+      )
 
-    val cashAccStatementReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
-      eoriNumber, CAN, DATE_STRING, DATE_STRING)
+    val cashAccStatementReqDetail: CashAccountStatementRequestDetail =
+      CashAccountStatementRequestDetail(eoriNumber, CAN, DATE_STRING, DATE_STRING)
   }
 }

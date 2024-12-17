@@ -21,12 +21,12 @@ object MetaConfig {
   val RETURN_PARAM_POSITION = "POSITION"
 
   object Platform {
-    val MDTP = "MDTP"
+    val MDTP       = "MDTP"
     val REGIME_CDS = "CDS"
-    val DIGITAL = "Digital"
+    val DIGITAL    = "Digital"
 
-    val SOURCE_MDTP = "mdtp"
-    val ENROLMENT_KEY = "HMRC-CUS-ORG"
+    val SOURCE_MDTP          = "mdtp"
+    val ENROLMENT_KEY        = "HMRC-CUS-ORG"
     val ENROLMENT_IDENTIFIER = "EORINumber"
 
     val EXPIRE_TIME_STAMP_SECONDS = 1728000L

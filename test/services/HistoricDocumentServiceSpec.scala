@@ -65,21 +65,24 @@ class HistoricDocumentServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier                  = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-    val mockAuditingService: AuditingService = mock[AuditingService]
+    val mockAuditingService: AuditingService        = mock[AuditingService]
 
-    val eori: EORI = EORI("testEORI")
+    val eori: EORI                         = EORI("testEORI")
     val mockAcc24Connector: Acc24Connector = mock[Acc24Connector]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc24Connector].toInstance(mockAcc24Connector),
-      inject.bind[AuditingService].toInstance(mockAuditingService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc24Connector].toInstance(mockAcc24Connector),
+        inject.bind[AuditingService].toInstance(mockAuditingService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val service: HistoricDocumentService = app.injector.instanceOf[HistoricDocumentService]
   }

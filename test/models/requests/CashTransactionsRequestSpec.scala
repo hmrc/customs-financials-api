@@ -128,20 +128,20 @@ class CashTransactionsRequestSpec extends SpecBase {
     val amount = 999.90
 
     val dateFromString = "2024-05-28"
-    val dateToString = "2024-05-28"
+    val dateToString   = "2024-05-28"
 
     val can = "12345678901"
 
-    val ownerEORI = "test_eori"
+    val ownerEORI   = "test_eori"
     val ownerEoriGB = "GB1234678900"
 
-    val paramValue = "test_value"
+    val paramValue   = "test_value"
     val paramValue_1 = "123456789abcd"
 
-    val receiptDate = "2001-12-17T09:30:47Z"
+    val receiptDate              = "2001-12-17T09:30:47Z"
     val acknowledgementReference = "601bb176b8e411ed8a9800001e3b1802"
 
-    val declarationDetailsOb: DeclarationDetails = DeclarationDetails(MRN, paramValue)
+    val declarationDetailsOb: DeclarationDetails        = DeclarationDetails(MRN, paramValue)
     val declarationDetailsWithUCROb: DeclarationDetails = DeclarationDetails(UCR, paramValue_1)
 
     val cashAccountPaymentDetailsOb: CashAccountPaymentDetails =
@@ -149,13 +149,18 @@ class CashTransactionsRequestSpec extends SpecBase {
 
     val cashAccountPaymentDetailsObAmountOnly: CashAccountPaymentDetails = CashAccountPaymentDetails(amount)
 
-    val cashAccountPaymentDetailsJsString = """{"amount":999.9,"dateFrom":"2024-05-28","dateTo":"2024-05-28"}"""
+    val cashAccountPaymentDetailsJsString           = """{"amount":999.9,"dateFrom":"2024-05-28","dateTo":"2024-05-28"}"""
     val cashAccountPaymentDetailsAmountOnlyJsString =
       """{"amount":999.9}"""
 
     val cashTranSearchRequestDetailsOb: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
-        can, ownerEORI, P, Some(declarationDetailsOb), Some(cashAccountPaymentDetailsOb))
+        can,
+        ownerEORI,
+        P,
+        Some(declarationDetailsOb),
+        Some(cashAccountPaymentDetailsOb)
+      )
 
     val cashTranSearchRequestDetailsWithSearchTypeDOb: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, D, Some(declarationDetailsWithUCROb))
@@ -223,7 +228,7 @@ class CashTransactionsRequestSpec extends SpecBase {
         |}""".stripMargin
 
     val cashAccTransSearchRequestWithSearchTypePJsString: String =
-     """{
+      """{
        |"cashAccountTransactionSearchRequest": {
        |"requestCommon": {
        |"originatingSystem": "MDTP",

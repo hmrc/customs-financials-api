@@ -31,17 +31,20 @@ class EmailTemplateSpec extends SpecBase {
       "file role is DutyDefermentStatement" in new Setup {
 
         val expectedParams: Map[String, String] = HashMap(
-          "recipientName_line1" -> companyName,
+          "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "weekly",
-          "PeriodIssueNumber" -> "4",
-          "date" -> "16 Sep 2018",
-          "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after")
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "16 Sep 2018",
+          "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
+        )
 
         val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
           Some(
-            DutyDefermentStatementEmail(emailAddress,
+            DutyDefermentStatementEmail(
+              emailAddress,
               eoriNumber,
-              expectedParams ++ Map("recipientName_line1" -> companyName))
+              expectedParams ++ Map("recipientName_line1" -> companyName)
+            )
           )
 
         EmailTemplate.fromNotification(emailAddress, ddNotification, companyName) mustBe
@@ -50,11 +53,7 @@ class EmailTemplateSpec extends SpecBase {
 
       "file role is DutyDefermentStatement and its historic" in new Setup {
         val expectedEmailTemplate: Option[HistoricDutyDefermentStatementEmail] =
-          Some(HistoricDutyDefermentStatementEmail(
-            emailAddress,
-            eoriNumber,
-            Map("recipientName_line1" -> companyName))
-          )
+          Some(HistoricDutyDefermentStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(emailAddress, ddNotificationHistoric, companyName) mustBe expectedEmailTemplate
       }
@@ -66,7 +65,8 @@ class EmailTemplateSpec extends SpecBase {
         EmailTemplate.fromNotification(
           emailAddress,
           c79CertificateNotification,
-          companyName) mustBe expectedEmailTemplate
+          companyName
+        ) mustBe expectedEmailTemplate
       }
 
       "file role is C79Certificate and its historic" in new Setup {
@@ -78,13 +78,13 @@ class EmailTemplateSpec extends SpecBase {
         EmailTemplate.fromNotification(
           emailAddress,
           c79CertificateHistoricNotification,
-          companyName) mustBe expectedEmailTemplate
+          companyName
+        ) mustBe expectedEmailTemplate
       }
 
       "file role is SecurityStatement" in new Setup {
         val expectedEmailTemplate: Option[SecurityStatementEmail] =
-          Some(
-            SecurityStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+          Some(SecurityStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
@@ -97,8 +97,7 @@ class EmailTemplateSpec extends SpecBase {
       "file role is SecurityStatement and its historic" in new Setup {
         val expectedEmailTemplate: Option[HistoricSecurityStatementEmail] =
           Some(
-            HistoricSecurityStatementEmail(
-              emailAddress, eoriNumber, Map("recipientName_line1" -> companyName))
+            HistoricSecurityStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName))
           )
 
         EmailTemplate.fromNotification(
@@ -111,8 +110,7 @@ class EmailTemplateSpec extends SpecBase {
 
       "file role is PostponedVATStatement" in new Setup {
         val expectedEmailTemplate: Option[PostponedVatEmail] =
-          Some(
-            PostponedVatEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+          Some(PostponedVatEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
@@ -123,8 +121,7 @@ class EmailTemplateSpec extends SpecBase {
 
       "file role is PostponedVATStatement and its historic" in new Setup {
         val expectedEmailTemplate: Option[HistoricPostponedVATStatementEmail] =
-          Some(
-            HistoricPostponedVATStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+          Some(HistoricPostponedVATStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
@@ -135,8 +132,7 @@ class EmailTemplateSpec extends SpecBase {
 
       "file role is StandingAuthority" in new Setup {
         val expectedEmailTemplate: Option[AuthoritiesStatementEmail] =
-          Some(
-            AuthoritiesStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+          Some(AuthoritiesStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
@@ -147,8 +143,7 @@ class EmailTemplateSpec extends SpecBase {
 
       "file role is CDSCashAccount" in new Setup {
         val expectedEmailTemplate: Option[CDSCashAccountEmail] =
-          Some(
-            CDSCashAccountEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
+          Some(CDSCashAccountEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName)))
 
         EmailTemplate.fromNotification(
           emailAddress,
@@ -172,36 +167,38 @@ class EmailTemplateSpec extends SpecBase {
   trait Setup {
 
     val emailAddress: EmailAddress = EmailAddress("test_mail@test.com")
-    val eoriNumber = "test_eori"
+    val eoriNumber                 = "test_eori"
 
-    val fileRoleDDStatement = "DutyDefermentStatement"
-    val fileRoleC79Certificate = "C79Certificate"
-    val fileRoleSecurityStatement = "SecurityStatement"
+    val fileRoleDDStatement           = "DutyDefermentStatement"
+    val fileRoleC79Certificate        = "C79Certificate"
+    val fileRoleSecurityStatement     = "SecurityStatement"
     val fileRolePostponedVATStatement = "PostponedVATStatement"
-    val fileRoleStandingAuthority = "StandingAuthority"
-    val fileRoleCDSCashAccount = "CDSCashAccount"
-    val fileRoleUnknown = "Unknown"
+    val fileRoleStandingAuthority     = "StandingAuthority"
+    val fileRoleCDSCashAccount        = "CDSCashAccount"
+    val fileRoleUnknown               = "Unknown"
 
     val fileNameValue = "test_file"
     val fileSizeValue = 999L
 
-    val statementRequestIDKey = "statementRequestID"
+    val statementRequestIDKey   = "statementRequestID"
     val statementRequestIDValue = "1abcdeff2-a2b1-abcd-abcd-0123456789"
 
     val companyName: String = "test_company"
 
-    val year = 2024
-    val monthOfTheYear = 2
-    val dayOfMonth = 26
+    val year            = 2024
+    val monthOfTheYear  = 2
+    val dayOfMonth      = 26
     val date: LocalDate = LocalDate.of(year, monthOfTheYear, dayOfMonth)
 
-    val params: Map[String, String] = Map("PeriodStartYear" -> "2017",
-      "PeriodStartMonth" -> "5",
-      "PeriodEndYear" -> "2018",
-      "PeriodEndMonth" -> "8",
-      "PeriodIssueNumber" -> "4",
+    val params: Map[String, String] = Map(
+      "PeriodStartYear"        -> "2017",
+      "PeriodStartMonth"       -> "5",
+      "PeriodEndYear"          -> "2018",
+      "PeriodEndMonth"         -> "8",
+      "PeriodIssueNumber"      -> "4",
       "DefermentStatementType" -> "Weekly",
-      "Something" -> "Random")
+      "Something"              -> "Random"
+    )
 
     val ddNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -209,7 +206,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val ddNotificationHistoric: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -217,14 +215,12 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+    )
 
     val ddEmailHistoricTemplate: Option[HistoricDutyDefermentStatementEmail] =
       Some(
-        HistoricDutyDefermentStatementEmail(emailAddress,
-          eoriNumber,
-          Map("recipientName_line1" -> companyName)
-        )
+        HistoricDutyDefermentStatementEmail(emailAddress, eoriNumber, Map("recipientName_line1" -> companyName))
       )
 
     val c79CertificateNotification: Notification = Notification(
@@ -233,7 +229,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val c79CertificateHistoricNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -241,7 +238,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+    )
 
     val securityStatementNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -249,7 +247,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val securityStatementHistoricNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -257,7 +256,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+    )
 
     val pVATStatementNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -265,7 +265,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val pVATStatementHistoricNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -273,7 +274,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue))
+      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+    )
 
     val standingAuthNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -281,7 +283,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val cdsCashAccountNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -289,7 +292,8 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
 
     val unknownNotification: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -297,6 +301,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params)
+      metadata = params
+    )
   }
 }

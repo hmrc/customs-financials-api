@@ -114,30 +114,35 @@ class Acc30ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val grantRequest: GrantAuthorityRequest = GrantAuthorityRequest(
       Accounts(None, Seq.empty, None),
       StandingAuthority(EORI("authorised"), LocalDate.now().toString, None, viewBalance = true),
       AuthorisedUser("someUser", "someRole"),
-      editRequest = true)
+      editRequest = true
+    )
 
     val revokeRequest: RevokeAuthorityRequest = RevokeAuthorityRequest(
       AccountNumber("GAN"),
       CdsCashAccount,
       EORI("someEori"),
-      AuthorisedUser("someUser", "someRole"))
+      AuthorisedUser("someUser", "someRole")
+    )
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc30Connector = app.injector.instanceOf[Acc30Connector]
   }

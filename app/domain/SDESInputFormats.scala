@@ -31,24 +31,18 @@ object SDESInputFormats {
 
   implicit val inputMetadataReader: OFormat[InputMetadata] = Json.format[InputMetadata]
 
-  implicit val notificationReads: Reads[Notification] = {
+  implicit val notificationReads: Reads[Notification] =
     (
       (JsPath \ Symbol("eori")).read[EORI] and
         (JsPath \ Symbol("fileName")).read[String] and
         (JsPath \ Symbol("fileSize")).read[Long] and
         (JsPath \ Symbol("metadata")).read[Seq[InputMetadata]]
-      ) {
-      (eoriWithOptionalDan, fileName, fileSize, rawMetadata) =>
-        val (metadata, fileRoleSeq) = rawMetadata.partition(_.metadata != "FileRole")
-        val fileRole = fileRoleSeq.headOption.map(_.value).getOrElse("UnknownFileRole")
-        val metadataToSave = metadata.map(_.toKeyValue).toMap
-        val eori = eoriWithOptionalDan.value.split('-').head
+    ) { (eoriWithOptionalDan, fileName, fileSize, rawMetadata) =>
+      val (metadata, fileRoleSeq) = rawMetadata.partition(_.metadata != "FileRole")
+      val fileRole                = fileRoleSeq.headOption.map(_.value).getOrElse("UnknownFileRole")
+      val metadataToSave          = metadata.map(_.toKeyValue).toMap
+      val eori                    = eoriWithOptionalDan.value.split('-').head
 
-        Notification(EORI(eori),
-          FileRole(fileRole),
-          fileName,
-          fileSize, Some(LocalDate.now),
-          metadataToSave)
+      Notification(EORI(eori), FileRole(fileRole), fileName, fileSize, Some(LocalDate.now), metadataToSave)
     }
-  }
 }

@@ -39,39 +39,42 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-class StatementSearchFailureNotificationController @Inject()(cc: ControllerComponents,
-                                                             jsonSchemaValidator: JSONSchemaValidator,
-                                                             authorizationHeaderFilter: AuthorizationHeaderFilter,
-                                                             mdgHeaderFilter: MdgHeaderFilter,
-                                                             cacheService: HistoricDocumentRequestSearchCacheService,
-                                                             histDocumentService: HistoricDocumentService,
-                                                             smc: SecureMessageConnector)
-                                                            (implicit execution: ExecutionContext)
-  extends BackendController(cc) {
+class StatementSearchFailureNotificationController @Inject() (
+  cc: ControllerComponents,
+  jsonSchemaValidator: JSONSchemaValidator,
+  authorizationHeaderFilter: AuthorizationHeaderFilter,
+  mdgHeaderFilter: MdgHeaderFilter,
+  cacheService: HistoricDocumentRequestSearchCacheService,
+  histDocumentService: HistoricDocumentService,
+  smc: SecureMessageConnector
+)(implicit execution: ExecutionContext)
+    extends BackendController(cc) {
 
   private val logger = play.api.Logger(getClass)
 
-  def processNotification(): Action[AnyContent] = (authorizationHeaderFilter andThen mdgHeaderFilter).async {
-    request =>
-      jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
-        case Success(_) =>
-          processStatementReqId(requestBody(request), correlationId(request))(hc(request))
+  def processNotification(): Action[AnyContent] = (authorizationHeaderFilter andThen mdgHeaderFilter).async { request =>
+    jsonSchemaValidator.validatePayload(requestBody(request), jsonSchemaValidator.ssfnRequestSchema) match {
+      case Success(_) =>
+        processStatementReqId(requestBody(request), correlationId(request))(hc(request))
 
-        case Failure(errors) =>
-          import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
-          Future(BadRequest(buildErrorResponse(Option(errors), ErrorCode.code400, correlationId(request))))
-      }
+      case Failure(errors) =>
+        import StatementSearchFailureNotificationErrorResponse.ssfnErrorResponseFormat
+        Future(BadRequest(buildErrorResponse(Option(errors), ErrorCode.code400, correlationId(request))))
+    }
   }
 
-  private def processStatementReqId(request: JsValue,
-                                    correlationId: String)(implicit hc: HeaderCarrier): Future[Result] = {
+  private def processStatementReqId(request: JsValue, correlationId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Result] =
     Json.fromJson(request) match {
       case JsSuccess(value, _) =>
         val statementRequestID = value.StatementSearchFailureNotificationMetadata.statementRequestID
-        val failureReasonCode = value.StatementSearchFailureNotificationMetadata.reason
+        val failureReasonCode  = value.StatementSearchFailureNotificationMetadata.reason
 
-        logger.info(s"Request has been successfully validated for statementRequestID" +
-          s" ::: $statementRequestID with reason :: $failureReasonCode")
+        logger.info(
+          s"Request has been successfully validated for statementRequestID" +
+            s" ::: $statementRequestID with reason :: $failureReasonCode"
+        )
 
         handleExceptionAndProcessStatementRequestId(correlationId, statementRequestID, failureReasonCode)
 
@@ -79,221 +82,253 @@ class StatementSearchFailureNotificationController @Inject()(cc: ControllerCompo
         logger.error("Request is not properly formed and failing in parsing")
         Future(BadRequest)
     }
-  }
 
-  private def handleExceptionAndProcessStatementRequestId(correlationId: String,
-                                                          statementRequestID: String,
-                                                          failureReasonCode: String
-                                                         )(implicit hc: HeaderCarrier): Future[Result] = {
+  private def handleExceptionAndProcessStatementRequestId(
+    correlationId: String,
+    statementRequestID: String,
+    failureReasonCode: String
+  )(implicit hc: HeaderCarrier): Future[Result] =
     Try {
       checkStatementReqIdInDBAndProcess(statementRequestID, correlationId, failureReasonCode).recoverWith {
         case exception: Exception =>
           logger.error(
             s"Technical error occurred while processing statementRequestID " +
-              s"::: $statementRequestID and error is :: ${exception.getMessage}")
+              s"::: $statementRequestID and error is :: ${exception.getMessage}"
+          )
 
-          Future(InternalServerError(buildInternalServerErrorResponse(
-            correlationId, statementRequestID, technicalErrorDetail(statementRequestID))))
+          Future(
+            InternalServerError(
+              buildInternalServerErrorResponse(
+                correlationId,
+                statementRequestID,
+                technicalErrorDetail(statementRequestID)
+              )
+            )
+          )
       }
     } match {
-      case Success(value) => value
+      case Success(value)     => value
       case Failure(exception) =>
         logger.error(
           s"Technical error occurred while processing statementRequestID " +
-            s"::: $statementRequestID and error is :: ${exception.getMessage}")
+            s"::: $statementRequestID and error is :: ${exception.getMessage}"
+        )
 
-        Future(InternalServerError(buildInternalServerErrorResponse(
-          correlationId, statementRequestID, technicalErrorDetail(statementRequestID))))
+        Future(
+          InternalServerError(
+            buildInternalServerErrorResponse(
+              correlationId,
+              statementRequestID,
+              technicalErrorDetail(statementRequestID)
+            )
+          )
+        )
     }
-  }
 
-  private def checkStatementReqIdInDBAndProcess(statementRequestID: String,
-                                                correlationId: String,
-                                                failureReasonCode: String)(implicit hc: HeaderCarrier): Future[Result] = {
+  private def checkStatementReqIdInDBAndProcess(
+    statementRequestID: String,
+    correlationId: String,
+    failureReasonCode: String
+  )(implicit hc: HeaderCarrier): Future[Result] =
     for {
-      optHistDocReq <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
+      optHistDocReq  <- cacheService.retrieveHistDocRequestSearchDocForStatementReqId(statementRequestID)
       result: Result <- processStatReqIdOrSendErrorResponseIfReqIdNotPresent(
-        statementRequestID, correlationId, failureReasonCode, optHistDocReq)
-    } yield {
-      result
-    }
-  }
+                          statementRequestID,
+                          correlationId,
+                          failureReasonCode,
+                          optHistDocReq
+                        )
+    } yield result
 
-  private def processStatReqIdOrSendErrorResponseIfReqIdNotPresent(statementRequestID: String,
-                                                                   correlationId: String,
-                                                                   failureReasonCode: String,
-                                                                   optHistDocReq: Option[HistoricDocumentRequestSearch]
-                                                                  )(implicit hc: HeaderCarrier): Future[Result] = {
+  private def processStatReqIdOrSendErrorResponseIfReqIdNotPresent(
+    statementRequestID: String,
+    correlationId: String,
+    failureReasonCode: String,
+    optHistDocReq: Option[HistoricDocumentRequestSearch]
+  )(implicit hc: HeaderCarrier): Future[Result] =
     if (optHistDocReq.isEmpty) {
-      Future(BadRequest(buildErrorResponse(
-        errors = None,
-        errorCode = ErrorCode.code400,
-        correlationId = correlationId,
-        Option(statementRequestID))))
+      Future(
+        BadRequest(
+          buildErrorResponse(
+            errors = None,
+            errorCode = ErrorCode.code400,
+            correlationId = correlationId,
+            Option(statementRequestID)
+          )
+        )
+      )
     } else {
-      checkFailureReasonAndProcessRequestId(
-        statementRequestID,
-        correlationId,
-        failureReasonCode,
-        optHistDocReq)
+      checkFailureReasonAndProcessRequestId(statementRequestID, correlationId, failureReasonCode, optHistDocReq)
     }
-  }
 
-  private def checkFailureReasonAndProcessRequestId(statementRequestID: String,
-                                                    correlationId: String,
-                                                    failureReasonCode: String,
-                                                    optHistDocReq: Option[HistoricDocumentRequestSearch]
-                                                   )(implicit hc: HeaderCarrier): Future[Result] = {
+  private def checkFailureReasonAndProcessRequestId(
+    statementRequestID: String,
+    correlationId: String,
+    failureReasonCode: String,
+    optHistDocReq: Option[HistoricDocumentRequestSearch]
+  )(implicit hc: HeaderCarrier): Future[Result] =
     if (failureReasonCode != NO_DOCUMENTS_FOUND) {
       updateRetryCountAndSendRequest(correlationId, statementRequestID, failureReasonCode, optHistDocReq.get)
     } else {
       updateHistoricDocumentRequestSearchForStatReqId(statementRequestID, failureReasonCode, optHistDocReq.get)
     }
-  }
 
-  private def updateHistoricDocumentRequestSearchForStatReqId(statementRequestID: String,
-                                                              failureReasonCode: String,
-                                                              optHistDocReqSearchDoc: HistoricDocumentRequestSearch
-                                                             ): Future[Result] = {
+  private def updateHistoricDocumentRequestSearchForStatReqId(
+    statementRequestID: String,
+    failureReasonCode: String,
+    optHistDocReqSearchDoc: HistoricDocumentRequestSearch
+  ): Future[Result] =
     for {
       updatedHistDoc <- updateSearchRequestIfInProcess(statementRequestID, failureReasonCode, optHistDocReqSearchDoc)
-    } yield {
-      updatedHistDoc match {
-        case Some(histDoc) =>
-          updateDocumentStatusIfInProcess(histDoc)
-        case _ => NoContent
-      }
+    } yield updatedHistDoc match {
+      case Some(histDoc) =>
+        updateDocumentStatusIfInProcess(histDoc)
+      case _             => NoContent
     }
-  }
 
-  private def updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Unit] = {
+  private def updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Unit] =
     cacheService.updateResultsFoundStatusToNoIfEligible(histDoc).map {
       case Some(updatedDoc) =>
         if (updatedDoc.resultsFound == SearchResultStatus.no) {
-          smc.sendSecureMessage(updatedDoc).recover {
-            case exception =>
-              logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
-              throw exception
+          smc.sendSecureMessage(updatedDoc).recover { case exception =>
+            logger.error(s"secure message could not be sent due to error::: ${exception.getMessage}")
+            throw exception
           }
           logger.info("secure message has been triggered")
         } else {
           logger.info("Not eligible to send secure message")
         }
-      case _ =>
+      case _                =>
         logger.info("Not eligible to send secure message")
     }
-  }
 
   private def updateDocumentStatusIfInProcess(histDoc: HistoricDocumentRequestSearch): Result = {
     histDoc.resultsFound match {
       case SearchResultStatus.inProcess =>
         updateDocStatusToNoIfEligibleAndSendSecureMessage(histDoc)
-      case _ =>
+      case _                            =>
         logger.info("Document status in not inProcess hence no further processing required")
     }
     NoContent
   }
 
-  private def updateSearchRequestIfInProcess(statementRequestID: String,
-                                             failureReasonCode: String,
-                                             optHistDocReqSearchDoc: HistoricDocumentRequestSearch)
-  : Future[Option[HistoricDocumentRequestSearch]] = {
+  private def updateSearchRequestIfInProcess(
+    statementRequestID: String,
+    failureReasonCode: String,
+    optHistDocReqSearchDoc: HistoricDocumentRequestSearch
+  ): Future[Option[HistoricDocumentRequestSearch]] =
     if (isSearchRequestIsInProcess(optHistDocReqSearchDoc, statementRequestID)) {
-      cacheService.updateSearchRequestForStatementRequestId(
-        optHistDocReqSearchDoc,
-        statementRequestID,
-        failureReasonCode).map {
-        updatedDoc => logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
-      }
+      cacheService
+        .updateSearchRequestForStatementRequestId(optHistDocReqSearchDoc, statementRequestID, failureReasonCode)
+        .map { updatedDoc =>
+          logErrorMessageIfUpdateFails(statementRequestID, failureReasonCode, updatedDoc)
+        }
     } else {
       Future(None)
     }
-  }
 
-  private def updateRetryCountAndSendRequest(correlationId: String,
-                                             statementRequestID: String,
-                                             failureReasonCode: String,
-                                             histDocReqSearchDoc: HistoricDocumentRequestSearch
-                                            )(implicit hc: HeaderCarrier): Future[Result] = {
-    val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests.find(
-      sReq => sReq.statementRequestId == statementRequestID).fold(false)(sr => sr.failureRetryCount < FINAL_RETRY)
+  private def updateRetryCountAndSendRequest(
+    correlationId: String,
+    statementRequestID: String,
+    failureReasonCode: String,
+    histDocReqSearchDoc: HistoricDocumentRequestSearch
+  )(implicit hc: HeaderCarrier): Future[Result] = {
+    val isReqRetryCountBelowMax = histDocReqSearchDoc.searchRequests
+      .find(sReq => sReq.statementRequestId == statementRequestID)
+      .fold(false)(sr => sr.failureRetryCount < FINAL_RETRY)
 
     if (isReqRetryCountBelowMax) {
       for {
         optHistDoc <- cacheService.updateSearchRequestRetryCount(
-          statementRequestID,
-          failureReasonCode,
-          histDocReqSearchDoc.searchID.toString,
-          histDocReqSearchDoc.searchRequests)
-      } yield {
-        histDocumentService.sendHistoricDocumentRequest(
-          HistoricDocumentRequest(statementRequestID, optHistDoc.getOrElse(
-            throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved")))).map {
+                        statementRequestID,
+                        failureReasonCode,
+                        histDocReqSearchDoc.searchID.toString,
+                        histDocReqSearchDoc.searchRequests
+                      )
+      } yield histDocumentService
+        .sendHistoricDocumentRequest(
+          HistoricDocumentRequest(
+            statementRequestID,
+            optHistDoc.getOrElse(throw new RuntimeException("HistoricDocumentRequestSearch could not be retrieved"))
+          )
+        )
+        .map {
           case true => logger.info("ACC24 request got 204 response")
-          case _ => logger.error("ACC24 request did not get 204 response")
+          case _    => logger.error("ACC24 request did not get 204 response")
         }
-      }
 
       Future(NoContent)
-    }
-    else {
-      Future(InternalServerError(buildInternalServerErrorResponse(
-        correlationId, statementRequestID, ErrorMessage.failureRetryCountErrorDetail(statementRequestID))))
+    } else {
+      Future(
+        InternalServerError(
+          buildInternalServerErrorResponse(
+            correlationId,
+            statementRequestID,
+            ErrorMessage.failureRetryCountErrorDetail(statementRequestID)
+          )
+        )
+      )
     }
   }
 
-  private def isSearchRequestIsInProcess(optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
-                                         statementRequestID: String): Boolean = {
-    optHistDocReqSearchDoc.searchRequests.find(
-      sr => sr.statementRequestId == statementRequestID).fold(false)(
-      serReq => serReq.searchSuccessful == SearchResultStatus.inProcess)
-  }
+  private def isSearchRequestIsInProcess(
+    optHistDocReqSearchDoc: HistoricDocumentRequestSearch,
+    statementRequestID: String
+  ): Boolean =
+    optHistDocReqSearchDoc.searchRequests
+      .find(sr => sr.statementRequestId == statementRequestID)
+      .fold(false)(serReq => serReq.searchSuccessful == SearchResultStatus.inProcess)
 
-  private def logErrorMessageIfUpdateFails(statementRequestID: String,
-                                           failureReasonCode: String,
-                                           updatedDoc: Option[HistoricDocumentRequestSearch]):
-  Option[HistoricDocumentRequestSearch] = {
+  private def logErrorMessageIfUpdateFails(
+    statementRequestID: String,
+    failureReasonCode: String,
+    updatedDoc: Option[HistoricDocumentRequestSearch]
+  ): Option[HistoricDocumentRequestSearch] =
     if (updatedDoc.isEmpty) {
-      logger.error(s"update failed for statementRequestID :: $statementRequestID" +
-        s" and reasonCode :: $failureReasonCode")
+      logger.error(
+        s"update failed for statementRequestID :: $statementRequestID" +
+          s" and reasonCode :: $failureReasonCode"
+      )
       None
     } else {
       updatedDoc
     }
-  }
 
-  private def buildInternalServerErrorResponse(correlationId: String,
-                                               statementRequestID: String,
-                                               errorDetailMessage: String) = {
+  private def buildInternalServerErrorResponse(
+    correlationId: String,
+    statementRequestID: String,
+    errorDetailMessage: String
+  ) =
     buildErrorResponse(
       errorCode = ErrorCode.code500,
       correlationId = correlationId,
       statementReqId = Some(statementRequestID),
-      errorDetailMsg = errorDetailMessage)
-  }
+      errorDetailMsg = errorDetailMessage
+    )
 
-  private def buildErrorResponse(errors: Option[Throwable] = None,
-                                 errorCode: String,
-                                 correlationId: String,
-                                 statementReqId: Option[String] = None,
-                                 errorDetailMsg: String = emptyString) = {
-    val errorResponse = StatementSearchFailureNotificationErrorResponse(
-      errors,
-      errorCode,
-      correlationId,
-      statementReqId,
-      errorDetailMsg)
+  private def buildErrorResponse(
+    errors: Option[Throwable] = None,
+    errorCode: String,
+    correlationId: String,
+    statementReqId: Option[String] = None,
+    errorDetailMsg: String = emptyString
+  ) = {
+    val errorResponse =
+      StatementSearchFailureNotificationErrorResponse(errors, errorCode, correlationId, statementReqId, errorDetailMsg)
 
     jsonSchemaValidator.validatePayload(Json.toJson(errorResponse), jsonSchemaValidator.ssfnErrorResponseSchema) match {
       case Success(_) => errorResponse
-      case _ =>
-        StatementSearchFailureNotificationErrorResponse(ErrorDetail(
-          currentDateTimeAsRFC7231(LocalDateTime.now()),
-          correlationId,
-          ErrorCode.code400,
-          ErrorMessage.badRequestReceived,
-          ErrorSource.cdsFinancials,
-          SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))))
+      case _          =>
+        StatementSearchFailureNotificationErrorResponse(
+          ErrorDetail(
+            currentDateTimeAsRFC7231(LocalDateTime.now()),
+            correlationId,
+            ErrorCode.code400,
+            ErrorMessage.badRequestReceived,
+            ErrorSource.cdsFinancials,
+            SourceFaultDetail(Seq(ErrorMessage.badRequestReceived))
+          )
+        )
     }
   }
 

@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) {
+class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Configuration) {
 
   lazy val appName: String = configuration.get[String]("appName")
 
@@ -31,7 +31,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   private def baseUrl(path: String) = servicesConfig.baseUrl(path)
 
   lazy val notificationCacheCollectionName = "notificationStore"
-  lazy val bearerTokenValuePrefix = "Bearer"
+  lazy val bearerTokenValuePrefix          = "Bearer"
 
   lazy val hodsEndpoint: String =
     baseUrl("acc27") +
@@ -40,7 +40,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   lazy val onlyOpenItems: Boolean = configuration.get[Boolean]("features.onlyOpenItems")
 
-  lazy val bearerToken: String = getConfString("acc27.bearer-token", "test")
+  lazy val bearerToken: String       = getConfString("acc27.bearer-token", "test")
   lazy val dataStoreEndpoint: String =
     baseUrl("customs-data-store") + getConfString("customs-data-store.context-base", "/")
 
@@ -156,13 +156,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   lazy val acc44BearerToken: String = getConfString("acc44.bearer-token", "test")
 
   lazy val acc44CashTransactionSearchEndpoint: String =
-    s"${
-      baseUrl("acc44")
-    }${
-      getConfString("acc44.context-base", "/")
-    }${
-      getConfString("acc44.endpoint", "/")
-    }"
+    s"${baseUrl("acc44")}${getConfString("acc44.context-base", "/")}${getConfString("acc44.endpoint", "/")}"
 
   lazy val dbTimeToLiveInSeconds: Int =
     configuration.getOptional[Int]("mongodb.timeToLiveInSeconds").getOrElse(30 * 24 * 60 * 60)
@@ -175,7 +169,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   lazy val secureMessageBearerToken: String = getConfString("secureMessage.bearer-token", "test")
 
-  lazy val ssfnBearerToken: String = getConfString("ssfn.bearer-token", "test")
+  lazy val ssfnBearerToken: String           = getConfString("ssfn.bearer-token", "test")
   lazy val ssfnForwardedHost: Option[String] =
     configuration.getOptional[String]("microservice.services.ssfn.forwarded-host")
 

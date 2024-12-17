@@ -27,17 +27,19 @@ class DocumentationControllerSpec extends SpecBase {
   "DocumentController" should {
     "return controllers.definition view" in {
 
-      val app: Application = GuiceApplicationBuilder().configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled" -> false,
-        "auditing.enabled" -> false
-      ).build()
+      val app: Application = GuiceApplicationBuilder()
+        .configure(
+          "microservice.metrics.enabled" -> false,
+          "metrics.enabled"              -> false,
+          "auditing.enabled"             -> false
+        )
+        .build()
 
       val view = views.txt.definition().toString
 
       running(app) {
-        val result = route(app,
-          FakeRequest(GET, controllers.definition.routes.DocumentationController.definition().url)).value
+        val result =
+          route(app, FakeRequest(GET, controllers.definition.routes.DocumentationController.definition().url)).value
 
         contentAsString(result) mustBe view
       }

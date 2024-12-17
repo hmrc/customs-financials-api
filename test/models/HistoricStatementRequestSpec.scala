@@ -32,28 +32,23 @@ class HistoricStatementRequestSpec extends SpecBase {
 
   trait Setup {
     val statementRequestID: UUID = UUID.randomUUID()
-    val eori: EORI = EORI("test_eori")
-    val fileRole: FileRole = FileRole("PostponedVATStatement")
+    val eori: EORI               = EORI("test_eori")
+    val fileRole: FileRole       = FileRole("PostponedVATStatement")
 
     val histStatRetIntMetadata: HistoricalStatementRetrievalInterfaceMetadata =
-      HistoricalStatementRetrievalInterfaceMetadata(statementRequestID.toString,
+      HistoricalStatementRetrievalInterfaceMetadata(
+        statementRequestID.toString,
         eori,
         fileRole,
         "2021",
         "02",
         "2021",
         "04",
-        None)
+        None
+      )
 
-    val histDocRequest: HistoricDocumentRequest = HistoricDocumentRequest(
-      eori,
-      fileRole,
-      YEAR_2021,
-      MONTH_2,
-      YEAR_2021,
-      MONTH_4,
-      None,
-      statementRequestID)
+    val histDocRequest: HistoricDocumentRequest =
+      HistoricDocumentRequest(eori, fileRole, YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, None, statementRequestID)
 
     val histStatementReq: HistoricStatementRequest = HistoricStatementRequest(histStatRetIntMetadata)
   }

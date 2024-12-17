@@ -91,7 +91,7 @@ class AppConfigSpec extends SpecBase {
   }
 
   trait Setup {
-    val app: Application = application().build()
+    val app: Application     = application().build()
     val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   }
 }

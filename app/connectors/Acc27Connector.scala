@@ -26,14 +26,14 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc27Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc27Connector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig, mdgHeaders: MdgHeaders)(implicit
+  executionContext: ExecutionContext
+) {
 
-  def getAccounts(requestBody: JsValue): Future[JsObject] = {
-    httpClient.post(url"${appConfig.hodsEndpoint}")(HeaderCarrier())
+  def getAccounts(requestBody: JsValue): Future[JsObject] =
+    httpClient
+      .post(url"${appConfig.hodsEndpoint}")(HeaderCarrier())
       .withBody[JsValue](requestBody)
       .setHeader(mdgHeaders.headers(appConfig.bearerToken, None): _*)
       .execute[JsObject]
-  }
 }

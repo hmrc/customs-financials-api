@@ -31,10 +31,10 @@ class CompanyInformationSpec extends SpecBase {
         streetAndNumber = "street&Number",
         city = "london",
         postalCode = Option("Post"),
-        countryCode = COUNTRY_CODE_GB)
+        countryCode = COUNTRY_CODE_GB
+      )
 
-      val result: CompanyInformation = CompanyInformation(
-        name = "Company Name", consent = "Yes", address = address)
+      val result: CompanyInformation = CompanyInformation(name = "Company Name", consent = "Yes", address = address)
 
       result mustBe expectedResult
     }
@@ -49,18 +49,19 @@ class CompanyInformationSpec extends SpecBase {
   }
 
   trait Setup {
-    val streetAndNumber: String = "street&Number"
-    val city: String = "london"
+    val streetAndNumber: String    = "street&Number"
+    val city: String               = "london"
     val postalCode: Option[String] = Option("Post")
-    val countryCode: String = COUNTRY_CODE_GB
+    val countryCode: String        = COUNTRY_CODE_GB
 
     val testAddress: AddressInformation = AddressInformation(
       streetAndNumber = streetAndNumber,
       city = city,
       postalCode = postalCode,
-      countryCode = countryCode)
+      countryCode = countryCode
+    )
 
-    val name: String = "Company Name"
+    val name: String    = "Company Name"
     val consent: String = "Yes"
 
     val companyInfoJsValue: String =

@@ -45,10 +45,13 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")),
     scalacOptions += "-Wconf:msg=Flag.*repeatedly:s",
-    Test / scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all"))
+    Test / scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")),
+    scalafmtDetailedError := true,
+    scalafmtPrintDiff := true,
+    scalafmtFailOnErrors := true
   )
   .settings(scalastyleSettings)
   .settings(Test / parallelExecution := false)
   .settings(resolvers += Resolver.jcenterRepo)
 
-addCommandAlias("runAllChecks", ";clean;compile;coverage;test;it/test;scalastyle;Test/scalastyle;coverageReport")
+addCommandAlias("runAllChecks", ";clean;compile;coverage;test;it/test;scalafmtAll;scalastyle;Test/scalastyle;coverageReport")

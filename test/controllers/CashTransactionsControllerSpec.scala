@@ -20,9 +20,7 @@ import domain.*
 import domain.CashDailyStatement.*
 import models.requests.SearchType.P
 import models.requests.{
-  CashAccountPaymentDetails,
-  CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails
+  CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails
 }
 import models.responses.ErrorCode.{code400, code500}
 import models.responses.EtmpErrorCode.code001
@@ -55,26 +53,37 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val aListOfCashDailyStatements: Seq[CashDailyStatement] =
         Seq(
-          CashDailyStatement("date",
+          CashDailyStatement(
+            "date",
             "openingBalance",
             "closingBalance",
-            Seq(Declaration("mrn",
-              Some(EORI("importerEORI")),
-              EORI("declarantEori"),
-              Some("declarantReference"),
-              "postingDate",
-              "amount",
-              Nil)),
-            Seq(Transaction("12.34", "Payment", None), Transaction("12.34", "Withdrawal", Some("77665544")))))
+            Seq(
+              Declaration(
+                "mrn",
+                Some(EORI("importerEORI")),
+                EORI("declarantEori"),
+                Some("declarantReference"),
+                "postingDate",
+                "amount",
+                Nil
+              )
+            ),
+            Seq(Transaction("12.34", "Payment", None), Transaction("12.34", "Withdrawal", Some("77665544")))
+          )
+        )
 
       val aListOfPendingTransactions: Seq[Declaration] =
-        Seq(Declaration("pendingDeclarationID",
-          Some(EORI("pendingImporterEORI")),
-          EORI("pendingDeclarantEORINumber"),
-          Some("pendingDeclarantReference"),
-          "pendingPostingDate",
-          "pendingAmount",
-          Nil))
+        Seq(
+          Declaration(
+            "pendingDeclarationID",
+            Some(EORI("pendingImporterEORI")),
+            EORI("pendingDeclarantEORINumber"),
+            Some("pendingDeclarantReference"),
+            "pendingPostingDate",
+            "pendingAmount",
+            Nil
+          )
+        )
 
       val expectedCashTransactions: CashTransactions =
         CashTransactions(aListOfPendingTransactions, aListOfCashDailyStatements, Some(false))
@@ -107,7 +116,9 @@ class CashTransactionsControllerSpec extends SpecBase {
       import domain.{Declaration, TaxGroup}
 
       val expectedTaxGroups: Seq[TaxGroup] = Seq(
-        TaxGroup("VAT", fourHundred,
+        TaxGroup(
+          "VAT",
+          fourHundred,
           Seq(
             TaxTypeHolder(
               reasonForSecurity = Some("a"),
@@ -116,8 +127,9 @@ class CashTransactionsControllerSpec extends SpecBase {
             )
           )
         ),
-
-        TaxGroup("Excise", sevenHundred,
+        TaxGroup(
+          "Excise",
+          sevenHundred,
           Seq(
             TaxTypeHolder(
               reasonForSecurity = Some("a"),
@@ -130,17 +142,23 @@ class CashTransactionsControllerSpec extends SpecBase {
 
       val aListOfCashDailyStatements: Seq[CashDailyStatement] =
         Seq(
-          CashDailyStatement("date",
+          CashDailyStatement(
+            "date",
             "openingBalance",
             "closingBalance",
-            Seq(Declaration("mrn",
-              Some(EORI("importerEORI")),
-              EORI("declarantEori"),
-              Some("declarantReference"),
-              "postingDate",
-              "amount",
-              expectedTaxGroups)),
-            Seq(Transaction("12.34", "Payment", None), Transaction("12.34", "Withdrawal", Some("77665544"))))
+            Seq(
+              Declaration(
+                "mrn",
+                Some(EORI("importerEORI")),
+                EORI("declarantEori"),
+                Some("declarantReference"),
+                "postingDate",
+                "amount",
+                expectedTaxGroups
+              )
+            ),
+            Seq(Transaction("12.34", "Payment", None), Transaction("12.34", "Withdrawal", Some("77665544")))
+          )
         )
 
       val aListOfPendingTransactions: Seq[Declaration] =
@@ -220,7 +238,9 @@ class CashTransactionsControllerSpec extends SpecBase {
       when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
           Future.successful(
-            Left(errorDetails.copy(errorCode = code500, errorMessage = "Error connecting to the server"))))
+            Left(errorDetails.copy(errorCode = code500, errorMessage = "Error connecting to the server"))
+          )
+        )
 
       running(app) {
         val result = route(app, retrieveCashAccountTransactions).value
@@ -234,9 +254,8 @@ class CashTransactionsControllerSpec extends SpecBase {
     "return error response for ETMP error codes" in new Setup {
       when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
-          Future.successful(
-            Left(errorDetails.copy(
-              errorCode = code001, errorMessage = "Invalid Cash Account"))))
+          Future.successful(Left(errorDetails.copy(errorCode = code001, errorMessage = "Invalid Cash Account")))
+        )
 
       running(app) {
         val result = route(app, retrieveCashAccountTransactions).value
@@ -251,16 +270,21 @@ class CashTransactionsControllerSpec extends SpecBase {
       when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
           Future.successful(
-            Left(errorDetails.copy(
-              errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server"))))
+            Left(
+              errorDetails
+                .copy(errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server")
+            )
+          )
+        )
 
       running(app) {
         val result = route(app, retrieveCashAccountTransactions).value
 
         status(result) mustBe SERVICE_UNAVAILABLE
         contentAsJson(result) mustBe
-          Json.toJson(errorDetails.copy(
-            errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server"))
+          Json.toJson(
+            errorDetails.copy(errorCode = SERVICE_UNAVAILABLE.toString, errorMessage = "Error connecting to the server")
+          )
       }
     }
   }
@@ -412,35 +436,35 @@ class CashTransactionsControllerSpec extends SpecBase {
   trait Setup {
 
     val sevenHundred = "-789.01"
-    val fourHundred = "-456.78"
-    val tenThousand = "10000.00"
+    val fourHundred  = "-456.78"
+    val tenThousand  = "10000.00"
 
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
+    val mockAuthConnector: CustomAuthConnector               = mock[CustomAuthConnector]
     val mockCashTransactionsService: CashTransactionsService = mock[CashTransactionsService]
 
     val dateFromString = "2024-05-28"
-    val dateToString = "2024-05-28"
+    val dateToString   = "2024-05-28"
 
-    val can = "12345678901"
-    val ownerEORI = "test_eori"
+    val can         = "12345678901"
+    val ownerEORI   = "test_eori"
     val ownerEoriGB = "GB1234678900"
-    val amount = 999.90
+    val amount      = 999.90
 
     val fromDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_1, DAY_1)
-    val toDate: LocalDate = LocalDate.of(YEAR_2020, MONTH_6, DAY_1)
+    val toDate: LocalDate   = LocalDate.of(YEAR_2020, MONTH_6, DAY_1)
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
-    val dateTo: LocalDate = LocalDate.now()
+    val dateTo: LocalDate   = LocalDate.now()
 
-    val eoriNumber = "GB123456789"
-    val dateString = "2024-05-28"
-    val eoriDataName = "test"
+    val eoriNumber       = "GB123456789"
+    val dateString       = "2024-05-28"
+    val eoriDataName     = "test"
     val paymentReference = "CDSC1234567890"
-    val bankAccount = "1234567890987"
-    val sortCode = "123456789"
+    val bankAccount      = "1234567890987"
+    val sortCode         = "123456789"
 
     val cashAccountPaymentDetailsOb: CashAccountPaymentDetails =
       CashAccountPaymentDetails(amount, Some(dateFromString), Some(dateToString))
@@ -469,31 +493,34 @@ class CashTransactionsControllerSpec extends SpecBase {
       FakeRequest(POST, controllers.routes.CashTransactionsController.retrieveCashAccountTransactions().url)
         .withBody(Json.toJson(cashTranSearchRequestDetailsWithSearchTypePOb))
 
-    val cashAccSttRequest: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
-      "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
+    val cashAccSttRequest: CashAccountStatementRequestDetail =
+      CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val submitCashAccStatementRequest: FakeRequest[JsValue] =
       FakeRequest(POST, controllers.routes.CashTransactionsController.submitCashAccStatementRequest().url)
         .withBody(Json.toJson(cashAccSttRequest))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[CashTransactionsService].toInstance(mockCashTransactionsService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[CashTransactionsService].toInstance(mockCashTransactionsService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val cashAccountTransactionSearchResponseDetailOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
         can,
         eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, eoriDataName))),
         declarations = None,
-        paymentsWithdrawalsAndTransfers =
-          Some(
-            Seq(
-              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+        paymentsWithdrawalsAndTransfers = Some(
+          Seq(
+            PaymentsWithdrawalsAndTransferContainer(
+              PaymentsWithdrawalsAndTransfer(
                 dateString,
                 dateString,
                 paymentReference,
@@ -501,8 +528,10 @@ class CashTransactionsControllerSpec extends SpecBase {
                 Payment,
                 Some(bankAccount),
                 Some(sortCode)
-              ))
-            ))
+              )
+            )
+          )
+        )
       )
 
   }

@@ -28,10 +28,7 @@ object ExternalReference {
   implicit val extRefFormat: OFormat[ExternalReference] = Json.format[ExternalReference]
 }
 
-case class Recipient(regime: String,
-                     taxIdentifier: TaxIdentifier,
-                     name: Name,
-                     email: String)
+case class Recipient(regime: String, taxIdentifier: TaxIdentifier, name: Name, email: String)
 
 case class Name(line1: String)
 
@@ -67,20 +64,18 @@ object DateRange {
   def apply(params: Params, lang: String = englishLangKey): DateRange = {
 
     val startMonth = params.periodStartMonth
-    val endMonth = params.periodEndMonth
-    val startYear = params.periodStartYear
-    val endYear = params.periodEndYear
+    val endMonth   = params.periodEndMonth
+    val startYear  = params.periodStartYear
+    val endYear    = params.periodEndYear
 
     val startMonthFullName = convertMonthValueToFullMonthName(startMonth, lang)
-    val endMonthFullName = convertMonthValueToFullMonthName(endMonth, lang)
+    val endMonthFullName   = convertMonthValueToFullMonthName(endMonth, lang)
 
-    val dateRangeMsgText = s"$startMonthFullName$singleSpace$startYear$singleSpace${
-      if (lang == welshLangKey) "i" else "to"
-    }$singleSpace$endMonthFullName$singleSpace$endYear"
+    val dateRangeMsgText =
+      s"$startMonthFullName$singleSpace$startYear$singleSpace${if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonthFullName$singleSpace$endYear"
 
-    val dateRangeMsgNum = s"$startMonth$singleSpace$startYear$singleSpace${
-      if (lang == welshLangKey) "i" else "to"
-    }$singleSpace$endMonth$singleSpace$endYear"
+    val dateRangeMsgNum =
+      s"$startMonth$singleSpace$startYear$singleSpace${if (lang == welshLangKey) "i" else "to"}$singleSpace$endMonth$singleSpace$endYear"
 
     DateRange(dateRangeMsgText, dateRangeMsgNum)
   }
@@ -90,21 +85,21 @@ object DateRange {
 
 object SecureMessage {
 
-  val SubjectDutyDef = "Requested duty deferment statements "
-  val SubjectCert = "Requested import VAT certificates (C79) "
+  val SubjectDutyDef  = "Requested duty deferment statements "
+  val SubjectCert     = "Requested import VAT certificates (C79) "
   val SubjectSecurity = "Requested notification of adjustment statements "
-  val SubjectImport = "Requested postponed import VAT statements "
+  val SubjectImport   = "Requested postponed import VAT statements "
 
-  val SubjectDutyDefCy = "Datganiadau gohirio tollau a wnaed cais amdanynt "
-  val SubjectCertCy = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
+  val SubjectDutyDefCy  = "Datganiadau gohirio tollau a wnaed cais amdanynt "
+  val SubjectCertCy     = "Tystysgrifau TAW mewnforio (C79) a wnaed cais amdanynt "
   val SubjectSecurityCy = "Hysbysiad o ddatganiadau addasu a wnaed cais amdanynt"
-  val SubjectImportCy = "Datganiadau TAW mewnforio ohiriedig a wnaed cais amdanynt "
+  val SubjectImportCy   = "Datganiadau TAW mewnforio ohiriedig a wnaed cais amdanynt "
 
-  val SignOff = "From the Customs Declaration Service"
-  val WereNotFound = " were not found.<br/><br/>"
+  val SignOff                 = "From the Customs Declaration Service"
+  val WereNotFound            = " were not found.<br/><br/>"
   val CheckIfYourDeclarations = " Check if your declarations were made using CHIEF and contact"
-  val ImportVATCerts = "<li>Import VAT certificates for declarations"
-  val RequestChief = " request CHIEF statements.<br/>"
+  val ImportVATCerts          = "<li>Import VAT certificates for declarations"
+  val RequestChief            = " request CHIEF statements.<br/>"
 
   val TwoReasons: String = "There are 2 possible reasons for this:<br/>" +
     "<ol><li>Statements are only created for the periods in which you imported goods." +
@@ -115,14 +110,12 @@ object SecureMessage {
 
   val YouRequestedFor = "you requested for"
 
-  val DutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+  val DutyDefermentTemplate  = "customs_financials_requested_duty_deferment_not_found"
   val C79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-  val SecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
-  val PostponedVATemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+  val SecurityTemplate       = "customs_financials_requested_notification_adjustment_statements_not_found"
+  val PostponedVATemplate    = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
-  def dutyDefermentBody(companyName: String,
-                        dateRange: DateRange,
-                        lang: String = englishLangKey): String = {
+  def dutyDefermentBody(companyName: String, dateRange: DateRange, lang: String = englishLangKey): String = {
     val guidanceLink = "https://secure.hmce.gov.uk/ecom/login/index.html"
 
     if (lang == englishLangKey) {
@@ -151,11 +144,9 @@ object SecureMessage {
     }
   }
 
-  def c79CertificateBody(companyName: String,
-                         dateRange: DateRange,
-                         lang: String = englishLangKey): String = {
+  def c79CertificateBody(companyName: String, dateRange: DateRange, lang: String = englishLangKey): String = {
     val guidanceLinkText = "cbc-c79requests@hmrc.gov.uk"
-    val guidanceLink = "mailto:cbc-c79requests@hmrc.gov.uk"
+    val guidanceLink     = "mailto:cbc-c79requests@hmrc.gov.uk"
 
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
@@ -180,9 +171,7 @@ object SecureMessage {
     }
   }
 
-  def securityBody(companyName: String,
-                   dateRange: DateRange,
-                   lang: String = englishLangKey): String = {
+  def securityBody(companyName: String, dateRange: DateRange, lang: String = englishLangKey): String =
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
         s"The notification of adjustment statements $YouRequestedFor ${dateRange.dateAsText}" +
@@ -200,13 +189,10 @@ object SecureMessage {
         "eu Mewnforio a’u Hallforio (CHIEF)." +
         "</li></ol><br/>Oddi wrth y Gwasanaeth Datganiadau Tollau"
     }
-  }
 
-  def postponedVATBody(companyName: String,
-                       dateRange: DateRange,
-                       lang: String = englishLangKey): String = {
+  def postponedVATBody(companyName: String, dateRange: DateRange, lang: String = englishLangKey): String = {
     val guidanceLinkText = "pvaenquiries@hmrc.gov.uk"
-    val guidanceLink = "mailto:pvaenquiries@hmrc.gov.uk"
+    val guidanceLink     = "mailto:pvaenquiries@hmrc.gov.uk"
 
     if (lang == englishLangKey) {
       s"Dear ${companyNameForMsg(companyName, lang)}<br/><br/>" +
@@ -229,12 +215,10 @@ object SecureMessage {
     }
   }
 
-  private def companyNameForMsg(companyName: String,
-                                lang: String): String = {
+  private def companyNameForMsg(companyName: String, lang: String): String =
     if (companyName.isEmpty) {
       if (lang == englishLangKey) "Customer" else "Gwsmer"
     } else {
       companyName
     }
-  }
 }

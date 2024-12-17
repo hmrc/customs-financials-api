@@ -30,60 +30,66 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
-                                        acc44Connector: Acc44Connector,
-                                        acc45Connector: Acc45Connector,
-                                        domainService: DomainService,
-                                        auditingService: AuditingService)(implicit executionContext: ExecutionContext) {
-  def retrieveCashTransactionsSummary(can: String,
-                                      from: LocalDate,
-                                      to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+class CashTransactionsService @Inject() (
+  acc31Connector: Acc31Connector,
+  acc44Connector: Acc44Connector,
+  acc45Connector: Acc45Connector,
+  domainService: DomainService,
+  auditingService: AuditingService
+)(implicit executionContext: ExecutionContext) {
+  def retrieveCashTransactionsSummary(
+    can: String,
+    from: LocalDate,
+    to: LocalDate
+  ): Future[Either[ErrorResponse, CashTransactions]] =
     acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainSummary(responseDetail))
-          case None => Right(CashTransactions(Nil, Nil))
+          case None                 => Right(CashTransactions(Nil, Nil))
         }
 
       case Left(errorValue) => Left(errorValue)
     }
-  }
 
-  def retrieveCashTransactionsDetail(can: String,
-                                     from: LocalDate,
-                                     to: LocalDate): Future[Either[ErrorResponse, CashTransactions]] = {
+  def retrieveCashTransactionsDetail(
+    can: String,
+    from: LocalDate,
+    to: LocalDate
+  ): Future[Either[ErrorResponse, CashTransactions]] =
     acc31Connector.retrieveCashTransactions(can, from, to).map {
       case Right(value) =>
         value match {
           case Some(responseDetail) => Right(domainService.toDomainDetail(responseDetail))
-          case None => Right(CashTransactions(Nil, Nil))
+          case None                 => Right(CashTransactions(Nil, Nil))
         }
 
       case Left(errorValue) => Left(errorValue)
     }
-  }
 
-  def retrieveCashAccountTransactions(request: CashAccountTransactionSearchRequestDetails)
-                                     (implicit hc: HeaderCarrier): Future[Either[ErrorDetail,
-    CashAccountTransactionSearchResponseDetail]] = {
+  def retrieveCashAccountTransactions(
+    request: CashAccountTransactionSearchRequestDetails
+  )(implicit hc: HeaderCarrier): Future[Either[ErrorDetail, CashAccountTransactionSearchResponseDetail]] = {
 
     auditingService.auditCashAccountTransactionsSearch(request)
 
     acc44Connector.cashAccountTransactionSearch(request).map {
-      case Right(resValue) => populateSuccessfulResponseDetail(resValue)
+      case Right(resValue)    => populateSuccessfulResponseDetail(resValue)
       case Left(errorDetails) => Left(errorDetails)
     }
   }
 
-  def submitCashAccountStatementRequest(request: CashAccountStatementRequestDetail)
-                                       (implicit hc: HeaderCarrier): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
+  def submitCashAccountStatementRequest(
+    request: CashAccountStatementRequestDetail
+  )(implicit hc: HeaderCarrier): Future[Either[ErrorDetail, Acc45ResponseCommon]] = {
     auditingService.auditCashAccountStatementsRequest(request)
 
     acc45Connector.submitStatementRequest(request)
   }
 
-  private def populateSuccessfulResponseDetail(resValue: CashAccountTransactionSearchResponseContainer): Either[ErrorDetail,
-    CashAccountTransactionSearchResponseDetail] = {
+  private def populateSuccessfulResponseDetail(
+    resValue: CashAccountTransactionSearchResponseContainer
+  ): Either[ErrorDetail, CashAccountTransactionSearchResponseDetail] = {
 
     val responseDetailOptional = resValue.cashAccountTransactionSearchResponse.responseDetail
 
@@ -95,11 +101,11 @@ class CashTransactionsService @Inject()(acc31Connector: Acc31Connector,
   }
 
   private def populateErrorDetails(cashTranResponseCommon: CashTransactionsResponseCommon): ErrorDetail = {
-    val statusText = cashTranResponseCommon.statusText.getOrElse(INVALID_CASH_ACCOUNT_STATUS_TEXT)
+    val statusText                                  = cashTranResponseCommon.statusText.getOrElse(INVALID_CASH_ACCOUNT_STATUS_TEXT)
     val statusTextAfterSplitByHyphen: Array[String] = statusText.split(hyphen)
 
     val etmpErrorCode: String = statusTextAfterSplitByHyphen.head
-    val etmpErrorMessage = statusTextAfterSplitByHyphen.tail.head
+    val etmpErrorMessage      = statusTextAfterSplitByHyphen.tail.head
 
     ErrorDetail(
       timestamp = cashTranResponseCommon.processingDate,

@@ -170,7 +170,8 @@ class UtilsSpec extends SpecBase {
           "09" -> "September",
           "10" -> "October",
           "11" -> "November",
-          "12" -> "December")
+          "12" -> "December"
+        )
       }
 
       "create the correct map for Welsh" in {
@@ -186,7 +187,8 @@ class UtilsSpec extends SpecBase {
           "09" -> "Medi",
           "10" -> "Hydref",
           "11" -> "Tachwedd",
-          "12" -> "Rhagfyr")
+          "12" -> "Rhagfyr"
+        )
       }
 
       "singleSpace" should {

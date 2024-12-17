@@ -46,8 +46,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
       when(mockNotificationCache.getNotifications(any)).thenReturn(Future.successful(None))
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
       when(mockDateTimeService.utcDateTime)
-        .thenReturn(
-          LocalDateTime.of(YEAR_2021, MONTH_7, DAY_7, HOUR_10, MINUTES_5, SECONDS_29, MILI_SECONDS_352))
+        .thenReturn(LocalDateTime.of(YEAR_2021, MONTH_7, DAY_7, HOUR_10, MINUTES_5, SECONDS_29, MILI_SECONDS_352))
 
       running(app) {
         val result = route(app, getRequest).value
@@ -57,24 +56,28 @@ class SDESNotificationsControllerSpec extends SpecBase {
     }
 
     "return seq of notifications from a mongo when there are some" in new Setup {
-      val notification: NotificationsForEori = NotificationsForEori(eori, Seq(
-        Notification(
-          eori,
-          FILE_ROLE_C79_CERTIFICATE,
-          CSV_FILE_NAME,
-          FILE_SIZE_1000L,
-          None,
-          Map(
-            "periodStartYear" -> "2019",
-            "periodStartMonth" -> "1",
-            "fileType" -> "csv",
-            "fileRole" -> "C79Certificate",
-            "fileName" -> CSV_FILE_NAME,
-            "downloadURL" -> "http://localhost/abc.csv",
-            "fileSize" -> "1000")
-        )
-      ),
-        Some(LocalDateTime.parse("2021-07-07T10:05:29.352", DateTimeFormatter.ISO_DATE_TIME)))
+      val notification: NotificationsForEori = NotificationsForEori(
+        eori,
+        Seq(
+          Notification(
+            eori,
+            FILE_ROLE_C79_CERTIFICATE,
+            CSV_FILE_NAME,
+            FILE_SIZE_1000L,
+            None,
+            Map(
+              "periodStartYear"  -> "2019",
+              "periodStartMonth" -> "1",
+              "fileType"         -> "csv",
+              "fileRole"         -> "C79Certificate",
+              "fileName"         -> CSV_FILE_NAME,
+              "downloadURL"      -> "http://localhost/abc.csv",
+              "fileSize"         -> "1000"
+            )
+          )
+        ),
+        Some(LocalDateTime.parse("2021-07-07T10:05:29.352", DateTimeFormatter.ISO_DATE_TIME))
+      )
 
       when(mockNotificationCache.getNotifications(ArgumentMatchers.eq(eori)))
         .thenReturn(Future.successful(Some(notification)))
@@ -82,7 +85,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
       running(app) {
-        val result = route(app, getRequest).value
+        val result          = route(app, getRequest).value
         val expectedContent = Json.toJson(notification)
         status(result) mustBe OK
         contentAsJson(result) mustBe expectedContent
@@ -167,27 +170,30 @@ class SDESNotificationsControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val eori: EORI = EORI("123456789")
+    val eori: EORI             = EORI("123456789")
     val enrolments: Enrolments =
       Enrolments(Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, eori.value)), "activated")))
 
-    val mockNotificationCache: NotificationCache = mock[NotificationCache]
+    val mockNotificationCache: NotificationCache    = mock[NotificationCache]
     val mockEmailThrottler: EmailThrottlerConnector = mock[EmailThrottlerConnector]
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    val mockDataStore: DataStoreConnector = mock[DataStoreConnector]
-    val mockDateTimeService: DateTimeService = mock[DateTimeService]
+    val mockAuthConnector: CustomAuthConnector      = mock[CustomAuthConnector]
+    val mockDataStore: DataStoreConnector           = mock[DataStoreConnector]
+    val mockDateTimeService: DateTimeService        = mock[DateTimeService]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[NotificationCache].toInstance(mockNotificationCache),
-      inject.bind[EmailThrottlerConnector].toInstance(mockEmailThrottler),
-      inject.bind[DataStoreConnector].toInstance(mockDataStore),
-      inject.bind[DateTimeService].toInstance(mockDateTimeService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[NotificationCache].toInstance(mockNotificationCache),
+        inject.bind[EmailThrottlerConnector].toInstance(mockEmailThrottler),
+        inject.bind[DataStoreConnector].toInstance(mockDataStore),
+        inject.bind[DateTimeService].toInstance(mockDateTimeService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val notificationForEoriCaptor: ArgumentCaptor[NotificationsForEori] =
       ArgumentCaptor.forClass(classOf[NotificationsForEori])

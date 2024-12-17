@@ -45,7 +45,8 @@ class AccountAuthorityServiceSpec extends SpecBase {
                 AccountNumber("123456"),
                 AccountStatus("Open"),
                 Seq(StandingAuthority(EORI("Agent EORI"), "from date", Some("to date"), viewBalance = false))
-              ))
+              )
+            )
 
           when(mockAcc29Connector.getStandingAuthorities(eqTo(EORI("Trader EORI"))))
             .thenReturn(Future.successful(aListOfAccountWithAuthorities))
@@ -109,7 +110,10 @@ class AccountAuthorityServiceSpec extends SpecBase {
     "calling ACC30 revokeAccountAuthorities" should {
 
       val revokeAuthorityRequest = RevokeAuthorityRequest(
-        AccountNumber("123"), CdsCashAccount, EORI("authorisedEori"), AuthorisedUser("some name", "some role")
+        AccountNumber("123"),
+        CdsCashAccount,
+        EORI("authorisedEori"),
+        AuthorisedUser("some name", "some role")
       )
 
       "propagate the connector's result when true" in new Setup {
@@ -139,23 +143,26 @@ class AccountAuthorityServiceSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier                  = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-    val eori: EORI = EORI("testEORI")
-    val mockAcc29Connector: Acc29Connector = mock[Acc29Connector]
-    val mockAcc30Connector: Acc30Connector = mock[Acc30Connector]
+    val eori: EORI                           = EORI("testEORI")
+    val mockAcc29Connector: Acc29Connector   = mock[Acc29Connector]
+    val mockAcc30Connector: Acc30Connector   = mock[Acc30Connector]
     val mockAuditingService: AuditingService = mock[AuditingService]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc29Connector].toInstance(mockAcc29Connector),
-      inject.bind[Acc30Connector].toInstance(mockAcc30Connector),
-      inject.bind[AuditingService].toInstance(mockAuditingService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc29Connector].toInstance(mockAcc29Connector),
+        inject.bind[Acc30Connector].toInstance(mockAcc30Connector),
+        inject.bind[AuditingService].toInstance(mockAuditingService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val service: AccountAuthorityService = app.injector.instanceOf[AccountAuthorityService]
   }

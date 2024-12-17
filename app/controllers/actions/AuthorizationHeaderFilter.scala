@@ -23,29 +23,24 @@ import play.api.mvc.Results.Unauthorized
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DefaultAuthorizationHeaderFilter @Inject()(val parser: BodyParsers.Default,
-                                                 appConfig: AppConfig)
-                                                (implicit val executionContext: ExecutionContext)
-  extends AuthorizationHeaderFilter {
+class DefaultAuthorizationHeaderFilter @Inject() (val parser: BodyParsers.Default, appConfig: AppConfig)(implicit
+  val executionContext: ExecutionContext
+) extends AuthorizationHeaderFilter {
 
   private val logger = play.api.Logger(getClass)
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
+  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     Future.successful(for {
       requestWithAuthorizationHeader <- validateAuthorization(request)
     } yield requestWithAuthorizationHeader)
-  }
 
-  private def validateAuthorization[A](request: Request[A]): Either[Result, Request[A]] = {
+  private def validateAuthorization[A](request: Request[A]): Either[Result, Request[A]] =
     request.headers.get("Authorization") match {
       case Some(s"${appConfig.bearerTokenValuePrefix} ${appConfig.ssfnBearerToken}") => Right(request)
-      case _ =>
+      case _                                                                         =>
         logger.error("Invalid Authorization token")
         Left(Unauthorized)
     }
-  }
 }
 
-trait AuthorizationHeaderFilter
-  extends ActionBuilder[Request, AnyContent]
-    with ActionRefiner[Request, Request]
+trait AuthorizationHeaderFilter extends ActionBuilder[Request, AnyContent] with ActionRefiner[Request, Request]

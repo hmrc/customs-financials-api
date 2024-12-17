@@ -53,7 +53,8 @@ class Acc40ConnectorSpec extends SpecBase {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
       when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
+      when(requestBuilder.execute(any, any))
+        .thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
@@ -77,23 +78,29 @@ class Acc40ConnectorSpec extends SpecBase {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
       when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(
-        response(None,
-          Some("1"),
-          Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
-          None,
-          None)))
+      when(requestBuilder.execute(any, any)).thenReturn(
+        Future.successful(
+          response(
+            None,
+            Some("1"),
+            Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
+            None,
+            None
+          )
+        )
+      )
 
       running(app) {
         val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
         result mustBe
           Right(
-            AuthoritiesFound(Some("1"),
+            AuthoritiesFound(
+              Some("1"),
               None,
               None,
-              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"),
-                Some("10.0"))))
-            ))
+              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0"))))
+            )
+          )
       }
     }
 
@@ -122,16 +129,17 @@ class Acc40ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-    def response(error: Option[String],
-                 numberOfAuthorities: Option[String],
-                 cashAccount: Option[Seq[CashAccount]],
-                 dutyDefermentAccount: Option[Seq[DutyDefermentAccount]],
-                 generalGuaranteeAccount: Option[Seq[GeneralGuaranteeAccount]]): SearchAuthoritiesResponse = {
-
+    def response(
+      error: Option[String],
+      numberOfAuthorities: Option[String],
+      cashAccount: Option[Seq[CashAccount]],
+      dutyDefermentAccount: Option[Seq[DutyDefermentAccount]],
+      generalGuaranteeAccount: Option[Seq[GeneralGuaranteeAccount]]
+    ): SearchAuthoritiesResponse =
       SearchAuthoritiesResponse(
         domain.acc40.Response(
           RequestCommon("date", MDTP, "reference", REGIME_CDS),
@@ -145,16 +153,18 @@ class Acc40ConnectorSpec extends SpecBase {
           )
         )
       )
-    }
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
   }

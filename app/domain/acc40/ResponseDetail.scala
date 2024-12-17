@@ -19,11 +19,13 @@ package domain.acc40
 import domain.AuthoritiesFound
 import play.api.libs.json.{Json, OFormat}
 
-case class ResponseDetail(errorMessage: Option[String],
-                          numberOfAuthorities: Option[String],
-                          dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
-                          generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
-                          cdsCashAccounts: Option[Seq[CashAccount]]) {
+case class ResponseDetail(
+  errorMessage: Option[String],
+  numberOfAuthorities: Option[String],
+  dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
+  generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
+  cdsCashAccounts: Option[Seq[CashAccount]]
+) {
   def toAuthoritiesFound: AuthoritiesFound =
     AuthoritiesFound(
       numberOfAuthorities,

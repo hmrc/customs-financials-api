@@ -81,7 +81,7 @@ class DomainServiceSpec extends SpecBase {
     val domainService = new DomainService()
 
     val twoHundred = "200.00"
-    val hundred = "100.00"
+    val hundred    = "100.00"
 
     val taxTypeDetail: TaxTypeDetail =
       TaxTypeDetail(reasonForSecurity = Some("b"), taxTypeID = "a", amount = hundred)
@@ -117,16 +117,49 @@ class DomainServiceSpec extends SpecBase {
     )
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
-    val dateTo: LocalDate = LocalDate.now()
-    val twoThousand = "2000.00"
-    val thousand = "1000.00"
+    val dateTo: LocalDate   = LocalDate.now()
+    val twoThousand         = "2000.00"
+    val thousand            = "1000.00"
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
       DailyStatementDetail(
         dateFrom.toString,
         "10000",
         "9000",
-        Some(Seq(DeclarationContainer(
+        Some(
+          Seq(
+            DeclarationContainer(
+              DeclarationDetail(
+                "someId",
+                Some(EORI("someImporterEORI")),
+                EORI("someEori"),
+                Some("reference"),
+                dateTo.toString,
+                "10000",
+                Seq(
+                  TaxGroupContainer(
+                    TaxGroupDetail(
+                      "something",
+                      twoThousand,
+                      Seq(
+                        TaxTypeContainer(
+                          TaxTypeDetail(reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand)
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        Some(Seq(PaymentAndWithdrawalContainer(PaymentAndWithdrawalDetail("10000", "A21", Some("Bank")))))
+      )
+    )
+
+    val pending: PendingTransactions = PendingTransactions(
+      Seq(
+        DeclarationContainer(
           DeclarationDetail(
             "someId",
             Some(EORI("someImporterEORI")),
@@ -136,7 +169,9 @@ class DomainServiceSpec extends SpecBase {
             "10000",
             Seq(
               TaxGroupContainer(
-                TaxGroupDetail("something", twoThousand,
+                TaxGroupDetail(
+                  "something",
+                  twoThousand,
                   Seq(
                     TaxTypeContainer(TaxTypeDetail(reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand))
                   )
@@ -144,36 +179,12 @@ class DomainServiceSpec extends SpecBase {
               )
             )
           )
-        ))),
-        Some(Seq(PaymentAndWithdrawalContainer(PaymentAndWithdrawalDetail("10000", "A21", Some("Bank"))
-        )))
+        )
       )
     )
 
-    val pending: PendingTransactions = PendingTransactions(
-      Seq(DeclarationContainer(
-        DeclarationDetail(
-          "someId",
-          Some(EORI("someImporterEORI")),
-          EORI("someEori"),
-          Some("reference"),
-          dateTo.toString,
-          "10000",
-          Seq(
-            TaxGroupContainer(
-              TaxGroupDetail("something", twoThousand,
-                Seq(TaxTypeContainer(TaxTypeDetail(reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand)))
-              )
-            )
-          )
-        )
-      ))
-    )
-
-    val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
-      Some(Seq(dailyStatement)),
-      Some(pending),
-      Some(true))
+    val cashTransactionsResponseDetail: CashTransactionsResponseDetail =
+      CashTransactionsResponseDetail(Some(Seq(dailyStatement)), Some(pending), Some(true))
 
   }
 }

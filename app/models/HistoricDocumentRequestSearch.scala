@@ -26,13 +26,15 @@ import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.UUID
 
-case class HistoricDocumentRequestSearch(searchID: UUID,
-                                         resultsFound: SearchResultStatus.SearchResultStatus,
-                                         searchStatusUpdateDate: String = emptyString,
-                                         currentEori: String,
-                                         params: Params,
-                                         searchRequests: Set[SearchRequest],
-                                         expireAt: Option[LocalDateTime] = None) {
+case class HistoricDocumentRequestSearch(
+  searchID: UUID,
+  resultsFound: SearchResultStatus.SearchResultStatus,
+  searchStatusUpdateDate: String = emptyString,
+  currentEori: String,
+  params: Params,
+  searchRequests: Set[SearchRequest],
+  expireAt: Option[LocalDateTime] = None
+) {
   require(searchRequests.nonEmpty, "searchRequests is empty")
 }
 
@@ -43,40 +45,46 @@ object HistoricDocumentRequestSearch {
     Reads[LocalDateTime](js =>
       js.validate[Long] match {
         case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
-        case _ =>
-          JsSuccess(Instant.now()
-            .plus(EXPIRE_TIME_STAMP_SECONDS, ChronoUnit.SECONDS).atOffset(ZoneOffset.UTC).toLocalDateTime)
+        case _                  =>
+          JsSuccess(
+            Instant
+              .now()
+              .plus(EXPIRE_TIME_STAMP_SECONDS, ChronoUnit.SECONDS)
+              .atOffset(ZoneOffset.UTC)
+              .toLocalDateTime
+          )
       }
     ),
-    Writes[LocalDateTime](d =>
-      JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli)
-    )
+    Writes[LocalDateTime](d => JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli))
   )
 
   implicit val historicDocumentRequestSearchFormat: OFormat[HistoricDocumentRequestSearch] =
     Json.format[HistoricDocumentRequestSearch]
 
-  def from(historicDocumentRequests: Set[HistoricDocumentRequest],
-           requestEori: String): HistoricDocumentRequestSearch = {
+  def from(
+    historicDocumentRequests: Set[HistoricDocumentRequest],
+    requestEori: String
+  ): HistoricDocumentRequestSearch = {
 
     val headHistDocRequest = historicDocumentRequests.head
-    val params = Params(
+    val params             = Params(
       zeroPad(headHistDocRequest.periodStartMonth),
       headHistDocRequest.periodStartYear.toString,
       zeroPad(headHistDocRequest.periodEndMonth),
       headHistDocRequest.periodEndYear.toString,
       headHistDocRequest.documentType.value,
-      headHistDocRequest.dan.getOrElse(emptyString))
+      headHistDocRequest.dan.getOrElse(emptyString)
+    )
 
-    val searchDocReqs = historicDocumentRequests.map {
-      histDoc =>
-        SearchRequest(
-          histDoc.eori.value,
-          histDoc.statementRequestID.toString,
-          SearchResultStatus.inProcess,
-          emptyString,
-          emptyString,
-          0)
+    val searchDocReqs = historicDocumentRequests.map { histDoc =>
+      SearchRequest(
+        histDoc.eori.value,
+        histDoc.statementRequestID.toString,
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      )
     }
 
     HistoricDocumentRequestSearch(
@@ -85,6 +93,7 @@ object HistoricDocumentRequestSearch {
       emptyString,
       requestEori,
       params,
-      searchDocReqs)
+      searchDocReqs
+    )
   }
 }

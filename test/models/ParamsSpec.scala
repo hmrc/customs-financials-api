@@ -23,12 +23,7 @@ class ParamsSpec extends SpecBase {
 
   "object should be created" should {
     "for correct parameter values" in {
-      val paramsOb = Params("2",
-        "2021",
-        "3",
-        "2021",
-        AccountTypeForParams.DutyDefermentStatement.toString,
-        "1234567")
+      val paramsOb = Params("2", "2021", "3", "2021", AccountTypeForParams.DutyDefermentStatement.toString, "1234567")
 
       paramsOb.accountType mustBe AccountTypeForParams.DutyDefermentStatement.toString
     }
@@ -37,14 +32,11 @@ class ParamsSpec extends SpecBase {
   "Exception must be thrown" should {
     "for incorrect parameter values" in {
       intercept[RuntimeException] {
-        Params("2",
-          "2021",
-          "3",
-          "2021",
-          "DutyDeferment",
-          "1234567")
-      }.getMessage.contains("invalid value for accountType," +
-        " valid values are C79Certificate,PostponedVATStatement,SecurityStatement,DutyDefermentStatement")
+        Params("2", "2021", "3", "2021", "DutyDeferment", "1234567")
+      }.getMessage.contains(
+        "invalid value for accountType," +
+          " valid values are C79Certificate,PostponedVATStatement,SecurityStatement,DutyDefermentStatement"
+      )
     }
   }
 
@@ -52,12 +44,7 @@ class ParamsSpec extends SpecBase {
     "result the correct output" in {
       import Params.paramsFormat
 
-      val paramsOb = Params("2",
-        "2021",
-        "3",
-        "2021",
-        AccountTypeForParams.DutyDefermentStatement.toString,
-        "1234567")
+      val paramsOb = Params("2", "2021", "3", "2021", AccountTypeForParams.DutyDefermentStatement.toString, "1234567")
 
       val jsValue =
         """{"periodStartMonth": "2",
@@ -73,12 +60,7 @@ class ParamsSpec extends SpecBase {
 
   "Json Writes" should {
     "result in correct output" in {
-      val paramsOb = Params("2",
-        "2021",
-        "3",
-        "2021",
-        "DutyDefermentStatement",
-        "1234567")
+      val paramsOb = Params("2", "2021", "3", "2021", "DutyDefermentStatement", "1234567")
 
       val jsValue =
         """{"periodStartMonth": "2",

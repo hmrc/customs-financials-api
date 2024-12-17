@@ -34,32 +34,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
-                                          appConfig: AppConfig)(implicit executionContext: ExecutionContext)
-  extends PlayMongoRepository[NotificationsForEori](
-    collectionName = appConfig.notificationCacheCollectionName,
-    mongoComponent = mongoComponent,
-    domainFormat = NotificationsForEori.notificationsFormat,
-    indexes = Seq(
-      IndexModel(
-        ascending("eori"),
-        IndexOptions().name("eoriIndex")
-          .unique(true)
-          .sparse(true)
-      ),
-      IndexModel(
-        ascending("lastUpdated"),
-        IndexOptions().name("lastUpdatedIndex")
-          .expireAfter(appConfig.dbTimeToLiveInSeconds.toLong, TimeUnit.SECONDS)
-      ))
-  ) with NotificationCache {
+class DefaultNotificationCache @Inject() (mongoComponent: MongoComponent, appConfig: AppConfig)(implicit
+  executionContext: ExecutionContext
+) extends PlayMongoRepository[NotificationsForEori](
+      collectionName = appConfig.notificationCacheCollectionName,
+      mongoComponent = mongoComponent,
+      domainFormat = NotificationsForEori.notificationsFormat,
+      indexes = Seq(
+        IndexModel(
+          ascending("eori"),
+          IndexOptions()
+            .name("eoriIndex")
+            .unique(true)
+            .sparse(true)
+        ),
+        IndexModel(
+          ascending("lastUpdated"),
+          IndexOptions()
+            .name("lastUpdatedIndex")
+            .expireAfter(appConfig.dbTimeToLiveInSeconds.toLong, TimeUnit.SECONDS)
+        )
+      )
+    )
+    with NotificationCache {
 
-  override def getNotifications(eori: EORI): Future[Option[NotificationsForEori]] = {
+  override def getNotifications(eori: EORI): Future[Option[NotificationsForEori]] =
     for {
-      _ <- removeExpiredNotifications(eori)
+      _      <- removeExpiredNotifications(eori)
       result <- collection.find(equal("eori", eori.value)).toSingle().toFutureOption()
     } yield result
-  }
 
   override def removeByFileRole(eori: EORI, fileRole: FileRole): Future[Unit] = {
     val query = Filters.and(
@@ -67,19 +70,17 @@ class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
       Filters.exists("metadata.statementRequestID", exists = false)
     )
 
-    collection.updateOne(
-      equal("eori", eori.value),
-      Updates.pull("notifications", query))
+    collection
+      .updateOne(equal("eori", eori.value), Updates.pull("notifications", query))
       .toFuture()
       .map(_ => ())
   }
 
-  override def removeEori(eori: EORI): Future[Unit] = {
+  override def removeEori(eori: EORI): Future[Unit] =
     collection
       .deleteOne(equal("eori", eori.value))
       .toFuture()
       .map(_ => ())
-  }
 
   override def removeRequestedByFileRole(eori: EORI, fileRole: FileRole): Future[Unit] = {
     val query = Filters.and(
@@ -87,53 +88,54 @@ class DefaultNotificationCache @Inject()(mongoComponent: MongoComponent,
       Filters.exists("metadata.statementRequestID", exists = true)
     )
 
-    collection.updateOne(
-      equal("eori", eori.value),
-      Updates.pull("notifications", query))
+    collection
+      .updateOne(equal("eori", eori.value), Updates.pull("notifications", query))
       .toFuture()
       .map(_ => ())
   }
 
-  override def removeByMetaData(eori: EORI, statementRequestID: Map[String, String]): Future[Unit] = {
-    collection.updateOne(
-      equal("eori", eori.value),
-      Updates.pull("notifications", Codecs.toBson(Json.obj("metadata" -> statementRequestID))))
+  override def removeByMetaData(eori: EORI, statementRequestID: Map[String, String]): Future[Unit] =
+    collection
+      .updateOne(
+        equal("eori", eori.value),
+        Updates.pull("notifications", Codecs.toBson(Json.obj("metadata" -> statementRequestID)))
+      )
       .toFuture()
       .map(_ => ())
-  }
 
   override def putNotifications(notificationsForEori: NotificationsForEori): Future[Unit] = {
     import NotificationsForEori.*
 
     val lastUpdated: Bson = Updates.set("lastUpdated", Codecs.toBson(notificationsForEori.lastUpdated))
-    val records = notificationsForEori.notifications.map(Codecs.toBson(_))
-    val test = Updates.addEachToSet("notifications", records: _*)
-    collection.updateOne(
-      equal("eori", notificationsForEori.eori.value),
-      Updates.combine(
-        test,
-        lastUpdated
-      ),
-      UpdateOptions().upsert(true)
-    ).toFuture().map(_ => ())
+    val records           = notificationsForEori.notifications.map(Codecs.toBson(_))
+    val test              = Updates.addEachToSet("notifications", records: _*)
+    collection
+      .updateOne(
+        equal("eori", notificationsForEori.eori.value),
+        Updates.combine(
+          test,
+          lastUpdated
+        ),
+        UpdateOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_ => ())
   }
 
   private def removeExpiredNotifications(eori: EORI): Future[Seq[Unit]] = {
     val findResult = collection.find(equal("eori", eori.value)).toFuture().map(_.flatMap(_.notifications))
 
     findResult.flatMap { notifications =>
-      Future.sequence(notifications.map {
-        notification => {
-          val retentionDays: Option[String] = notification.metadata.get("RETENTION_DAYS")
-          val statementRequestIDExists: Boolean = notification.metadata.contains("statementRequestID")
-          val created: Option[LocalDate] = notification.created
+      Future.sequence(notifications.map { notification =>
+        val retentionDays: Option[String]     = notification.metadata.get("RETENTION_DAYS")
+        val statementRequestIDExists: Boolean = notification.metadata.contains("statementRequestID")
+        val created: Option[LocalDate]        = notification.created
 
-          (retentionDays, statementRequestIDExists, created) match {
-            case (Some(days), true, Some(date)) if date.plusDays(days.toInt).isBefore(LocalDate.now) =>
-              removeByMetaData(notification.eori, notification.metadata)
+        (retentionDays, statementRequestIDExists, created) match {
+          case (Some(days), true, Some(date)) if date.plusDays(days.toInt).isBefore(LocalDate.now) =>
+            removeByMetaData(notification.eori, notification.metadata)
 
-            case _ => Future.successful(())
-          }
+          case _ => Future.successful(())
         }
       })
     }

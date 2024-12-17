@@ -24,35 +24,26 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionService @Inject()(sub09Connector: Sub09Connector)(implicit ec: ExecutionContext) {
+class SubscriptionService @Inject() (sub09Connector: Sub09Connector)(implicit ec: ExecutionContext) {
 
-  def getVerifiedEmail(eori: EORI): Future[EmailVerifiedResponse] = {
+  def getVerifiedEmail(eori: EORI): Future[EmailVerifiedResponse] =
     for (subscription <- sub09Connector.getSubscriptions(eori))
-      yield {
-        subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
-          case Some(ci) if ci.emailVerificationTimestamp.isDefined => EmailVerifiedResponse(ci.emailAddress)
-          case _ => EmailVerifiedResponse(None)
-        }
+      yield subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
+        case Some(ci) if ci.emailVerificationTimestamp.isDefined => EmailVerifiedResponse(ci.emailAddress)
+        case _                                                   => EmailVerifiedResponse(None)
       }
-  }
 
-  def getEmailAddress(eori: EORI): Future[EmailVerifiedResponse] = {
+  def getEmailAddress(eori: EORI): Future[EmailVerifiedResponse] =
     for (subscription <- sub09Connector.getSubscriptions(eori))
-      yield {
-        subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
-          case Some(ci) if ci.emailAddress.isDefined => EmailVerifiedResponse(ci.emailAddress)
-          case _ => EmailVerifiedResponse(None)
-        }
+      yield subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
+        case Some(ci) if ci.emailAddress.isDefined => EmailVerifiedResponse(ci.emailAddress)
+        case _                                     => EmailVerifiedResponse(None)
       }
-  }
 
-  def getUnverifiedEmail(eori: EORI): Future[EmailUnverifiedResponse] = {
+  def getUnverifiedEmail(eori: EORI): Future[EmailUnverifiedResponse] =
     for (subscription <- sub09Connector.getSubscriptions(eori))
-      yield {
-        subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
-          case Some(ci) if ci.emailVerificationTimestamp.isEmpty => EmailUnverifiedResponse(ci.emailAddress)
-          case _ => EmailUnverifiedResponse(None)
-        }
+      yield subscription.subscriptionDisplayResponse.responseDetail.contactInformation match {
+        case Some(ci) if ci.emailVerificationTimestamp.isEmpty => EmailUnverifiedResponse(ci.emailAddress)
+        case _                                                 => EmailUnverifiedResponse(None)
       }
-  }
 }

@@ -20,10 +20,12 @@ import models.HistoricalStatementRetrievalInterfaceMetadata
 import play.api.libs.json.{JsValue, Json, OWrites, Writes}
 import play.api.libs.ws.BodyWritable
 
-case class HistoricStatementRequest(HistoricalStatementRetrievalInterfaceMetadata: HistoricalStatementRetrievalInterfaceMetadata)
+case class HistoricStatementRequest(
+  HistoricalStatementRetrievalInterfaceMetadata: HistoricalStatementRetrievalInterfaceMetadata
+)
 
 object HistoricStatementRequest {
-  def from(historicDocumentRequest: HistoricDocumentRequest): HistoricStatementRequest = {
+  def from(historicDocumentRequest: HistoricDocumentRequest): HistoricStatementRequest =
     HistoricStatementRequest(
       HistoricalStatementRetrievalInterfaceMetadata(
         statementRequestID = historicDocumentRequest.statementRequestID.toString,
@@ -36,17 +38,17 @@ object HistoricStatementRequest {
         DAN = historicDocumentRequest.dan
       )
     )
-  }
 
-  implicit val historicalStatementRetrievalInterfaceMetadataWrites: OWrites[HistoricalStatementRetrievalInterfaceMetadata] =
+  implicit val historicalStatementRetrievalInterfaceMetadataWrites
+    : OWrites[HistoricalStatementRetrievalInterfaceMetadata] =
     Json.writes[HistoricalStatementRetrievalInterfaceMetadata]
 
   implicit val HistoricStatementRequestWrites: OWrites[HistoricStatementRequest] = Json.writes[HistoricStatementRequest]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 
   private def zeroPad(value: Int): String = "%02d".format(value)
 }

@@ -26,42 +26,44 @@ import utils.Utils.{encodeToUTF8Charsets, englishLangKey, welshLangKey}
 
 import java.time.LocalDate
 
-case class Request(externalRef: ExternalReference,
-                   recipient: Recipient,
-                   tags: Tags,
-                   content: List[Content],
-                   messageType: String,
-                   validFrom: String,
-                   alertQueue: String)
+case class Request(
+  externalRef: ExternalReference,
+  recipient: Recipient,
+  tags: Tags,
+  content: List[Content],
+  messageType: String,
+  validFrom: String,
+  alertQueue: String
+)
 
 object Request {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request = {
-
-    Request(externalRef = ExternalReference(histDoc.searchID.toString, SOURCE_MDTP),
+  def apply(histDoc: HistoricDocumentRequestSearch, email: EmailAddress, company: String): Request =
+    Request(
+      externalRef = ExternalReference(histDoc.searchID.toString, SOURCE_MDTP),
       recipient = Recipient(
         regime = "cds",
         taxIdentifier = TaxIdentifier(ENROLMENT_KEY, histDoc.currentEori),
         name = Name(company),
-        email = email.value),
+        email = email.value
+      ),
       tags = Tags("CDS Financials"),
       content = contents(histDoc.params, company),
       messageType = messageTemplate(histDoc.params.accountType),
       validFrom = LocalDate.now().toString,
-      alertQueue = "DEFAULT")
-  }
+      alertQueue = "DEFAULT"
+    )
 
-  private def messageTemplate(id: String): String = {
+  private def messageTemplate(id: String): String =
     id match {
       case "DutyDefermentStatement" => DutyDefermentTemplate
-      case "C79Certificate" => C79CertificateTemplate
-      case "SecurityStatement" => SecurityTemplate
-      case "PostponedVATStatement" => PostponedVATemplate
-      case _ => "Unknown Template"
+      case "C79Certificate"         => C79CertificateTemplate
+      case "SecurityStatement"      => SecurityTemplate
+      case "PostponedVATStatement"  => PostponedVATemplate
+      case _                        => "Unknown Template"
     }
-  }
 
   private def contents(params: Params, company: String): List[Content] = {
 
@@ -71,38 +73,66 @@ object Request {
     params.accountType match {
       case "DutyDefermentStatement" =>
         List(
-          Content(englishLangKey, s"$SubjectDutyDef${en.dateAsNumber}",
-            encodeToUTF8Charsets(dutyDefermentBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"$SubjectDutyDefCy${cy.dateAsNumber}",
-            encodeToUTF8Charsets(dutyDefermentBody(company, cy, welshLangKey))))
+          Content(
+            englishLangKey,
+            s"$SubjectDutyDef${en.dateAsNumber}",
+            encodeToUTF8Charsets(dutyDefermentBody(company, en, englishLangKey))
+          ),
+          Content(
+            welshLangKey,
+            s"$SubjectDutyDefCy${cy.dateAsNumber}",
+            encodeToUTF8Charsets(dutyDefermentBody(company, cy, welshLangKey))
+          )
+        )
 
       case "C79Certificate" =>
         List(
-          Content(englishLangKey, s"$SubjectCert${en.dateAsNumber}",
-            encodeToUTF8Charsets(c79CertificateBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"$SubjectCertCy${cy.dateAsNumber}",
-            encodeToUTF8Charsets(c79CertificateBody(company, cy, welshLangKey))))
+          Content(
+            englishLangKey,
+            s"$SubjectCert${en.dateAsNumber}",
+            encodeToUTF8Charsets(c79CertificateBody(company, en, englishLangKey))
+          ),
+          Content(
+            welshLangKey,
+            s"$SubjectCertCy${cy.dateAsNumber}",
+            encodeToUTF8Charsets(c79CertificateBody(company, cy, welshLangKey))
+          )
+        )
 
       case "SecurityStatement" =>
         List(
-          Content(englishLangKey, s"$SubjectSecurity${en.dateAsNumber}",
-            encodeToUTF8Charsets(securityBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"$SubjectSecurityCy${cy.dateAsNumber}",
-            encodeToUTF8Charsets(securityBody(company, cy, welshLangKey))))
+          Content(
+            englishLangKey,
+            s"$SubjectSecurity${en.dateAsNumber}",
+            encodeToUTF8Charsets(securityBody(company, en, englishLangKey))
+          ),
+          Content(
+            welshLangKey,
+            s"$SubjectSecurityCy${cy.dateAsNumber}",
+            encodeToUTF8Charsets(securityBody(company, cy, welshLangKey))
+          )
+        )
 
       case "PostponedVATStatement" =>
         List(
-          Content(englishLangKey, s"$SubjectImport${en.dateAsNumber}",
-            encodeToUTF8Charsets(postponedVATBody(company, en, englishLangKey))),
-          Content(welshLangKey, s"$SubjectImportCy${cy.dateAsNumber}",
-            encodeToUTF8Charsets(postponedVATBody(company, cy, welshLangKey))))
+          Content(
+            englishLangKey,
+            s"$SubjectImport${en.dateAsNumber}",
+            encodeToUTF8Charsets(postponedVATBody(company, en, englishLangKey))
+          ),
+          Content(
+            welshLangKey,
+            s"$SubjectImportCy${cy.dateAsNumber}",
+            encodeToUTF8Charsets(postponedVATBody(company, cy, welshLangKey))
+          )
+        )
     }
   }
 
   implicit val requestFormat: OFormat[Request] = Json.format[Request]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

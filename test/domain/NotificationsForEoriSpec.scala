@@ -51,20 +51,23 @@ class NotificationsForEoriSpec extends SpecBase {
   }
 
   trait Setup {
-    val eori: EORI = EORI(EORI_VALUE)
+    val eori: EORI           = EORI(EORI_VALUE)
     val localDate: LocalDate = LocalDate.of(YEAR_2023, MONTH_3, DAY_11)
 
     val lastUpdatedTime: LocalDateTime =
       LocalDateTime.parse("2023-03-11T10:05:30.352Z", DateTimeFormatter.ISO_DATE_TIME)
 
-    val notification: Notification = Notification(eori = eori,
+    val notification: Notification = Notification(
+      eori = eori,
       fileRole = FILE_ROLE_C79_CERTIFICATE,
       fileName = TEST_FILE_NAME,
       fileSize = FILE_SIZE_1024L,
       created = Some(localDate),
-      metadata = Map("Something" -> "Random"))
+      metadata = Map("Something" -> "Random")
+    )
 
-    val notificationsForEori: NotificationsForEori = NotificationsForEori(eori, Seq(notification), Some(lastUpdatedTime))
+    val notificationsForEori: NotificationsForEori =
+      NotificationsForEori(eori, Seq(notification), Some(lastUpdatedTime))
 
     val expectedJsValue: String =
       """{

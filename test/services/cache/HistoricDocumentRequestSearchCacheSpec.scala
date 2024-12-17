@@ -37,11 +37,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //TODO its only temporarily since EmbeddedMongoDB Support is failing in pipeline, will remove once its fixed.
 // Also set branch coverage to 90%
 @Ignore
-class HistoricDocumentRequestSearchCacheSpec extends SpecBase
-  with EmbeddedMongoDBSupport
-  with BeforeAndAfter
-  with BeforeAndAfterAll
-  with ScalaFutures {
+class HistoricDocumentRequestSearchCacheSpec
+    extends SpecBase
+    with EmbeddedMongoDBSupport
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with ScalaFutures {
 
   val spanLength = 30
 
@@ -52,11 +53,10 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   var historicDocumentRequestCache: HistoricDocumentRequestSearchCache = _
 
   override def beforeAll(): Unit = {
-    when(mockConfig.get[String]("mongodb.historic-document-request-search.name")).thenReturn(
-      "historic-document-request-search")
+    when(mockConfig.get[String]("mongodb.historic-document-request-search.name"))
+      .thenReturn("historic-document-request-search")
     when(mockAppConfig.mongoHistDocSearchCollectionName).thenReturn("historic-document-request-search")
-    when(mockConfig.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")).thenReturn(
-      ttlValue)
+    when(mockConfig.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")).thenReturn(ttlValue)
 
     when(mockAppConfig.mongoHistDocSearchTtl).thenReturn(ttlValue)
 
@@ -71,28 +71,26 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   "insertDocument " should {
     "insert the document in Mongo collection when collection is empty" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        _             <- historicDocumentRequestCache.collection.drop().toFuture()
+        _             <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
         documentsInDB <- historicDocumentRequestCache.collection.find().toFuture()
       } yield documentsInDB
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB.size mustBe 1
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB.size mustBe 1
       }
     }
 
     "insert the document in Mongo collection when collection has one doc already" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
-        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        _             <- historicDocumentRequestCache.collection.drop().toFuture()
+        _             <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        _             <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
         documentsInDB <- historicDocumentRequestCache.collection.find().toFuture()
       } yield documentsInDB
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB.size mustBe 2
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB.size mustBe 2
       }
     }
   }
@@ -100,28 +98,26 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   "retrieveDocumentForStatementRequestID" should {
     "retrieve the document for the given statementRequestID" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
-        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _            <- historicDocumentRequestCache.collection.drop().toFuture()
+        _            <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        retrievedDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield retrievedDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB.get.currentEori mustBe "GB123456789012"
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB.get.currentEori mustBe "GB123456789012"
       }
     }
 
     "return None if there is no document for the provided value" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _            <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield retrievedDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB mustBe empty
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB mustBe empty
       }
     }
   }
@@ -129,10 +125,9 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   "retrieveDocumentsForCurrentEori" should {
     "retrieve the documents correctly" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
-        documentsInDB <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori(
-          "GB123456789012")
+        _             <- historicDocumentRequestCache.collection.drop().toFuture()
+        _             <- historicDocumentRequestCache.insertDocument(getHistoricDocumentRequestSearchDoc)
+        documentsInDB <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori("GB123456789012")
       } yield documentsInDB
 
       whenReady(documentsInDB) { documentsInDB =>
@@ -142,14 +137,12 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
     "return None if there is no document for the provided value" in {
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori(
-          "GB123456789012")
+        _            <- historicDocumentRequestCache.collection.drop().toFuture()
+        retrievedDoc <- historicDocumentRequestCache.retrieveDocumentsForCurrentEori("GB123456789012")
       } yield retrievedDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB mustBe Seq()
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB mustBe Seq()
       }
     }
   }
@@ -157,44 +150,42 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
   "updateDocumentForQueryFilter" should {
     "update the document correctly for the given queryFilter and updates" in {
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
-      val searchId = docToBeInserted.searchID.toString
-      val queryFilter = Filters.equal("searchID", searchId)
-      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
+      val searchId        = docToBeInserted.searchID.toString
+      val queryFilter     = Filters.equal("searchID", searchId)
+      val updates         = Updates.set("resultsFound", SearchResultStatus.no.toString)
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
-        _ <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
-        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _        <- historicDocumentRequestCache.collection.drop().toFuture()
+        _        <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        _        <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
+        finalDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield finalDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          val docInDB = documentsInDB.get
+      whenReady(documentsInDB) { documentsInDB =>
+        val docInDB = documentsInDB.get
 
-          docInDB.currentEori mustBe "GB123456789012"
-          docInDB.searchID.toString mustBe searchId
-          docInDB.resultsFound mustBe SearchResultStatus.no
+        docInDB.currentEori mustBe "GB123456789012"
+        docInDB.searchID.toString mustBe searchId
+        docInDB.resultsFound mustBe SearchResultStatus.no
       }
     }
 
     "return None when there is no document to update" in {
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
-      val searchId = docToBeInserted.searchID.toString
-      val queryFilter = Filters.equal("searchID", searchId)
-      val updates = Updates.set("resultsFound", SearchResultStatus.no.toString)
+      val searchId        = docToBeInserted.searchID.toString
+      val queryFilter     = Filters.equal("searchID", searchId)
+      val updates         = Updates.set("resultsFound", SearchResultStatus.no.toString)
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
-        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _        <- historicDocumentRequestCache.collection.drop().toFuture()
+        _        <- historicDocumentRequestCache.updateDocumentForQueryFilter(queryFilter, updates)
+        finalDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield finalDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB mustBe empty
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB mustBe empty
       }
     }
   }
@@ -206,57 +197,66 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
-          updatedDateTime, "AWSUnreachable", 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+          "GB123456789012",
+          "5b89895-f0da-4472-af5a-d84d340e7mn5",
+          SearchResultStatus.no,
+          updatedDateTime,
+          "AWSUnreachable",
+          0
+        ),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
-        _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
-          updatedSearchRequests,
-          docToBeInserted.searchID.toString)
-        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _        <- historicDocumentRequestCache.collection.drop().toFuture()
+        _        <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        _        <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
+                      updatedSearchRequests,
+                      docToBeInserted.searchID.toString
+                    )
+        finalDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield finalDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB.get.currentEori mustBe "GB123456789012"
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB.get.currentEori mustBe "GB123456789012"
 
-          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
-            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+        val searchRequestAfterUpdate = documentsInDB.get.searchRequests
+          .find(sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5")
+          .get
 
-          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
-          searchRequestAfterUpdate.searchDateTime must not be empty
+        searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
+        searchRequestAfterUpdate.searchDateTime must not be empty
       }
     }
 
     "return None when there is no document to update" in {
-      val histSearchDoc = getHistoricDocumentRequestSearchDoc
-      val updatedDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+      val histSearchDoc         = getHistoricDocumentRequestSearchDoc
+      val updatedDateTime       = Utils.dateTimeAsIso8601(LocalDateTime.now)
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
-          updatedDateTime, "AWSUnreachable", 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+          "GB123456789012",
+          "5b89895-f0da-4472-af5a-d84d340e7mn5",
+          SearchResultStatus.no,
+          updatedDateTime,
+          "AWSUnreachable",
+          0
+        ),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
-          updatedSearchRequests,
-          histSearchDoc.searchID.toString)
-        finalDoc <- historicDocumentRequestCache.retrieveDocumentForStatementRequestID(
-          "5b89895-f0da-4472-af5a-d84d340e7mn5")
+        _        <- historicDocumentRequestCache.collection.drop().toFuture()
+        _        <- historicDocumentRequestCache.updateSearchRequestForStatementRequestId(
+                      updatedSearchRequests,
+                      histSearchDoc.searchID.toString
+                    )
+        finalDoc <-
+          historicDocumentRequestCache.retrieveDocumentForStatementRequestID("5b89895-f0da-4472-af5a-d84d340e7mn5")
       } yield finalDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          documentsInDB mustBe None
+      whenReady(documentsInDB) { documentsInDB =>
+        documentsInDB mustBe None
       }
     }
   }
@@ -267,35 +267,47 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.no,
-          updatedDateTime, "AWSUnreachable", 0),
+          "GB123456789012",
+          "5b89895-f0da-4472-af5a-d84d340e7mn5",
+          SearchResultStatus.no,
+          updatedDateTime,
+          "AWSUnreachable",
+          0
+        ),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
-          SearchResultStatus.no, updatedDateTime, "NoDocumentsFound", 0)
+          "GB234567890121",
+          "5c79895-f0da-4472-af5a-d84d340e7mn6",
+          SearchResultStatus.no,
+          updatedDateTime,
+          "NoDocumentsFound",
+          0
+        )
       )
 
       val docToBeInserted = getHistoricDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
-        updatedDoc <- historicDocumentRequestCache.updateResultsFoundStatus(docToBeInserted.searchID.toString,
-          SearchResultStatus.no)
+        _          <- historicDocumentRequestCache.collection.drop().toFuture()
+        _          <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        updatedDoc <- historicDocumentRequestCache.updateResultsFoundStatus(
+                        docToBeInserted.searchID.toString,
+                        SearchResultStatus.no
+                      )
       } yield updatedDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          val updateDoc = documentsInDB.get
-          documentsInDB.get.currentEori mustBe "GB123456789012"
+      whenReady(documentsInDB) { documentsInDB =>
+        val updateDoc = documentsInDB.get
+        documentsInDB.get.currentEori mustBe "GB123456789012"
 
-          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
-            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+        val searchRequestAfterUpdate = documentsInDB.get.searchRequests
+          .find(sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5")
+          .get
 
-          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
-          searchRequestAfterUpdate.searchDateTime must not be empty
+        searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.no
+        searchRequestAfterUpdate.searchDateTime must not be empty
 
-          updateDoc.resultsFound mustBe SearchResultStatus.no
-          updateDoc.searchStatusUpdateDate must not be empty
+        updateDoc.resultsFound mustBe SearchResultStatus.no
+        updateDoc.searchStatusUpdateDate must not be empty
       }
     }
   }
@@ -306,73 +318,76 @@ class HistoricDocumentRequestSearchCacheSpec extends SpecBase
 
       val updatedSearchRequests = Set(
         SearchRequest(
-          "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", SearchResultStatus.yes,
-          updatedDateTime, "AWSUnreachable", 0),
+          "GB123456789012",
+          "5b89895-f0da-4472-af5a-d84d340e7mn5",
+          SearchResultStatus.yes,
+          updatedDateTime,
+          "AWSUnreachable",
+          0
+        ),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
-          SearchResultStatus.no, updatedDateTime, "NoDocumentsFound", 0)
+          "GB234567890121",
+          "5c79895-f0da-4472-af5a-d84d340e7mn6",
+          SearchResultStatus.no,
+          updatedDateTime,
+          "NoDocumentsFound",
+          0
+        )
       )
 
       val docToBeInserted = getHistoricDocumentRequestSearchDoc
 
       val documentsInDB = for {
-        _ <- historicDocumentRequestCache.collection.drop().toFuture()
-        _ <- historicDocumentRequestCache.insertDocument(docToBeInserted)
+        _          <- historicDocumentRequestCache.collection.drop().toFuture()
+        _          <- historicDocumentRequestCache.insertDocument(docToBeInserted)
         updatedDoc <- historicDocumentRequestCache.updateSearchReqsAndResultsFoundStatus(
-          docToBeInserted.searchID.toString,
-          updatedSearchRequests,
-          SearchResultStatus.yes)
+                        docToBeInserted.searchID.toString,
+                        updatedSearchRequests,
+                        SearchResultStatus.yes
+                      )
       } yield updatedDoc
 
-      whenReady(documentsInDB) {
-        documentsInDB =>
-          val updateDoc = documentsInDB.get
-          documentsInDB.get.currentEori mustBe "GB123456789012"
+      whenReady(documentsInDB) { documentsInDB =>
+        val updateDoc = documentsInDB.get
+        documentsInDB.get.currentEori mustBe "GB123456789012"
 
-          val searchRequestAfterUpdate = documentsInDB.get.searchRequests.find(
-            sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5").get
+        val searchRequestAfterUpdate = documentsInDB.get.searchRequests
+          .find(sr => sr.statementRequestId == "5b89895-f0da-4472-af5a-d84d340e7mn5")
+          .get
 
-          searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.yes
-          searchRequestAfterUpdate.searchDateTime must not be empty
+        searchRequestAfterUpdate.searchSuccessful mustBe SearchResultStatus.yes
+        searchRequestAfterUpdate.searchDateTime must not be empty
 
-          updateDoc.resultsFound mustBe SearchResultStatus.yes
-          updateDoc.searchStatusUpdateDate must not be empty
+        updateDoc.resultsFound mustBe SearchResultStatus.yes
+        updateDoc.searchStatusUpdateDate must not be empty
       }
     }
   }
 
   private def getHistoricDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
-    val searchID: UUID = UUID.randomUUID()
-    val resultsFound = SearchResultStatus.inProcess
-    val searchStatusUpdateDate: String = emptyString
-    val currentEori: String = "GB123456789012"
-    val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+    val searchID: UUID                     = UUID.randomUUID()
+    val resultsFound                       = SearchResultStatus.inProcess
+    val searchStatusUpdateDate: String     = emptyString
+    val currentEori: String                = "GB123456789012"
+    val params: Params                     = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
     val searchRequests: Set[SearchRequest] = Set(
-      SearchRequest(
-        "GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", inProcess, emptyString, emptyString, 0),
-      SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+      SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5", inProcess, emptyString, emptyString, 0),
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
     )
 
-    HistoricDocumentRequestSearch(searchID,
-      resultsFound,
-      searchStatusUpdateDate,
-      currentEori,
-      params,
-      searchRequests)
+    HistoricDocumentRequestSearch(searchID, resultsFound, searchStatusUpdateDate, currentEori, params, searchRequests)
   }
 }
 
 object HistoricDocumentRequestSearchCacheSpec extends SpecBase {
 
   private val mockAppConfig = mock[AppConfig]
-  private val mockConfig = mock[Configuration]
-  private val ttlValue = 28
+  private val mockConfig    = mock[Configuration]
+  private val ttlValue      = 28
 
-  private def buildFormRepository(mongoHost: String,
-                                  mongoPort: Int): HistoricDocumentRequestSearchCache = {
+  private def buildFormRepository(mongoHost: String, mongoPort: Int): HistoricDocumentRequestSearchCache = {
     val databaseName = "historic-document-request-search"
-    val mongoUri = s"mongodb://$mongoHost:$mongoPort/$databaseName?heartbeatFrequencyMS=1000&rm.failover=default"
+    val mongoUri     = s"mongodb://$mongoHost:$mongoPort/$databaseName?heartbeatFrequencyMS=1000&rm.failover=default"
     new HistoricDocumentRequestSearchCache(mockAppConfig, MongoComponent(mongoUri))
   }
 }

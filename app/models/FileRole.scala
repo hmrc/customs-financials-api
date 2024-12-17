@@ -25,14 +25,12 @@ final case class FileRole(value: String)
 object FileRole {
   implicit val format: Format[FileRole] = JsonFormatUtils.stringFormat(FileRole.apply)(_.value)
 
-  implicit def pathBinder(implicit stringBinder: PathBindable[String]): PathBindable[FileRole] = {
+  implicit def pathBinder(implicit stringBinder: PathBindable[String]): PathBindable[FileRole] =
     new PathBindable[FileRole] {
-      override def bind(key: String, value: String): Either[String, FileRole] = {
+      override def bind(key: String, value: String): Either[String, FileRole] =
         stringBinder.bind(key, value).map(FileRole(_))
-      }
 
       override def unbind(key: String, fileRole: FileRole): String =
         fileRole.value
     }
-  }
 }

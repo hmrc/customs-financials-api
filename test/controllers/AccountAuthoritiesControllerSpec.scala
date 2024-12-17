@@ -93,15 +93,15 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     "return 500 (InternalServerError)" when {
       "get account authorities call fails with InternalServerException (5xx) and error message contains" +
         " 'JSON validation'" in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
+          when(mockAccountAuthorityService.getAccountAuthorities(any))
+            .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
 
-        running(app) {
-          val result = route(app, getRequest).value
+          running(app) {
+            val result = route(app, getRequest).value
 
-          status(result) mustBe INTERNAL_SERVER_ERROR
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
         }
-      }
     }
 
     "return 200 (OK) and return empty AccountWithAuthorities" when {
@@ -109,16 +109,16 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       "get account authorities call fails with BAD_REQUEST and contains " +
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 
-        when(mockAccountAuthorityService.getAccountAuthorities(any)).thenReturn(
-          Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
+          when(mockAccountAuthorityService.getAccountAuthorities(any))
+            .thenReturn(Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
 
-        running(app) {
-          val result: Future[Result] = route(app, getRequest).value
+          running(app) {
+            val result: Future[Result] = route(app, getRequest).value
 
-          status(result) mustBe OK
-          contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
+            status(result) mustBe OK
+            contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
+          }
         }
-      }
     }
   }
 
@@ -170,9 +170,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "request JSON is invalid" should {
       "return 400" in new Setup {
-        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(
-          POST, controllers.routes.AccountAuthoritiesController.grant(EORI("testEori")).url)
-          .withJsonBody(Json.parse("""{"valid": "nope"}"""))
+        val invalidRequest: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, controllers.routes.AccountAuthoritiesController.grant(EORI("testEori")).url)
+            .withJsonBody(Json.parse("""{"valid": "nope"}"""))
 
         running(app) {
           val result = route(app, invalidRequest).value
@@ -199,13 +199,18 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   "AccountAuthoritiesController.revoke" when {
 
     val revokeAuthorityRequest = RevokeAuthorityRequest(
-      AccountNumber("123"), CdsCashAccount, EORI("authorisedEori"), AuthorisedUser("some name", "some role")
+      AccountNumber("123"),
+      CdsCashAccount,
+      EORI("authorisedEori"),
+      AuthorisedUser("some name", "some role")
     )
 
     "request is valid and API call is successful" should {
       "delegate to the service and return a 204 status code" when {
         "revoking for a cash account" in new Setup {
-          when(mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(traderEORI))(any))
+          when(
+            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(traderEORI))(any)
+          )
             .thenReturn(Future.successful(true))
 
           running(app) {
@@ -218,7 +223,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           val revokeGuaranteeRequest: RevokeAuthorityRequest =
             revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
 
-          when(mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any))
+          when(
+            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any)
+          )
             .thenReturn(Future.successful(true))
 
           running(app) {
@@ -231,7 +238,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           val revokeDefermentRequest: RevokeAuthorityRequest =
             revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
 
-          when(mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any))
+          when(
+            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any)
+          )
             .thenReturn(Future.successful(true))
 
           running(app) {
@@ -257,9 +266,9 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     "request JSON is invalid" should {
       "return 400" in new Setup {
 
-        val invalidRequest: FakeRequest[AnyContentAsJson] = FakeRequest(
-          POST, controllers.routes.AccountAuthoritiesController.revoke(EORI("testEori")).url)
-          .withJsonBody(Json.parse("""{"valid": "nope"}"""))
+        val invalidRequest: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke(EORI("testEori")).url)
+            .withJsonBody(Json.parse("""{"valid": "nope"}"""))
 
         running(app) {
           val result = route(app, invalidRequest).value
@@ -283,11 +292,11 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val traderEORI: EORI = EORI("testEORI")
+    val traderEORI: EORI       = EORI("testEORI")
     val enrolments: Enrolments =
-      Enrolments(Set(Enrolment(ENROLMENT_KEY,
-        Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)),
-        "activated")))
+      Enrolments(
+        Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)), "activated"))
+      )
 
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
@@ -304,7 +313,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         | "sourceFaultDetail":{
         | "detail":["Bad Request : could not find accounts related to eori XI333186811548"]}}}""".stripMargin
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     def grantRequest(request: GrantAuthorityRequest): FakeRequest[AnyContentAsJson] =
@@ -315,18 +324,21 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       FakeRequest(POST, controllers.routes.AccountAuthoritiesController.revoke(traderEORI).url)
         .withJsonBody(Json.toJson(request))
 
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
+    val mockAuthConnector: CustomAuthConnector               = mock[CustomAuthConnector]
     val mockAccountAuthorityService: AccountAuthorityService = mock[AccountAuthorityService]
 
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[AccountAuthorityService].toInstance(mockAccountAuthorityService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[AccountAuthorityService].toInstance(mockAccountAuthorityService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

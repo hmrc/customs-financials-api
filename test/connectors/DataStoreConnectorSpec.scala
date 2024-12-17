@@ -96,8 +96,8 @@ class DataStoreConnectorSpec extends SpecBase {
       when(requestBuilder.execute(any, any)).thenReturn(Future.successful(companyNameResponse))
 
       running(app) {
-        connector.getCompanyName(EORI("someEori")).map {
-          cname => cname mustBe Some("test_company")
+        connector.getCompanyName(EORI("someEori")).map { cname =>
+          cname mustBe Some("test_company")
         }
       }
     }
@@ -109,8 +109,8 @@ class DataStoreConnectorSpec extends SpecBase {
       when(requestBuilder.execute(any, any)).thenReturn(Future.successful(companyNameResponse.copy(consent = "2")))
 
       running(app) {
-        connector.getCompanyName(EORI("someEori")).map {
-          cname => cname mustBe None
+        connector.getCompanyName(EORI("someEori")).map { cname =>
+          cname mustBe None
         }
       }
     }
@@ -122,32 +122,35 @@ class DataStoreConnectorSpec extends SpecBase {
       when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
       running(app) {
-        connector.getCompanyName(EORI("someEori")).map {
-          cname => cname mustBe None
+        connector.getCompanyName(EORI("someEori")).map { cname =>
+          cname mustBe None
         }
       }
     }
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-    val emailResponse: EmailResponse = EmailResponse(Some(EmailAddress("some@email.com")), None)
+    val emailResponse: EmailResponse             = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI("someEori"), None, None)))
 
     val companyNameResponse: CompanyInformation =
       CompanyInformation("test_company", "1", AddressInformation("1", "Kailash", None, COUNTRY_CODE_GB))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: DataStoreConnector = app.injector.instanceOf[DataStoreConnector]
   }

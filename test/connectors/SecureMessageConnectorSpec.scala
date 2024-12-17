@@ -45,10 +45,12 @@ class SecureMessageConnectorSpec extends SpecBase {
 
       val request: Request = Request(
         externalRef = ExternalReference(searchID.toString, SOURCE_MDTP),
-        recipient = Recipient(REGIME,
+        recipient = Recipient(
+          REGIME,
           TaxIdentifier(ENROLMENT_KEY, "GB333186811543"),
           name = Name("Company Name"),
-          email = TEST_EMAIL),
+          email = TEST_EMAIL
+        ),
         tags = Tags("CDS Financials"),
         content = TestContents,
         messageType = "newMessageAlert",
@@ -69,8 +71,8 @@ class SecureMessageConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(Option(EmailAddress("email"))))
 
         running(app) {
-          connector.sendSecureMessage(histDoc = doc).map {
-            result => result mustBe Right(Response(eori.value))
+          connector.sendSecureMessage(histDoc = doc).map { result =>
+            result mustBe Right(Response(eori.value))
           }
         }
       }
@@ -88,8 +90,8 @@ class SecureMessageConnectorSpec extends SpecBase {
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
         running(app) {
-          connector.sendSecureMessage(histDoc = doc).map {
-            result => result mustBe Right(Response(eori.value))
+          connector.sendSecureMessage(histDoc = doc).map { result =>
+            result mustBe Right(Response(eori.value))
           }
         }
       }
@@ -102,8 +104,8 @@ class SecureMessageConnectorSpec extends SpecBase {
           .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
         running(app) {
-          connector.sendSecureMessage(histDoc = doc).map {
-            result => result mustBe Left(ERROR_MSG)
+          connector.sendSecureMessage(histDoc = doc).map { result =>
+            result mustBe Left(ERROR_MSG)
           }
         }
       }
@@ -115,50 +117,66 @@ class SecureMessageConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val eori: EORI = EORI("GB333186811543")
-    val id: String = "abcd12345"
+    val eori: EORI                     = EORI("GB333186811543")
+    val id: String                     = "abcd12345"
 
     val address: AddressInformation = AddressInformation(
       streetAndNumber = "street&Number",
       city = "london",
       postalCode = Option("Post"),
-      countryCode = COUNTRY_CODE_GB)
+      countryCode = COUNTRY_CODE_GB
+    )
 
-    val corp: CompanyInformation = CompanyInformation(
-      name = "Company Name", consent = "Yes", address = address)
+    val corp: CompanyInformation = CompanyInformation(name = "Company Name", consent = "Yes", address = address)
 
     val searchID: UUID = UUID.randomUUID()
     val params: Params = Params("01", "2022", "01", "2023", "DutyDefermentStatement", "abcd12345")
 
     val searchRequests: Set[SearchRequest] = Set(
-      SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
-        SearchResultStatus.inProcess, emptyString, emptyString, 0),
-      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
-        SearchResultStatus.inProcess, emptyString, emptyString, 0))
+      SearchRequest(
+        "GB123456789012",
+        "5b89895-f0da-4472-af5a-d84d340e7mn5",
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      ),
+      SearchRequest(
+        "GB234567890121",
+        "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      )
+    )
 
-    val doc: HistoricDocumentRequestSearch = HistoricDocumentRequestSearch(searchID,
-      SearchResultStatus.no, emptyString, eori.value, params, searchRequests)
+    val doc: HistoricDocumentRequestSearch =
+      HistoricDocumentRequestSearch(searchID, SearchResultStatus.no, emptyString, eori.value, params, searchRequests)
 
-    val TestContents: List[Content] = {
-      List(secureMessage.Content("en", "DutyDefermentStatement",
-        "Message content - 4254101384174917141"), secureMessage.Content(
-        "cy", "DutyDefermentStatement", "Cynnwys - 4254101384174917141"))
-    }
+    val TestContents: List[Content] =
+      List(
+        secureMessage.Content("en", "DutyDefermentStatement", "Message content - 4254101384174917141"),
+        secureMessage.Content("cy", "DutyDefermentStatement", "Cynnwys - 4254101384174917141")
+      )
 
     val compareRequest: Request = secureMessage.Request(
       externalRef = secureMessage.ExternalReference(searchID.toString, SOURCE_MDTP),
-      recipient = secureMessage.Recipient(REGIME,
+      recipient = secureMessage.Recipient(
+        REGIME,
         secureMessage.TaxIdentifier(ENROLMENT_KEY, eori.value),
         name = Name("Company Name"),
-        email = TEST_EMAIL),
+        email = TEST_EMAIL
+      ),
       tags = secureMessage.Tags("CDS Financials"),
       content = TestContents,
       messageType = "newMessageAlert",
       validFrom = LocalDate.now().toString,
-      alertQueue = "DEFAULT")
+      alertQueue = "DEFAULT"
+    )
 
     val jsValue: String =
       s"""{"externalRef": {
@@ -196,18 +214,21 @@ class SecureMessageConnectorSpec extends SpecBase {
          |"alertQueue": "DEFAULT"
          |}""".stripMargin
 
-    val response: secureMessage.Response = secureMessage.Response("GB333186811543")
+    val response: secureMessage.Response         = secureMessage.Response("GB333186811543")
     val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder),
-      inject.bind[DataStoreConnector].toInstance(mockDataStoreService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder),
+        inject.bind[DataStoreConnector].toInstance(mockDataStoreService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
   }

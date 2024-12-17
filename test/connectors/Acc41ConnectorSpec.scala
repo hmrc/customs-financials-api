@@ -78,7 +78,6 @@ class Acc41ConnectorSpec extends SpecBase {
       }
     }
 
-
     "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
       when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
@@ -95,28 +94,31 @@ class Acc41ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-    def response(error: Option[String],
-                 requestAcceptedDate: Option[String]): domain.acc41.Response = domain.acc41.Response(
-      RequestCommon("date", MDTP, "reference", REGIME_CDS),
-      RequestDetail(EORI("someEORI"), Some(EORI("someAltEori"))),
-      ResponseDetail(
-        errorMessage = error,
-        requestAcceptedDate = requestAcceptedDate
+    def response(error: Option[String], requestAcceptedDate: Option[String]): domain.acc41.Response =
+      domain.acc41.Response(
+        RequestCommon("date", MDTP, "reference", REGIME_CDS),
+        RequestDetail(EORI("someEORI"), Some(EORI("someAltEori"))),
+        ResponseDetail(
+          errorMessage = error,
+          requestAcceptedDate = requestAcceptedDate
+        )
       )
-    )
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc41Connector = app.injector.instanceOf[Acc41Connector]
   }

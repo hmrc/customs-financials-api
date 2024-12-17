@@ -29,9 +29,11 @@ import javax.inject.Singleton
 import scala.concurrent.*
 
 @Singleton
-class Sub21Connector @Inject()(appConfig: AppConfig,
-                               metricsReporterService: MetricsReporterService,
-                               httpClient: HttpClientV2)(implicit ec: ExecutionContext) {
+class Sub21Connector @Inject() (
+  appConfig: AppConfig,
+  metricsReporterService: MetricsReporterService,
+  httpClient: HttpClientV2
+)(implicit ec: ExecutionContext) {
 
   def getEORIHistory(eori: EORI): Future[HistoricEoriResponse] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -39,7 +41,8 @@ class Sub21Connector @Inject()(appConfig: AppConfig,
     metricsReporterService.withResponseTimeLogging("hods.get.get-eori-history.validate") {
       val sub21Url = s"${appConfig.sub21CheckEORIValidEndpoint}?eori=${eori.value}"
 
-      httpClient.get(url"$sub21Url")
+      httpClient
+        .get(url"$sub21Url")
         .setHeader("Authorization" -> s"Bearer ${appConfig.sub21BearerToken}")
         .execute[HistoricEoriResponse]
     }

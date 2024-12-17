@@ -21,22 +21,18 @@ import play.api.libs.json.{Json, OFormat}
 
 case class HistoricEoriResponse(getEORIHistoryResponse: GetEORIHistoryResponse)
 
-case class GetEORIHistoryResponse(responseCommon: EORIHistoryResponseCommon,
-                                  responseDetail: EORIHistoryResponseDetail)
+case class GetEORIHistoryResponse(responseCommon: EORIHistoryResponseCommon, responseDetail: EORIHistoryResponseDetail)
 
-case class EORIHistoryResponseCommon(status: String,
-                                     processingDate: String)
+case class EORIHistoryResponseCommon(status: String, processingDate: String)
 
 case class EORIHistoryResponseDetail(EORIHistory: Seq[EORIHistory])
 
-case class EORIHistory(EORI: EORI,
-                       validFrom: Option[String],
-                       validUntil: Option[String])
+case class EORIHistory(EORI: EORI, validFrom: Option[String], validUntil: Option[String])
 
 object HistoricEoriResponse {
-  implicit val eoriHistoryFormat: OFormat[EORIHistory] = Json.format[EORIHistory]
-  implicit val responseDetailFormat: OFormat[EORIHistoryResponseDetail] = Json.format[EORIHistoryResponseDetail]
-  implicit val responseCommonFormat: OFormat[EORIHistoryResponseCommon] = Json.format[EORIHistoryResponseCommon]
+  implicit val eoriHistoryFormat: OFormat[EORIHistory]                       = Json.format[EORIHistory]
+  implicit val responseDetailFormat: OFormat[EORIHistoryResponseDetail]      = Json.format[EORIHistoryResponseDetail]
+  implicit val responseCommonFormat: OFormat[EORIHistoryResponseCommon]      = Json.format[EORIHistoryResponseCommon]
   implicit val getEORIHistoryResponseFormat: OFormat[GetEORIHistoryResponse] = Json.format[GetEORIHistoryResponse]
-  implicit val historicEoriResponseFormat: OFormat[HistoricEoriResponse] = Json.format[HistoricEoriResponse]
+  implicit val historicEoriResponseFormat: OFormat[HistoricEoriResponse]     = Json.format[HistoricEoriResponse]
 }

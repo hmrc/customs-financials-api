@@ -123,13 +123,13 @@ class MetricsReporterServiceSpec extends SpecBase {
 
   trait Setup {
     val startTimestamp: Long = OffsetDateTime.parse("2018-11-09T17:15:30+01:00").toInstant.toEpochMilli
-    val endTimestamp: Long = OffsetDateTime.parse("2018-11-09T17:15:35+01:00").toInstant.toEpochMilli
-    val elapsedTimeInMillis = 5000L
+    val endTimestamp: Long   = OffsetDateTime.parse("2018-11-09T17:15:35+01:00").toInstant.toEpochMilli
+    val elapsedTimeInMillis  = 5000L
 
     val mockDateTimeService: DateTimeService = mock[DateTimeService]
-    val mockHistogram: Histogram = mock[Histogram]
-    val mockRegistry: MetricRegistry = mock[MetricRegistry]
-    val mockMetrics: Metrics = mock[Metrics]
+    val mockHistogram: Histogram             = mock[Histogram]
+    val mockRegistry: MetricRegistry         = mock[MetricRegistry]
+    val mockMetrics: Metrics                 = mock[Metrics]
 
     when(mockDateTimeService.timeStamp())
       .thenReturn(startTimestamp, endTimestamp)
@@ -137,15 +137,18 @@ class MetricsReporterServiceSpec extends SpecBase {
     when(mockRegistry.histogram(any)).thenReturn(mockHistogram)
     when(mockMetrics.defaultRegistry).thenReturn(mockRegistry)
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[DateTimeService].toInstance(mockDateTimeService),
-      inject.bind[Histogram].toInstance(mockHistogram),
-      inject.bind[Metrics].toInstance(mockMetrics)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[DateTimeService].toInstance(mockDateTimeService),
+        inject.bind[Histogram].toInstance(mockHistogram),
+        inject.bind[Metrics].toInstance(mockMetrics)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val service: MetricsReporterService = app.injector.instanceOf[MetricsReporterService]
   }

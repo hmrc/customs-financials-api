@@ -17,7 +17,7 @@
 package utils
 
 import com.codahale.metrics.MetricRegistry
-import models.claims.responses.{SctyClaimDetails, Goods => GoodsResponse, Reimbursement => ReimbursementResponse}
+import models.claims.responses.{Goods => GoodsResponse, Reimbursement => ReimbursementResponse, SctyClaimDetails}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
@@ -28,7 +28,7 @@ import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 trait SpecBase
-  extends AnyWordSpecLike
+    extends AnyWordSpecLike
     with MockitoSugar
     with Matchers
     with FutureAwaits
@@ -57,15 +57,19 @@ trait SpecBase
     Some("name"),
     Some("email@email.com"),
     Some("20221012"),
-    Some(Seq(reimbursementResponse)))
+    Some(Seq(reimbursementResponse))
+  )
 
-  def application(): GuiceApplicationBuilder = new GuiceApplicationBuilder().overrides(
-    bind[Metrics].toInstance(new FakeMetrics)
-  ).configure(
-    "play.filters.csp.nonce.enabled" -> false,
-    "auditing.enabled" -> "false",
-    "microservice.metrics.graphite.enabled" -> "false",
-    "metrics.enabled" -> "false")
+  def application(): GuiceApplicationBuilder = new GuiceApplicationBuilder()
+    .overrides(
+      bind[Metrics].toInstance(new FakeMetrics)
+    )
+    .configure(
+      "play.filters.csp.nonce.enabled"        -> false,
+      "auditing.enabled"                      -> "false",
+      "microservice.metrics.graphite.enabled" -> "false",
+      "metrics.enabled"                       -> "false"
+    )
 
   def requestWithoutHeaders[A](request: FakeRequest[A], keys: String*): FakeRequest[A] = {
     val incompleteHeaders = request.headers.remove(keys: _*)

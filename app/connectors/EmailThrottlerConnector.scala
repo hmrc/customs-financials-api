@@ -29,32 +29,33 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EmailThrottlerConnector @Inject()(http: HttpClientV2,
-                                        metricsReporter: MetricsReporterService)
-                                       (implicit appConfig: AppConfig, ec: ExecutionContext) {
+class EmailThrottlerConnector @Inject() (http: HttpClientV2, metricsReporter: MetricsReporterService)(implicit
+  appConfig: AppConfig,
+  ec: ExecutionContext
+) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def sendEmail(request: EmailRequest)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def sendEmail(request: EmailRequest)(implicit hc: HeaderCarrier): Future[Boolean] =
     metricsReporter.withResponseTimeLogging(s"email.post.${request.templateId}") {
 
-      http.post(url"${appConfig.sendEmailEndpoint}")
+      http
+        .post(url"${appConfig.sendEmailEndpoint}")
         .withBody[EmailRequest](request)
         .execute[HttpResponse]
         .collect {
-        case response if response.status == Status.ACCEPTED =>
-          log.info(s"successfuly sent email notification for ${request.templateId}")
-          true
+          case response if response.status == Status.ACCEPTED =>
+            log.info(s"successfuly sent email notification for ${request.templateId}")
+            true
 
-        case response =>
-          log.error(s"Send email failed with status - ${response.status}")
-          false
+          case response =>
+            log.error(s"Send email failed with status - ${response.status}")
+            false
 
-      }.recover {
-        case ex: Throwable =>
+        }
+        .recover { case ex: Throwable =>
           log.error(s"Send email threw an exception - ${ex.getMessage}")
           false
-      }
+        }
     }
-  }
 }

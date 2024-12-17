@@ -53,35 +53,45 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         val response = route(app, validRequest).value
         status(response) mustBe BAD_REQUEST
 
-        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code400, correlationId, Option(incomingStatementReqId)))
+        contentAsJson(response) mustBe Json.toJson(
+          StatementSearchFailureNotificationErrorResponse(
+            None,
+            ErrorCode.code400,
+            correlationId,
+            Option(incomingStatementReqId)
+          )
+        )
       }
     }
 
     "return 204 when req is valid and one searchRequest is already in no status and other is inProcess" in new Setup {
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc))
-      )
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc))
+        )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess,
-          emptyString, emptyString, 0)
+        SearchRequest("GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, emptyString, 0),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
-      when(mockHistDocReqSearchCacheService.updateSearchRequestForStatementRequestId(
-        historicDocumentRequestSearchDoc,
-        incomingStatementReqId,
-        "NoDocumentsFound"
-      )).thenReturn(Future.successful(Some(historicDocumentRequestSearchDoc.copy(
-        searchRequests = updatedSearchRequests))))
+      when(
+        mockHistDocReqSearchCacheService.updateSearchRequestForStatementRequestId(
+          historicDocumentRequestSearchDoc,
+          incomingStatementReqId,
+          "NoDocumentsFound"
+        )
+      ).thenReturn(
+        Future.successful(Some(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
+      )
 
-      when(mockHistDocReqSearchCacheService.updateResultsFoundStatusToNoIfEligible(
-        historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests))).thenReturn(
-        Future.successful(Some(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests))))
+      when(
+        mockHistDocReqSearchCacheService.updateResultsFoundStatusToNoIfEligible(
+          historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)
+        )
+      ).thenReturn(
+        Future.successful(Some(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
+      )
 
       running(app) {
         val response = route(app, validRequest).value
@@ -104,16 +114,27 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
       val searchRequestsWithNoStatus: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, searchDateTime, "NoDocumentsFound", 0),
+          "GB123456789012",
+          incomingStatementReqId,
+          SearchResultStatus.no,
+          searchDateTime,
+          "NoDocumentsFound",
+          0
+        ),
         SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.no,
-          searchDateTime, "NoDocumentsFound", 0)
+          "GB234567890121",
+          "5c79895-f0da-4472-af5a-d84d340e7mn6",
+          SearchResultStatus.no,
+          searchDateTime,
+          "NoDocumentsFound",
+          0
+        )
       )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsWithNoStatus)))
-      )
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsWithNoStatus)))
+        )
 
       running(app) {
         val response = route(app, validRequest).value
@@ -123,23 +144,19 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     "return 204 when request is valid and reason is not NoDocumentsFound" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
-      )
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
+        )
 
       when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any)).thenReturn(
         Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
@@ -163,69 +180,91 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
     "return 500 and valid error response when request is valid and reason is not NoDocumentsFound and " +
       "failureRetryCount already has 5 as value" in new Setup {
 
-      val failureRetryCount = 5
+        val failureRetryCount = 5
 
-      val searchRequestsWithMaximumRetryCount: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, failureRetryCount),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
-      )
+        val searchRequestsWithMaximumRetryCount: Set[SearchRequest] = Set(
+          SearchRequest(
+            "GB123456789012",
+            incomingStatementReqId,
+            inProcess,
+            emptyString,
+            docUnreachable,
+            failureRetryCount
+          ),
+          SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(
-          searchRequests = searchRequestsWithMaximumRetryCount)))
-      )
+        when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+          .thenReturn(
+            Future.successful(
+              Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsWithMaximumRetryCount))
+            )
+          )
 
-      running(app) {
-        val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
-        status(response) mustBe INTERNAL_SERVER_ERROR
+        running(app) {
+          val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
+          status(response) mustBe INTERNAL_SERVER_ERROR
 
-        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId),
-          ErrorMessage.failureRetryCountErrorDetail(incomingStatementReqId)))
+          contentAsJson(response) mustBe Json.toJson(
+            StatementSearchFailureNotificationErrorResponse(
+              None,
+              ErrorCode.code500,
+              correlationId,
+              Option(incomingStatementReqId),
+              ErrorMessage.failureRetryCountErrorDetail(incomingStatementReqId)
+            )
+          )
+        }
+
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .retrieveHistDocRequestSearchDocForStatementReqId(any)
       }
 
-      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
-        .retrieveHistDocRequestSearchDocForStatementReqId(any)
-    }
-
     "return 500 with correct error response when there is exception while retrieving the document" in new Setup {
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenThrow(new RuntimeException("Technical Error occurred"))
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenThrow(new RuntimeException("Technical Error occurred"))
 
       running(app) {
         val response = route(app, validRequest).value
         status(response) mustBe INTERNAL_SERVER_ERROR
 
-        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId)))
+        contentAsJson(response) mustBe Json.toJson(
+          StatementSearchFailureNotificationErrorResponse(
+            None,
+            ErrorCode.code500,
+            correlationId,
+            Option(incomingStatementReqId)
+          )
+        )
       }
     }
 
     "return 500 with correct error response when there is exception while updating the document" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
-      )
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
+        )
 
-      when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any)).thenThrow(
-        new ArrayIndexOutOfBoundsException("Technical Error occurred"))
+      when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any))
+        .thenThrow(new ArrayIndexOutOfBoundsException("Technical Error occurred"))
 
       running(app) {
         val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
         status(response) mustBe INTERNAL_SERVER_ERROR
 
-        contentAsJson(response) mustBe Json.toJson(StatementSearchFailureNotificationErrorResponse(
-          None, ErrorCode.code500, correlationId, Option(incomingStatementReqId)))
+        contentAsJson(response) mustBe Json.toJson(
+          StatementSearchFailureNotificationErrorResponse(
+            None,
+            ErrorCode.code500,
+            correlationId,
+            Option(incomingStatementReqId)
+          )
+        )
       }
 
       verify(mockHistDocReqSearchCacheService, Mockito.times(1))
@@ -234,62 +273,61 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     "return 204 when exception occurs while sending the ACC24 request " +
       "after updating the retry count" in new Setup {
-      val searchRequestsInProcess: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
-      )
+        val searchRequestsInProcess: Set[SearchRequest] = Set(
+          SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
+          SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        )
 
-      val updatedSearchRequests: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
-      )
+        val updatedSearchRequests: Set[SearchRequest] = Set(
+          SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, docUnreachable, 1),
+          SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
-      )
+        when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+          .thenReturn(
+            Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
+          )
 
-      when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
-      )
+        when(mockHistDocReqSearchCacheService.updateSearchRequestRetryCount(any, any, any, any)).thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
+        )
 
-      when(mockHistDocService.sendHistoricDocumentRequest(any)(any)).thenThrow(
-        new RuntimeException("Technical error occurred"))
+        when(mockHistDocService.sendHistoricDocumentRequest(any)(any))
+          .thenThrow(new RuntimeException("Technical error occurred"))
 
-      running(app) {
-        val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
-        status(response) mustBe NO_CONTENT
+        running(app) {
+          val response = route(app, validRequestWithReasonOtherThanNoDocuments).value
+          status(response) mustBe NO_CONTENT
+        }
+
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .retrieveHistDocRequestSearchDocForStatementReqId(any)
+        verify(mockHistDocReqSearchCacheService, Mockito.times(1))
+          .updateSearchRequestRetryCount(any, any, any, any)
       }
-
-      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
-        .retrieveHistDocRequestSearchDocForStatementReqId(any)
-      verify(mockHistDocReqSearchCacheService, Mockito.times(1))
-        .updateSearchRequestRetryCount(any, any, any, any)
-    }
 
     "return 204 when exception occurs while sending secure message" in new Setup {
       val searchRequestsInProcess: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+        SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
       val updatedSearchRequests: Set[SearchRequest] = Set(
         SearchRequest(
-          "GB123456789012", incomingStatementReqId, SearchResultStatus.no, emptyString, noDocumentsFound, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+          "GB123456789012",
+          incomingStatementReqId,
+          SearchResultStatus.no,
+          emptyString,
+          noDocumentsFound,
+          0
+        ),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
       )
 
-      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(
-        incomingStatementReqId)).thenReturn(
-        Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
-      )
+      when(mockHistDocReqSearchCacheService.retrieveHistDocRequestSearchDocForStatementReqId(incomingStatementReqId))
+        .thenReturn(
+          Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = searchRequestsInProcess)))
+        )
 
       when(mockHistDocReqSearchCacheService.updateSearchRequestForStatementRequestId(any, any, any)).thenReturn(
         Future.successful(Option(historicDocumentRequestSearchDoc.copy(searchRequests = updatedSearchRequests)))
@@ -299,8 +337,8 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
         Future.successful(Option(historicDocumentRequestSearchDoc.copy(resultsFound = SearchResultStatus.no)))
       )
 
-      when(mockSecureMessageConnector.sendSecureMessage(any)).thenThrow(
-        new RuntimeException("Technical error occurred"))
+      when(mockSecureMessageConnector.sendSecureMessage(any))
+        .thenThrow(new RuntimeException("Technical error occurred"))
 
       running(app) {
         val response = route(app, validRequest).value
@@ -329,10 +367,10 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val docUnreachable = "DocumentumUnreachable"
+    val docUnreachable   = "DocumentumUnreachable"
     val noDocumentsFound = "NoDocumentsFound"
 
-    val incomingStatementReqId: String = UUID.randomUUID().toString
+    val incomingStatementReqId: String                           = UUID.randomUUID().toString
     val ssfnMeteData: StatementSearchFailureNotificationMetadata =
       StatementSearchFailureNotificationMetadata(incomingStatementReqId, "NoDocumentsFound")
 
@@ -341,106 +379,106 @@ class StatementSearchFailureNotificationControllerSpec extends SpecBase {
 
     val ssfnReq: StatementSearchFailureNotificationRequest = StatementSearchFailureNotificationRequest(ssfnMeteData)
 
-    val validRequestJSON: JsObject = ssfnRequestFormat.writes(ssfnReq)
+    val validRequestJSON: JsObject                              = ssfnRequestFormat.writes(ssfnReq)
     val validReqJSONForReasonCodeOtherThanNoDocuments: JsObject =
-      ssfnRequestFormat.writes(ssfnReq.copy(
-        StatementSearchFailureNotificationMetadata = ssfnMetaDataWithReasonOtherThanNoDocuments))
+      ssfnRequestFormat.writes(
+        ssfnReq.copy(StatementSearchFailureNotificationMetadata = ssfnMetaDataWithReasonOtherThanNoDocuments)
+      )
 
-    val inValidRequestJSON: JsObject = ssfnRequestFormat.writes(ssfnReq.copy(
-      StatementSearchFailureNotificationMetadata = ssfnReq.StatementSearchFailureNotificationMetadata.copy(
-        reason = "UnKnown")))
+    val inValidRequestJSON: JsObject = ssfnRequestFormat.writes(
+      ssfnReq.copy(
+        StatementSearchFailureNotificationMetadata =
+          ssfnReq.StatementSearchFailureNotificationMetadata.copy(reason = "UnKnown")
+      )
+    )
 
     val validRequestWithoutHeaders: FakeRequest[JsObject] = FakeRequest(
       "POST",
-      routes.StatementSearchFailureNotificationController.processNotification().url)
-      .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(validRequestJSON)
+      routes.StatementSearchFailureNotificationController.processNotification().url
+    ).withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(validRequestJSON)
 
-    val validRequestWithReasonCodeOtherThanNoDocumentsWithoutHeaders: FakeRequest[JsObject] = FakeRequest(
-      "POST",
-      routes.StatementSearchFailureNotificationController.processNotification().url)
-      .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(
-      validReqJSONForReasonCodeOtherThanNoDocuments
-    )
+    val validRequestWithReasonCodeOtherThanNoDocumentsWithoutHeaders: FakeRequest[JsObject] =
+      FakeRequest("POST", routes.StatementSearchFailureNotificationController.processNotification().url).withCSRFToken
+        .asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
+        .withBody(
+          validReqJSONForReasonCodeOtherThanNoDocuments
+        )
 
     val inValidRequestWithoutHeaders: FakeRequest[JsObject] = FakeRequest(
       "POST",
-      routes.StatementSearchFailureNotificationController.processNotification().url)
-      .withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(inValidRequestJSON)
+      routes.StatementSearchFailureNotificationController.processNotification().url
+    ).withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]].withBody(inValidRequestJSON)
 
     val correlationId = "some-id"
 
     val validRequest: FakeRequest[JsObject] = validRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "2023-10-18T11:10:22Z",
+        "Date"             -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json",
-        "Authorization" -> "Bearer test1234567"
+        "Content-Type"     -> "application/json",
+        "Accept"           -> "application/json",
+        "Authorization"    -> "Bearer test1234567"
       )
 
     val validRequestWithReasonOtherThanNoDocuments: FakeRequest[JsObject] =
       validRequestWithReasonCodeOtherThanNoDocumentsWithoutHeaders.withHeaders(
-        "Date" -> "2023-10-18T11:10:22Z",
+        "Date"             -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "CDDM",
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json",
-        "Authorization" -> "Bearer test1234567"
+        "Content-Type"     -> "application/json",
+        "Accept"           -> "application/json",
+        "Authorization"    -> "Bearer test1234567"
       )
 
     val invalidRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "2023-10-18T11:10:22Z",
+        "Date"             -> "2023-10-18T11:10:22Z",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "MD/TP",
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json",
-        "Authorization" -> "Bearer test1234567"
+        "Content-Type"     -> "application/json",
+        "Accept"           -> "application/json",
+        "Authorization"    -> "Bearer test1234567"
       )
 
     val invalidDateHeaderRequest: FakeRequest[JsObject] = inValidRequestWithoutHeaders
       .withHeaders(
-        "Date" -> "Thu, 14 Sep 2023 16:30:30 GMT",
+        "Date"             -> "Thu, 14 Sep 2023 16:30:30 GMT",
         "X-Correlation-ID" -> correlationId,
         "X-Forwarded-Host" -> "MD/TP",
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json",
-        "Authorization" -> "Bearer test1234567"
+        "Content-Type"     -> "application/json",
+        "Accept"           -> "application/json",
+        "Authorization"    -> "Bearer test1234567"
       )
 
-    val schemaValidator = new JSONSchemaValidator()
+    val schemaValidator                                                             = new JSONSchemaValidator()
     val mockHistDocReqSearchCacheService: HistoricDocumentRequestSearchCacheService =
       mock[HistoricDocumentRequestSearchCacheService]
 
     val mockSecureMessageConnector: SecureMessageConnector = mock[SecureMessageConnector]
-    val mockHistDocService: HistoricDocumentService = mock[HistoricDocumentService]
+    val mockHistDocService: HistoricDocumentService        = mock[HistoricDocumentService]
 
-    val app: Application = application().overrides(
-      inject.bind[JSONSchemaValidator].toInstance(schemaValidator),
-      inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService),
-      inject.bind[SecureMessageConnector].toInstance(mockSecureMessageConnector),
-      inject.bind[HistoricDocumentService].toInstance(mockHistDocService)
-    ).build()
+    val app: Application = application()
+      .overrides(
+        inject.bind[JSONSchemaValidator].toInstance(schemaValidator),
+        inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService),
+        inject.bind[SecureMessageConnector].toInstance(mockSecureMessageConnector),
+        inject.bind[HistoricDocumentService].toInstance(mockHistDocService)
+      )
+      .build()
 
     val historicDocumentRequestSearchDoc: HistoricDocumentRequestSearch = {
-      val searchID: UUID = UUID.randomUUID()
+      val searchID: UUID                         = UUID.randomUUID()
       val resultsFound: SearchResultStatus.Value = inProcess
-      val searchStatusUpdateDate: String = emptyString
-      val currentEori: String = "GB123456789012"
-      val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
-      val searchRequests: Set[SearchRequest] = Set(
-        SearchRequest(
-          "GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
-        SearchRequest(
-          "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0))
+      val searchStatusUpdateDate: String         = emptyString
+      val currentEori: String                    = "GB123456789012"
+      val params: Params                         = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+      val searchRequests: Set[SearchRequest]     = Set(
+        SearchRequest("GB123456789012", incomingStatementReqId, inProcess, emptyString, emptyString, 0),
+        SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+      )
 
-      HistoricDocumentRequestSearch(searchID,
-        resultsFound,
-        searchStatusUpdateDate,
-        currentEori,
-        params,
-        searchRequests)
+      HistoricDocumentRequestSearch(searchID, resultsFound, searchStatusUpdateDate, currentEori, params, searchRequests)
     }
   }
 }

@@ -106,12 +106,11 @@ class SubscriptionControllerSpec extends SpecBase {
 
   trait Setup {
 
-    val traderEORI: EORI = EORI(EORI_VALUE)
+    val traderEORI: EORI       = EORI(EORI_VALUE)
     val enrolments: Enrolments =
       Enrolments(
-        Set(Enrolment(ENROLMENT_KEY,
-          Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)),
-          "activated")))
+        Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)), "activated"))
+      )
 
     val request: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest("GET", controllers.routes.SubscriptionController.getVerifiedEmail().url)
@@ -122,18 +121,21 @@ class SubscriptionControllerSpec extends SpecBase {
     val unVerifiedEmailRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest("GET", controllers.routes.SubscriptionController.getUnverifiedEmail().url)
 
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
+    val mockAuthConnector: CustomAuthConnector       = mock[CustomAuthConnector]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

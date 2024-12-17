@@ -28,30 +28,29 @@ object Request {
   implicit val format: OFormat[Request] = Json.format[Request]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
-case class AmendCorrespondenceAddressRequest(requestCommon: RequestCommon,
-                                             requestDetail: RequestDetail)
+case class AmendCorrespondenceAddressRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
 
 object AmendCorrespondenceAddressRequest {
   implicit val format: OFormat[AmendCorrespondenceAddressRequest] = Json.format[AmendCorrespondenceAddressRequest]
 }
 
-case class RequestCommon(originatingSystem: String,
-                         receiptDate: String,
-                         acknowledgementReference: String)
+case class RequestCommon(originatingSystem: String, receiptDate: String, acknowledgementReference: String)
 
 object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
 }
 
-case class RequestDetail(eori: EORI,
-                         accountDetails: AccountDetails,
-                         contactDetails: ContactDetails,
-                         reasonForChange: Option[String])
+case class RequestDetail(
+  eori: EORI,
+  accountDetails: AccountDetails,
+  contactDetails: ContactDetails,
+  reasonForChange: Option[String]
+)
 
 object RequestDetail {
   implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]
@@ -63,20 +62,22 @@ object AccountDetails {
   implicit val format: OFormat[AccountDetails] = Json.format[AccountDetails]
 }
 
-case class ContactDetails(contactName: Option[String],
-                          addressLine1: String,
-                          addressLine2: Option[String],
-                          addressLine3: Option[String],
-                          addressLine4: Option[String],
-                          postCode: Option[String],
-                          countryCode: String,
-                          telephone: Option[String],
-                          faxNumber: Option[String],
-                          email: Option[EmailAddress])
+case class ContactDetails(
+  contactName: Option[String],
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  postCode: Option[String],
+  countryCode: String,
+  telephone: Option[String],
+  faxNumber: Option[String],
+  email: Option[EmailAddress]
+)
 
 object ContactDetails {
 
-  def fromRequest(request: UpdateContactDetailsRequest): ContactDetails = {
+  def fromRequest(request: UpdateContactDetailsRequest): ContactDetails =
     ContactDetails(
       request.name,
       request.addressLine1,
@@ -89,7 +90,6 @@ object ContactDetails {
       request.fax,
       request.email
     )
-  }
 
   implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails]
 }

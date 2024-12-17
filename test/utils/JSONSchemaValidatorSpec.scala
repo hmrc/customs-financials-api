@@ -21,15 +21,15 @@ import play.api.Application
 import play.api.test.Helpers.running
 
 class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReader {
-  val ssfnRequestSchemaPath = "/schemas/statement-search-failure-notification-request-schema.json"
-  val ssfnErrorResponseSchemaPath = "/schemas/statement-search-failure-notification-error-response-schema.json"
-  val ssfnSecrureMessageRequestSchemaPath = "/schemas/secure-message-request-schema.json"
-  val ssfnValidRequestJsonFilePath = "/ssfn-valid-request.json"
-  val ssfnInvalidRequestJsonFilePath = "/ssfn-invalid-request.json"
-  val ssfnValidErrorResponseJsonFilePath = "/ssfn-valid-error-response.json"
-  val ssfnInvalidErrorResponseJsonFilePath = "/ssfn-invalid-error-response.json"
+  val ssfnRequestSchemaPath                              = "/schemas/statement-search-failure-notification-request-schema.json"
+  val ssfnErrorResponseSchemaPath                        = "/schemas/statement-search-failure-notification-error-response-schema.json"
+  val ssfnSecrureMessageRequestSchemaPath                = "/schemas/secure-message-request-schema.json"
+  val ssfnValidRequestJsonFilePath                       = "/ssfn-valid-request.json"
+  val ssfnInvalidRequestJsonFilePath                     = "/ssfn-invalid-request.json"
+  val ssfnValidErrorResponseJsonFilePath                 = "/ssfn-valid-error-response.json"
+  val ssfnInvalidErrorResponseJsonFilePath               = "/ssfn-invalid-error-response.json"
   val ssfnInvalidMultipleErrorsErrorResponseJsonFilePath = "/ssfn-invalid-multiple-errors-error-response.json"
-  val ssfnValidSecureMessageRequestJsonFilePath = "/ssfn-valid-secure-message-request.json"
+  val ssfnValidSecureMessageRequestJsonFilePath          = "/ssfn-valid-secure-message-request.json"
 
   "ssfnRequestSchema" should {
     "return correct value for the schema path" in new Setup {
@@ -59,15 +59,19 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "validate the ssfn valid request" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnValidRequestJsonFilePath), ssfnRequestSchemaPath)
-        result.success.value mustBe()
+          readJsonFromFile(ssfnValidRequestJsonFilePath),
+          ssfnRequestSchemaPath
+        )
+        result.success.value mustBe ()
       }
     }
 
     "return error for ssfn invalid request" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnInvalidRequestJsonFilePath), ssfnRequestSchemaPath)
+          readJsonFromFile(ssfnInvalidRequestJsonFilePath),
+          ssfnRequestSchemaPath
+        )
 
         result.isFailure mustBe true
         result.failure.exception.getMessage must include("/StatementSearchFailureNotificationMetadata/reason")
@@ -77,16 +81,20 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "validate the ssfn valid error response" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnValidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+          readJsonFromFile(ssfnValidErrorResponseJsonFilePath),
+          ssfnErrorResponseSchemaPath
+        )
 
-        result.success.value mustBe()
+        result.success.value mustBe ()
       }
     }
 
     "return error for ssfn invalid error response" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnInvalidErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+          readJsonFromFile(ssfnInvalidErrorResponseJsonFilePath),
+          ssfnErrorResponseSchemaPath
+        )
 
         result.isFailure mustBe true
         result.failure.exception.getMessage must include("/errorDetail/correlationId")
@@ -96,7 +104,9 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "return errors for ssfn invalid error response that has multiple incorrect values" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnInvalidMultipleErrorsErrorResponseJsonFilePath), ssfnErrorResponseSchemaPath)
+          readJsonFromFile(ssfnInvalidMultipleErrorsErrorResponseJsonFilePath),
+          ssfnErrorResponseSchemaPath
+        )
 
         result.isFailure mustBe true
         result.failure.exception.getMessage must include("/errorDetail/correlationId")
@@ -107,15 +117,17 @@ class JSONSchemaValidatorSpec extends SpecBase with TryValues with JsonFileReade
     "validate the ssfn secure message request" in new Setup {
       running(app) {
         val result = jsonPayloadSchemaValidator.validatePayload(
-          readJsonFromFile(ssfnValidSecureMessageRequestJsonFilePath), ssfnSecrureMessageRequestSchemaPath)
+          readJsonFromFile(ssfnValidSecureMessageRequestJsonFilePath),
+          ssfnSecrureMessageRequestSchemaPath
+        )
 
-        result.success.value mustBe()
+        result.success.value mustBe ()
       }
     }
   }
 
   trait Setup {
-    val app: Application = application().build()
+    val app: Application                                = application().build()
     val jsonPayloadSchemaValidator: JSONSchemaValidator = app.injector.instanceOf[JSONSchemaValidator]
   }
 }

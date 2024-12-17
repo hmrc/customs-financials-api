@@ -32,7 +32,6 @@ import utils.Utils.emptyString
 
 import scala.concurrent.Future
 
-
 class Acc37ConnectorSpec extends SpecBase {
 
   "updateAccountContactDetails" should {
@@ -52,8 +51,8 @@ class Acc37ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val response: domain.acc37.Response = domain.acc37.Response(
@@ -80,14 +79,17 @@ class Acc37ConnectorSpec extends SpecBase {
       Some(EmailAddress("somedata@email.com"))
     )
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc37Connector = app.injector.instanceOf[Acc37Connector]
   }

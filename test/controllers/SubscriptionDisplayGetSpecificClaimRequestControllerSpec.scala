@@ -43,22 +43,40 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
       val cdsEstablishmentAddress: CdsEstablishmentAddress =
         CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
 
-      val vatIds: VatId = VatId(Some("abc"), Some("123"))
+      val vatIds: VatId         = VatId(Some("abc"), Some("123"))
       val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
 
-      val xiEoriAddress: PbeAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
+      val xiEoriAddress: PbeAddress          = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
       val xiEoriSubscription: XiSubscription =
-        XiSubscription("XI1234567",
+        XiSubscription(
+          "XI1234567",
           Some(xiEoriAddress),
           Some("1"),
           Some("12345"),
           Some(Array(euVatIds)),
           "1",
-          Some("abc"))
+          Some("abc")
+        )
 
-      val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
-        cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
-        None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
+      val responseDetail: ResponseDetail = ResponseDetail(
+        Some(EORI("someEori")),
+        None,
+        None,
+        "CDSFullName",
+        cdsEstablishmentAddress,
+        Some("0"),
+        None,
+        None,
+        Some(Array(vatIds)),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        ETMP_Master_Indicator = true,
+        Some(xiEoriSubscription)
+      )
 
       val response: SubscriptionResponse =
         SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
@@ -84,16 +102,20 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
   }
 
   trait Setup {
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    val mockSub09Connector: Sub09Connector = mock[Sub09Connector]
+    val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
+    val mockAuthConnector: CustomAuthConnector       = mock[CustomAuthConnector]
+    val mockSub09Connector: Sub09Connector           = mock[Sub09Connector]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Sub09Connector].toInstance(mockSub09Connector)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Sub09Connector].toInstance(mockSub09Connector)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

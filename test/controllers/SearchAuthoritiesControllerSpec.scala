@@ -76,8 +76,10 @@ class SearchAuthoritiesControllerSpec extends SpecBase {
       FakeRequest("POST", routes.SearchAuthoritiesController.searchAuthorities().url)
         .withJsonBody(Json.toJson(frontendRequest))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc40Connector].toInstance(mockConnector)
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc40Connector].toInstance(mockConnector)
+      )
+      .build()
   }
 }

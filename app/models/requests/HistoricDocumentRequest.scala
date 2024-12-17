@@ -21,34 +21,42 @@ import play.api.libs.json.*
 
 import java.util.UUID
 
-case class HistoricDocumentRequest(eori: EORI,
-                                   documentType: FileRole,
-                                   periodStartYear: Int,
-                                   periodStartMonth: Int,
-                                   periodEndYear: Int,
-                                   periodEndMonth: Int,
-                                   dan: Option[String],
-                                   statementRequestID: UUID = UUID.randomUUID())
+case class HistoricDocumentRequest(
+  eori: EORI,
+  documentType: FileRole,
+  periodStartYear: Int,
+  periodStartMonth: Int,
+  periodEndYear: Int,
+  periodEndMonth: Int,
+  dan: Option[String],
+  statementRequestID: UUID = UUID.randomUUID()
+)
 
 object HistoricDocumentRequest {
   implicit val historicDocumentRequestFormat: OFormat[HistoricDocumentRequest] = Json.format[HistoricDocumentRequest]
 
-  def apply(statementRequestID: String,
-            histDocRequestSearch: HistoricDocumentRequestSearch): HistoricDocumentRequest = {
+  def apply(
+    statementRequestID: String,
+    histDocRequestSearch: HistoricDocumentRequestSearch
+  ): HistoricDocumentRequest = {
     val searchReqForStatReqId: SearchRequest =
-      histDocRequestSearch.searchRequests.find(
-        sr => sr.statementRequestId == statementRequestID).getOrElse(
-        throw new RuntimeException(s"SearchRequest is not found for statementRequestId :: $statementRequestID"))
+      histDocRequestSearch.searchRequests
+        .find(sr => sr.statementRequestId == statementRequestID)
+        .getOrElse(
+          throw new RuntimeException(s"SearchRequest is not found for statementRequestId :: $statementRequestID")
+        )
 
     val params = histDocRequestSearch.params
 
-    HistoricDocumentRequest(eori = EORI(searchReqForStatReqId.eoriNumber),
+    HistoricDocumentRequest(
+      eori = EORI(searchReqForStatReqId.eoriNumber),
       documentType = FileRole(params.accountType),
       periodStartYear = params.periodStartYear.toInt,
       periodStartMonth = params.periodStartMonth.toInt,
       periodEndYear = params.periodEndYear.toInt,
       periodEndMonth = params.periodEndMonth.toInt,
       dan = if (params.dan.isEmpty) None else Some(params.dan),
-      statementRequestID = UUID.fromString(statementRequestID))
+      statementRequestID = UUID.fromString(statementRequestID)
+    )
   }
 }

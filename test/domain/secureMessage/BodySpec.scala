@@ -43,7 +43,7 @@ class BodySpec extends SpecBase {
 
     "Recipient" in new Setup {
       val tax: TaxIdentifier = TaxIdentifier("name", "value")
-      val recip: Recipient = Recipient(REGIME, tax, Name(TEST_COMPANY), TEST_EMAIL)
+      val recip: Recipient   = Recipient(REGIME, tax, Name(TEST_COMPANY), TEST_EMAIL)
       recip mustBe testRecip
     }
 
@@ -67,7 +67,8 @@ class BodySpec extends SpecBase {
     }
 
     "display C79CertificateBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
       c79CertificateBody("Apples & Pears Ltd", dateRange) mustBe testC79CertificateBody(applesAndPearsLtd)
     }
 
@@ -77,7 +78,8 @@ class BodySpec extends SpecBase {
     }
 
     "display PostponedVATBody correctly" in new Setup {
-      override val dateRange: DateRange = DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
       postponedVATBody("Apples & Pears Ltd", dateRange) mustBe testPostponedVATBody(applesAndPearsLtd)
     }
 
@@ -139,23 +141,23 @@ class BodySpec extends SpecBase {
     }
 
     "display PostponedVATBody correctly in welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(
-        dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
       postponedVATBody("Apples & Pears Ltd", dateRange, welshLangKey) mustBe
         testPostponedVATBodyCy(applesAndPearsLtd)
     }
 
     "display DutyDefermentBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(
-        dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "September 2022 to October 2022", dateAsNumber = emptyString)
 
       dutyDefermentBody(emptyString, dateRange, welshLangKey) mustBe testDutyDefermentBodyCy()
     }
 
     "display C79CertificateBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(
-        dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "January 2022 to April 2022", dateAsNumber = emptyString)
 
       c79CertificateBody(emptyString, dateRange, welshLangKey) mustBe testC79CertificateBodyCy()
     }
@@ -166,8 +168,8 @@ class BodySpec extends SpecBase {
     }
 
     "display PostponedVATBody correctly when company name is empty for Welsh" in new Setup {
-      override val dateRange: DateRange = DateRange(
-        dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
+      override val dateRange: DateRange =
+        DateRange(dateAsText = "February 2022 to March 2022", dateAsNumber = emptyString)
 
       postponedVATBody(emptyString, dateRange, welshLangKey) mustBe testPostponedVATBodyCy()
     }
@@ -296,25 +298,25 @@ class BodySpec extends SpecBase {
 
   trait Setup {
 
-    val testBody: Body = Body("eori")
+    val testBody: Body             = Body("eori")
     val testRef: ExternalReference = ExternalReference("id", "source")
-    val testTax: TaxIdentifier = TaxIdentifier("name", "value")
-    val testRecip: Recipient = Recipient(REGIME, testTax, Name(TEST_COMPANY), TEST_EMAIL)
-    val testTags: Tags = Tags("NotificationType")
-    val testContent: Content = Content("en", "accountType", "body")
+    val testTax: TaxIdentifier     = TaxIdentifier("name", "value")
+    val testRecip: Recipient       = Recipient(REGIME, testTax, Name(TEST_COMPANY), TEST_EMAIL)
+    val testTags: Tags             = Tags("NotificationType")
+    val testContent: Content       = Content("en", "accountType", "body")
 
-    val testDutyDefermentTemplate = "customs_financials_requested_duty_deferment_not_found"
+    val testDutyDefermentTemplate  = "customs_financials_requested_duty_deferment_not_found"
     val testC79CertificateTemplate = "customs_financials_requested_c79_certificate_not_found"
-    val testSecurityTemplate = "customs_financials_requested_notification_adjustment_statements_not_found"
-    val testPostponedVATTemplate = "customs_financials_requested_postponed_import_vat_statements_not_found"
+    val testSecurityTemplate       = "customs_financials_requested_notification_adjustment_statements_not_found"
+    val testPostponedVATTemplate   = "customs_financials_requested_postponed_import_vat_statements_not_found"
 
-    val testSubjectDutyDef = "Requested duty deferment statements "
-    val testSubjectCert = "Requested import VAT certificates (C79) "
+    val testSubjectDutyDef          = "Requested duty deferment statements "
+    val testSubjectCert             = "Requested import VAT certificates (C79) "
     val testSubjectSecurity: String = "Requested notification of adjustment statements "
-    val testSubjectImport = "Requested postponed import VAT statements "
+    val testSubjectImport           = "Requested postponed import VAT statements "
 
-    val applesAndPearsLtd = "Apples & Pears Ltd"
-    val defaultCompanyName = "Customer"
+    val applesAndPearsLtd    = "Apples & Pears Ltd"
+    val defaultCompanyName   = "Customer"
     val defaultCompanyNameCy = "Gwsmer"
 
     def testDutyDefermentBody(companyName: String = defaultCompanyName): String = s"Dear $companyName<br/><br/>" +
@@ -370,7 +372,8 @@ class BodySpec extends SpecBase {
       "EdXR5IERlZmVybWVudCBFbGVjdHJvbmljIFN0YXRlbWVudHMgKERERVMpPC9hPi48YnIvPjwvbGk+PC9vbD5Gcm9tIHRoZSBDdXN0b21" +
       "zIERlY2xhcmF0aW9uIFNlcnZpY2U="
 
-    val encodedDutyDefermentBodyForEmptyCompanyName: String = "RGVhciBDdXN0b21lcjxici8+PGJyLz5UaGUgZHV0eSBkZWZlcm1lbnQ" +
+    val encodedDutyDefermentBodyForEmptyCompanyName
+      : String = "RGVhciBDdXN0b21lcjxici8+PGJyLz5UaGUgZHV0eSBkZWZlcm1lbnQ" +
       "gc3RhdG" +
       "VtZW50cyB5b3UgcmVxdWVzdGVkIGZvciBTZXB" +
       "0ZW1iZXIgMjAyMiB0byBPY3RvYmVyIDIwMjIgd2VyZSBub3QgZm91bmQuPGJyLz48YnIvPlRoZXJlIGFyZSAyIHBvc3NpYmxlIHJlYXNvbnM" +
@@ -461,14 +464,16 @@ class BodySpec extends SpecBase {
       "UgYSB3bmFlZCBnYW4gZGRlZm55ZGRpb+KAmXIgZ3dhc2FuYWV0aCBDSElFRi48L2xpPjwvb2w+PGJyLz5PZGRpIHdydGggeSBHd2FzYW5hZX" +
       "RoIERhdGdhbmlhZGF1IFRvbGxhdQ=="
 
-    val params: Params = Params(periodStartMonth = "02",
+    val params: Params = Params(
+      periodStartMonth = "02",
       periodStartYear = "2021",
       periodEndMonth = "04",
       periodEndYear = "2021",
       accountType = "PostponedVATStatement",
-      dan = "1234567")
+      dan = "1234567"
+    )
 
-    val jsValue: String = """{"dateAsText":"test_msg","dateAsNumber":"test_msg"}""".stripMargin
+    val jsValue: String      = """{"dateAsText":"test_msg","dateAsNumber":"test_msg"}""".stripMargin
     val dateRange: DateRange = DateRange(dateAsText = "test_msg", dateAsNumber = "test_msg")
   }
 }

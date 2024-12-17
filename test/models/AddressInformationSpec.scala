@@ -39,21 +39,22 @@ class AddressInformationSpec extends SpecBase {
   }
 
   trait Setup {
-    val streetAndNumber: String = "street&Number"
-    val city: String = "london"
+    val streetAndNumber: String    = "street&Number"
+    val city: String               = "london"
     val postalCode: Option[String] = Option("Post")
-    val countryCode: String = COUNTRY_CODE_GB
+    val countryCode: String        = COUNTRY_CODE_GB
 
     val expectedResult: AddressInformation = AddressInformation(
       streetAndNumber = streetAndNumber,
       city = city,
       postalCode = postalCode,
-      countryCode = countryCode)
+      countryCode = countryCode
+    )
 
     val addressJsValue: String = """{"streetAndNumber": "123",
         |"city": "city","postalCode": "post","countryCode": "GB"}""".stripMargin
 
-    val addressObject: AddressInformation = AddressInformation(streetAndNumber = "123",
-      city = "city", postalCode = Option("post"), countryCode = "GB")
+    val addressObject: AddressInformation =
+      AddressInformation(streetAndNumber = "123", city = "city", postalCode = Option("post"), countryCode = "GB")
   }
 }
