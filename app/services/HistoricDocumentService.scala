@@ -24,10 +24,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class HistoricDocumentService @Inject()(acc24Connector: Acc24Connector,
-                                        auditingService: AuditingService) {
-  def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest)
-                                 (implicit hc: HeaderCarrier): Future[Boolean] = {
+class HistoricDocumentService @Inject() (acc24Connector: Acc24Connector, auditingService: AuditingService) {
+  def sendHistoricDocumentRequest(
+    historicDocumentRequest: HistoricDocumentRequest
+  )(implicit hc: HeaderCarrier): Future[Boolean] = {
     auditingService.auditHistoricStatementRequest(historicDocumentRequest)
     acc24Connector.sendHistoricDocumentRequest(historicDocumentRequest)
   }

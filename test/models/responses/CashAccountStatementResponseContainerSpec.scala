@@ -103,7 +103,6 @@ class CashAccountStatementResponseContainerSpec extends SpecBase {
         |  }
         |}""".stripMargin
 
-
     val casErrorJson01: String =
       """
         |{
@@ -124,12 +123,15 @@ class CashAccountStatementResponseContainerSpec extends SpecBase {
     val returnParamObj: ReturnParameter = ReturnParameter("POSITION", "FAIL")
 
     val responseCommonObj01: Acc45ResponseCommon = Acc45ResponseCommon(
-      "OK", Some("003-Request could not be processed"),
-      "2021-12-17T09:30:47Z", Some(Seq(returnParamObj))
+      "OK",
+      Some("003-Request could not be processed"),
+      "2021-12-17T09:30:47Z",
+      Some(Seq(returnParamObj))
     )
 
     val casResponseObj01: CashAccountStatementResponseContainer = CashAccountStatementResponseContainer(
-      CashAccountStatementResponse(responseCommonObj01))
+      CashAccountStatementResponse(responseCommonObj01)
+    )
 
     val responseCommonObj02: Acc45ResponseCommon = Acc45ResponseCommon("OK", None, "2021-12-17T09:30:47Z", None)
 

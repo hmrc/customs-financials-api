@@ -30,10 +30,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc38Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc38Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
   def getAccountContactDetails(dan: AccountNumber, eori: EORI): Future[acc38.Response] = {
 
@@ -54,8 +56,8 @@ class Acc38Connector @Inject()(httpClient: HttpClientV2,
       )
     )
 
-    httpClient.post(
-      url"${appConfig.acc38DutyDefermentContactDetailsEndpoint}")(HeaderCarrier())
+    httpClient
+      .post(url"${appConfig.acc38DutyDefermentContactDetailsEndpoint}")(HeaderCarrier())
       .withBody[acc38.Request](request)
       .setHeader(mdgHeaders.headers(appConfig.acc38BearerToken, appConfig.acc38HostHeader): _*)
       .execute[acc38.Response]

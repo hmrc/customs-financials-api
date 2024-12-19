@@ -21,9 +21,7 @@ import play.api.libs.json.*
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
-case class NotificationsForEori(eori: EORI,
-                                notifications: Seq[Notification],
-                                lastUpdated: Option[LocalDateTime])
+case class NotificationsForEori(eori: EORI, notifications: Seq[Notification], lastUpdated: Option[LocalDateTime])
 
 object NotificationsForEori {
 
@@ -31,14 +29,12 @@ object NotificationsForEori {
     Reads[LocalDateTime](js =>
       js.validate[Long] match {
         case JsSuccess(epoc, _) => JsSuccess(Instant.ofEpochMilli(epoc).atOffset(ZoneOffset.UTC).toLocalDateTime)
-        case _ => JsSuccess(Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime)
+        case _                  => JsSuccess(Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime)
       }
     ),
-    Writes[LocalDateTime](d =>
-      JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli)
-    )
+    Writes[LocalDateTime](d => JsNumber(d.toInstant(ZoneOffset.UTC).toEpochMilli))
   )
 
-  implicit val notificationWrites: OFormat[Notification] = Json.format[Notification]
+  implicit val notificationWrites: OFormat[Notification]          = Json.format[Notification]
   implicit val notificationsFormat: OFormat[NotificationsForEori] = Json.format[NotificationsForEori]
 }

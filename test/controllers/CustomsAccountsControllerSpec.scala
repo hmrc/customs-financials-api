@@ -49,9 +49,10 @@ class CustomsAccountsControllerSpec extends SpecBase {
           .overrides()
           .configure(
             "microservice.metrics.enabled" -> false,
-            "metrics.enabled" -> false,
-            "auditing.enabled" -> false
-          ).build()
+            "metrics.enabled"              -> false,
+            "auditing.enabled"             -> false
+          )
+          .build()
 
         val invalidRequest: FakeRequest[AnyContentAsJson] =
           FakeRequest(POST, controllers.routes.CustomsAccountsController.getCustomsAccountsDod09().url)
@@ -66,25 +67,28 @@ class CustomsAccountsControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val EORI = "testEORI"
+    val EORI                       = "testEORI"
     val expectedResponse: JsString = JsString("TheGoodResponse")
-    val requestBody: JsObject = Json.obj("EORINo" -> JsString(EORI))
+    val requestBody: JsObject      = Json.obj("EORINo" -> JsString(EORI))
 
     val request: FakeRequest[AnyContentAsJson] =
-      FakeRequest(POST,
-        controllers.routes.CustomsAccountsController.getCustomsAccountsDod09().url).withJsonBody(requestBody)
+      FakeRequest(POST, controllers.routes.CustomsAccountsController.getCustomsAccountsDod09().url)
+        .withJsonBody(requestBody)
 
     val mockAcc27Connector: Acc27Connector = mock[Acc27Connector]
 
     when(mockAcc27Connector.getAccounts(meq(requestBody)))
       .thenReturn(Future.successful(Json.obj("response" -> expectedResponse)))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc27Connector].toInstance(mockAcc27Connector)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc27Connector].toInstance(mockAcc27Connector)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

@@ -32,50 +32,51 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class SecureMessageConnector @Inject()(httpClient: HttpClientV2,
-                                       appConfig: AppConfig,
-                                       jsonSchemaValidator: JSONSchemaValidator,
-                                       mdgHeaders: MdgHeaders,
-                                       dataStore: DataStoreConnector)(implicit executionContext: ExecutionContext) {
+class SecureMessageConnector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  jsonSchemaValidator: JSONSchemaValidator,
+  mdgHeaders: MdgHeaders,
+  dataStore: DataStoreConnector
+)(implicit executionContext: ExecutionContext) {
 
   def sendSecureMessage(histDoc: HistoricDocumentRequestSearch): Future[Either[String, Response]] = {
 
-    val log: LoggerLike = Logger(this.getClass)
+    val log: LoggerLike            = Logger(this.getClass)
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val companyNameResult: Future[Option[String]] = dataStore.getCompanyName(
-      EORI(histDoc.currentEori)).recoverWith {
-      case exc: Exception =>
+    val companyNameResult: Future[Option[String]] =
+      dataStore.getCompanyName(EORI(histDoc.currentEori)).recoverWith { case exc: Exception =>
         log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
         Future(Some(emptyString))
-    }
+      }
 
     val result = for {
-      companyName: Option[String] <- companyNameResult
+      companyName: Option[String]        <- companyNameResult
       emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
     } yield {
 
-      val request: Request = Request(histDoc,
-        emailAddress.getOrElse(EmailAddress(emptyString)),
-        companyName.getOrElse(emptyString))
+      val request: Request =
+        Request(histDoc, emailAddress.getOrElse(EmailAddress(emptyString)), companyName.getOrElse(emptyString))
 
       jsonSchemaValidator.validatePayload(
-        requestBody(request), jsonSchemaValidator.ssfnSecureMessageRequestSchema) match {
+        requestBody(request),
+        jsonSchemaValidator.ssfnSecureMessageRequestSchema
+      ) match {
         case Success(_) =>
-          val result: Future[Response] = httpClient.post(
-            url"${appConfig.secureMessageEndpoint}")
+          val result: Future[Response] = httpClient
+            .post(url"${appConfig.secureMessageEndpoint}")
             .withBody[Request](request)
-            .setHeader(mdgHeaders.headers(
-              appConfig.secureMessageBearerToken,
-              appConfig.secureMessageHostHeader): _*)
+            .setHeader(mdgHeaders.headers(appConfig.secureMessageBearerToken, appConfig.secureMessageHostHeader): _*)
             .execute[Response]
-            .recover {
-            case exception =>
+            .recover { case exception =>
               log.error(exception.getMessage)
-              log.error(s"error occurred for " +
-                s"message id ${request.externalRef.id} while sending secure message")
+              log.error(
+                s"error occurred for " +
+                  s"message id ${request.externalRef.id} while sending secure message"
+              )
               Response(id = s"Secure Message API Error for :::${request.externalRef.id}")
-          }
+            }
 
           result.map(res => Right(res))
 
@@ -83,9 +84,8 @@ class SecureMessageConnector @Inject()(httpClient: HttpClientV2,
           log.error(s"Json Schema Failed Validation for sendSecureMessage")
           Future(Left(exception.getMessage))
       }
-    }.recoverWith {
-      case exception: Exception =>
-        Future(Left(exception.getMessage))
+    }.recoverWith { case exception: Exception =>
+      Future(Left(exception.getMessage))
     }
     result.flatten
   }

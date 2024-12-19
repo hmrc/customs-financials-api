@@ -34,45 +34,47 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
-                                                   mongoComponent: MongoComponent)
-                                                  (implicit val ec: ExecutionContext)
-  extends PlayMongoRepository[HistoricDocumentRequestSearch](
-    mongoComponent = mongoComponent,
-    collectionName = appConfig.mongoHistDocSearchCollectionName,
-    domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
-    indexes = Seq(
-      IndexModel(
-        ascending("expireAt"),
-        IndexOptions().name("dataExpiry_idx").expireAfter(
-          appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS).background(true)
+class HistoricDocumentRequestSearchCache @Inject() (appConfig: AppConfig, mongoComponent: MongoComponent)(implicit
+  val ec: ExecutionContext
+) extends PlayMongoRepository[HistoricDocumentRequestSearch](
+      mongoComponent = mongoComponent,
+      collectionName = appConfig.mongoHistDocSearchCollectionName,
+      domainFormat = HistoricDocumentRequestSearch.historicDocumentRequestSearchFormat,
+      indexes = Seq(
+        IndexModel(
+          ascending("expireAt"),
+          IndexOptions()
+            .name("dataExpiry_idx")
+            .expireAfter(appConfig.mongoHistDocSearchTtl, TimeUnit.SECONDS)
+            .background(true)
+        ),
+        IndexModel(
+          ascending("searchID"),
+          IndexOptions()
+            .name("SearchIDIndex")
+            .unique(false)
+            .sparse(false)
+            .background(true)
+        )
       ),
-      IndexModel(
-        ascending("searchID"),
-        IndexOptions()
-          .name("SearchIDIndex")
-          .unique(false)
-          .sparse(false).background(true)
+      extraCodecs = Seq(
+        Codecs.playFormatCodec(Params.paramsFormat),
+        Codecs.playFormatCodec(SearchRequest.searchRequestFormat),
+        Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
       )
-    ),
-    extraCodecs = Seq(
-      Codecs.playFormatCodec(Params.paramsFormat),
-      Codecs.playFormatCodec(SearchRequest.searchRequestFormat),
-      Codecs.playFormatCodec(SearchResultStatus.searchResultStatusFormat)
-    )
-  ) {
-  private val searchIDFieldKey = "searchID"
-  private val searchRequestsFieldKey = "searchRequests"
-  private val currentEoriFieldKey = "currentEori"
-  private val statementRequestIdFieldKey = "searchRequests.statementRequestId"
-  private val resultsFoundFieldKey = "resultsFound"
+    ) {
+  private val searchIDFieldKey               = "searchID"
+  private val searchRequestsFieldKey         = "searchRequests"
+  private val currentEoriFieldKey            = "currentEori"
+  private val statementRequestIdFieldKey     = "searchRequests.statementRequestId"
+  private val resultsFoundFieldKey           = "resultsFound"
   private val searchStatusUpdateDateFieldKey = "searchStatusUpdateDate"
 
   def insertDocument(req: HistoricDocumentRequestSearch): Future[Boolean] = {
     val expireAtTS = LocalDateTime.now().plusSeconds(appConfig.mongoHistDocSearchTtl.toInt)
 
-    collection.insertOne(req.copy(expireAt = Option(expireAtTS))).toFuture() map { _ => false } recover {
-      case _ => true
+    collection.insertOne(req.copy(expireAt = Option(expireAtTS))).toFuture() map { _ => false } recover { case _ =>
+      true
     }
   }
 
@@ -82,24 +84,30 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
   def retrieveDocumentForStatementRequestID(statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] =
     collection.find(equal(statementRequestIdFieldKey, statementRequestID)).headOption()
 
-  def updateDocumentForQueryFilter(queryFilter: Bson,
-                                   updates: Bson): Future[Option[HistoricDocumentRequestSearch]] =
-    collection.findOneAndUpdate(
-      filter = queryFilter,
-      update = updates,
-      new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)).headOption()
+  def updateDocumentForQueryFilter(queryFilter: Bson, updates: Bson): Future[Option[HistoricDocumentRequestSearch]] =
+    collection
+      .findOneAndUpdate(
+        filter = queryFilter,
+        update = updates,
+        new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(false)
+      )
+      .headOption()
 
-  def updateSearchRequestForStatementRequestId(searchRequests: Set[SearchRequest],
-                                               searchID: String): Future[Option[HistoricDocumentRequestSearch]] = {
+  def updateSearchRequestForStatementRequestId(
+    searchRequests: Set[SearchRequest],
+    searchID: String
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
 
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
-    val updates = Updates.set(searchRequestsFieldKey, searchRequests)
+    val updates    = Updates.set(searchRequestsFieldKey, searchRequests)
 
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  def updateResultsFoundStatus(searchID: String,
-                               updatedStatus: SearchResultStatus.Value): Future[Option[HistoricDocumentRequestSearch]] = {
+  def updateResultsFoundStatus(
+    searchID: String,
+    updatedStatus: SearchResultStatus.Value
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
 
     val updates = Updates.combine(
@@ -110,10 +118,11 @@ class HistoricDocumentRequestSearchCache @Inject()(appConfig: AppConfig,
     updateDocumentForQueryFilter(queryFiler, updates)
   }
 
-  def updateSearchReqsAndResultsFoundStatus(searchID: String,
-                                            searchRequests: Set[SearchRequest],
-                                            updatedStatus: SearchResultStatus.Value
-                                           ): Future[Option[HistoricDocumentRequestSearch]] = {
+  def updateSearchReqsAndResultsFoundStatus(
+    searchID: String,
+    searchRequests: Set[SearchRequest],
+    updatedStatus: SearchResultStatus.Value
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
     val queryFiler = Filters.equal(searchIDFieldKey, searchID)
 
     val updates = Updates.combine(

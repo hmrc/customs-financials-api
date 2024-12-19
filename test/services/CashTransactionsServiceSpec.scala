@@ -20,10 +20,7 @@ import connectors.{Acc31Connector, Acc44Connector, Acc45Connector}
 import domain.{Declaration, TaxGroup, *}
 import models.*
 import models.requests.{
-  CashAccountPaymentDetails,
-  CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails,
-  SearchType
+  CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, SearchType
 }
 import models.responses.*
 import models.responses.PaymentType.Payment
@@ -64,47 +61,55 @@ class CashTransactionsServiceSpec extends SpecBase {
         val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
 
         val expectedResult = CashTransactions(
-          List(Declaration(
-            "someId",
-            Some(EORI("someImporterEORI")),
-            EORI("someEori"),
-            Some("reference"),
-            dateTo.toString,
-            "10000",
-            List(TaxGroup(
-              "something",
-              twoThousand,
-              List(TaxTypeHolder(Some("a"), "b", thousand))
-            ))
-          )),
-
-          List(CashDailyStatement(
-            dateFrom.toString,
-            "10000",
-            "9000",
-            List(Declaration(
+          List(
+            Declaration(
               "someId",
               Some(EORI("someImporterEORI")),
               EORI("someEori"),
               Some("reference"),
               dateTo.toString,
               "10000",
-              List(TaxGroup(
-                "something",
-                twoThousand,
-                List(TaxTypeHolder(Some("a"), "b", thousand))
-              ))
-            )),
-
-            List(Transaction("10000", "A21", Some("Bank")))
-          )),
+              List(
+                TaxGroup(
+                  "something",
+                  twoThousand,
+                  List(TaxTypeHolder(Some("a"), "b", thousand))
+                )
+              )
+            )
+          ),
+          List(
+            CashDailyStatement(
+              dateFrom.toString,
+              "10000",
+              "9000",
+              List(
+                Declaration(
+                  "someId",
+                  Some(EORI("someImporterEORI")),
+                  EORI("someEori"),
+                  Some("reference"),
+                  dateTo.toString,
+                  "10000",
+                  List(
+                    TaxGroup(
+                      "something",
+                      twoThousand,
+                      List(TaxTypeHolder(Some("a"), "b", thousand))
+                    )
+                  )
+                )
+              ),
+              List(Transaction("10000", "A21", Some("Bank")))
+            )
+          ),
           Some(false)
         )
 
         result mustBe Right(expectedResult)
 
-        result.map {
-          cashTransactions => cashTransactions.maxTransactionsExceeded mustBe Some(false)
+        result.map { cashTransactions =>
+          cashTransactions.maxTransactionsExceeded mustBe Some(false)
         }
       }
     }
@@ -112,65 +117,73 @@ class CashTransactionsServiceSpec extends SpecBase {
     "return Right with the Cash transactions on a successful response from the API " +
       "with maxTransactionsExceeded Flag as true" in new Setup {
 
-      when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
-        .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail02))))
+        when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo))
+          .thenReturn(Future.successful(Right(Some(cashTransactionsResponseDetail02))))
 
-      running(app) {
-        val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
+        running(app) {
+          val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
 
-        val expectedResult = CashTransactions(
-          List(Declaration(
-            "someId",
-            Some(EORI("someImporterEORI")),
-            EORI("someEori"),
-            Some("reference"),
-            dateTo.toString,
-            "10000",
-            List(TaxGroup(
-              "something",
-              twoThousand,
-              List(TaxTypeHolder(Some("a"), "b", thousand))
-            ))
-          )),
+          val expectedResult = CashTransactions(
+            List(
+              Declaration(
+                "someId",
+                Some(EORI("someImporterEORI")),
+                EORI("someEori"),
+                Some("reference"),
+                dateTo.toString,
+                "10000",
+                List(
+                  TaxGroup(
+                    "something",
+                    twoThousand,
+                    List(TaxTypeHolder(Some("a"), "b", thousand))
+                  )
+                )
+              )
+            ),
+            List(
+              CashDailyStatement(
+                dateFrom.toString,
+                "10000",
+                "9000",
+                List(
+                  Declaration(
+                    "someId",
+                    Some(EORI("someImporterEORI")),
+                    EORI("someEori"),
+                    Some("reference"),
+                    dateTo.toString,
+                    "10000",
+                    List(
+                      TaxGroup(
+                        "something",
+                        twoThousand,
+                        List(TaxTypeHolder(Some("a"), "b", thousand))
+                      )
+                    )
+                  )
+                ),
+                List(Transaction("10000", "A21", Some("Bank")))
+              )
+            ),
+            Some(true)
+          )
 
-          List(CashDailyStatement(
-            dateFrom.toString,
-            "10000",
-            "9000",
-            List(Declaration(
-              "someId",
-              Some(EORI("someImporterEORI")),
-              EORI("someEori"),
-              Some("reference"),
-              dateTo.toString,
-              "10000",
-              List(TaxGroup(
-                "something",
-                twoThousand,
-                List(TaxTypeHolder(Some("a"), "b", thousand))
-              ))
-            )),
+          result mustBe Right(expectedResult)
 
-            List(Transaction("10000", "A21", Some("Bank")))
-          )),
-          Some(true)
-        )
+          result.map { cashTransactions =>
+            cashTransactions.maxTransactionsExceeded mustBe Some(true)
+          }
 
-        result mustBe Right(expectedResult)
-
-        result.map {
-          cashTransactions => cashTransactions.maxTransactionsExceeded mustBe Some(true)
         }
-
       }
-    }
 
     "return Right with nil transactions on successful response with no responseDetail" in new Setup {
       when(mockAcc31Connector.retrieveCashTransactions("can", dateFrom, dateTo)).thenReturn(
         Future.successful(Right(None))
       )
       running(app) {
-        val result = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
+        val result         = await(service.retrieveCashTransactionsSummary("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(Nil, Nil)
 
         result mustBe Right(expectedResult)
@@ -200,51 +213,66 @@ class CashTransactionsServiceSpec extends SpecBase {
         val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
 
         val expectedResult = CashTransactions(
-          List(Declaration(
-            movementReferenceNumber = "someId",
-            importerEori = Some(EORI("someImporterEORI")),
-            declarantEori = EORI("someEori"),
-            declarantReference = Some("reference"),
-            date = dateTo.toString,
-            amount = "10000",
-            taxGroups = List(TaxGroup(
-              taxGroupDescription = "something",
-              amount = twoThousand,
-              taxTypes = Seq(TaxTypeHolder(
-                reasonForSecurity = Some("a"),
-                taxTypeID = "b",
-                amount = thousand
-              ))
-            ))
-          )),
-
-          List(CashDailyStatement(
-            date = dateFrom.toString,
-            openingBalance = "10000",
-            closingBalance = "9000",
-            declarations = List(Declaration(
+          List(
+            Declaration(
               movementReferenceNumber = "someId",
               importerEori = Some(EORI("someImporterEORI")),
               declarantEori = EORI("someEori"),
               declarantReference = Some("reference"),
               date = dateTo.toString,
               amount = "10000",
-              taxGroups = List(TaxGroup(
-                taxGroupDescription = "something",
-                amount = twoThousand,
-                taxTypes = Seq(TaxTypeHolder(
-                  reasonForSecurity = Some("a"),
-                  taxTypeID = "b",
-                  amount = thousand
-                ))
-              ))
-            )),
-            otherTransactions = List(Transaction(
-              amount = "10000",
-              transactionType = "A21",
-              bankAccountNumber = Some("Bank")
-            ))
-          )),
+              taxGroups = List(
+                TaxGroup(
+                  taxGroupDescription = "something",
+                  amount = twoThousand,
+                  taxTypes = Seq(
+                    TaxTypeHolder(
+                      reasonForSecurity = Some("a"),
+                      taxTypeID = "b",
+                      amount = thousand
+                    )
+                  )
+                )
+              )
+            )
+          ),
+          List(
+            CashDailyStatement(
+              date = dateFrom.toString,
+              openingBalance = "10000",
+              closingBalance = "9000",
+              declarations = List(
+                Declaration(
+                  movementReferenceNumber = "someId",
+                  importerEori = Some(EORI("someImporterEORI")),
+                  declarantEori = EORI("someEori"),
+                  declarantReference = Some("reference"),
+                  date = dateTo.toString,
+                  amount = "10000",
+                  taxGroups = List(
+                    TaxGroup(
+                      taxGroupDescription = "something",
+                      amount = twoThousand,
+                      taxTypes = Seq(
+                        TaxTypeHolder(
+                          reasonForSecurity = Some("a"),
+                          taxTypeID = "b",
+                          amount = thousand
+                        )
+                      )
+                    )
+                  )
+                )
+              ),
+              otherTransactions = List(
+                Transaction(
+                  amount = "10000",
+                  transactionType = "A21",
+                  bankAccountNumber = Some("Bank")
+                )
+              )
+            )
+          ),
           Some(false)
         )
 
@@ -258,7 +286,7 @@ class CashTransactionsServiceSpec extends SpecBase {
       )
 
       running(app) {
-        val result = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
+        val result         = await(service.retrieveCashTransactionsDetail("can", dateFrom, dateTo))
         val expectedResult = CashTransactions(Nil, Nil)
         result mustBe Right(expectedResult)
       }
@@ -277,10 +305,9 @@ class CashTransactionsServiceSpec extends SpecBase {
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
 
-        result.map {
-          response =>
-            response mustBe
-              Right(cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.responseDetail.get)
+        result.map { response =>
+          response mustBe
+            Right(cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.responseDetail.get)
         }
       }
     }
@@ -289,12 +316,16 @@ class CashTransactionsServiceSpec extends SpecBase {
       when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
         .thenReturn(
           Future.successful(
-            Right(cashAccTranSearchResponseContainerOb.copy(
-              cashAccountTransactionSearchResponse =
-                cashAccountTransactionSearchResponseOb.copy(
+            Right(
+              cashAccTranSearchResponseContainerOb.copy(
+                cashAccountTransactionSearchResponse = cashAccountTransactionSearchResponseOb.copy(
                   responseDetail = None,
-                  responseCommon = resCommonOb.copy(statusText = Some("001-Invalid Cash Account"))))
-            )))
+                  responseCommon = resCommonOb.copy(statusText = Some("001-Invalid Cash Account"))
+                )
+              )
+            )
+          )
+        )
 
       when(mockAuditingService.auditCashAccountTransactionsSearch(any)(any))
         .thenReturn(Future.successful(AuditResult.Success))
@@ -302,17 +333,18 @@ class CashTransactionsServiceSpec extends SpecBase {
       running(app) {
         val result = service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails)
 
-        result.map {
-          response =>
-            response mustBe
-              Left(ErrorDetail(
+        result.map { response =>
+          response mustBe
+            Left(
+              ErrorDetail(
                 timestamp = cashAccountTransactionSearchResponseOb.responseCommon.processingDate,
                 correlationId = "NA",
                 errorCode = "001",
                 errorMessage = "Invalid Cash Account",
                 source = "Backend",
                 sourceFaultDetail = SourceFaultDetail(Seq())
-              ))
+              )
+            )
         }
       }
     }
@@ -336,8 +368,7 @@ class CashTransactionsServiceSpec extends SpecBase {
           |  }
           |}""".stripMargin
 
-      val casErrorResponseDetails01: ErrorDetail = Json.fromJson[ErrorDetail](
-        Json.parse(casErrorDetailStr01)).get
+      val casErrorResponseDetails01: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(casErrorDetailStr01)).get
 
       when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
         Future.successful(Left(casErrorResponseDetails01))
@@ -361,8 +392,8 @@ class CashTransactionsServiceSpec extends SpecBase {
           |  "processingDate": "2021-12-17T09:30:47Z"
           |}""".stripMargin
 
-      val casResponseCommon01: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](
-        Json.parse(casResponseCommonStr01)).get
+      val casResponseCommon01: Acc45ResponseCommon =
+        Json.fromJson[Acc45ResponseCommon](Json.parse(casResponseCommonStr01)).get
 
       when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
         Future.successful(Right(casResponseCommon01))
@@ -393,8 +424,8 @@ class CashTransactionsServiceSpec extends SpecBase {
           |  ]
           |}""".stripMargin
 
-      val casResponseCommon01: Acc45ResponseCommon = Json.fromJson[Acc45ResponseCommon](
-        Json.parse(casResponseCommonStr01)).get
+      val casResponseCommon01: Acc45ResponseCommon =
+        Json.fromJson[Acc45ResponseCommon](Json.parse(casResponseCommonStr01)).get
 
       when(mockAcc45Connector.submitStatementRequest(cashAccSttReqDetail)).thenReturn(
         Future.successful(Right(casResponseCommon01))
@@ -414,30 +445,73 @@ class CashTransactionsServiceSpec extends SpecBase {
   trait Setup {
 
     val twoThousand = "2000.00"
-    val thousand = "1000.00"
+    val thousand    = "1000.00"
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier                  = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
     val dateFrom: LocalDate = LocalDate.now().minusDays(1)
-    val dateTo: LocalDate = LocalDate.now()
-    val eoriNumber = "GB123456789"
-    val processingDate = "2001-12-17T09:30:47Z"
+    val dateTo: LocalDate   = LocalDate.now()
+    val eoriNumber          = "GB123456789"
+    val processingDate      = "2001-12-17T09:30:47Z"
 
-    val mockAcc31Connector: Acc31Connector = mock[Acc31Connector]
-    val mockAcc44Connector: Acc44Connector = mock[Acc44Connector]
-    val mockAcc45Connector: Acc45Connector = mock[Acc45Connector]
+    val mockAcc31Connector: Acc31Connector   = mock[Acc31Connector]
+    val mockAcc44Connector: Acc44Connector   = mock[Acc44Connector]
+    val mockAcc45Connector: Acc45Connector   = mock[Acc45Connector]
     val mockAuditingService: AuditingService = mock[AuditingService]
 
-    val cashAccSttReqDetail: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail(
-      "GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
+    val cashAccSttReqDetail: CashAccountStatementRequestDetail =
+      CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val dailyStatement: DailyStatementContainer = DailyStatementContainer(
       DailyStatementDetail(
         dateFrom.toString,
         "10000",
         "9000",
-        Some(Seq(DeclarationContainer(
+        Some(
+          Seq(
+            DeclarationContainer(
+              DeclarationDetail(
+                "someId",
+                Some(EORI("someImporterEORI")),
+                EORI("someEori"),
+                Some("reference"),
+                dateTo.toString,
+                "10000",
+                Seq(
+                  TaxGroupContainer(
+                    TaxGroupDetail(
+                      "something",
+                      twoThousand,
+                      Seq(
+                        TaxTypeContainer(
+                          TaxTypeDetail(
+                            reasonForSecurity = Some("a"),
+                            taxTypeID = "b",
+                            amount = thousand
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        Some(
+          Seq(
+            PaymentAndWithdrawalContainer(
+              PaymentAndWithdrawalDetail("10000", "A21", Some("Bank"))
+            )
+          )
+        )
+      )
+    )
+
+    val pending: PendingTransactions = PendingTransactions(
+      Seq(
+        DeclarationContainer(
           DeclarationDetail(
             "someId",
             Some(EORI("someImporterEORI")),
@@ -447,11 +521,15 @@ class CashTransactionsServiceSpec extends SpecBase {
             "10000",
             Seq(
               TaxGroupContainer(
-                TaxGroupDetail("something", twoThousand,
+                TaxGroupDetail(
+                  "something",
+                  twoThousand,
                   Seq(
                     TaxTypeContainer(
                       TaxTypeDetail(
-                        reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand
+                        reasonForSecurity = Some("a"),
+                        taxTypeID = "b",
+                        amount = thousand
                       )
                     )
                   )
@@ -459,48 +537,15 @@ class CashTransactionsServiceSpec extends SpecBase {
               )
             )
           )
-        ))),
-        Some(Seq(PaymentAndWithdrawalContainer(
-          PaymentAndWithdrawalDetail("10000", "A21", Some("Bank"))
-        )))
+        )
       )
     )
 
-    val pending: PendingTransactions = PendingTransactions(
-      Seq(DeclarationContainer(
-        DeclarationDetail(
-          "someId",
-          Some(EORI("someImporterEORI")),
-          EORI("someEori"),
-          Some("reference"),
-          dateTo.toString,
-          "10000",
-          Seq(
-            TaxGroupContainer(
-              TaxGroupDetail("something", twoThousand,
-                Seq(
-                  TaxTypeContainer(
-                    TaxTypeDetail(
-                      reasonForSecurity = Some("a"), taxTypeID = "b", amount = thousand
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      ))
-    )
+    val cashTransactionsResponseDetail: CashTransactionsResponseDetail =
+      CashTransactionsResponseDetail(Some(Seq(dailyStatement)), Some(pending), Some(false))
 
-    val cashTransactionsResponseDetail: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
-      Some(Seq(dailyStatement)),
-      Some(pending),
-      Some(false))
-
-    val cashTransactionsResponseDetail02: CashTransactionsResponseDetail = CashTransactionsResponseDetail(
-      Some(Seq(dailyStatement)),
-      Some(pending),
-      Some(true))
+    val cashTransactionsResponseDetail02: CashTransactionsResponseDetail =
+      CashTransactionsResponseDetail(Some(Seq(dailyStatement)), Some(pending), Some(true))
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(
@@ -508,23 +553,25 @@ class CashTransactionsServiceSpec extends SpecBase {
         eoriNumber,
         SearchType.P,
         declarationDetails = None,
-        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING))))
+        cashAccountPaymentDetails = Some(CashAccountPaymentDetails(AMOUNT, Some(DATE_STRING), Some(DATE_STRING)))
+      )
 
     val resCommonOb: CashTransactionsResponseCommon = CashTransactionsResponseCommon(
       status = "OK",
       statusText = None,
       processingDate = processingDate,
-      returnParameters = None)
+      returnParameters = None
+    )
 
     val cashAccTranSearchResponseDetailWithPaymentWithdrawalOb: CashAccountTransactionSearchResponseDetail =
       CashAccountTransactionSearchResponseDetail(
         CAN,
         eoriDetails = Seq(EoriDataContainer(EoriData(eoriNumber, EORI_DATA_NAME))),
         declarations = None,
-        paymentsWithdrawalsAndTransfers =
-          Some(
-            Seq(
-              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+        paymentsWithdrawalsAndTransfers = Some(
+          Seq(
+            PaymentsWithdrawalsAndTransferContainer(
+              PaymentsWithdrawalsAndTransfer(
                 DATE_STRING,
                 DATE_STRING,
                 PAYMENT_REFERENCE,
@@ -532,8 +579,10 @@ class CashTransactionsServiceSpec extends SpecBase {
                 Payment,
                 Some(BANK_ACCOUNT),
                 Some(SORT_CODE)
-              ))
-            ))
+              )
+            )
+          )
+        )
       )
 
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
@@ -542,16 +591,19 @@ class CashTransactionsServiceSpec extends SpecBase {
     val cashAccTranSearchResponseContainerOb: CashAccountTransactionSearchResponseContainer =
       CashAccountTransactionSearchResponseContainer(cashAccountTransactionSearchResponseOb)
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
-      inject.bind[Acc44Connector].toInstance(mockAcc44Connector),
-      inject.bind[Acc45Connector].toInstance(mockAcc45Connector),
-      inject.bind[AuditingService].toInstance(mockAuditingService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc31Connector].toInstance(mockAcc31Connector),
+        inject.bind[Acc44Connector].toInstance(mockAcc44Connector),
+        inject.bind[Acc45Connector].toInstance(mockAcc45Connector),
+        inject.bind[AuditingService].toInstance(mockAuditingService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val service: CashTransactionsService = app.injector.instanceOf[CashTransactionsService]
   }

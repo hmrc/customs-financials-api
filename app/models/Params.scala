@@ -18,17 +18,20 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Params(periodStartMonth: String,
-                  periodStartYear: String,
-                  periodEndMonth: String,
-                  periodEndYear: String,
-                  accountType: String,
-                  dan: String) {
+case class Params(
+  periodStartMonth: String,
+  periodStartYear: String,
+  periodEndMonth: String,
+  periodEndYear: String,
+  accountType: String,
+  dan: String
+) {
   require(
     AccountTypeForParams.fromString(accountType).nonEmpty,
     "invalid value for accountType," +
       " valid values are C79Certificate, PostponedVATStatement, " +
-      "SecurityStatement, DutyDefermentStatement")
+      "SecurityStatement, DutyDefermentStatement"
+  )
 }
 
 object Params {
@@ -39,7 +42,6 @@ object AccountTypeForParams extends Enumeration {
   type AccountTypeForParams = Value
   val C79Certificate, PostponedVATStatement, SecurityStatement, DutyDefermentStatement = Value
 
-  def fromString(value: String): Option[AccountTypeForParams] = {
+  def fromString(value: String): Option[AccountTypeForParams] =
     values.find(_.toString.toLowerCase == value.toLowerCase)
-  }
 }

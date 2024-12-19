@@ -18,9 +18,7 @@ package connectors
 
 import config.MetaConfig.Platform.MDTP
 import models.requests.{
-  CashAccountStatementRequest,
-  CashAccountStatementRequestCommon,
-  CashAccountStatementRequestContainer,
+  CashAccountStatementRequest, CashAccountStatementRequestCommon, CashAccountStatementRequestContainer,
   CashAccountStatementRequestDetail
 }
 import models.responses.*
@@ -52,8 +50,8 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, casResponseStr01)))
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Right(responseCommon01)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Right(responseCommon01)
           }
         }
       }
@@ -66,8 +64,8 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr02)))
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Right(responseCommon02)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Right(responseCommon02)
           }
 
         }
@@ -81,8 +79,8 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(CREATED, casResponseStr03)))
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Right(responseCommon03)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Right(responseCommon03)
           }
 
         }
@@ -102,8 +100,8 @@ class Acc45ConnectorSpec extends SpecBase {
         )
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Left(errorResponseDetails01)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Left(errorResponseDetails01)
           }
         }
       }
@@ -118,8 +116,8 @@ class Acc45ConnectorSpec extends SpecBase {
         )
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Left(errorResponseDetails02)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Left(errorResponseDetails02)
           }
         }
       }
@@ -134,8 +132,8 @@ class Acc45ConnectorSpec extends SpecBase {
         )
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response => response mustBe Left(errorResponseDetails03)
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            response mustBe Left(errorResponseDetails03)
           }
 
         }
@@ -151,11 +149,10 @@ class Acc45ConnectorSpec extends SpecBase {
         )
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response =>
-              val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
-              errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
-              errorDetail.errorMessage must not be empty
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
+            errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+            errorDetail.errorMessage must not be empty
           }
         }
       }
@@ -167,11 +164,10 @@ class Acc45ConnectorSpec extends SpecBase {
         when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
         running(app) {
-          connector.submitStatementRequest(reqDetail01).map {
-            response =>
-              val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
-              errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
-              errorDetail.errorMessage must not be empty
+          connector.submitStatementRequest(reqDetail01).map { response =>
+            val errorDetail: ErrorDetail = response.left.getOrElse(defaultErrorDetail)
+            errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+            errorDetail.errorMessage must not be empty
           }
 
         }
@@ -182,18 +178,22 @@ class Acc45ConnectorSpec extends SpecBase {
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-    val defaultErrorDetail: ErrorDetail = ErrorDetail(
-      "2024-01-21T11:30:47Z", "f058ebd6", "500",
-      "Internal Server Error", "MDTP", SourceFaultDetail(Seq("Failure in backend System"))
+    val defaultErrorDetail: ErrorDetail              = ErrorDetail(
+      "2024-01-21T11:30:47Z",
+      "f058ebd6",
+      "500",
+      "Internal Server Error",
+      "MDTP",
+      SourceFaultDetail(Seq("Failure in backend System"))
     )
-    val reqCommon: CashAccountStatementRequestCommon = CashAccountStatementRequestCommon(MDTP,
-      "2021-01-01T10:00:00Z", "601bb176b8e411e")
+    val reqCommon: CashAccountStatementRequestCommon =
+      CashAccountStatementRequestCommon(MDTP, "2021-01-01T10:00:00Z", "601bb176b8e411e")
 
-    val reqDetail01: CashAccountStatementRequestDetail = CashAccountStatementRequestDetail("GB123456789012345",
-      "12345678910", "2024-05-10", "2024-05-20")
+    val reqDetail01: CashAccountStatementRequestDetail =
+      CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")
 
     val request01: CashAccountStatementRequestContainer =
       CashAccountStatementRequestContainer(CashAccountStatementRequest(reqCommon, reqDetail01))
@@ -310,31 +310,39 @@ class Acc45ConnectorSpec extends SpecBase {
         |    }
         |  }""".stripMargin
 
-    val responseCommon01: Acc45ResponseCommon = Json.fromJson[CashAccountStatementResponseContainer](
-      Json.parse(casResponseStr01)).get.cashAccountStatementResponse.responseCommon
+    val responseCommon01: Acc45ResponseCommon = Json
+      .fromJson[CashAccountStatementResponseContainer](Json.parse(casResponseStr01))
+      .get
+      .cashAccountStatementResponse
+      .responseCommon
 
-    val responseCommon02: Acc45ResponseCommon = Json.fromJson[CashAccountStatementResponseContainer](
-      Json.parse(casResponseStr02)).get.cashAccountStatementResponse.responseCommon
+    val responseCommon02: Acc45ResponseCommon = Json
+      .fromJson[CashAccountStatementResponseContainer](Json.parse(casResponseStr02))
+      .get
+      .cashAccountStatementResponse
+      .responseCommon
 
-    val responseCommon03: Acc45ResponseCommon = Json.fromJson[CashAccountStatementResponseContainer](
-      Json.parse(casResponseStr03)).get.cashAccountStatementResponse.responseCommon
+    val responseCommon03: Acc45ResponseCommon = Json
+      .fromJson[CashAccountStatementResponseContainer](Json.parse(casResponseStr03))
+      .get
+      .cashAccountStatementResponse
+      .responseCommon
 
-    val errorResponseDetails01: ErrorDetail = Json.fromJson[CashAccountStatementErrorResponse](
-      Json.parse(casErrorResponseStr01)).get.errorDetail
+    val errorResponseDetails01: ErrorDetail =
+      Json.fromJson[CashAccountStatementErrorResponse](Json.parse(casErrorResponseStr01)).get.errorDetail
 
-    val errorResponseDetails02: ErrorDetail = Json.fromJson[CashAccountStatementErrorResponse](
-      Json.parse(casErrorResponseStr02)).get.errorDetail
+    val errorResponseDetails02: ErrorDetail =
+      Json.fromJson[CashAccountStatementErrorResponse](Json.parse(casErrorResponseStr02)).get.errorDetail
 
-    val errorResponseDetails03: ErrorDetail = Json.fromJson[CashAccountStatementErrorResponse](
-      Json.parse(casErrorResponseStr03)).get.errorDetail
+    val errorResponseDetails03: ErrorDetail =
+      Json.fromJson[CashAccountStatementErrorResponse](Json.parse(casErrorResponseStr03)).get.errorDetail
 
-    val app: Application = GuiceApplicationBuilder().overrides(
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
         bind[HttpClientV2].toInstance(mockHttpClient),
         bind[RequestBuilder].toInstance(requestBuilder)
-      ).configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled" -> false,
-        "auditing.enabled" -> false)
+      )
+      .configure("microservice.metrics.enabled" -> false, "metrics.enabled" -> false, "auditing.enabled" -> false)
       .build()
 
     val connector: Acc45Connector = app.injector.instanceOf[Acc45Connector]

@@ -19,7 +19,9 @@ package models.requests
 import models.StatementSearchFailureNotificationMetadata
 import play.api.libs.json.{Json, OFormat}
 
-case class StatementSearchFailureNotificationRequest(StatementSearchFailureNotificationMetadata: StatementSearchFailureNotificationMetadata)
+case class StatementSearchFailureNotificationRequest(
+  StatementSearchFailureNotificationMetadata: StatementSearchFailureNotificationMetadata
+)
 
 object StatementSearchFailureNotificationRequest {
   implicit val ssfnRequestFormat: OFormat[StatementSearchFailureNotificationRequest] =

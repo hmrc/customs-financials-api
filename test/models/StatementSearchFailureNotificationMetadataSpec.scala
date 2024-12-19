@@ -21,20 +21,20 @@ import utils.SpecBase
 
 class StatementSearchFailureNotificationMetadataSpec extends SpecBase {
 
-"Json Reads" should {
+  "Json Reads" should {
 
-  "generate the correct output" in new Setup {
-    import StatementSearchFailureNotificationMetadata.ssfnMetaDataFormats
+    "generate the correct output" in new Setup {
+      import StatementSearchFailureNotificationMetadata.ssfnMetaDataFormats
 
-    Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(ssfnMetaDataOb)
+      Json.fromJson(Json.parse(jsValue)) mustBe JsSuccess(ssfnMetaDataOb)
+    }
+
+    "generate error for incorrect JsValue" in new Setup {
+      import StatementSearchFailureNotificationMetadata.ssfnMetaDataFormats
+
+      Json.fromJson(Json.parse(incorrectJsValue)).isError mustBe true
+    }
   }
-
-  "generate error for incorrect JsValue" in new Setup {
-    import StatementSearchFailureNotificationMetadata.ssfnMetaDataFormats
-
-    Json.fromJson(Json.parse(incorrectJsValue)).isError mustBe true
-  }
-}
 
   "Json Writes" should {
     "generate the correct output" in new Setup {

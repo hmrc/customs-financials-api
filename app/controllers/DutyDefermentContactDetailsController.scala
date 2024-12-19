@@ -28,15 +28,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DutyDefermentContactDetailsController @Inject()(service: AccountContactDetailsService,
-                                                      cc: ControllerComponents)
-                                                     (implicit ec: ExecutionContext) extends BackendController(cc) {
+class DutyDefermentContactDetailsController @Inject() (service: AccountContactDetailsService, cc: ControllerComponents)(
+  implicit ec: ExecutionContext
+) extends BackendController(cc) {
 
   private val log: LoggerLike = Logger(this.getClass)
 
   def getContactDetails: Action[GetContactDetailsRequest] =
     Action.async(parse.json[GetContactDetailsRequest]) { implicit request =>
-      service.getAccountContactDetails(request.body.dan, request.body.eori)
+      service
+        .getAccountContactDetails(request.body.dan, request.body.eori)
         .map {
           case response if response.mdtpError => InternalServerError
 
@@ -45,26 +46,27 @@ class DutyDefermentContactDetailsController @Inject()(service: AccountContactDet
 
           case domain.acc38.Response(GetCorrespondenceAddressResponse(_, None)) => BadRequest
         }
-        .recover {
-          case e =>
-            log.error(s"getDutyDefermentContactDetails failed: ${e.getMessage}")
-            ServiceUnavailable
+        .recover { case e =>
+          log.error(s"getDutyDefermentContactDetails failed: ${e.getMessage}")
+          ServiceUnavailable
         }
     }
 
   def updateContactDetails(): Action[UpdateContactDetailsRequest] =
     Action.async(parse.json[UpdateContactDetailsRequest]) { implicit request =>
-      service.updateAccountContactDetails(
-        request.body.dan,
-        request.body.eori,
-        domain.acc37.ContactDetails.fromRequest(request.body)
-      ).map {
-        case response if response.mdtpError => InternalServerError
-        case _ => Ok(Json.toJson(UpdateContactDetailsResponse(true)))
-      }.recover {
-        case e =>
+      service
+        .updateAccountContactDetails(
+          request.body.dan,
+          request.body.eori,
+          domain.acc37.ContactDetails.fromRequest(request.body)
+        )
+        .map {
+          case response if response.mdtpError => InternalServerError
+          case _                              => Ok(Json.toJson(UpdateContactDetailsResponse(true)))
+        }
+        .recover { case e =>
           log.error(s"Updating contact details failed: ${e.getMessage}")
           ServiceUnavailable
-      }
+        }
     }
 }

@@ -23,8 +23,9 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCache: HistoricDocumentRequestSearchCache)
-                                                         (implicit ec: ExecutionContext) {
+class HistoricDocumentRequestSearchCacheService @Inject() (historicDocRequestCache: HistoricDocumentRequestSearchCache)(
+  implicit ec: ExecutionContext
+) {
 
   def saveHistoricDocumentRequestSearch(req: HistoricDocumentRequestSearch): Future[Boolean] =
     historicDocRequestCache.insertDocument(req)
@@ -32,33 +33,38 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
   def retrieveHistDocRequestSearchDocsForCurrentEori(currentEori: String): Future[Seq[HistoricDocumentRequestSearch]] =
     historicDocRequestCache.retrieveDocumentsForCurrentEori(currentEori)
 
-  def retrieveHistDocRequestSearchDocForStatementReqId(statReqID: String): Future[Option[HistoricDocumentRequestSearch]] =
+  def retrieveHistDocRequestSearchDocForStatementReqId(
+    statReqID: String
+  ): Future[Option[HistoricDocumentRequestSearch]] =
     historicDocRequestCache.retrieveDocumentForStatementRequestID(statReqID)
 
-  def updateSearchRequestForStatementRequestId(req: HistoricDocumentRequestSearch,
-                                               statementRequestID: String,
-                                               failureReason: String): Future[Option[HistoricDocumentRequestSearch]] = {
+  def updateSearchRequestForStatementRequestId(
+    req: HistoricDocumentRequestSearch,
+    statementRequestID: String,
+    failureReason: String
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
 
-    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
-      sr =>
-        if (sr.statementRequestId.equals(statementRequestID)) {
-          sr.copy(
-            searchSuccessful = SearchResultStatus.no,
-            searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now),
-            searchFailureReasonCode = failureReason)
-        } else {
-          sr
-        }
+    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map { sr =>
+      if (sr.statementRequestId.equals(statementRequestID)) {
+        sr.copy(
+          searchSuccessful = SearchResultStatus.no,
+          searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now),
+          searchFailureReasonCode = failureReason
+        )
+      } else {
+        sr
+      }
     }
 
-    historicDocRequestCache.updateSearchRequestForStatementRequestId(
-      updatedSearchRequests,
-      req.searchID.toString)
+    historicDocRequestCache.updateSearchRequestForStatementRequestId(updatedSearchRequests, req.searchID.toString)
   }
 
-  def updateResultsFoundStatusToNoIfEligible(req: HistoricDocumentRequestSearch): Future[Option[HistoricDocumentRequestSearch]] = {
-    val isAllSearchRequestsSearchStatusNo: Boolean = !req.searchRequests.exists(
-      sr => sr.searchSuccessful == SearchResultStatus.inProcess || sr.searchSuccessful == SearchResultStatus.yes)
+  def updateResultsFoundStatusToNoIfEligible(
+    req: HistoricDocumentRequestSearch
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
+    val isAllSearchRequestsSearchStatusNo: Boolean = !req.searchRequests.exists(sr =>
+      sr.searchSuccessful == SearchResultStatus.inProcess || sr.searchSuccessful == SearchResultStatus.yes
+    )
 
     if (isAllSearchRequestsSearchStatusNo) {
       historicDocRequestCache.updateResultsFoundStatus(req.searchID.toString, SearchResultStatus.no)
@@ -67,44 +73,50 @@ class HistoricDocumentRequestSearchCacheService @Inject()(historicDocRequestCach
     }
   }
 
-  def processSDESNotificationForStatReqId(req: HistoricDocumentRequestSearch,
-                                          statementRequestID: String): Future[Option[HistoricDocumentRequestSearch]] = {
+  def processSDESNotificationForStatReqId(
+    req: HistoricDocumentRequestSearch,
+    statementRequestID: String
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
 
-    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map {
-      sr =>
-        if (sr.statementRequestId.equals(statementRequestID) &&
-          sr.searchSuccessful == SearchResultStatus.inProcess) {
-          sr.copy(
-            searchSuccessful = SearchResultStatus.yes,
-            searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
-          )
-        } else {
-          sr
-        }
+    val updatedSearchRequests: Set[SearchRequest] = req.searchRequests.map { sr =>
+      if (
+        sr.statementRequestId.equals(statementRequestID) &&
+        sr.searchSuccessful == SearchResultStatus.inProcess
+      ) {
+        sr.copy(
+          searchSuccessful = SearchResultStatus.yes,
+          searchDateTime = Utils.dateTimeAsIso8601(LocalDateTime.now)
+        )
+      } else {
+        sr
+      }
     }
 
-    historicDocRequestCache.updateSearchReqsAndResultsFoundStatus(req.searchID.toString,
+    historicDocRequestCache.updateSearchReqsAndResultsFoundStatus(
+      req.searchID.toString,
       updatedSearchRequests,
-      SearchResultStatus.yes)
+      SearchResultStatus.yes
+    )
   }
 
-  def updateSearchRequestRetryCount(statementRequestID: String,
-                                    failureReason: String,
-                                    searchId: String,
-                                    searchRequests: Set[SearchRequest]): Future[Option[HistoricDocumentRequestSearch]] = {
-    val updatedSearchRequests = searchRequests.map {
-      sr =>
-        if (sr.statementRequestId == statementRequestID &&
-          sr.searchSuccessful == SearchResultStatus.inProcess) {
-          sr.copy(searchFailureReasonCode = failureReason, failureRetryCount = sr.failureRetryCount + 1)
-        } else {
-          sr
-        }
+  def updateSearchRequestRetryCount(
+    statementRequestID: String,
+    failureReason: String,
+    searchId: String,
+    searchRequests: Set[SearchRequest]
+  ): Future[Option[HistoricDocumentRequestSearch]] = {
+    val updatedSearchRequests = searchRequests.map { sr =>
+      if (
+        sr.statementRequestId == statementRequestID &&
+        sr.searchSuccessful == SearchResultStatus.inProcess
+      ) {
+        sr.copy(searchFailureReasonCode = failureReason, failureRetryCount = sr.failureRetryCount + 1)
+      } else {
+        sr
+      }
     }
 
-    historicDocRequestCache.updateSearchRequestForStatementRequestId(
-      updatedSearchRequests,
-      searchId)
+    historicDocRequestCache.updateSearchRequestForStatementRequestId(updatedSearchRequests, searchId)
   }
 
 }

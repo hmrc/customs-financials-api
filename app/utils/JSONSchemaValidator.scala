@@ -33,45 +33,42 @@ class JSONSchemaValidator {
   private type ValidationReport = Either[List[ErrorReport], Unit]
   private val basePath = System.getProperty("user.dir")
 
-  val ssfnRequestSchema = "/schemas/statement-search-failure-notification-request-schema.json"
-  val ssfnErrorResponseSchema = "/schemas/statement-search-failure-notification-error-response-schema.json"
+  val ssfnRequestSchema              = "/schemas/statement-search-failure-notification-request-schema.json"
+  val ssfnErrorResponseSchema        = "/schemas/statement-search-failure-notification-error-response-schema.json"
   val ssfnSecureMessageRequestSchema = "/schemas/secure-message-request-schema.json"
-  val acc44RequestSchema = "/schemas/acc44-fe-request-schema-v1.2.json"
-  val acc44ResponseSchema = "/schemas/acc44-fe-response-schema-success-v1.2.json"
-  val acc45RequestSchema = "/schemas/acc45-fe-request-schema-v1.1.json"
+  val acc44RequestSchema             = "/schemas/acc44-fe-request-schema-v1.2.json"
+  val acc44ResponseSchema            = "/schemas/acc44-fe-response-schema-success-v1.2.json"
+  val acc45RequestSchema             = "/schemas/acc45-fe-request-schema-v1.1.json"
 
-  def validatePayload(data: JsValue, apiSchemaPath: String): Try[Unit] = {
+  def validatePayload(data: JsValue, apiSchemaPath: String): Try[Unit] =
     validateJsonPayload(apiSchemaPath, data) match {
-      case Right(()) => Success(())
+      case Right(())    => Success(())
       case Left(errors) =>
         val allErrorsAsString = errors.mkString(threeColons)
         Failure(new BadRequestException(allErrorsAsString))
     }
-  }
 
   private def validateJsonPayload(jsonSchemaPath: String, data: JsValue): ValidationReport = {
     val deepValidationCheck = true
-    val factory = JsonSchemaFactory.byDefault()
-    val schemaPath = JsonLoader.fromPath(s"$basePath/conf/$jsonSchemaPath")
-    val schema = factory.getJsonSchema(schemaPath)
-    val jsonDataAsString = JsonLoader.fromString(data.toString())
-    val doValidation = schema.validate(jsonDataAsString, deepValidationCheck)
-    val isSuccess = doValidation.isSuccess
+    val factory             = JsonSchemaFactory.byDefault()
+    val schemaPath          = JsonLoader.fromPath(s"$basePath/conf/$jsonSchemaPath")
+    val schema              = factory.getJsonSchema(schemaPath)
+    val jsonDataAsString    = JsonLoader.fromString(data.toString())
+    val doValidation        = schema.validate(jsonDataAsString, deepValidationCheck)
+    val isSuccess           = doValidation.isSuccess
 
     if (!isSuccess) {
-      val jsArray = Json.parse(
-        doValidation.asInstanceOf[ListProcessingReport].asJson().toString).asInstanceOf[JsArray].value
+      val jsArray =
+        Json.parse(doValidation.asInstanceOf[ListProcessingReport].asJson().toString).asInstanceOf[JsArray].value
 
-      val jsArrayErrors = jsArray.map {
-        error =>
-          ((error \ "instance" \ "pointer").asOpt[String], (error \ "message").asOpt[String]) match {
-            case Tuple2(Some(instanceOfError), Some(messageOfError)) => ErrorReport(instanceOfError, messageOfError)
-            case _ => throw new RuntimeException(s"Error: $jsArray")
-          }
+      val jsArrayErrors = jsArray.map { error =>
+        ((error \ "instance" \ "pointer").asOpt[String], (error \ "message").asOpt[String]) match {
+          case Tuple2(Some(instanceOfError), Some(messageOfError)) => ErrorReport(instanceOfError, messageOfError)
+          case _                                                   => throw new RuntimeException(s"Error: $jsArray")
+        }
       }
       Left(jsArrayErrors.toList)
-    }
-    else {
+    } else {
       Right(())
     }
   }

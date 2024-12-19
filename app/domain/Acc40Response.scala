@@ -21,11 +21,12 @@ import play.api.libs.json.{Json, OFormat}
 
 sealed trait Acc40Response
 
-case class AuthoritiesFound(numberOfAuthorities: Option[String],
-                            dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
-                            generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
-                            cdsCashAccounts: Option[Seq[CashAccount]]
-                           ) extends Acc40Response
+case class AuthoritiesFound(
+  numberOfAuthorities: Option[String],
+  dutyDefermentAccounts: Option[Seq[DutyDefermentAccount]],
+  generalGuaranteeAccounts: Option[Seq[GeneralGuaranteeAccount]],
+  cdsCashAccounts: Option[Seq[CashAccount]]
+) extends Acc40Response
 
 object AuthoritiesFound {
   implicit val format: OFormat[AuthoritiesFound] = Json.format[AuthoritiesFound]

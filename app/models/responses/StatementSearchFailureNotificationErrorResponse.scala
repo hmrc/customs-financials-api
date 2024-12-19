@@ -28,14 +28,16 @@ object StatementSearchFailureNotificationErrorResponse {
   implicit val ssfnErrorResponseFormat: OFormat[StatementSearchFailureNotificationErrorResponse] =
     Json.format[StatementSearchFailureNotificationErrorResponse]
 
-  def apply(errors: Option[Throwable] = None,
-            errorCode: String = ErrorCode.code400,
-            correlationId: String,
-            statementRequestID: Option[String] = None,
-            errorDetailMsg: String = emptyString): StatementSearchFailureNotificationErrorResponse = {
+  def apply(
+    errors: Option[Throwable] = None,
+    errorCode: String = ErrorCode.code400,
+    correlationId: String,
+    statementRequestID: Option[String] = None,
+    errorDetailMsg: String = emptyString
+  ): StatementSearchFailureNotificationErrorResponse = {
 
-    val aggregateErrorMsg = errors.fold[Throwable](
-      new BadRequestException(ErrorMessage.badRequestReceived))(identity).getMessage
+    val aggregateErrorMsg =
+      errors.fold[Throwable](new BadRequestException(ErrorMessage.badRequestReceived))(identity).getMessage
 
     val errorMsgList: Seq[String] = formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg)
 
@@ -44,44 +46,44 @@ object StatementSearchFailureNotificationErrorResponse {
       correlationId = correlationId,
       errorCode = errorCode,
       errorMessage = statementRequestID.fold(ErrorMessage.badRequestReceived)(_ =>
-        if (errorCode == ErrorCode.code500) ErrorMessage.technicalError else ErrorMessage.invalidStatementReqId),
+        if (errorCode == ErrorCode.code500) ErrorMessage.technicalError else ErrorMessage.invalidStatementReqId
+      ),
       source = ErrorSource.cdsFinancials,
-      sourceFaultDetail = SourceFaultDetail(
-        retrieveErrorMsgList(errorCode, statementRequestID, errorDetailMsg, errorMsgList))
+      sourceFaultDetail =
+        SourceFaultDetail(retrieveErrorMsgList(errorCode, statementRequestID, errorDetailMsg, errorMsgList))
     )
 
     StatementSearchFailureNotificationErrorResponse(errorDetail)
   }
 
-  private def retrieveErrorMsgList(errorCode: String,
-                                   statementRequestID: Option[String],
-                                   errorDetailMsg: String,
-                                   errorMsgList: Seq[String]): Seq[String] = {
-    statementRequestID.fold(errorMsgList)(stReqId => Seq(
-      if (errorCode == ErrorCode.code500) {
+  private def retrieveErrorMsgList(
+    errorCode: String,
+    statementRequestID: Option[String],
+    errorDetailMsg: String,
+    errorMsgList: Seq[String]
+  ): Seq[String] =
+    statementRequestID.fold(errorMsgList)(stReqId =>
+      Seq(if (errorCode == ErrorCode.code500) {
         checkErrorDetailsMsg(errorDetailMsg, stReqId)
       } else {
         ErrorMessage.invalidStatementReqIdDetail(stReqId)
       })
     )
-  }
 
   private def formatAggregateErrorMsgForErrorResponse(aggregateErrorMsg: String): Seq[String] = {
-    val leftParenthesis = "("
+    val leftParenthesis     = "("
     val parenWithColonSpace = "(: "
-    val doubleQuotes = "\""
+    val doubleQuotes        = "\""
 
     if (aggregateErrorMsg.nonEmpty) {
-      aggregateErrorMsg.split(threeColons).toSeq.map {
-        msgStr => {
-          val strAfterQuotesReplacement = msgStr.replace(doubleQuotes, emptyString)
+      aggregateErrorMsg.split(threeColons).toSeq.map { msgStr =>
+        val strAfterQuotesReplacement = msgStr.replace(doubleQuotes, emptyString)
 
-          if (strAfterQuotesReplacement.startsWith(parenWithColonSpace)) {
-            val strAfterParenReplacement = strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
-            strAfterParenReplacement.substring(1, strAfterParenReplacement.length - 1)
-          } else {
-            strAfterQuotesReplacement.substring(1, strAfterQuotesReplacement.length - 1)
-          }
+        if (strAfterQuotesReplacement.startsWith(parenWithColonSpace)) {
+          val strAfterParenReplacement = strAfterQuotesReplacement.replace(parenWithColonSpace, leftParenthesis)
+          strAfterParenReplacement.substring(1, strAfterParenReplacement.length - 1)
+        } else {
+          strAfterQuotesReplacement.substring(1, strAfterQuotesReplacement.length - 1)
         }
       }
     } else {
@@ -89,23 +91,22 @@ object StatementSearchFailureNotificationErrorResponse {
     }
   }
 
-  private def checkErrorDetailsMsg(errorDetailMsg: String,
-                                   stReqId: String): String = {
+  private def checkErrorDetailsMsg(errorDetailMsg: String, stReqId: String): String =
     if (errorDetailMsg.isEmpty) {
       ErrorMessage.technicalErrorDetail(stReqId)
-    }
-    else {
+    } else {
       errorDetailMsg
     }
-  }
 }
 
-case class ErrorDetail(timestamp: String,
-                       correlationId: String,
-                       errorCode: String,
-                       errorMessage: String,
-                       source: String = ErrorSource.cdsFinancials,
-                       sourceFaultDetail: SourceFaultDetail)
+case class ErrorDetail(
+  timestamp: String,
+  correlationId: String,
+  errorCode: String,
+  errorMessage: String,
+  source: String = ErrorSource.cdsFinancials,
+  sourceFaultDetail: SourceFaultDetail
+)
 
 object ErrorDetail {
   implicit val errorDetailsFormat: OFormat[ErrorDetail] = Json.format[ErrorDetail]
@@ -124,9 +125,9 @@ object SourceFaultDetail {
 }
 
 object ErrorMessage {
-  val badRequestReceived = "Bad request received"
+  val badRequestReceived    = "Bad request received"
   val invalidStatementReqId = "Invalid statementRequestId"
-  val technicalError = "Technical error"
+  val technicalError        = "Technical error"
 
   def invalidStatementReqIdDetail: String => String =
     statementReqId => s"statementRequestId : $statementReqId is not recognised"
@@ -141,9 +142,9 @@ object ErrorMessage {
 
 object ErrorSource {
   val cdsFinancials = "CDS Financials"
-  val backEnd = "Backend"
-  val etmp = "ETMP"
-  val mdtp = "MDTP"
+  val backEnd       = "Backend"
+  val etmp          = "ETMP"
+  val mdtp          = "MDTP"
 }
 
 object ErrorCode {
@@ -162,9 +163,9 @@ object EtmpErrorCode {
 }
 
 object SourceFaultDetailMsg {
-  val REQUEST_SCHEMA_VALIDATION_ERROR = "Failure while validating request against schema"
+  val REQUEST_SCHEMA_VALIDATION_ERROR          = "Failure while validating request against schema"
   val SUCCESS_RESPONSE_SCHEMA_VALIDATION_ERROR = "Failure while validating response against schema"
-  val ETMP_FAILURE = "Failure while calling ETMP"
-  val BACK_END_FAILURE = "Failure in backend System"
-  val SERVER_CONNECTION_ERROR = "Error connecting to the server"
+  val ETMP_FAILURE                             = "Failure while calling ETMP"
+  val BACK_END_FAILURE                         = "Failure in backend System"
+  val SERVER_CONNECTION_ERROR                  = "Error connecting to the server"
 }

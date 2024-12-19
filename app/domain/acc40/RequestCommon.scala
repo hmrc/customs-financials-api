@@ -18,10 +18,12 @@ package domain.acc40
 
 import play.api.libs.json.{Json, OFormat}
 
-case class RequestCommon(receiptDate: String,
-                         originatingSystem: String,
-                         acknowledgementReference: String,
-                         regime: String)
+case class RequestCommon(
+  receiptDate: String,
+  originatingSystem: String,
+  acknowledgementReference: String,
+  regime: String
+)
 
 object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]

@@ -21,9 +21,7 @@ import domain.*
 import domain.acc40.ResponseDetail
 import models.requests.manageAuthorities.*
 import models.requests.{
-  CashAccountStatementRequestDetail,
-  CashAccountTransactionSearchRequestDetails,
-  HistoricDocumentRequest
+  CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails, HistoricDocumentRequest
 }
 import models.*
 import play.api.http.HeaderNames
@@ -40,142 +38,167 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditingService @Inject()(appConfig: AppConfig,
-                                auditConnector: AuditConnector)(implicit executionContext: ExecutionContext) {
+class AuditingService @Inject() (appConfig: AppConfig, auditConnector: AuditConnector)(implicit
+  executionContext: ExecutionContext
+) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  private val MANAGE_AUTHORITY_AUDIT_TYPE = "ManageAuthority"
-  private val UPDATE_AUTHORITY_AUDIT_TYPE = "UpdateAuthority"
-  private val EDIT_AUTHORITY_ACTION = "Update Authority"
-  private val GRANT_AUTHORITY_ACTION = "Grant Authority"
-  private val REVOKE_AUTHORITY_ACTION = "Revoke Authority"
-  private val HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE = "RequestHistoricStatement"
-  private val HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME = "Request historic statements"
-  private val REQUEST_STANDING_AUTHORITIES_NAME = "Request Authorities CSV"
-  private val REQUEST_STANDING_AUTHORITIES_TYPE = "RequestAuthoritiesCSV"
-  private val REQUEST_AUTHORITIES_NAME = "Request Authorities"
-  private val REQUEST_AUTHORITIES_TYPE = "RequestAuthorities"
-  private val DISPLAY_STANDING_AUTHORITIES_NAME = "Display Authorities CSV"
-  private val DISPLAY_STANDING_AUTHORITIES_TYPE = "DisplayStandingAuthoritiesCSV"
-  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME = "Search cash account transactions"
-  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE = "SearchCashAccountTransactions"
+  private val MANAGE_AUTHORITY_AUDIT_TYPE                        = "ManageAuthority"
+  private val UPDATE_AUTHORITY_AUDIT_TYPE                        = "UpdateAuthority"
+  private val EDIT_AUTHORITY_ACTION                              = "Update Authority"
+  private val GRANT_AUTHORITY_ACTION                             = "Grant Authority"
+  private val REVOKE_AUTHORITY_ACTION                            = "Revoke Authority"
+  private val HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE              = "RequestHistoricStatement"
+  private val HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME        = "Request historic statements"
+  private val REQUEST_STANDING_AUTHORITIES_NAME                  = "Request Authorities CSV"
+  private val REQUEST_STANDING_AUTHORITIES_TYPE                  = "RequestAuthoritiesCSV"
+  private val REQUEST_AUTHORITIES_NAME                           = "Request Authorities"
+  private val REQUEST_AUTHORITIES_TYPE                           = "RequestAuthorities"
+  private val DISPLAY_STANDING_AUTHORITIES_NAME                  = "Display Authorities CSV"
+  private val DISPLAY_STANDING_AUTHORITIES_TYPE                  = "DisplayStandingAuthoritiesCSV"
+  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME  = "Search cash account transactions"
+  private val CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE        = "SearchCashAccountTransactions"
   private val CASH_ACCOUNT_TRANSACTIONS_REQUEST_TRANSACTION_NAME = "Request cash account transactions"
-  private val CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE = "RequestCashAccountTransactions"
+  private val CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE       = "RequestCashAccountTransactions"
 
   private val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold(hyphen)(_._2)
 
-  def auditEditAuthority(grantAuthorityRequest: GrantAuthorityRequest,
-                         eori: EORI)(implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditEditAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
     val accountDetails =
-      convertToAuditRequest(
-        grantAuthorityRequest.accounts).headOption
+      convertToAuditRequest(grantAuthorityRequest.accounts).headOption
         .getOrElse(AccountAuditDetail(AccountType(hyphen), AccountNumber(hyphen)))
 
-    val auditJson: JsValue = Json.toJson(EditAuthorityRequestAuditDetail(eori,
-      grantAuthorityRequest.authority.authorisedEori,
-      EDIT_AUTHORITY_ACTION,
-      accountDetails.accountType,
-      accountDetails.accountNumber,
-      grantAuthorityRequest.authority.authorisedFromDate,
-      grantAuthorityRequest.authority.authorisedToDate.getOrElse(emptyString),
-      grantAuthorityRequest.authority.viewBalance,
-      grantAuthorityRequest.authorisedUser.userName,
-      grantAuthorityRequest.authorisedUser.userRole))
+    val auditJson: JsValue = Json.toJson(
+      EditAuthorityRequestAuditDetail(
+        eori,
+        grantAuthorityRequest.authority.authorisedEori,
+        EDIT_AUTHORITY_ACTION,
+        accountDetails.accountType,
+        accountDetails.accountNumber,
+        grantAuthorityRequest.authority.authorisedFromDate,
+        grantAuthorityRequest.authority.authorisedToDate.getOrElse(emptyString),
+        grantAuthorityRequest.authority.viewBalance,
+        grantAuthorityRequest.authorisedUser.userName,
+        grantAuthorityRequest.authorisedUser.userRole
+      )
+    )
 
     audit(AuditModel(EDIT_AUTHORITY_ACTION, auditJson, UPDATE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditGrantAuthority(grantAuthorityRequest: GrantAuthorityRequest,
-                          eori: EORI)(implicit hc: HeaderCarrier): Future[AuditResult] = {
-    val auditJson = Json.toJson(GrantAuthorityRequestAuditDetail(eori,
-      grantAuthorityRequest.authority.authorisedEori,
-      GRANT_AUTHORITY_ACTION,
-      convertToAuditRequest(grantAuthorityRequest.accounts),
-      grantAuthorityRequest.authority.authorisedFromDate,
-      grantAuthorityRequest.authority.authorisedToDate.getOrElse(emptyString),
-      grantAuthorityRequest.authority.viewBalance,
-      grantAuthorityRequest.authorisedUser.userName,
-      grantAuthorityRequest.authorisedUser.userRole))
+  def auditGrantAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
+    val auditJson = Json.toJson(
+      GrantAuthorityRequestAuditDetail(
+        eori,
+        grantAuthorityRequest.authority.authorisedEori,
+        GRANT_AUTHORITY_ACTION,
+        convertToAuditRequest(grantAuthorityRequest.accounts),
+        grantAuthorityRequest.authority.authorisedFromDate,
+        grantAuthorityRequest.authority.authorisedToDate.getOrElse(emptyString),
+        grantAuthorityRequest.authority.viewBalance,
+        grantAuthorityRequest.authorisedUser.userName,
+        grantAuthorityRequest.authorisedUser.userRole
+      )
+    )
 
     audit(AuditModel(GRANT_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditRevokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest,
-                           eori: EORI)(implicit hc: HeaderCarrier): Future[AuditResult] = {
-    val auditJson = Json.toJson(RevokeAuthorityRequestAuditDetail(eori,
-      revokeAuthorityRequest.authorisedEori,
-      REVOKE_AUTHORITY_ACTION,
-      RevokeAccountType.toAuditLabel(revokeAuthorityRequest.accountType),
-      revokeAuthorityRequest.accountNumber,
-      revokeAuthorityRequest.authorisedUser.userName,
-      revokeAuthorityRequest.authorisedUser.userRole))
+  def auditRevokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
+    val auditJson = Json.toJson(
+      RevokeAuthorityRequestAuditDetail(
+        eori,
+        revokeAuthorityRequest.authorisedEori,
+        REVOKE_AUTHORITY_ACTION,
+        RevokeAccountType.toAuditLabel(revokeAuthorityRequest.accountType),
+        revokeAuthorityRequest.accountNumber,
+        revokeAuthorityRequest.authorisedUser.userName,
+        revokeAuthorityRequest.authorisedUser.userRole
+      )
+    )
 
     audit(AuditModel(REVOKE_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail,
-                                          request: domain.acc41.RequestDetail)
-                                         (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditRequestAuthCSVStatementRequest(response: acc41.ResponseDetail, request: domain.acc41.RequestDetail)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
 
-    val auditJson = Json.toJson(RequestAuthCSVAuditDetail(
-      request.requestingEORI.value,
-      response.requestAcceptedDate.get))
+    val auditJson =
+      Json.toJson(RequestAuthCSVAuditDetail(request.requestingEORI.value, response.requestAcceptedDate.get))
 
     audit(AuditModel(REQUEST_STANDING_AUTHORITIES_NAME, auditJson, REQUEST_STANDING_AUTHORITIES_TYPE))
   }
 
-  def auditDisplayAuthCSVStatementRequest(notification: Notification,
-                                          fileType: FileType)
-                                         (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditDisplayAuthCSVStatementRequest(notification: Notification, fileType: FileType)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
 
-    val auditJson = Json.toJson(RequestDisplayStandingAuthCSVAuditDetail(
-      Eori = notification.eori.toString,
-      isHistoric = notification.metadata.contains("statementRequestID"),
-      fileName = notification.fileName,
-      fileRole = notification.fileRole.toString,
-      fileType = fileType.toString))
+    val auditJson = Json.toJson(
+      RequestDisplayStandingAuthCSVAuditDetail(
+        Eori = notification.eori.toString,
+        isHistoric = notification.metadata.contains("statementRequestID"),
+        fileName = notification.fileName,
+        fileRole = notification.fileRole.toString,
+        fileType = fileType.toString
+      )
+    )
 
     audit(AuditModel(DISPLAY_STANDING_AUTHORITIES_NAME, auditJson, DISPLAY_STANDING_AUTHORITIES_TYPE))
   }
 
-  def auditRequestAuthStatementRequest(response: ResponseDetail,
-                                       request: domain.acc40.RequestDetail)
-                                      (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditRequestAuthStatementRequest(response: ResponseDetail, request: domain.acc40.RequestDetail)(implicit
+    hc: HeaderCarrier
+  ): Future[AuditResult] = {
 
-    val auditJson = Json.toJson(RequestAuthAuditDetail(
-      request.requestingEORI.value,
-      request.searchType,
-      request.searchID.value,
-      response.numberOfAuthorities,
-      response.dutyDefermentAccounts,
-      response.generalGuaranteeAccounts,
-      response.cdsCashAccounts))
+    val auditJson = Json.toJson(
+      RequestAuthAuditDetail(
+        request.requestingEORI.value,
+        request.searchType,
+        request.searchID.value,
+        response.numberOfAuthorities,
+        response.dutyDefermentAccounts,
+        response.generalGuaranteeAccounts,
+        response.cdsCashAccounts
+      )
+    )
 
     audit(AuditModel(REQUEST_AUTHORITIES_NAME, auditJson, REQUEST_AUTHORITIES_TYPE))
   }
 
-  def auditHistoricStatementRequest(historicDocumentRequest: HistoricDocumentRequest)
-                                   (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditHistoricStatementRequest(
+    historicDocumentRequest: HistoricDocumentRequest
+  )(implicit hc: HeaderCarrier): Future[AuditResult] = {
     import domain.HistoricDocumentRequestAuditDetail.*
-    val auditJson = Json.toJson(HistoricDocumentRequestAuditDetail(
-      historicDocumentRequest.eori,
-      historicDocumentRequest.documentType.value match {
-        case "C79Certificate" => FileRole("C79Statement")
-        case "SecurityStatement" => FileRole("SecuritiesStatement")
-        case statementName => FileRole(statementName)
-      },
-      AccountNumber(historicDocumentRequest.dan),
-      historicDocumentRequest.periodStartYear.toString,
-      "%02d".format(historicDocumentRequest.periodStartMonth),
-      historicDocumentRequest.periodEndYear.toString,
-      "%02d".format(historicDocumentRequest.periodEndMonth)))
+    val auditJson = Json.toJson(
+      HistoricDocumentRequestAuditDetail(
+        historicDocumentRequest.eori,
+        historicDocumentRequest.documentType.value match {
+          case "C79Certificate"    => FileRole("C79Statement")
+          case "SecurityStatement" => FileRole("SecuritiesStatement")
+          case statementName       => FileRole(statementName)
+        },
+        AccountNumber(historicDocumentRequest.dan),
+        historicDocumentRequest.periodStartYear.toString,
+        "%02d".format(historicDocumentRequest.periodStartMonth),
+        historicDocumentRequest.periodEndYear.toString,
+        "%02d".format(historicDocumentRequest.periodEndMonth)
+      )
+    )
 
     audit(AuditModel(HISTORIC_STATEMENT_REQUEST_TRANSACTION_NAME, auditJson, HISTORIC_STATEMENT_REQUEST_AUDIT_TYPE))
   }
 
-  def auditCashAccountTransactionsSearch(cashAccountTransSearchRequest: CashAccountTransactionSearchRequestDetails)
-                                        (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditCashAccountTransactionsSearch(
+    cashAccountTransSearchRequest: CashAccountTransactionSearchRequestDetails
+  )(implicit hc: HeaderCarrier): Future[AuditResult] = {
     log.info("audit event for ACC44 api call")
 
     val auditJson = Json.toJson(cashAccountTransSearchRequest)
@@ -184,12 +207,14 @@ class AuditingService @Inject()(appConfig: AppConfig,
       AuditModel(
         CASH_ACCOUNT_TRANSACTIONS_SEARCH_TRANSACTION_NAME,
         auditJson,
-        CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE)
+        CASH_ACCOUNT_TRANSACTIONS_SEARCH_AUDIT_TYPE
+      )
     )
   }
 
-  def auditCashAccountStatementsRequest(cashAccountStatementRequest: CashAccountStatementRequestDetail)
-                                       (implicit hc: HeaderCarrier): Future[AuditResult] = {
+  def auditCashAccountStatementsRequest(
+    cashAccountStatementRequest: CashAccountStatementRequestDetail
+  )(implicit hc: HeaderCarrier): Future[AuditResult] = {
     log.info("audit event for ACC45 api call")
 
     val auditJson = Json.toJson(cashAccountStatementRequest)
@@ -198,7 +223,8 @@ class AuditingService @Inject()(appConfig: AppConfig,
       AuditModel(
         CASH_ACCOUNT_TRANSACTIONS_REQUEST_TRANSACTION_NAME,
         auditJson,
-        CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE)
+        CASH_ACCOUNT_TRANSACTIONS_REQUEST_AUDIT_TYPE
+      )
     )
   }
 
@@ -207,11 +233,13 @@ class AuditingService @Inject()(appConfig: AppConfig,
       auditSource = appConfig.appName,
       auditType = auditModel.auditType,
       tags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags(auditModel.transactionName, referrer(hc)),
-      detail = auditModel.detail)
+      detail = auditModel.detail
+    )
 
     log.debug(s"Splunk Audit Event:\n$dataEvent\n")
 
-    auditConnector.sendExtendedEvent(dataEvent)
+    auditConnector
+      .sendExtendedEvent(dataEvent)
       .map { auditResult =>
         logAuditResult(auditResult)
         auditResult
@@ -228,17 +256,17 @@ class AuditingService @Inject()(appConfig: AppConfig,
       accounts.guarantee.map(number => AccountAuditDetail(AccountType("GeneralGuarantee"), AccountNumber(number)))
 
     val AccountAuditDetails = cash +: dutyDeferment.map(Some(_)) :+ guarantee
-    AccountAuditDetails.collect {
-      case Some(accountAuditDetail) => accountAuditDetail
+    AccountAuditDetails.collect { case Some(accountAuditDetail) =>
+      accountAuditDetail
     }
   }
 
   private def logAuditResult(auditResult: AuditResult): Unit = auditResult match {
-    case Success =>
+    case Success         =>
       log.debug("Splunk Audit Successful")
     case Failure(err, _) =>
       log.error(s"Splunk Audit Error, message: $err")
-    case Disabled =>
+    case Disabled        =>
       log.debug(s"Auditing Disabled")
   }
 }

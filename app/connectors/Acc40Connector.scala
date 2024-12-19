@@ -31,14 +31,17 @@ import utils.Utils.{gbEoriPrefix, xIEoriPrefix}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc40Connector @Inject()(httpClient: HttpClientV2,
-                               auditingService: AuditingService,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc40Connector @Inject() (
+  httpClient: HttpClientV2,
+  auditingService: AuditingService,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
-  def searchAuthorities(requestingEORI: EORI,
-                        searchID: EORI)(implicit hc: HeaderCarrier): Future[Either[Acc40Response, AuthoritiesFound]] = {
+  def searchAuthorities(requestingEORI: EORI, searchID: EORI)(implicit
+    hc: HeaderCarrier
+  ): Future[Either[Acc40Response, AuthoritiesFound]] = {
 
     val commonRequest = acc40.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -53,36 +56,38 @@ class Acc40Connector @Inject()(httpClient: HttpClientV2,
       searchID = searchID
     )
 
-    val request = SearchAuthoritiesRequest(acc40.Request(
-      commonRequest,
-      requestDetail
-    ))
+    val request = SearchAuthoritiesRequest(
+      acc40.Request(
+        commonRequest,
+        requestDetail
+      )
+    )
 
-    val result: Future[SearchAuthoritiesResponse] = httpClient.post(
-      url"${appConfig.acc40SearchAuthoritiesEndpoint}")(HeaderCarrier())
+    val result: Future[SearchAuthoritiesResponse] = httpClient
+      .post(url"${appConfig.acc40SearchAuthoritiesEndpoint}")(HeaderCarrier())
       .withBody[SearchAuthoritiesRequest](request)
       .setHeader(mdgHeaders.headers(appConfig.acc40BearerToken, appConfig.acc40HostHeader): _*)
       .execute[SearchAuthoritiesResponse]
 
-    result.map {
-      res =>
+    result
+      .map { res =>
         res.searchAuthoritiesResponse.responseDetail match {
-          case ResponseDetail(Some(_), _, _, _, _) => Left(ErrorResponse)
+          case ResponseDetail(Some(_), _, _, _, _)      => Left(ErrorResponse)
           case ResponseDetail(None, Some("0"), _, _, _) => Left(NoAuthoritiesFound)
 
-          case v@ResponseDetail(_, _, _, _, _) =>
+          case v @ ResponseDetail(_, _, _, _, _) =>
             auditingService.auditRequestAuthStatementRequest(v, res.searchAuthoritiesResponse.requestDetail)
             Right(v.toAuthoritiesFound)
         }
-    }.recover {
-      case _ => Left(ErrorResponse)
-    }
+      }
+      .recover { case _ =>
+        Left(ErrorResponse)
+      }
   }
 
-  def searchType(searchID: EORI): String = {
+  def searchType(searchID: EORI): String =
     searchID.value match {
       case searchEori if searchEori.startsWith(gbEoriPrefix) || searchEori.startsWith(xIEoriPrefix) => "0"
-      case _ => "1"
+      case _                                                                                        => "1"
     }
-  }
 }

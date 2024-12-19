@@ -24,20 +24,26 @@ case class GuaranteeTransactionsResponse(getGGATransactionResponse: GetGGATransa
 object GuaranteeTransactionsResponse {
 
   implicit val thresholdErrorFormat: OFormat[ExceededThresholdErrorException.type] =
-    OFormat[ExceededThresholdErrorException.type](Reads[ExceededThresholdErrorException.type] {
-      case JsObject(_) => JsSuccess(ExceededThresholdErrorException)
-      case _ => JsError("Empty object expected")
-    }, OWrites[ExceededThresholdErrorException.type] { _ =>
-      Json.obj()
-    })
+    OFormat[ExceededThresholdErrorException.type](
+      Reads[ExceededThresholdErrorException.type] {
+        case JsObject(_) => JsSuccess(ExceededThresholdErrorException)
+        case _           => JsError("Empty object expected")
+      },
+      OWrites[ExceededThresholdErrorException.type] { _ =>
+        Json.obj()
+      }
+    )
 
   implicit val noAssociatedDataFormat: OFormat[NoAssociatedDataException.type] =
-    OFormat[NoAssociatedDataException.type](Reads[NoAssociatedDataException.type] {
-      case JsObject(_) => JsSuccess(NoAssociatedDataException)
-      case _ => JsError("Empty object expected")
-    }, OWrites[NoAssociatedDataException.type] { _ =>
-      Json.obj()
-    })
+    OFormat[NoAssociatedDataException.type](
+      Reads[NoAssociatedDataException.type] {
+        case JsObject(_) => JsSuccess(NoAssociatedDataException)
+        case _           => JsError("Empty object expected")
+      },
+      OWrites[NoAssociatedDataException.type] { _ =>
+        Json.obj()
+      }
+    )
 
   implicit val errorResponseFormat: OFormat[ErrorResponse] = Json.format[ErrorResponse]
 
@@ -63,37 +69,38 @@ object GuaranteeTransactionsResponse {
     Json.format[GuaranteeTransactionsResponse]
 }
 
-case class GetGGATransactionResponse(responseCommon: ResponseCommon,
-                                     responseDetail: Option[ResponseDetail])
+case class GetGGATransactionResponse(responseCommon: ResponseCommon, responseDetail: Option[ResponseDetail])
 
-case class ResponseCommon(status: String,
-                          statusText: Option[String],
-                          processingDate: String)
+case class ResponseCommon(status: String, statusText: Option[String], processingDate: String)
 
 case class ResponseDetail(openItems: Boolean, declarations: Seq[GuaranteeTransactionDeclaration])
 
-case class GuaranteeTransactionDeclaration(declarationID: String,
-                                           postingDate: String,
-                                           declarantsRefNumber: Option[String],
-                                           declarantsEORINumber: EORI,
-                                           importersEORINumber: EORI,
-                                           defAmounts: DefAmounts,
-                                           interestCharge: Option[String],
-                                           c18Reference: Option[String],
-                                           dueDates: Seq[DueDate])
+case class GuaranteeTransactionDeclaration(
+  declarationID: String,
+  postingDate: String,
+  declarantsRefNumber: Option[String],
+  declarantsEORINumber: EORI,
+  importersEORINumber: EORI,
+  defAmounts: DefAmounts,
+  interestCharge: Option[String],
+  c18Reference: Option[String],
+  dueDates: Seq[DueDate]
+)
 
-case class DefAmounts(openAmount: Option[String],
-                      totalAmount: String,
-                      clearedAmount: Option[String],
-                      updateDate: String)
+case class DefAmounts(
+  openAmount: Option[String],
+  totalAmount: String,
+  clearedAmount: Option[String],
+  updateDate: String
+)
 
-case class DueDate(dueDate: String,
-                   reasonForSecurity: Option[String],
-                   defAmounts: DefAmounts,
-                   taxTypeGroups: Seq[TaxTypeGroup])
+case class DueDate(
+  dueDate: String,
+  reasonForSecurity: Option[String],
+  defAmounts: DefAmounts,
+  taxTypeGroups: Seq[TaxTypeGroup]
+)
 
-case class TaxTypeGroup(taxTypeGroup: String,
-                        defAmounts: DefAmounts,
-                        taxTypes: Seq[TaxType])
+case class TaxTypeGroup(taxTypeGroup: String, defAmounts: DefAmounts, taxTypes: Seq[TaxType])
 
 case class TaxType(taxType: String, defAmounts: DefAmounts)

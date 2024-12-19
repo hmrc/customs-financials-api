@@ -55,8 +55,9 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
-    val mockSub09Connector: Sub09Connector = mock[Sub09Connector]
+    val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
+    val mockSub09Connector: Sub09Connector           = mock[Sub09Connector]
 
     val responseCommon: ResponseCommon =
       ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
@@ -67,23 +68,41 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
       CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
 
-    val vatIds: VatId = VatId(Some("abc"), Some("123"))
+    val vatIds: VatId         = VatId(Some("abc"), Some("123"))
     val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
 
     val xiEoriAddress: PbeAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
 
     val xiEoriSubscription: XiSubscription =
-      XiSubscription("XI1234567",
+      XiSubscription(
+        "XI1234567",
         Some(xiEoriAddress),
         Some("1"),
         Some("12345"),
         Some(Array(euVatIds)),
         "1",
-        Some("abc"))
+        Some("abc")
+      )
 
-    val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
-      cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
-      None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
+    val responseDetail: ResponseDetail = ResponseDetail(
+      Some(EORI("someEori")),
+      None,
+      None,
+      "CDSFullName",
+      cdsEstablishmentAddress,
+      Some("0"),
+      None,
+      None,
+      Some(Array(vatIds)),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      ETMP_Master_Indicator = true,
+      Some(xiEoriSubscription)
+    )
 
     val response: SubscriptionResponse =
       SubscriptionResponse(domain.sub09.SubscriptionDisplayResponse(responseCommon, responseDetail))
@@ -91,12 +110,15 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
     val responseWithNoStatusText: SubscriptionResponse =
       SubscriptionResponse(domain.sub09.SubscriptionDisplayResponse(responseCommonWithNoStatusText, responseDetail))
 
-    val app: Application = application().overrides(
-      inject.bind[Sub09Connector].toInstance(mockSub09Connector)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = application()
+      .overrides(
+        inject.bind[Sub09Connector].toInstance(mockSub09Connector)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

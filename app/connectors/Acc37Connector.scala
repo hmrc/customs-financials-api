@@ -29,22 +29,28 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc37Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               headers: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc37Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  headers: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
-  def updateAccountContactDetails(dan: AccountNumber,
-                                  eori: EORI,
-                                  contactInformation: domain.acc37.ContactDetails): Future[domain.acc37.Response] = {
+  def updateAccountContactDetails(
+    dan: AccountNumber,
+    eori: EORI,
+    contactInformation: domain.acc37.ContactDetails
+  ): Future[domain.acc37.Response] = {
 
     val request = domain.acc37.Request(
       AmendCorrespondenceAddressRequest(
         domain.acc37.RequestCommon(DIGITAL, dateTimeService.currentDateTimeAsIso8601, headers.acknowledgementReference),
         domain.acc37.RequestDetail(eori, AccountDetails(AccountType("DutyDeferment"), dan), contactInformation, None)
-      ))
+      )
+    )
 
-    httpClient.post(url"${appConfig.acc37UpdateAccountContactDetailsEndpoint}")(HeaderCarrier())
+    httpClient
+      .post(url"${appConfig.acc37UpdateAccountContactDetailsEndpoint}")(HeaderCarrier())
       .withBody[domain.acc37.Request](request)
       .setHeader(headers.headers(appConfig.acc37BearerToken, appConfig.acc37HostHeader): _*)
       .execute[domain.acc37.Response]

@@ -28,13 +28,9 @@ case class GGATransactionListing(requestCommon: RequestCommon, requestDetail: Re
 
 case class RequestParameters(paramName: String, paramValue: String)
 
-case class RequestCommon(receiptDate: String,
-                         acknowledgementReference: String,
-                         requestParameters: RequestParameters)
+case class RequestCommon(receiptDate: String, acknowledgementReference: String, requestParameters: RequestParameters)
 
-case class RequestDetail(gan: AccountNumber,
-                         openItems: Boolean,
-                         dates: Option[RequestDates])
+case class RequestDetail(gan: AccountNumber, openItems: Boolean, dates: Option[RequestDates])
 
 case class RequestDates(dateFrom: LocalDate, dateTo: LocalDate)
 
@@ -55,7 +51,7 @@ object GuaranteeTransactionsRequest {
     Json.writes[GuaranteeTransactionsRequest]
 
   implicit def jsonBodyWritable[T](implicit
-                                     writes: Writes[T],
-                                     jsValueBodyWritable: BodyWritable[JsValue]
-                                    ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

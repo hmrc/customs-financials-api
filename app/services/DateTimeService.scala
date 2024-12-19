@@ -24,15 +24,14 @@ import java.time.{Instant, LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DateTimeService @Inject()() {
+class DateTimeService @Inject() () {
 
   def now(): LocalDateTime = LocalDateTime.now()
 
   def timeStamp(): Long = Instant.now.toEpochMilli
 
-  def currentDateTimeAsIso8601: String = {
+  def currentDateTimeAsIso8601: String =
     s"${DateTimeFormatter.ISO_DATE_TIME.format(now().truncatedTo(ChronoUnit.SECONDS))}Z"
-  }
 
   def utcDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of(UTC_TIME_ZONE)).truncatedTo(ChronoUnit.MILLIS)
 }

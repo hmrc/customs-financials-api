@@ -48,35 +48,61 @@ class Sub09ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val responseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+    implicit val hc: HeaderCarrier                       = HeaderCarrier()
+    val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder                   = mock[RequestBuilder]
+    val responseCommon: ResponseCommon                   = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
       CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
 
-    val vatIds: VatId = VatId(Some("abc"), Some("123"))
-    val euVatIds: EUVATNumber = EUVATNumber(Some("def"), Some("456"))
+    val vatIds: VatId             = VatId(Some("abc"), Some("123"))
+    val euVatIds: EUVATNumber     = EUVATNumber(Some("def"), Some("456"))
     val xiEoriAddress: PbeAddress = PbeAddress("1 Test street", Some("city A"), Some("county"), None, Some("AA1 1AA"))
 
-    val xiEoriSubscription: XiSubscription = XiSubscription("XI1234567", Some(xiEoriAddress), Some("1"),
-      Some("12345"), Some(Array(euVatIds)), "1", Some("abc"))
+    val xiEoriSubscription: XiSubscription = XiSubscription(
+      "XI1234567",
+      Some(xiEoriAddress),
+      Some("1"),
+      Some("12345"),
+      Some(Array(euVatIds)),
+      "1",
+      Some("abc")
+    )
 
-    val responseDetail: ResponseDetail = ResponseDetail(Some(EORI("someEori")), None, None, "CDSFullName",
-      cdsEstablishmentAddress, Some("0"), None, None, Some(Array(vatIds)),
-      None, None, None, None, None, None, ETMP_Master_Indicator = true, Some(xiEoriSubscription))
+    val responseDetail: ResponseDetail = ResponseDetail(
+      Some(EORI("someEori")),
+      None,
+      None,
+      "CDSFullName",
+      cdsEstablishmentAddress,
+      Some("0"),
+      None,
+      None,
+      Some(Array(vatIds)),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      ETMP_Master_Indicator = true,
+      Some(xiEoriSubscription)
+    )
 
     val response: SubscriptionResponse =
       SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Sub09Connector = app.injector.instanceOf[Sub09Connector]
   }

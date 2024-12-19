@@ -26,8 +26,8 @@ import scala.util.Random
 trait EmbeddedMongoDBSupport {
 
   val minNumberForPort = 10000
-  val mongoHost = "localhost"
-  val mongoPort: Int = minNumberForPort + Random.nextInt(minNumberForPort)
+  val mongoHost        = "localhost"
+  val mongoPort: Int   = minNumberForPort + Random.nextInt(minNumberForPort)
 
   var mongodExecutable: MongodExecutable = _
 
@@ -39,9 +39,11 @@ trait EmbeddedMongoDBSupport {
 
   def initMongoDExecutable(): Unit =
     mongodExecutable = MongodStarter.getDefaultInstance
-      .prepare(MongodConfig.builder()
-        .version(Version.Main.V4_4)
-        .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6()))
-        .build()
+      .prepare(
+        MongodConfig
+          .builder()
+          .version(Version.Main.V4_4)
+          .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6()))
+          .build()
       )
 }

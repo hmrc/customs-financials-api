@@ -26,20 +26,20 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 object Utils {
-  val emptyString = ""
-  val threeColons = ":::"
-  val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
-  val httpDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
+  val emptyString                             = ""
+  val threeColons                             = ":::"
+  val rfc7231DateTimePattern                  = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+  val httpDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
   val iso8601DateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 
   val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
-  val englishLangKey = "en"
-  val welshLangKey = "cy"
-  val singleSpace = " "
-  val hyphen = "-"
-  val comma = ","
-  val gbEoriPrefix = "GB"
-  val xIEoriPrefix = "XI"
+  val englishLangKey       = "en"
+  val welshLangKey         = "cy"
+  val singleSpace          = " "
+  val hyphen               = "-"
+  val comma                = ","
+  val gbEoriPrefix         = "GB"
+  val xIEoriPrefix         = "XI"
 
   val UTC_TIME_ZONE = "UTC"
 
@@ -64,8 +64,7 @@ object Utils {
     Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
   }
 
-  def convertMonthValueToFullMonthName(intPaddedValue: String,
-                                       lang: String = englishLangKey): String =
+  def convertMonthValueToFullMonthName(intPaddedValue: String, lang: String = englishLangKey): String =
     monthValueToNameMap(lang).getOrElse(intPaddedValue, emptyString)
 
   def monthValueToNameMap(lang: String): Map[String, String] =
@@ -84,17 +83,12 @@ object Utils {
       "12" -> msgForKey(lang, welshStr = "Rhagfyr", engStr = "December")
     )
 
-  def createHyperLink(text: String,
-                      link: String,
-                      styleClass: String = "govuk-link"): String = {
+  def createHyperLink(text: String, link: String, styleClass: String = "govuk-link"): String = {
     val doubleQuotes = "\""
 
     s"<a class=$doubleQuotes$styleClass$doubleQuotes href=$doubleQuotes$link$doubleQuotes>$text</a>"
   }
 
-  private def msgForKey(lang: String,
-                        welshStr: String,
-                        engStr: String): String = {
+  private def msgForKey(lang: String, welshStr: String, engStr: String): String =
     if (lang == welshLangKey) welshStr else engStr
-  }
 }

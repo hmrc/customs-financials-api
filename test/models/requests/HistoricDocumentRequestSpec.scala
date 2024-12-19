@@ -44,12 +44,19 @@ class HistoricDocumentRequestSpec extends SpecBase {
     "throw exception when SearchRequest is not found for statementRequestId" in new Setup {
       intercept[RuntimeException] {
 
-        HistoricDocumentRequest(incomingStatementReqId,
+        HistoricDocumentRequest(
+          incomingStatementReqId,
           historicDocumentRequestSearchDoc.copy(
-            searchRequests = Set(SearchRequest("GB234567890121",
-              "5c79895-f0da-4472-af5a-d84d340e7mn6",
-              SearchResultStatus.inProcess,
-              emptyString, emptyString, 0))
+            searchRequests = Set(
+              SearchRequest(
+                "GB234567890121",
+                "5c79895-f0da-4472-af5a-d84d340e7mn6",
+                SearchResultStatus.inProcess,
+                emptyString,
+                emptyString,
+                0
+              )
+            )
           )
         )
       }.getMessage mustBe s"SearchRequest is not found for statementRequestId :: $incomingStatementReqId"
@@ -59,8 +66,10 @@ class HistoricDocumentRequestSpec extends SpecBase {
     "create the object with empty DAN" in new Setup {
       val paramsWithEmptyDan: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", emptyString)
 
-      HistoricDocumentRequest(incomingStatementReqId,
-        historicDocumentRequestSearchDoc.copy(params = paramsWithEmptyDan)) mustBe
+      HistoricDocumentRequest(
+        incomingStatementReqId,
+        historicDocumentRequestSearchDoc.copy(params = paramsWithEmptyDan)
+      ) mustBe
         HistoricDocumentRequest(
           eori = EORI(eoriNumber),
           documentType = FileRole(accountType),
@@ -75,29 +84,28 @@ class HistoricDocumentRequestSpec extends SpecBase {
   }
 
   trait Setup {
-    val incomingStatementReqId: String = UUID.randomUUID().toString
-    val eoriNumber = "GB123456789012"
-    val accountType = "DutyDefermentStatement"
-    val dan = "1234567"
-    val searchID: UUID = UUID.randomUUID()
+    val incomingStatementReqId: String         = UUID.randomUUID().toString
+    val eoriNumber                             = "GB123456789012"
+    val accountType                            = "DutyDefermentStatement"
+    val dan                                    = "1234567"
+    val searchID: UUID                         = UUID.randomUUID()
     val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
-    val searchStatusUpdateDate: String = emptyString
-    val currentEori: String = "GB123456789012"
-    val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", dan)
-    val searchRequests: Set[SearchRequest] = Set(
+    val searchStatusUpdateDate: String         = emptyString
+    val currentEori: String                    = "GB123456789012"
+    val params: Params                         = Params("2", "2021", "4", "2021", "DutyDefermentStatement", dan)
+    val searchRequests: Set[SearchRequest]     = Set(
+      SearchRequest(eoriNumber, incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
       SearchRequest(
-        eoriNumber, incomingStatementReqId, SearchResultStatus.inProcess, emptyString, emptyString, 0),
-      SearchRequest(
-        "GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", SearchResultStatus.inProcess,
-        emptyString, emptyString, 0)
+        "GB234567890121",
+        "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      )
     )
 
     val historicDocumentRequestSearchDoc: HistoricDocumentRequestSearch =
-      HistoricDocumentRequestSearch(searchID,
-        resultsFound,
-        searchStatusUpdateDate,
-        currentEori,
-        params,
-        searchRequests)
+      HistoricDocumentRequestSearch(searchID, resultsFound, searchStatusUpdateDate, currentEori, params, searchRequests)
   }
 }

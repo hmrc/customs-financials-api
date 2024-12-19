@@ -69,21 +69,23 @@ class EmailThrottlerConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
-
 
     val request: EmailRequest = EmailRequest(List.empty, emptyString, Map.empty, force = true, None, Some("eori"), None)
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: EmailThrottlerConnector = app.injector.instanceOf[EmailThrottlerConnector]
   }

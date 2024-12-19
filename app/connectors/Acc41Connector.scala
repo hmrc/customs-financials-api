@@ -30,15 +30,17 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc41Connector @Inject()(httpClient: HttpClientV2,
-                               auditingService: AuditingService,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc41Connector @Inject() (
+  httpClient: HttpClientV2,
+  auditingService: AuditingService,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
-  def initiateAuthoritiesCSV(requestingEori: EORI,
-                             alternateEORI: Option[EORI])
-                            (implicit hc: HeaderCarrier): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
+  def initiateAuthoritiesCSV(requestingEori: EORI, alternateEORI: Option[EORI])(implicit
+    hc: HeaderCarrier
+  ): Future[Either[Acc41Response, AuthoritiesCsvGenerationResponse]] = {
 
     val commonRequest = acc41.RequestCommon(
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
@@ -49,34 +51,40 @@ class Acc41Connector @Inject()(httpClient: HttpClientV2,
 
     val requestDetail = alternateEORI match {
       case Some(x) if x.value.nonEmpty => acc41.RequestDetail(requestingEori, alternateEORI)
-      case _ => acc41.RequestDetail(requestingEori, None)
+      case _                           => acc41.RequestDetail(requestingEori, None)
     }
 
-    val request = acc41.StandingAuthoritiesForEORIRequest(acc41.Request(
-      commonRequest,
-      requestDetail
-    ))
+    val request = acc41.StandingAuthoritiesForEORIRequest(
+      acc41.Request(
+        commonRequest,
+        requestDetail
+      )
+    )
 
     val result: Future[StandingAuthoritiesForEORIResponse] =
-      httpClient.post(url"${appConfig.acc41AuthoritiesCsvGenerationEndpoint}")(HeaderCarrier())
+      httpClient
+        .post(url"${appConfig.acc41AuthoritiesCsvGenerationEndpoint}")(HeaderCarrier())
         .withBody[acc41.StandingAuthoritiesForEORIRequest](request)
         .setHeader(mdgHeaders.headers(appConfig.acc41BearerToken, appConfig.acc41HostHeader): _*)
         .execute[acc41.StandingAuthoritiesForEORIResponse]
 
-    result.map {
-      res =>
+    result
+      .map { res =>
         val resDetail = res.standingAuthoritiesForEORIResponse.responseDetail
 
         if (resDetail.errorMessage.isDefined) {
           Left(Acc41ErrorResponse)
         } else {
           auditingService.auditRequestAuthCSVStatementRequest(
-            resDetail, res.standingAuthoritiesForEORIResponse.requestDetail)
+            resDetail,
+            res.standingAuthoritiesForEORIResponse.requestDetail
+          )
 
           Right(resDetail.toAuthoritiesCsvGeneration)
         }
-    }.recover {
-      case _ => Left(Acc41ErrorResponse)
-    }
+      }
+      .recover { case _ =>
+        Left(Acc41ErrorResponse)
+      }
   }
 }

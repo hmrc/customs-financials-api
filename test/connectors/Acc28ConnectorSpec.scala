@@ -73,8 +73,8 @@ class Acc28ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val request: GuaranteeAccountTransactionsRequest = GuaranteeAccountTransactionsRequest(
@@ -99,21 +99,26 @@ class Acc28ConnectorSpec extends SpecBase {
 
     val tooMuchDataRequestedResponse: GuaranteeTransactionsResponse = GuaranteeTransactionsResponse(
       GetGGATransactionResponse(
-        ResponseCommon("OK",
+        ResponseCommon(
+          "OK",
           Some("091-The query has exceeded the threshold, please refine the search"),
-          LocalDate.now().toString),
+          LocalDate.now().toString
+        ),
         Some(ResponseDetail(openItems = true, Seq.empty))
       )
     )
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc28Connector = app.injector.instanceOf[Acc28Connector]
   }

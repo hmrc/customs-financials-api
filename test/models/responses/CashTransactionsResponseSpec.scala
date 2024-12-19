@@ -37,9 +37,9 @@ class CashTransactionsResponseSpec extends SpecBase {
   "PaymentType" should {
 
     "generate correct output for Json Reads" in {
-      val incomingJsValuePayment: JsString = JsString("Payment")
+      val incomingJsValuePayment: JsString    = JsString("Payment")
       val incomingJsValueWithdrawal: JsString = JsString("Withdrawal")
-      val incomingJsValueTransfer: JsString = JsString("Transfer")
+      val incomingJsValueTransfer: JsString   = JsString("Transfer")
 
       Json.fromJson(incomingJsValuePayment) mustBe JsSuccess(Payment)
       Json.fromJson(incomingJsValueWithdrawal) mustBe JsSuccess(Withdrawal)
@@ -121,7 +121,8 @@ class CashTransactionsResponseSpec extends SpecBase {
         val actual: CashAccountTransactionSearchResponseContainer =
           Json.fromJson(Json.parse(etmpStatus422AndMDTP201TranSearchResponseContainerJsString)).get
 
-        val expected: CashAccountTransactionSearchResponseContainer = etmpStatus422AndMDTP201TranSearchResponseContainerOb
+        val expected: CashAccountTransactionSearchResponseContainer =
+          etmpStatus422AndMDTP201TranSearchResponseContainerOb
 
         actual.cashAccountTransactionSearchResponse.responseCommon.returnParameters.get mustBe
           expected.cashAccountTransactionSearchResponse.responseCommon.returnParameters.get
@@ -184,10 +185,10 @@ class CashTransactionsResponseSpec extends SpecBase {
         CAN,
         eoriDetails = Seq(EoriDataContainer(EoriData(EORI_NUMBER, EORI_DATA_NAME))),
         declarations = None,
-        paymentsWithdrawalsAndTransfers =
-          Some(
-            Seq(
-              PaymentsWithdrawalsAndTransferContainer(PaymentsWithdrawalsAndTransfer(
+        paymentsWithdrawalsAndTransfers = Some(
+          Seq(
+            PaymentsWithdrawalsAndTransferContainer(
+              PaymentsWithdrawalsAndTransfer(
                 DATE_STRING,
                 DATE_STRING,
                 PAYMENT_REFERENCE,
@@ -195,8 +196,10 @@ class CashTransactionsResponseSpec extends SpecBase {
                 Payment,
                 Some(BANK_ACCOUNT),
                 Some(SORT_CODE)
-              ))
-            ))
+              )
+            )
+          )
+        )
       )
 
     val declarationWrapper: DeclarationWrapper = DeclarationWrapper(
@@ -209,13 +212,16 @@ class CashTransactionsResponseSpec extends SpecBase {
         DATE_STRING,
         DATE_STRING,
         AMOUNT,
-        taxGroups =
-          Seq(
-            TaxGroupWrapper(
-              TaxGroup(
-                "Customs",
-                AMOUNT,
-                Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", AMOUNT)))))))
+        taxGroups = Seq(
+          TaxGroupWrapper(
+            TaxGroup(
+              "Customs",
+              AMOUNT,
+              Seq(TaxTypeWithSecurityContainer(TaxTypeWithSecurity(Some("CRQ"), "A00", AMOUNT)))
+            )
+          )
+        )
+      )
     )
 
     val cashAccountTransactionSearchResponseDetailWithDeclarationOb: CashAccountTransactionSearchResponseDetail =
@@ -256,13 +262,17 @@ class CashTransactionsResponseSpec extends SpecBase {
       status = "OK",
       statusText = None,
       processingDate = processingDate,
-      returnParameters = None)
+      returnParameters = None
+    )
 
     val cashAccountTransactionSearchResponseOb: CashAccountTransactionSearchResponse =
       CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccountTransactionSearchResponseDetailOb))
 
     val cashAccountTransactionSearchResponseWithDeclarationOb: CashAccountTransactionSearchResponse =
-      CashAccountTransactionSearchResponse(resCommonOb, Some(cashAccountTransactionSearchResponseDetailWithDeclarationOb))
+      CashAccountTransactionSearchResponse(
+        resCommonOb,
+        Some(cashAccountTransactionSearchResponseDetailWithDeclarationOb)
+      )
 
     val cashAccountTransactionSearchResponseJsString: String =
       """{
@@ -337,7 +347,8 @@ class CashTransactionsResponseSpec extends SpecBase {
       status = "OK",
       statusText = Some("001-Invalid Cash Account"),
       processingDate = "2024-01-17T09:30:47Z",
-      returnParameters = Some(Seq(ReturnParameter("POSITION", "FAIL")).toArray))
+      returnParameters = Some(Seq(ReturnParameter("POSITION", "FAIL")).toArray)
+    )
 
     val cashAccTransResponseObForETMP422AndMDTP201: CashAccountTransactionSearchResponse =
       CashAccountTransactionSearchResponse(resCommonForETMP422AndMDTP201Ob)

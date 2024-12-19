@@ -27,7 +27,8 @@ class SctyClaimDetailsSpec extends SpecBase {
     "case class model" should {
       "populated correctly" in new Setup {
         val result: SctyClaimDetails =
-          SctyClaimDetails(emptyString,
+          SctyClaimDetails(
+            emptyString,
             Option(emptyString),
             emptyString,
             emptyString,
@@ -45,7 +46,8 @@ class SctyClaimDetailsSpec extends SpecBase {
             Option(emptyString),
             Option(emptyString),
             Option(emptyString),
-            testReimbursement)
+            testReimbursement
+          )
 
         result mustBe compareResult
       }
@@ -90,29 +92,31 @@ class SctyClaimDetailsSpec extends SpecBase {
   }
 
   trait Setup {
-    val testRefund: Option[String] = Some("Resolved-Refund")
-    val testManual: Option[String] = Some("Resolved-Manual BTA")
-    val testClosedC18: Option[String] = Some("Closed-C18 Raised")
-    val testResolvedAuto: Option[String] = Some("Resolved-Auto BTA")
-    val testResolvedManual: Option[String] = Some("Resolved-Manual BTA/Refund")
+    val testRefund: Option[String]            = Some("Resolved-Refund")
+    val testManual: Option[String]            = Some("Resolved-Manual BTA")
+    val testClosedC18: Option[String]         = Some("Closed-C18 Raised")
+    val testResolvedAuto: Option[String]      = Some("Resolved-Auto BTA")
+    val testResolvedManual: Option[String]    = Some("Resolved-Manual BTA/Refund")
     val testResolvedWithdrawn: Option[String] = Some("Resolved-Withdrawn")
 
     val testInProgress = "In Progress"
-    val testPending = "Pending"
-    val testClosed = "Closed"
+    val testPending    = "Pending"
+    val testClosed     = "Closed"
 
     val testGoods: Option[Seq[Goods]] =
-      Option(Seq(
-        Goods(emptyString, Option(emptyString)),
-        Goods(emptyString, Option(emptyString))))
+      Option(Seq(Goods(emptyString, Option(emptyString)), Goods(emptyString, Option(emptyString))))
 
     val testReimbursement: Option[Seq[Reimbursement]] =
-      Option(Seq(
-        Reimbursement(emptyString, emptyString, emptyString, emptyString),
-        Reimbursement(emptyString, emptyString, emptyString, emptyString)))
+      Option(
+        Seq(
+          Reimbursement(emptyString, emptyString, emptyString, emptyString),
+          Reimbursement(emptyString, emptyString, emptyString, emptyString)
+        )
+      )
 
     val compareResult: SctyClaimDetails =
-      SctyClaimDetails(emptyString,
+      SctyClaimDetails(
+        emptyString,
         Option(emptyString),
         emptyString,
         emptyString,
@@ -130,6 +134,7 @@ class SctyClaimDetailsSpec extends SpecBase {
         Option(emptyString),
         Option(emptyString),
         Option(emptyString),
-        testReimbursement)
+        testReimbursement
+      )
   }
 }

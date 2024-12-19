@@ -32,10 +32,12 @@ object CashAccountStatementResponse {
     Json.format[CashAccountStatementResponse]
 }
 
-case class Acc45ResponseCommon(status: String,
-                               statusText: Option[String],
-                               processingDate: String,
-                               returnParameters: Option[Seq[ReturnParameter]])
+case class Acc45ResponseCommon(
+  status: String,
+  statusText: Option[String],
+  processingDate: String,
+  returnParameters: Option[Seq[ReturnParameter]]
+)
 
 object Acc45ResponseCommon {
   implicit val acc45ResponseCommonFormat: OFormat[Acc45ResponseCommon] = Json.format[Acc45ResponseCommon]

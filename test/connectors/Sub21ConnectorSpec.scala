@@ -48,24 +48,29 @@ class Sub21ConnectorSpec extends SpecBase {
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val responseCommon: EORIHistoryResponseCommon = EORIHistoryResponseCommon("OK", emptyString)
-    val eoriHistory: EORIHistory = EORIHistory(EORI("1212"), Some("1211"), Some("12121"))
-    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(Array(eoriHistory).toIndexedSeq)
+    implicit val hc: HeaderCarrier                           = HeaderCarrier()
+    val mockHttpClient: HttpClientV2                         = mock[HttpClientV2]
+    val requestBuilder: RequestBuilder                       = mock[RequestBuilder]
+    val responseCommon: EORIHistoryResponseCommon            = EORIHistoryResponseCommon("OK", emptyString)
+    val eoriHistory: EORIHistory                             = EORIHistory(EORI("1212"), Some("1211"), Some("12121"))
+    val eoriHistoryResponseDetail: EORIHistoryResponseDetail = EORIHistoryResponseDetail(
+      Array(eoriHistory).toIndexedSeq
+    )
 
     val response: HistoricEoriResponse =
       HistoricEoriResponse(GetEORIHistoryResponse(responseCommon, eoriHistoryResponseDetail))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Sub21Connector = app.injector.instanceOf[Sub21Connector]
   }

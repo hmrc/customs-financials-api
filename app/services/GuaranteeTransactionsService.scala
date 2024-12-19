@@ -24,14 +24,17 @@ import models.requests.GuaranteeAccountTransactionsRequest
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GuaranteeTransactionsService @Inject()(acc28Connector: Acc28Connector,
-                                             domainService: DomainService)(implicit executionContext: ExecutionContext) {
+class GuaranteeTransactionsService @Inject() (acc28Connector: Acc28Connector, domainService: DomainService)(implicit
+  executionContext: ExecutionContext
+) {
 
-  def retrieveGuaranteeTransactionsSummary(request: GuaranteeAccountTransactionsRequest): Future[Either[ErrorResponse, Seq[GuaranteeTransaction]]] = {
+  def retrieveGuaranteeTransactionsSummary(
+    request: GuaranteeAccountTransactionsRequest
+  ): Future[Either[ErrorResponse, Seq[GuaranteeTransaction]]] =
     acc28Connector.retrieveGuaranteeTransactions(request).map(_.map(_.map(domainService.toDomainSummary)))
-  }
 
-  def retrieveGuaranteeTransactionsDetail(request: GuaranteeAccountTransactionsRequest): Future[Either[ErrorResponse, Seq[GuaranteeTransaction]]] = {
+  def retrieveGuaranteeTransactionsDetail(
+    request: GuaranteeAccountTransactionsRequest
+  ): Future[Either[ErrorResponse, Seq[GuaranteeTransaction]]] =
     acc28Connector.retrieveGuaranteeTransactions(request).map(_.map(_.map(domainService.toDomainDetail)))
-  }
 }

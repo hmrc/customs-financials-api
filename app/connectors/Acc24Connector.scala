@@ -29,31 +29,34 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc24Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               metricsReporterService: MetricsReporterService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc24Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  metricsReporterService: MetricsReporterService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] = {
+  def sendHistoricDocumentRequest(historicDocumentRequest: HistoricDocumentRequest): Future[Boolean] =
     metricsReporterService.withResponseTimeLogging("hods.post.historical-statement-retrieval") {
 
       val acc24Url = url"${appConfig.acc24HistoricalStatementRetrievalEndpoint}"
 
-      httpClient.post(acc24Url)(HeaderCarrier())
+      httpClient
+        .post(acc24Url)(HeaderCarrier())
         .withBody[HistoricStatementRequest](HistoricStatementRequest.from(historicDocumentRequest))
         .setHeader(mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader): _*)
         .execute[HttpResponse]
         .map { response =>
-        log.info(s"HistoricDocumentResponse :  $response")
-        response.status match {
-          case Status.NO_CONTENT => true
-          case _ => false
+          log.info(s"HistoricDocumentResponse :  $response")
+          response.status match {
+            case Status.NO_CONTENT => true
+            case _                 => false
+          }
         }
-      }.recover {
-        case _ => false
-      }
+        .recover { case _ =>
+          false
+        }
     }
-  }
 }

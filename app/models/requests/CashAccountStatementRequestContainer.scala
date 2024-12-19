@@ -26,22 +26,26 @@ object CashAccountStatementRequestContainer {
     Json.format[CashAccountStatementRequestContainer]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
-case class CashAccountStatementRequest(requestCommon: CashAccountStatementRequestCommon,
-                                       requestDetail: CashAccountStatementRequestDetail)
+case class CashAccountStatementRequest(
+  requestCommon: CashAccountStatementRequestCommon,
+  requestDetail: CashAccountStatementRequestDetail
+)
 
 object CashAccountStatementRequest {
   implicit val cashAccountStatementRequestFormat: OFormat[CashAccountStatementRequest] =
     Json.format[CashAccountStatementRequest]
 }
 
-case class CashAccountStatementRequestCommon(originatingSystem: String,
-                                             receiptDate: String,
-                                             acknowledgementReference: String)
+case class CashAccountStatementRequestCommon(
+  originatingSystem: String,
+  receiptDate: String,
+  acknowledgementReference: String
+)
 
 object CashAccountStatementRequestCommon {
   implicit val requestCommonFormat: OFormat[CashAccountStatementRequestCommon] =

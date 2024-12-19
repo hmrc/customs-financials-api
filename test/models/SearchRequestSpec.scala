@@ -24,12 +24,14 @@ class SearchRequestSpec extends SpecBase {
 
   "object should be created" should {
     "for correct parameter values" in {
-      val srOb = SearchRequest("GB123456789012",
+      val srOb = SearchRequest(
+        "GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
         SearchResultStatus.inProcess,
         emptyString,
         emptyString,
-        0)
+        0
+      )
 
       srOb.failureRetryCount mustBe 0
     }
@@ -40,12 +42,14 @@ class SearchRequestSpec extends SpecBase {
       val failureRetryCount = 6
 
       intercept[RuntimeException] {
-        SearchRequest("GB123456789012",
+        SearchRequest(
+          "GB123456789012",
           "5b89895-f0da-4472-af5a-d84d340e7mn5",
           SearchResultStatus.inProcess,
           emptyString,
           emptyString,
-          failureRetryCount)
+          failureRetryCount
+        )
       }.getMessage.contains("invalid value for failureRetryCount, valid values are 0,1,2,3,4,5")
     }
   }
@@ -54,12 +58,14 @@ class SearchRequestSpec extends SpecBase {
     "result the correct output" in {
       import SearchRequest.searchRequestFormat
 
-      val srOb = SearchRequest("GB123456789012",
+      val srOb = SearchRequest(
+        "GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
         SearchResultStatus.inProcess,
         emptyString,
         emptyString,
-        0)
+        0
+      )
 
       val jsValue =
         """{"eoriNumber": "GB123456789012",
@@ -73,12 +79,14 @@ class SearchRequestSpec extends SpecBase {
 
   "Json Writes" should {
     "result in correct output" in {
-      val srOb = SearchRequest("GB123456789012",
+      val srOb = SearchRequest(
+        "GB123456789012",
         "5b89895-f0da-4472-af5a-d84d340e7mn5",
         SearchResultStatus.inProcess,
         emptyString,
         emptyString,
-        0)
+        0
+      )
 
       val jsValue =
         """{"eoriNumber": "GB123456789012",

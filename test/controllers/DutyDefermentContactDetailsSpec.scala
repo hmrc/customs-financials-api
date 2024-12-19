@@ -117,7 +117,8 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       "update account contact details fails with InternalServerException (5xx) " in new Setup {
         when(mockAccountContactDetailsService.updateAccountContactDetails(any, any, any))
           .thenReturn(
-            Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE)))
+            Future.failed(UpstreamErrorResponse("5xx", Status.SERVICE_UNAVAILABLE, Status.SERVICE_UNAVAILABLE))
+          )
 
         running(app) {
           val result = route(app, updateContactDetailsRequest).value
@@ -162,44 +163,53 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
 
     val updateContactDetailsRequest: FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, routes.DutyDefermentContactDetailsController.updateContactDetails().url)
-        .withJsonBody(Json.toJson(UpdateContactDetailsRequest(
-          traderDan,
-          traderEORI,
-          Some("CHANGED MYNAME"),
-          "New Road",
-          None,
-          Some("Edinburgh"),
-          None,
-          Some("AB12 3CD"),
-          Some(COUNTRY_CODE_GB),
-          None,
-          None,
-          Some(EmailAddress("email@email.com"))
-        )))
+        .withJsonBody(
+          Json.toJson(
+            UpdateContactDetailsRequest(
+              traderDan,
+              traderEORI,
+              Some("CHANGED MYNAME"),
+              "New Road",
+              None,
+              Some("Edinburgh"),
+              None,
+              Some("AB12 3CD"),
+              Some(COUNTRY_CODE_GB),
+              None,
+              None,
+              Some(EmailAddress("email@email.com"))
+            )
+          )
+        )
 
     val mockAccountContactDetailsService: AccountContactDetailsService = mock[AccountContactDetailsService]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[AccountContactDetailsService].toInstance(mockAccountContactDetailsService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[AccountContactDetailsService].toInstance(mockAccountContactDetailsService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 
   trait TestData {
-    val traderEORI: EORI = EORI("testEORI")
+    val traderEORI: EORI         = EORI("testEORI")
     val traderDan: AccountNumber = AccountNumber("1234567")
-    val testValue = "test_value"
+    val testValue                = "test_value"
 
-    val acc38ResponseCommon: acc38.ResponseCommon = domain.acc38.ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+    val acc38ResponseCommon: acc38.ResponseCommon          =
+      domain.acc38.ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val acc38ResponseCommonMdtpError: acc38.ResponseCommon =
       domain.acc38.ResponseCommon(
         "OK",
         None,
         "2020-10-05T09:30:47Z",
-        Some(List(ACC38ReturnParameter(RETURN_PARAM_POSITION, testValue))))
+        Some(List(ACC38ReturnParameter(RETURN_PARAM_POSITION, testValue)))
+      )
 
     val acc38ContactDetails: acc38.ContactDetails = domain.acc38.ContactDetails(
       Some("Bobby Shaftoe"),
@@ -218,9 +228,12 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       GetCorrespondenceAddressResponse(
         acc38ResponseCommon,
         Some(
-          domain.acc38.ResponseDetail(traderEORI,
+          domain.acc38.ResponseDetail(
+            traderEORI,
             domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan),
-            acc38ContactDetails))
+            acc38ContactDetails
+          )
+        )
       )
     )
 
@@ -228,9 +241,12 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       GetCorrespondenceAddressResponse(
         acc38ResponseCommonMdtpError,
         Some(
-          domain.acc38.ResponseDetail(traderEORI,
+          domain.acc38.ResponseDetail(
+            traderEORI,
             domain.acc38.AccountDetails(AccountType("DutyDeferment"), traderDan),
-            acc38ContactDetails))
+            acc38ContactDetails
+          )
+        )
       )
     )
 
@@ -247,12 +263,14 @@ class DutyDefermentContactDetailsSpec extends SpecBase {
       Some(EmailAddress(TEST_EMAIL))
     )
 
-    val acc37ResponseCommon: ResponseCommon = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
+    val acc37ResponseCommon: ResponseCommon          = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val acc37ResponseCommonMdtpError: ResponseCommon =
-      ResponseCommon("OK",
+      ResponseCommon(
+        "OK",
         None,
         "2020-10-05T09:30:47Z",
-        Some(List(ReturnParameter(RETURN_PARAM_POSITION, testValue)).toArray))
+        Some(List(ReturnParameter(RETURN_PARAM_POSITION, testValue)).toArray)
+      )
 
     val acc37SuccessResponse: Response = domain.acc37.Response(AmendCorrespondenceAddressResponse(acc37ResponseCommon))
 

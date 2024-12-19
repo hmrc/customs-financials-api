@@ -30,18 +30,21 @@ sealed trait EmailTemplate {
   val params: Map[String, String] = Map.empty
   val eori: String
 
-  def toEmailRequest: EmailRequest = EmailRequest(List(email), templateId, params, force = false, Some(eori), None, None)
+  def toEmailRequest: EmailRequest =
+    EmailRequest(List(email), templateId, params, force = false, Some(eori), None, None)
 }
 
 object EmailTemplate {
-  private val EXCISE_DUTY_DUE_DATE = 29
-  private val EXCISE_DUTY_DUE_DATE_FEB = 28
+  private val EXCISE_DUTY_DUE_DATE                 = 29
+  private val EXCISE_DUTY_DUE_DATE_FEB             = 28
   private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 16
-  private val emailDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+  private val emailDateFormatter                   = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
-  def fromNotification(emailAddress: EmailAddress,
-                       notification: Notification,
-                       companyName: String): Option[EmailTemplate] = {
+  def fromNotification(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String
+  ): Option[EmailTemplate] = {
     val isHistoricStat = notification.metadata.contains("statementRequestID")
 
     notification.fileRole.value match {
@@ -65,21 +68,24 @@ object EmailTemplate {
     }
   }
 
-  private def emailTemplateForDutyDefermentStatement(emailAddress: EmailAddress,
-                                                     notification: Notification,
-                                                     companyName: String,
-                                                     isHistoricStat: Boolean): Option[EmailTemplate] = {
+  private def emailTemplateForDutyDefermentStatement(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String,
+    isHistoricStat: Boolean
+  ): Option[EmailTemplate] =
     if (isHistoricStat) {
       emailTemplateForHistDDStatement(emailAddress, notification, companyName)
     } else {
       emailTemplateValueForDDStatement(emailAddress, notification, companyName)
     }
-  }
 
-  private def emailTemplateForC79Certificate(emailAddress: EmailAddress,
-                                             notification: Notification,
-                                             companyName: String,
-                                             isHistoricStat: Boolean): Option[EmailTemplate] = {
+  private def emailTemplateForC79Certificate(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String,
+    isHistoricStat: Boolean
+  ): Option[EmailTemplate] = {
     val params = Map("recipientName_line1" -> companyName)
 
     if (isHistoricStat) {
@@ -89,10 +95,12 @@ object EmailTemplate {
     }
   }
 
-  private def emailTemplateForSecurityStatement(emailAddress: EmailAddress,
-                                                notification: Notification,
-                                                companyName: String,
-                                                isHistoricStat: Boolean): Option[EmailTemplate] = {
+  private def emailTemplateForSecurityStatement(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String,
+    isHistoricStat: Boolean
+  ): Option[EmailTemplate] = {
     val params = Map("recipientName_line1" -> companyName)
 
     if (isHistoricStat) {
@@ -102,10 +110,12 @@ object EmailTemplate {
     }
   }
 
-  private def emailTemplateForPVATStatement(emailAddress: EmailAddress,
-                                            notification: Notification,
-                                            companyName: String,
-                                            isHistoricStat: Boolean): Option[EmailTemplate] = {
+  private def emailTemplateForPVATStatement(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String,
+    isHistoricStat: Boolean
+  ): Option[EmailTemplate] = {
     val params = Map("recipientName_line1" -> companyName)
 
     if (isHistoricStat) {
@@ -115,77 +125,76 @@ object EmailTemplate {
     }
   }
 
-  private def emailTemplateForStandingAuthority(emailAddress: EmailAddress,
-                                                notification: Notification,
-                                                companyName: String): Option[AuthoritiesStatementEmail] = {
-    Some(AuthoritiesStatementEmail(
-      emailAddress,
-      notification.eori.value,
-      Map("recipientName_line1" -> companyName))
-    )
-  }
+  private def emailTemplateForStandingAuthority(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String
+  ): Option[AuthoritiesStatementEmail] =
+    Some(AuthoritiesStatementEmail(emailAddress, notification.eori.value, Map("recipientName_line1" -> companyName)))
 
-  private def emailTemplateForCDSCashAccount(emailAddress: EmailAddress,
-                                             notification: Notification,
-                                             companyName: String): Option[CDSCashAccountEmail] = {
-    Some(CDSCashAccountEmail(
-      emailAddress,
-      notification.eori.value,
-      Map("recipientName_line1" -> companyName))
-    )
-  }
+  private def emailTemplateForCDSCashAccount(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String
+  ): Option[CDSCashAccountEmail] =
+    Some(CDSCashAccountEmail(emailAddress, notification.eori.value, Map("recipientName_line1" -> companyName)))
 
-  private def emailTemplateValueForDDStatement(emailAddress: EmailAddress,
-                                               notification: Notification,
-                                               companyName: String): Option[DutyDefermentStatementEmail] = {
-    createDutyDefermentEmailRequestParams(notification.metadata).map {
-      params =>
-        DutyDefermentStatementEmail(emailAddress, notification.eori.value,
-          params ++ Map("recipientName_line1" -> companyName))
+  private def emailTemplateValueForDDStatement(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String
+  ): Option[DutyDefermentStatementEmail] =
+    createDutyDefermentEmailRequestParams(notification.metadata).map { params =>
+      DutyDefermentStatementEmail(
+        emailAddress,
+        notification.eori.value,
+        params ++ Map("recipientName_line1" -> companyName)
+      )
     }
-  }
 
-  private def emailTemplateForHistDDStatement(emailAddress: EmailAddress,
-                                              notification: Notification,
-                                              companyName: String): Option[HistoricDutyDefermentStatementEmail] = {
-    Some(HistoricDutyDefermentStatementEmail(emailAddress,
-      notification.eori.value,
-      Map("recipientName_line1" -> companyName))
+  private def emailTemplateForHistDDStatement(
+    emailAddress: EmailAddress,
+    notification: Notification,
+    companyName: String
+  ): Option[HistoricDutyDefermentStatementEmail] =
+    Some(
+      HistoricDutyDefermentStatementEmail(
+        emailAddress,
+        notification.eori.value,
+        Map("recipientName_line1" -> companyName)
+      )
     )
-  }
 
   private def createDutyDefermentEmailRequestParams(metadata: Map[String, String]): Option[Map[String, String]] = {
     val statementType = metadata.getOrElse("DefermentStatementType", emptyString)
 
     for {
       periodEndMonth <- metadata.get("PeriodEndMonth")
-      periodEndYear <- metadata.get("PeriodEndYear")
-      dutyText = statementType match {
-        case "Excise" => "The total excise owed will be collected by direct debit on or before"
-        case _ => "The total Duty and VAT owed will be collected by direct debit on or after"
-      }
-    } yield {
-      List(
-        Some("date" -> createDutyDefermentDueDate(statementType, periodEndMonth.toInt, periodEndYear.toInt)),
-        metadata.get("DefermentStatementType").map(
-          defermentStatementType => "DefermentStatementType" -> defermentStatementType.toLowerCase
-        ),
-        metadata.get("PeriodIssueNumber").map(periodIssueNumber => "PeriodIssueNumber" -> periodIssueNumber),
-        Some("DutyText" -> dutyText)).flatten.toMap
-    }
+      periodEndYear  <- metadata.get("PeriodEndYear")
+      dutyText        = statementType match {
+                          case "Excise" => "The total excise owed will be collected by direct debit on or before"
+                          case _        => "The total Duty and VAT owed will be collected by direct debit on or after"
+                        }
+    } yield List(
+      Some("date"     -> createDutyDefermentDueDate(statementType, periodEndMonth.toInt, periodEndYear.toInt)),
+      metadata
+        .get("DefermentStatementType")
+        .map(defermentStatementType => "DefermentStatementType" -> defermentStatementType.toLowerCase),
+      metadata.get("PeriodIssueNumber").map(periodIssueNumber => "PeriodIssueNumber" -> periodIssueNumber),
+      Some("DutyText" -> dutyText)
+    ).flatten.toMap
   }
 
-  def createDutyDefermentDueDate(defermentStatementType: String,
-                                 periodEndMonth: Int,
-                                 periodEndYear: Int): String = {
+  def createDutyDefermentDueDate(defermentStatementType: String, periodEndMonth: Int, periodEndYear: Int): String = {
     val oneMonth = 1
 
     val dueDate = defermentStatementType match {
-      case "Excise" => Try {
-        LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE)
-      }.getOrElse {
-        LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE_FEB)
-      }
+      case "Excise" =>
+        Try {
+          LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE)
+        }.getOrElse {
+          LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE_FEB)
+        }
 
       case _ => LocalDate.of(periodEndYear, periodEndMonth, CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE).plusMonths(oneMonth)
     }
@@ -194,67 +203,63 @@ object EmailTemplate {
   }
 }
 
-case class HistoricDutyDefermentStatementEmail(email: EmailAddress,
-                                               eori: String,
-                                               override val params: Map[String, String]) extends EmailTemplate {
+case class HistoricDutyDefermentStatementEmail(
+  email: EmailAddress,
+  eori: String,
+  override val params: Map[String, String]
+) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_duty_deferment_statement"
 }
 
-case class HistoricC79CertificateEmail(email: EmailAddress,
-                                       eori: String,
-                                       override val params: Map[String, String]) extends EmailTemplate {
+case class HistoricC79CertificateEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_historic_c79_certificate"
 }
 
-case class HistoricPostponedVATStatementEmail(email: EmailAddress,
-                                              eori: String,
-                                              override val params: Map[String, String]) extends EmailTemplate {
+case class HistoricPostponedVATStatementEmail(
+  email: EmailAddress,
+  eori: String,
+  override val params: Map[String, String]
+) extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_postponed_vat_notification"
 }
 
-case class HistoricSecurityStatementEmail(email: EmailAddress,
-                                          eori: String,
-                                          override val params: Map[String, String]) extends EmailTemplate {
+case class HistoricSecurityStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_import_adjustment"
 }
 
-case class DutyDefermentStatementEmail(email: EmailAddress,
-                                       eori: String,
-                                       override val params: Map[String, String]) extends EmailTemplate {
+case class DutyDefermentStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_new_statement_notification"
 }
 
-case class C79CertificateEmail(email: EmailAddress,
-                               eori: String,
-                               override val params: Map[String, String]) extends EmailTemplate {
+case class C79CertificateEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_new_c79_certificate"
 }
 
-case class SecurityStatementEmail(email: EmailAddress,
-                                  eori: String,
-                                  override val params: Map[String, String]) extends EmailTemplate {
+case class SecurityStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_new_import_adjustment"
 }
 
-case class PostponedVatEmail(email: EmailAddress,
-                             eori: String,
-                             override val params: Map[String, String]) extends EmailTemplate {
+case class PostponedVatEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_new_postponed_vat_notification"
 }
 
 case class Unknown(email: EmailAddress, eori: String) extends EmailTemplate {
-  override val templateId: String = "customs_financials_new_statement_notification"
+  override val templateId: String          = "customs_financials_new_statement_notification"
   override val params: Map[String, String] = Map("Name" -> "test")
 }
 
-case class AuthoritiesStatementEmail(email: EmailAddress,
-                                     eori: String,
-                                     override val params: Map[String, String]) extends EmailTemplate {
+case class AuthoritiesStatementEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_for_standing_authorities"
 }
 
-case class CDSCashAccountEmail(email: EmailAddress,
-                               eori: String,
-                               override val params: Map[String, String]) extends EmailTemplate {
+case class CDSCashAccountEmail(email: EmailAddress, eori: String, override val params: Map[String, String])
+    extends EmailTemplate {
   override val templateId: String = "customs_financials_requested_cash_account_transactions"
 }

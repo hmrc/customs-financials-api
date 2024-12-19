@@ -72,15 +72,17 @@ class AuthoritiesCsvGenerationControllerSpec extends SpecBase {
 
     val response: AuthoritiesCsvGenerationResponse = AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z"))
 
-    val frontendRequest: InitiateAuthoritiesCsvGenerationRequest = InitiateAuthoritiesCsvGenerationRequest(
-      EORI("someEori"), Some(EORI("someAltEori")))
+    val frontendRequest: InitiateAuthoritiesCsvGenerationRequest =
+      InitiateAuthoritiesCsvGenerationRequest(EORI("someEori"), Some(EORI("someAltEori")))
 
     val request: FakeRequest[AnyContentAsJson] =
       FakeRequest("POST", routes.AuthoritiesCsvGenerationController.initiateAuthoritiesCsvGeneration().url)
         .withJsonBody(Json.toJson(frontendRequest))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[Acc41Connector].toInstance(mockConnector)
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[Acc41Connector].toInstance(mockConnector)
+      )
+      .build()
   }
 }

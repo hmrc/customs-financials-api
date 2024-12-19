@@ -26,29 +26,24 @@ object Request {
   implicit val format: OFormat[Request] = Json.format[Request]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
-case class GetCorrespondenceAddressRequest(requestCommon: RequestCommon,
-                                           requestDetail: RequestDetail)
+case class GetCorrespondenceAddressRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
 
 object GetCorrespondenceAddressRequest {
   implicit val format: OFormat[GetCorrespondenceAddressRequest] = Json.format[GetCorrespondenceAddressRequest]
 }
 
-case class RequestCommon(originatingSystem: String,
-                         receiptDate: String,
-                         acknowledgementReference: String)
+case class RequestCommon(originatingSystem: String, receiptDate: String, acknowledgementReference: String)
 
 object RequestCommon {
   implicit val format: OFormat[RequestCommon] = Json.format[RequestCommon]
 }
 
-case class RequestDetail(eori: EORI,
-                         accountDetails: AccountDetails,
-                         referenceDate: Option[String])
+case class RequestDetail(eori: EORI, accountDetails: AccountDetails, referenceDate: Option[String])
 
 object RequestDetail {
   implicit val format: OFormat[RequestDetail] = Json.format[RequestDetail]

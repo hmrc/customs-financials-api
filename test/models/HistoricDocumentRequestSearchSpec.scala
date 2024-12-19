@@ -54,15 +54,16 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
     "return the correct HistoricDocumentRequestSearchSpec object" in new Setup {
       val actualHistDocReqSearch: HistoricDocumentRequestSearch =
         HistoricDocumentRequestSearch.from(historicDocumentRequests, currentEori)
-      val expected: HistoricDocumentRequestSearch = histDocRequestSearch
+      val expected: HistoricDocumentRequestSearch               = histDocRequestSearch
 
       actualHistDocReqSearch.resultsFound mustBe expected.resultsFound
       actualHistDocReqSearch.params mustBe expected.params
       actualHistDocReqSearch.searchRequests.size mustBe expected.searchRequests.size
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB123456789012") mustBe true
       actualHistDocReqSearch.searchRequests.exists(req => req.eoriNumber == "GB234567890121") mustBe true
-      actualHistDocReqSearch.searchRequests.exists(
-        req => req.searchSuccessful == SearchResultStatus.inProcess) mustBe true
+      actualHistDocReqSearch.searchRequests.exists(req =>
+        req.searchSuccessful == SearchResultStatus.inProcess
+      ) mustBe true
 
       actualHistDocReqSearch.searchRequests.exists(req => req.failureRetryCount == 0) mustBe true
     }
@@ -70,32 +71,55 @@ class HistoricDocumentRequestSearchSpec extends SpecBase {
 
   trait Setup {
 
-    val searchID: UUID = UUID.randomUUID()
-    val userId: String = "test_userId"
+    val searchID: UUID                         = UUID.randomUUID()
+    val userId: String                         = "test_userId"
     val resultsFound: SearchResultStatus.Value = SearchResultStatus.inProcess
-    val searchStatusUpdateDate: String = emptyString
-    val currentEori: String = "GB123456789012"
-    val params: Params = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
+    val searchStatusUpdateDate: String         = emptyString
+    val currentEori: String                    = "GB123456789012"
+    val params: Params                         = Params("02", "2021", "04", "2021", "DutyDefermentStatement", "1234567")
 
     val searchRequests: Set[SearchRequest] = Set(
-      SearchRequest("GB123456789012", "5b89895-f0da-4472-af5a-d84d340e7mn5",
-        SearchResultStatus.inProcess, emptyString, emptyString, 0),
-      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6",
-        SearchResultStatus.inProcess, emptyString, emptyString, 0))
+      SearchRequest(
+        "GB123456789012",
+        "5b89895-f0da-4472-af5a-d84d340e7mn5",
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      ),
+      SearchRequest(
+        "GB234567890121",
+        "5c79895-f0da-4472-af5a-d84d340e7mn6",
+        SearchResultStatus.inProcess,
+        emptyString,
+        emptyString,
+        0
+      )
+    )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
-      HistoricDocumentRequestSearch(searchID,
-        resultsFound,
-        searchStatusUpdateDate,
-        currentEori,
-        params,
-        searchRequests)
+      HistoricDocumentRequestSearch(searchID, resultsFound, searchStatusUpdateDate, currentEori, params, searchRequests)
 
     val historicDocumentRequests: Set[HistoricDocumentRequest] = Set(
-      HistoricDocumentRequest(EORI("GB123456789012"), FileRole("DutyDefermentStatement"),
-        YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, Some("1234567")),
-      HistoricDocumentRequest(EORI("GB234567890121"), FileRole("DutyDefermentStatement"),
-        YEAR_2021, MONTH_2, YEAR_2021, MONTH_4, Some("1234567")))
+      HistoricDocumentRequest(
+        EORI("GB123456789012"),
+        FileRole("DutyDefermentStatement"),
+        YEAR_2021,
+        MONTH_2,
+        YEAR_2021,
+        MONTH_4,
+        Some("1234567")
+      ),
+      HistoricDocumentRequest(
+        EORI("GB234567890121"),
+        FileRole("DutyDefermentStatement"),
+        YEAR_2021,
+        MONTH_2,
+        YEAR_2021,
+        MONTH_4,
+        Some("1234567")
+      )
+    )
 
     val jsValue: String =
       s"""{"searchID": "$searchID",

@@ -22,12 +22,16 @@ import play.api.libs.ws.BodyWritable
 
 case class CashTransactionsRequest(getCashAccountTransactionListingRequest: GetCashAccountTransactionListingRequest)
 
-case class GetCashAccountTransactionListingRequest(requestCommon: CashTransactionsRequestCommon,
-                                                   requestDetail: CashTransactionsRequestDetail)
+case class GetCashAccountTransactionListingRequest(
+  requestCommon: CashTransactionsRequestCommon,
+  requestDetail: CashTransactionsRequestDetail
+)
 
-case class CashTransactionsRequestCommon(originatingSystem: String,
-                                         receiptDate: String,
-                                         acknowledgementReference: String)
+case class CashTransactionsRequestCommon(
+  originatingSystem: String,
+  receiptDate: String,
+  acknowledgementReference: String
+)
 
 case class CashTransactionsRequestDetail(CAN: String, dates: CashTransactionsRequestDates)
 
@@ -47,9 +51,9 @@ object CashTransactionsRequest {
   implicit val cashTransactionsRequestWrites: OWrites[CashTransactionsRequest] = Json.writes[CashTransactionsRequest]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 object SearchType extends Enumeration {
@@ -57,8 +61,8 @@ object SearchType extends Enumeration {
 
   val P, D = Value
 
-  implicit val searchTypeReads: Reads[SearchType.Value] = JsPath.read[String].map(strVal => SearchType.withName(strVal))
-  implicit val searchTypeWrites: Writes[SearchType.Value] = Writes { value => JsString(value.toString) }
+  implicit val searchTypeReads: Reads[SearchType.Value]   = JsPath.read[String].map(strVal => SearchType.withName(strVal))
+  implicit val searchTypeWrites: Writes[SearchType.Value] = Writes(value => JsString(value.toString))
 
   implicit val searchTypeFormat: Format[requests.SearchType.Value] = Format(searchTypeReads, searchTypeWrites)
 }
@@ -68,8 +72,8 @@ object ParamName extends Enumeration {
 
   val MRN, UCR = Value
 
-  implicit val paramNameReads: Reads[ParamName.Value] = JsPath.read[String].map(strVal => ParamName.withName(strVal))
-  implicit val paramNameWrites: Writes[ParamName.Value] = Writes { value => JsString(value.toString) }
+  implicit val paramNameReads: Reads[ParamName.Value]   = JsPath.read[String].map(strVal => ParamName.withName(strVal))
+  implicit val paramNameWrites: Writes[ParamName.Value] = Writes(value => JsString(value.toString))
 
   implicit val paramNameFormat: Format[requests.ParamName.Value] = Format(paramNameReads, paramNameWrites)
 }
@@ -80,19 +84,19 @@ object DeclarationDetails {
   implicit val format: OFormat[DeclarationDetails] = Json.format[DeclarationDetails]
 }
 
-case class CashAccountPaymentDetails(amount: Double,
-                                     dateFrom: Option[String] = None,
-                                     dateTo: Option[String] = None)
+case class CashAccountPaymentDetails(amount: Double, dateFrom: Option[String] = None, dateTo: Option[String] = None)
 
 object CashAccountPaymentDetails {
   implicit val format: OFormat[CashAccountPaymentDetails] = Json.format[CashAccountPaymentDetails]
 }
 
-case class CashAccountTransactionSearchRequestDetails(can: String,
-                                                      ownerEORI: String,
-                                                      searchType: SearchType.Value,
-                                                      declarationDetails: Option[DeclarationDetails] = None,
-                                                      cashAccountPaymentDetails: Option[CashAccountPaymentDetails] = None)
+case class CashAccountTransactionSearchRequestDetails(
+  can: String,
+  ownerEORI: String,
+  searchType: SearchType.Value,
+  declarationDetails: Option[DeclarationDetails] = None,
+  cashAccountPaymentDetails: Option[CashAccountPaymentDetails] = None
+)
 
 object CashAccountTransactionSearchRequestDetails {
 
@@ -100,25 +104,29 @@ object CashAccountTransactionSearchRequestDetails {
     Json.format[CashAccountTransactionSearchRequestDetails]
 }
 
-case class CashAccountTransactionSearchRequest(requestCommon: CashTransactionsRequestCommon,
-                                               requestDetail: CashAccountTransactionSearchRequestDetails)
+case class CashAccountTransactionSearchRequest(
+  requestCommon: CashTransactionsRequestCommon,
+  requestDetail: CashAccountTransactionSearchRequestDetails
+)
 
 object CashAccountTransactionSearchRequest {
-  implicit val requestCommonWrites: OFormat[CashTransactionsRequestCommon] = Json.format[CashTransactionsRequestCommon]
+  implicit val requestCommonWrites: OFormat[CashTransactionsRequestCommon]              = Json.format[CashTransactionsRequestCommon]
   implicit val requestDetailFormat: OFormat[CashAccountTransactionSearchRequestDetails] =
     Json.format[CashAccountTransactionSearchRequestDetails]
 
   implicit val format: OFormat[CashAccountTransactionSearchRequest] = Json.format[CashAccountTransactionSearchRequest]
 }
 
-case class CashAccountTransactionSearchRequestContainer(cashAccountTransactionSearchRequest: CashAccountTransactionSearchRequest)
+case class CashAccountTransactionSearchRequestContainer(
+  cashAccountTransactionSearchRequest: CashAccountTransactionSearchRequest
+)
 
 object CashAccountTransactionSearchRequestContainer {
   implicit val format: OFormat[CashAccountTransactionSearchRequestContainer] =
     Json.format[CashAccountTransactionSearchRequestContainer]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }

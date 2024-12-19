@@ -25,8 +25,7 @@ class NotificationSpec extends SpecBase {
 
   import SDESInputFormats.*
 
-  val sdesMessage: JsValue = Json.parse(
-    """
+  val sdesMessage: JsValue = Json.parse("""
       |[
       |    {
       |       "eori":"testEORI",
@@ -70,29 +69,32 @@ class NotificationSpec extends SpecBase {
           "vat-2018-05.pdf",
           FILE_SIZE_75251L,
           Some(CURRENT_LOCAL_DATE),
-          Map("PeriodStartYear" -> "2018", "PeriodStartMonth" -> "5", "FileType" -> "PDF")),
+          Map("PeriodStartYear" -> "2018", "PeriodStartMonth" -> "5", "FileType" -> "PDF")
+        ),
         Notification(
           EORI(EORI_VALUE_1),
           FILE_ROLE_SECURITY_STATEMENT,
           "statement-2018-09-19.pdf",
           FILE_SIZE_2417804L,
           Some(CURRENT_LOCAL_DATE),
-          Map("PeriodStartYear" -> "2018",
-            "PeriodStartDay" -> "13",
-            "PeriodEndDay" -> "19",
-            "FileType" -> "PDF",
-            "PeriodEndYear" -> "2018",
-            "issueDate" -> "19/09/2018",
+          Map(
+            "PeriodStartYear"  -> "2018",
+            "PeriodStartDay"   -> "13",
+            "PeriodEndDay"     -> "19",
+            "FileType"         -> "PDF",
+            "PeriodEndYear"    -> "2018",
+            "issueDate"        -> "19/09/2018",
             "PeriodStartMonth" -> "9",
-            "PeriodEndMonth" -> "9"))
+            "PeriodEndMonth"   -> "9"
+          )
+        )
       )
 
       parsedNotifications.get mustBe expectedNotifications
     }
 
     "extract the EORI from a compound EORI-DAN style identifier" in {
-      val sdesDutyDefermentMessage = Json.parse(
-        """
+      val sdesDutyDefermentMessage = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -104,15 +106,18 @@ class NotificationSpec extends SpecBase {
           |    }
           |]
             """.stripMargin)
-      val parsedNotifications = Json.fromJson[Seq[Notification]](sdesDutyDefermentMessage)
+      val parsedNotifications      = Json.fromJson[Seq[Notification]](sdesDutyDefermentMessage)
 
       parsedNotifications.get mustBe List(
-        Notification(EORI(EORI_VALUE),
+        Notification(
+          EORI(EORI_VALUE),
           FileRole("DutyDeferment"),
           "filename",
           FILE_SIZE_75251L,
           Some(CURRENT_LOCAL_DATE),
-          Map.empty))
+          Map.empty
+        )
+      )
     }
   }
 
@@ -120,13 +125,13 @@ class NotificationSpec extends SpecBase {
 
     "return the correct value" in {
 
-      val fileRole = FileRole("DutyDeferment")
-      val fileName = "filename"
-      val key = "DAN"
-      val key1 = "test_key"
-      val keyValue = "test_value"
-      val metaData = Map(key -> keyValue)
-      val metaData1 = Map(key1 -> keyValue)
+      val fileRole         = FileRole("DutyDeferment")
+      val fileName         = "filename"
+      val key              = "DAN"
+      val key1             = "test_key"
+      val keyValue         = "test_value"
+      val metaData         = Map(key -> keyValue)
+      val metaData1        = Map(key1 -> keyValue)
       val expectedMetaData = Map(key -> "xxxxxx")
 
       Notification(
@@ -135,7 +140,8 @@ class NotificationSpec extends SpecBase {
         fileName,
         FILE_SIZE_75251L,
         Some(CURRENT_LOCAL_DATE),
-        metaData).toString mustBe
+        metaData
+      ).toString mustBe
         s"Notification(xxxxxxxx, $fileRole, $fileName, $FILE_SIZE_75251L, ${Some(CURRENT_LOCAL_DATE)}, $expectedMetaData"
 
       Notification(
@@ -144,7 +150,8 @@ class NotificationSpec extends SpecBase {
         fileName,
         FILE_SIZE_75251L,
         Some(CURRENT_LOCAL_DATE),
-        metaData1).toString mustBe
+        metaData1
+      ).toString mustBe
         s"Notification(xxxxxxxx, $fileRole, $fileName, $FILE_SIZE_75251L, ${Some(CURRENT_LOCAL_DATE)}, $metaData1"
     }
   }

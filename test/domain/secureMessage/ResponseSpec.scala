@@ -78,20 +78,20 @@ class ResponseSpec extends SpecBase {
   }
 
   trait Setup {
-    val externalRefJsValue: String = """{"id": "abcd12345","source": "mdtp"}""".stripMargin
+    val externalRefJsValue: String           = """{"id": "abcd12345","source": "mdtp"}""".stripMargin
     val externalRefObject: ExternalReference = ExternalReference(id = "abcd12345", source = SOURCE_MDTP)
 
-    val taxIdentifierJsValue: String = """{"name": "name","value": "value"}""".stripMargin
+    val taxIdentifierJsValue: String       = """{"name": "name","value": "value"}""".stripMargin
     val taxIdentifierObject: TaxIdentifier = TaxIdentifier(name = "name", value = "value")
 
-    val recipientJsValue: String =
+    val recipientJsValue: String   =
       """{"regime": "regime", "taxIdentifier":{"name": "name","value": "value"},
         | "name": {"line1": "Company Name"}, "email": "email"}""".stripMargin
-    val recipientObject: Recipient = Recipient(regime = "regime",
-      taxIdentifier = taxIdentifierObject, name = Name("Company Name"), email = "email")
+    val recipientObject: Recipient =
+      Recipient(regime = "regime", taxIdentifier = taxIdentifierObject, name = Name("Company Name"), email = "email")
 
     val tagsJsValue: String = """{"notificationType": "cds fin"}""".stripMargin
-    val tagsObject: Tags = Tags(notificationType = "cds fin")
+    val tagsObject: Tags    = Tags(notificationType = "cds fin")
 
     val contentJsValue: String = """{"lang":"en", "subject":"AccountType", "body": "body"}""".stripMargin
     val contentObject: Content = Content(lang = "en", subject = "AccountType", body = "body")

@@ -23,16 +23,14 @@ import models.{AccountNumber, EORI}
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class AccountContactDetailsService @Inject()(acc38Connector: Acc38Connector,
-                                             acc37Connector: Acc37Connector) {
-  def getAccountContactDetails(dan: AccountNumber,
-                               eori: EORI): Future[domain.acc38.Response] = {
+class AccountContactDetailsService @Inject() (acc38Connector: Acc38Connector, acc37Connector: Acc37Connector) {
+  def getAccountContactDetails(dan: AccountNumber, eori: EORI): Future[domain.acc38.Response] =
     acc38Connector.getAccountContactDetails(dan, eori)
-  }
 
-  def updateAccountContactDetails(dan: AccountNumber,
-                                  eori: EORI,
-                                  contactDetails: ContactDetails): Future[domain.acc37.Response] = {
+  def updateAccountContactDetails(
+    dan: AccountNumber,
+    eori: EORI,
+    contactDetails: ContactDetails
+  ): Future[domain.acc37.Response] =
     acc37Connector.updateAccountContactDetails(dan, eori, contactDetails)
-  }
 }

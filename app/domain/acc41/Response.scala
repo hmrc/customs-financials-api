@@ -24,9 +24,7 @@ object StandingAuthoritiesForEORIResponse {
   implicit val format: OFormat[StandingAuthoritiesForEORIResponse] = Json.format[StandingAuthoritiesForEORIResponse]
 }
 
-case class Response(requestCommon: RequestCommon,
-                    requestDetail: RequestDetail,
-                    responseDetail: ResponseDetail)
+case class Response(requestCommon: RequestCommon, requestDetail: RequestDetail, responseDetail: ResponseDetail)
 
 object Response {
   implicit val format: OFormat[Response] = Json.format[Response]

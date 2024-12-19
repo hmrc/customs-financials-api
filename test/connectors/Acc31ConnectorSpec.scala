@@ -17,9 +17,7 @@
 package connectors
 
 import models.responses.{
-  CashTransactionsResponse,
-  CashTransactionsResponseCommon,
-  CashTransactionsResponseDetail,
+  CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
   GetCashAccountTransactionListingResponse
 }
 import models.{ExceededThresholdErrorException, NoAssociatedDataException}
@@ -67,17 +65,17 @@ class Acc31ConnectorSpec extends SpecBase {
 
     "return NoAssociatedData error response when responded with no associated data " +
       "and maxTransactionsExceeded field is set to true" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse02))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse02))
 
-      running(app) {
-        connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map {
-          result => result mustBe Left(NoAssociatedDataException)
+        running(app) {
+          connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map { result =>
+            result mustBe Left(NoAssociatedDataException)
+          }
         }
       }
-    }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
       when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
@@ -93,25 +91,25 @@ class Acc31ConnectorSpec extends SpecBase {
 
     "return ExceededThreshold error response when responded with exceeded threshold " +
       "and maxTransactionsExceeded field is set to false" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse02))
+        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
+        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
+        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
+        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse02))
 
-      running(app) {
-        connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map {
-          result => result mustBe Left(ExceededThresholdErrorException)
+        running(app) {
+          connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map { result =>
+            result mustBe Left(ExceededThresholdErrorException)
+          }
         }
       }
-    }
   }
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val noAssociatedDataMessage = "025-No associated data found"
-    val exceedsThresholdMessage = "091-The query has exceeded the threshold, please refine the search"
+    val noAssociatedDataMessage        = "025-No associated data found"
+    val exceedsThresholdMessage        = "091-The query has exceeded the threshold, please refine the search"
 
     val response: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
@@ -148,14 +146,17 @@ class Acc31ConnectorSpec extends SpecBase {
       )
     )
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      bind[HttpClientV2].toInstance(mockHttpClient),
-      bind[RequestBuilder].toInstance(requestBuilder)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        bind[HttpClientV2].toInstance(mockHttpClient),
+        bind[RequestBuilder].toInstance(requestBuilder)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
     val connector: Acc31Connector = app.injector.instanceOf[Acc31Connector]
   }

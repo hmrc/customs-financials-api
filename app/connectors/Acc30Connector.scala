@@ -30,45 +30,49 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc30Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               metricsReporterService: MetricsReporterService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc30Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  metricsReporterService: MetricsReporterService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
-  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI): Future[Boolean] = {
+  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI): Future[Boolean] =
     makeRequest(
       ManageStandingAuthoritiesRequestDetail.grantAuthority(grantAuthorityRequest, eori)
     )
-  }
 
-  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI): Future[Boolean] = {
+  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI): Future[Boolean] =
     makeRequest(
       ManageStandingAuthoritiesRequestDetail.revokeAuthority(revokeAuthorityRequest, eori)
     )
-  }
 
   private def makeRequest(detail: ManageStandingAuthoritiesRequestDetail): Future[Boolean] = {
     val requestCommon = AuthoritiesRequestCommon(
       REGIME_CDS,
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      MDTP)
+      MDTP
+    )
 
     val manageStandingAuthoritiesRequestContainer = ManageStandingAuthoritiesRequestContainer(
-      ManageStandingAuthoritiesRequest(requestCommon, detail))
+      ManageStandingAuthoritiesRequest(requestCommon, detail)
+    )
 
     metricsReporterService.withResponseTimeLogging("hods.post.manage-standing-authority.grant") {
-      httpClient.post(url"${appConfig.acc30ManageAccountAuthoritiesEndpoint}")(HeaderCarrier())
+      httpClient
+        .post(url"${appConfig.acc30ManageAccountAuthoritiesEndpoint}")(HeaderCarrier())
         .withBody[ManageStandingAuthoritiesRequestContainer](manageStandingAuthoritiesRequestContainer)
         .setHeader(mdgHeaders.headers(appConfig.acc30BearerToken, appConfig.acc30HostHeader): _*)
         .execute[HttpResponse]
         .map {
-        _.status match {
-          case Status.NO_CONTENT => true
-          case _ => false
+          _.status match {
+            case Status.NO_CONTENT => true
+            case _                 => false
+          }
         }
-      }.recover { case _: Throwable => false }
+        .recover { case _: Throwable => false }
     }
   }
 }

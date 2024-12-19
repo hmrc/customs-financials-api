@@ -16,14 +16,16 @@
 
 package models
 
-case class HistoricalStatementRetrievalInterfaceMetadata(statementRequestID: String,
-                                                          eori: EORI,
-                                                          statementType: FileRole,
-                                                          periodStartYear: String,
-                                                          periodStartMonth: String,
-                                                          periodEndYear: String,
-                                                          periodEndMonth: String,
-                                                          DAN: Option[String]) {
+case class HistoricalStatementRetrievalInterfaceMetadata(
+  statementRequestID: String,
+  eori: EORI,
+  statementType: FileRole,
+  periodStartYear: String,
+  periodStartMonth: String,
+  periodEndYear: String,
+  periodEndMonth: String,
+  DAN: Option[String]
+) {
   override def toString: String =
     s"HistoricalStatementRetrievalInterfaceMetadata(statementRequestID: $statementRequestID," +
       s" eori: xxx, statementType: $statementType, periodStartYear: $periodStartYear," +

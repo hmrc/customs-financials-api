@@ -25,18 +25,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AuthoritiesCsvGenerationController @Inject()(acc41Connector: Acc41Connector,
-                                                   cc: ControllerComponents)
-                                                  (implicit ec: ExecutionContext) extends BackendController(cc) {
+class AuthoritiesCsvGenerationController @Inject() (acc41Connector: Acc41Connector, cc: ControllerComponents)(implicit
+  ec: ExecutionContext
+) extends BackendController(cc) {
 
-  def initiateAuthoritiesCsvGeneration: Action[InitiateAuthoritiesCsvGenerationRequest] = Action.async(
-    parse.json[InitiateAuthoritiesCsvGenerationRequest]) {
-
-    implicit request =>
+  def initiateAuthoritiesCsvGeneration: Action[InitiateAuthoritiesCsvGenerationRequest] =
+    Action.async(parse.json[InitiateAuthoritiesCsvGenerationRequest]) { implicit request =>
       acc41Connector.initiateAuthoritiesCSV(request.body.requestingEori, request.body.alternateEORI).map {
         case Left(Acc41ErrorResponse) => InternalServerError
-        case Right(value) => Ok(Json.toJson(value))
-        case _ => InternalServerError
+        case Right(value)             => Ok(Json.toJson(value))
+        case _                        => InternalServerError
       }
-  }
+    }
 }

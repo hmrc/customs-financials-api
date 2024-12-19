@@ -37,17 +37,21 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
     "delegate to the service and return a list of open guarantee transactions with a 200 status code" in new Setup {
       val guaranteeTransaction: Seq[GuaranteeTransaction] =
-        Seq(GuaranteeTransaction("someDate",
-          "mrn",
-          Some("100.00"),
-          Some("UCR"),
-          EORI("Declarant EORI"),
-          EORI("Consignee EORI"),
-          "200.00",
-          Some("300.00"),
-          None,
-          None,
-          Nil))
+        Seq(
+          GuaranteeTransaction(
+            "someDate",
+            "mrn",
+            Some("100.00"),
+            Some("UCR"),
+            EORI("Declarant EORI"),
+            EORI("Consignee EORI"),
+            "200.00",
+            Some("300.00"),
+            None,
+            None,
+            Nil
+          )
+        )
 
       when(mockService.retrieveGuaranteeTransactionsSummary(any))
         .thenReturn(Future.successful(Right(guaranteeTransaction)))
@@ -62,9 +66,10 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
   }
 
   "return an error when no gan found in request" in new Setup {
-    val request: FakeRequest[AnyContentAsJson] = FakeRequest("POST",
-      controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
-
+    val request: FakeRequest[AnyContentAsJson] = FakeRequest(
+      "POST",
+      controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url
+    )
       .withJsonBody(Json.parse("""{"invalid":"invalid"}"""))
 
     running(app) {
@@ -72,7 +77,7 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+        " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
@@ -104,10 +109,12 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
     import domain.*
 
-    val amountTaxType: Amounts = Amounts(openAmount = Some("600.00"),
+    val amountTaxType: Amounts = Amounts(
+      openAmount = Some("600.00"),
       totalAmount = "800.00",
       clearedAmount = Some("200.00"),
-      updateDate = "2020-08-01")
+      updateDate = "2020-08-01"
+    )
 
     val taxType: TaxType = TaxType(taxType = "taxType1", amounts = amountTaxType)
 
@@ -115,28 +122,33 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       openAmount = Some("400.00"),
       totalAmount = "700.00",
       clearedAmount = Some("300.00"),
-      updateDate = "2020-08-02")
+      updateDate = "2020-08-02"
+    )
 
     val taxTypeGroup: TaxTypeGroup = TaxTypeGroup(taxTypeGroup = "B", amountTaxTypeGroup, taxType = taxType)
 
-    val amountsDueDates: Amounts = Amounts(openAmount = Some("450.00"),
+    val amountsDueDates: Amounts = Amounts(
+      openAmount = Some("450.00"),
       totalAmount = "600.00",
       clearedAmount = Some("150.00"),
-      updateDate = "2020-08-03")
+      updateDate = "2020-08-03"
+    )
 
-    val guaranteeTransactionDetail: Seq[GuaranteeTransaction] = Seq(GuaranteeTransaction(
-      date = "someDate2",
-      movementReferenceNumber = "mrn",
-      balance = Some("balance 1"),
-      uniqueConsignmentReference = Some("UCR"),
-      declarantEori = EORI("Declarant EORI"),
-      consigneeEori = EORI("Consignee EORI"),
-      originalCharge = "charge 1",
-      dischargedAmount = Some("5.12"),
-      interestCharge = Some("interest rate 1"),
-      c18Reference = Some("C18-Ref1"),
-      dueDates = Seq(DueDate("dueDate", Some("reason1"), amountsDueDates, Seq(taxTypeGroup)))
-    ))
+    val guaranteeTransactionDetail: Seq[GuaranteeTransaction] = Seq(
+      GuaranteeTransaction(
+        date = "someDate2",
+        movementReferenceNumber = "mrn",
+        balance = Some("balance 1"),
+        uniqueConsignmentReference = Some("UCR"),
+        declarantEori = EORI("Declarant EORI"),
+        consigneeEori = EORI("Consignee EORI"),
+        originalCharge = "charge 1",
+        dischargedAmount = Some("5.12"),
+        interestCharge = Some("interest rate 1"),
+        c18Reference = Some("C18-Ref1"),
+        dueDates = Seq(DueDate("dueDate", Some("reason1"), amountsDueDates, Seq(taxTypeGroup)))
+      )
+    )
 
     when(mockService.retrieveGuaranteeTransactionsDetail(any))
       .thenReturn(Future.successful(Right(guaranteeTransactionDetail)))
@@ -170,7 +182,10 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
   "return an error from retrieveOpenGuaranteeTransactionsDetail when no gan found in request" in new Setup {
     val request: FakeRequest[AnyContentAsJson] =
-      FakeRequest(POST, controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
+      FakeRequest(
+        POST,
+        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url
+      )
         .withJsonBody(Json.parse("""{"invalid":"invalid"}"""))
 
     running(app) {
@@ -179,30 +194,37 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
         "Invalid GuaranteeAccountTransactionsRequest payload:" +
-          " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+        " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
     }
   }
 
   trait Setup {
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
+    val mockAuthConnector: CustomAuthConnector    = mock[CustomAuthConnector]
     val mockService: GuaranteeTransactionsService = mock[GuaranteeTransactionsService]
 
     val detailRequest: FakeRequest[AnyContentAsJson] =
-      FakeRequest("POST",
-        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url)
+      FakeRequest(
+        "POST",
+        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsDetail().url
+      )
         .withJsonBody(Json.parse("""{"gan":"gan1"}"""))
 
     val summaryRequest: FakeRequest[AnyContentAsJson] =
-      FakeRequest("POST",
-        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url)
+      FakeRequest(
+        "POST",
+        controllers.routes.GuaranteeTransactionsController.retrieveOpenGuaranteeTransactionsSummary().url
+      )
         .withJsonBody(Json.parse("""{"gan":"gan1"}"""))
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[GuaranteeTransactionsService].toInstance(mockService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[GuaranteeTransactionsService].toInstance(mockService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
   }
 }

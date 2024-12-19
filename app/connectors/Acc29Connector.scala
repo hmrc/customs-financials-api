@@ -20,7 +20,9 @@ import config.AppConfig
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.AccountWithAuthorities
 import models.EORI
-import models.requests.manageAuthorities.{AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest}
+import models.requests.manageAuthorities.{
+  AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest
+}
 import models.responses.StandingAuthoritiesResponse
 import play.api.libs.ws.writeableOf_JsValue
 import services.{DateTimeService, MetricsReporterService}
@@ -31,24 +33,28 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc29Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               metricsReporterService: MetricsReporterService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc29Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  metricsReporterService: MetricsReporterService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
   def getStandingAuthorities(eori: EORI): Future[Seq[AccountWithAuthorities]] = {
     val commonRequest = AuthoritiesRequestCommon(
       REGIME_CDS,
       receiptDate = dateTimeService.currentDateTimeAsIso8601,
       acknowledgementReference = mdgHeaders.acknowledgementReference,
-      MDTP)
+      MDTP
+    )
 
     val standingAuthoritiesRequest =
       StandingAuthoritiesRequest(commonRequest, AuthoritiesRequestDetail(ownerEori = eori))
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-standing-authority-details") {
-      httpClient.post(url"${appConfig.acc29GetStandingAuthoritiesEndpoint}")(HeaderCarrier())
+      httpClient
+        .post(url"${appConfig.acc29GetStandingAuthoritiesEndpoint}")(HeaderCarrier())
         .withBody[StandingAuthoritiesRequest](standingAuthoritiesRequest)
         .setHeader(mdgHeaders.headers(appConfig.acc29BearerToken, appConfig.acc29HostHeader): _*)
         .execute[StandingAuthoritiesResponse]

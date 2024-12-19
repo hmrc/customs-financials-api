@@ -20,10 +20,7 @@ import config.AppConfig
 import config.MetaConfig.Platform.REGIME_CDS
 import models.requests.*
 import models.responses.{
-  GetGGATransactionResponse,
-  GuaranteeTransactionDeclaration,
-  GuaranteeTransactionsResponse,
-  ResponseCommon
+  GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon
 }
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.ws.writeableOf_JsValue
@@ -36,50 +33,57 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Acc28Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               dateTimeService: DateTimeService,
-                               metricsReporterService: MetricsReporterService,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Acc28Connector @Inject() (
+  httpClient: HttpClientV2,
+  appConfig: AppConfig,
+  dateTimeService: DateTimeService,
+  metricsReporterService: MetricsReporterService,
+  mdgHeaders: MdgHeaders
+)(implicit executionContext: ExecutionContext) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def retrieveGuaranteeTransactions(request: GuaranteeAccountTransactionsRequest):
-                                                Future[Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]]] = {
+  def retrieveGuaranteeTransactions(
+    request: GuaranteeAccountTransactionsRequest
+  ): Future[Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]]] = {
 
     val requestCommon: RequestCommon = RequestCommon(
       dateTimeService.currentDateTimeAsIso8601,
       mdgHeaders.acknowledgementReference,
-      RequestParameters("REGIME", REGIME_CDS))
+      RequestParameters("REGIME", REGIME_CDS)
+    )
 
     val guaranteeTransactionsRequest = GuaranteeTransactionsRequest(
-      GGATransactionListing(requestCommon, request.toRequestDetail()(appConfig)))
+      GGATransactionListing(requestCommon, request.toRequestDetail()(appConfig))
+    )
 
     metricsReporterService.withResponseTimeLogging("hods.post.get-ggatransaction-listing") {
-      httpClient.post(url"${appConfig.acc28GetGGATransactionEndpoint}")(HeaderCarrier())
+      httpClient
+        .post(url"${appConfig.acc28GetGGATransactionEndpoint}")(HeaderCarrier())
         .withBody[GuaranteeTransactionsRequest](guaranteeTransactionsRequest)
         .setHeader(mdgHeaders.headers(appConfig.acc28BearerToken, appConfig.acc28HostHeader): _*)
         .execute[GuaranteeTransactionsResponse]
-        .map {
-        gtr => transactions(gtr.getGGATransactionResponse)
-      }
+        .map { gtr =>
+          transactions(gtr.getGGATransactionResponse)
+        }
     }
   }
 
-  private def transactions(resp: GetGGATransactionResponse): Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]] =
+  private def transactions(
+    resp: GetGGATransactionResponse
+  ): Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]] =
     resp.responseCommon match {
-      case ResponseCommon(status@"OK", Some(msg), _) if msg.contains("025-No associated data found") =>
+      case ResponseCommon(status @ "OK", Some(msg), _) if msg.contains("025-No associated data found") =>
         log.info(s"$status: $msg")
         Left(NoAssociatedDataException)
 
-      case ResponseCommon(status@"OK", Some(msg), _) if hasQueryExceededThreshold(msg) =>
+      case ResponseCommon(status @ "OK", Some(msg), _) if hasQueryExceededThreshold(msg) =>
         log.info(s"$status: $msg")
         Left(ExceededThresholdErrorException)
 
       case _ => Right(resp.responseDetail.map(_.declarations).getOrElse(Seq.empty))
     }
 
-  private def hasQueryExceededThreshold(msg: String) = {
+  private def hasQueryExceededThreshold(msg: String) =
     msg.contains("091-The query has exceeded the threshold, please refine the search")
-  }
 }

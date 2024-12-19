@@ -25,9 +25,9 @@ object SearchAuthoritiesRequest {
   implicit val format: OFormat[SearchAuthoritiesRequest] = Json.format[SearchAuthoritiesRequest]
 
   implicit def jsonBodyWritable[T](implicit
-                                   writes: Writes[T],
-                                   jsValueBodyWritable: BodyWritable[JsValue]
-                                  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
+    writes: Writes[T],
+    jsValueBodyWritable: BodyWritable[JsValue]
+  ): BodyWritable[T] = jsValueBodyWritable.map(writes.writes)
 }
 
 case class Request(requestCommon: RequestCommon, requestDetail: RequestDetail)

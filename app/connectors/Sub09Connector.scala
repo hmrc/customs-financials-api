@@ -26,9 +26,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class Sub09Connector @Inject()(httpClient: HttpClientV2,
-                               appConfig: AppConfig,
-                               mdgHeaders: MdgHeaders)(implicit executionContext: ExecutionContext) {
+class Sub09Connector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig, mdgHeaders: MdgHeaders)(implicit
+  executionContext: ExecutionContext
+) {
   def getSubscriptions(eori: EORI): Future[SubscriptionResponse] = {
 
     val sub09Url = s"${appConfig.sub09GetSubscriptionsEndpoint}?" +
@@ -36,7 +36,8 @@ class Sub09Connector @Inject()(httpClient: HttpClientV2,
       s"acknowledgementReference=${mdgHeaders.acknowledgementReference}&" +
       s"regime=CDS"
 
-    httpClient.get(url"$sub09Url")(HeaderCarrier())
+    httpClient
+      .get(url"$sub09Url")(HeaderCarrier())
       .setHeader(mdgHeaders.headers(appConfig.sub09BearerToken, appConfig.sub09HostHeader): _*)
       .execute[SubscriptionResponse]
   }

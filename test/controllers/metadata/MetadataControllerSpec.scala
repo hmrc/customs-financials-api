@@ -96,8 +96,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when 4th week duty deferment statement is available" in new Setup {
-      val dd4emailRequest: JsValue = Json.parse(
-        """
+      val dd4emailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -130,24 +129,25 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
 
-        val params: Map[String, String] = Map("DefermentStatementType" -> "weekly",
-            "PeriodIssueNumber" -> "4",
-            "date" -> "16 Sep 2018",
-            "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
-            "recipientName_line1" -> TEST_COMPANY)
+        val params: Map[String, String] = Map(
+          "DefermentStatementType" -> "weekly",
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "16 Sep 2018",
+          "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after",
+          "recipientName_line1"    -> TEST_COMPANY
+        )
 
         verify(mockEmailThrottler).sendEmail(is(emailRequest(params = params)))(any)
       }
     }
 
     "do not send email when companyName is not available " in new Setup {
-      val dd4emailRequest: JsValue = Json.parse(
-        """
+      val dd4emailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -179,7 +179,7 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
@@ -187,8 +187,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when requested duty deferment statement is available" in new Setup {
-      val newFileNotificationFromSDES: JsValue = Json.parse(
-        """
+      val newFileNotificationFromSDES: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -229,8 +228,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when requested Standing Authority is available" in new Setup {
-      val newFileNotificationFromSDES: JsValue = Json.parse(
-        """
+      val newFileNotificationFromSDES: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-23456",
@@ -254,8 +252,8 @@ class MetadataControllerSpec extends SpecBase {
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
         .thenReturn(Future.successful(Option(histDocRequestSearch)))
 
-      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any)).
-        thenReturn(Future.successful(Option(histDocRequestSearch)))
+      when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any))
+        .thenReturn(Future.successful(Option(histDocRequestSearch)))
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] =
@@ -271,8 +269,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when supplementary duty deferment statement is available" in new Setup {
-      val dd4emailRequest: JsValue = Json.parse(
-        """
+      val dd4emailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -304,23 +301,24 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
 
-        val params: Map[String, String] = Map("DefermentStatementType" -> "supplementary",
-            "date" -> "16 Sep 2018",
-            "PeriodIssueNumber" -> "1",
-            "DutyText" -> "The total Duty and VAT owed will be collected by direct debit on or after",
-            "recipientName_line1" -> TEST_COMPANY)
+        val params: Map[String, String] = Map(
+          "DefermentStatementType" -> "supplementary",
+          "date"                   -> "16 Sep 2018",
+          "PeriodIssueNumber"      -> "1",
+          "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after",
+          "recipientName_line1"    -> TEST_COMPANY
+        )
 
         verify(mockEmailThrottler).sendEmail(is(emailRequest(params = params)))(any)
       }
     }
 
     "send email when excise duty deferment statement is available" in new Setup {
-      val dd4emailRequest: JsValue = Json.parse(
-        """
+      val dd4emailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI-12345",
@@ -352,23 +350,24 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
 
-        val params: Map[String, String] = Map("DefermentStatementType" -> "excise",
-            "date" -> "29 Aug 2018",
-            "PeriodIssueNumber" -> "1",
-            "DutyText" -> "The total excise owed will be collected by direct debit on or before",
-            "recipientName_line1" -> TEST_COMPANY)
+        val params: Map[String, String] = Map(
+          "DefermentStatementType" -> "excise",
+          "date"                   -> "29 Aug 2018",
+          "PeriodIssueNumber"      -> "1",
+          "DutyText"               -> "The total excise owed will be collected by direct debit on or before",
+          "recipientName_line1"    -> TEST_COMPANY
+        )
 
         verify(mockEmailThrottler).sendEmail(is(emailRequest(params = params)))(any)
       }
     }
 
     "send email when C79 Certificate is available" in new Setup {
-      val c79emailRequest: JsValue = Json.parse(
-        """
+      val c79emailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI",
@@ -395,7 +394,7 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(c79emailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
         verify(mockEmailThrottler)
@@ -404,8 +403,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when historic C79 Certificate is available" in new Setup {
-      val historicC79CertificateNotificationRequest: JsValue = Json.parse(
-        s"""
+      val historicC79CertificateNotificationRequest: JsValue = Json.parse(s"""
            |[
            |    {
            |        "eori":"${eori.value}",
@@ -444,14 +442,14 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         verify(mockEmailThrottler)
-          .sendEmail(is(emailRequest(templateId = "customs_financials_historic_c79_certificate",
-            enrolment = testEnrolment)))(any)
+          .sendEmail(
+            is(emailRequest(templateId = "customs_financials_historic_c79_certificate", enrolment = testEnrolment))
+          )(any)
       }
     }
 
     "send email when Security statement is available" in new Setup {
-      val ssemailRequest: JsValue = Json.parse(
-        """
+      val ssemailRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI",
@@ -478,7 +476,7 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(ssemailRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
 
         status(result) mustBe OK
         verify(mockEmailThrottler)
@@ -487,8 +485,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when requested Security statement is available" in new Setup {
-      val requestedSecurityStatementNotificationRequest: JsValue = Json.parse(
-        s"""
+      val requestedSecurityStatementNotificationRequest: JsValue = Json.parse(s"""
            |[
            |    {
            |        "eori":"${eori.value}",
@@ -527,14 +524,14 @@ class MetadataControllerSpec extends SpecBase {
         val result = route(app, req).value
         status(result) mustBe OK
         verify(mockEmailThrottler)
-          .sendEmail(is(emailRequest(templateId = "customs_financials_requested_import_adjustment",
-            enrolment = testEnrolment)))(any)
+          .sendEmail(
+            is(emailRequest(templateId = "customs_financials_requested_import_adjustment", enrolment = testEnrolment))
+          )(any)
       }
     }
 
     "send email when PVAT statement is available" in new Setup {
-      val pvatStatementRequest: JsValue = Json.parse(
-        """
+      val pvatStatementRequest: JsValue = Json.parse("""
           |[
           |    {
           |       "eori":"testEORI",
@@ -561,7 +558,7 @@ class MetadataControllerSpec extends SpecBase {
 
       running(app) {
         val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(pvatStatementRequest)
-        val result = route(app, req).value
+        val result                             = route(app, req).value
         status(result) mustBe OK
 
         verify(mockEmailThrottler)
@@ -570,8 +567,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send email when a requested PVAT statement is available" in new Setup {
-      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
-        s"""
+      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(s"""
            |[
            |    {
            |        "eori":"testEORI",
@@ -615,8 +611,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "send the email only once in case of multiple notifications for same statementRequestID" in new Setup {
-      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(
-        s"""
+      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(s"""
            |[
            |    {
            |        "eori":"testEORI",
@@ -658,9 +653,9 @@ class MetadataControllerSpec extends SpecBase {
       when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
-      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any)).thenReturn(
-        Future.successful(Option(histDocRequestSearch))).thenReturn(
-        Future.successful(Option(histDocRequestSearch.copy(resultsFound = yes))))
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
+        .thenReturn(Future.successful(Option(histDocRequestSearch)))
+        .thenReturn(Future.successful(Option(histDocRequestSearch.copy(resultsFound = yes))))
 
       when(mockHistDocReqCacheService.processSDESNotificationForStatReqId(any, any))
         .thenReturn(Future.successful(Option(histDocRequestSearch)))
@@ -702,31 +697,33 @@ class MetadataControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val eori: EORI = EORI("123456789")
-    val mockNotificationCache: NotificationCache = mock[NotificationCache]
-    val mockEmailThrottler: EmailThrottlerConnector = mock[EmailThrottlerConnector]
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    val mockDataStore: DataStoreConnector = mock[DataStoreConnector]
+    val eori: EORI                                                            = EORI("123456789")
+    val mockNotificationCache: NotificationCache                              = mock[NotificationCache]
+    val mockEmailThrottler: EmailThrottlerConnector                           = mock[EmailThrottlerConnector]
+    val mockAuthConnector: CustomAuthConnector                                = mock[CustomAuthConnector]
+    val mockDataStore: DataStoreConnector                                     = mock[DataStoreConnector]
     val mockHistDocReqCacheService: HistoricDocumentRequestSearchCacheService =
       mock[HistoricDocumentRequestSearchCacheService]
 
     val mockHistDocReqCache: HistoricDocumentRequestSearchCache = mock[HistoricDocumentRequestSearchCache]
 
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[NotificationCache].toInstance(mockNotificationCache),
-      inject.bind[EmailThrottlerConnector].toInstance(mockEmailThrottler),
-      inject.bind[DataStoreConnector].toInstance(mockDataStore),
-      inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqCacheService),
-      inject.bind[HistoricDocumentRequestSearchCache].toInstance(mockHistDocReqCache)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[NotificationCache].toInstance(mockNotificationCache),
+        inject.bind[EmailThrottlerConnector].toInstance(mockEmailThrottler),
+        inject.bind[DataStoreConnector].toInstance(mockDataStore),
+        inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqCacheService),
+        inject.bind[HistoricDocumentRequestSearchCache].toInstance(mockHistDocReqCache)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
-    val addRequest: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(Json.parse(
-      """
+    val addRequest: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(Json.parse("""
         |[
         |    {
         |       "eori":"testEORI",
@@ -772,30 +769,32 @@ class MetadataControllerSpec extends SpecBase {
         |]
       """.stripMargin))
 
-    val searchID: UUID = UUID.randomUUID()
-    val userId: String = "test_userId"
+    val searchID: UUID                         = UUID.randomUUID()
+    val userId: String                         = "test_userId"
     val resultsFound: SearchResultStatus.Value = inProcess
-    val searchStatusUpdateDate: String = emptyString
-    val currentEori: String = "GB123456789012"
-    val params: Params = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
-    val emailAddress: EmailAddress = EmailAddress(TEST_EMAIL)
-    val testEori: EORI = EORI(EORI_VALUE)
-    val testEnrolment: Option[String] = Some("123456789")
-    val errorMsg: String = "Error occurred"
+    val searchStatusUpdateDate: String         = emptyString
+    val currentEori: String                    = "GB123456789012"
+    val params: Params                         = Params("2", "2021", "4", "2021", "DutyDefermentStatement", "1234567")
+    val emailAddress: EmailAddress             = EmailAddress(TEST_EMAIL)
+    val testEori: EORI                         = EORI(EORI_VALUE)
+    val testEnrolment: Option[String]          = Some("123456789")
+    val errorMsg: String                       = "Error occurred"
 
     val searchRequests: Set[SearchRequest] = Set(
       SearchRequest("GB123456789012", "1abcdefg2-a2b1-abcd-abcd-0123456789", inProcess, emptyString, emptyString, 0),
-      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0))
+      SearchRequest("GB234567890121", "5c79895-f0da-4472-af5a-d84d340e7mn6", inProcess, emptyString, emptyString, 0)
+    )
 
     val histDocRequestSearch: HistoricDocumentRequestSearch =
       HistoricDocumentRequestSearch(searchID, resultsFound, searchStatusUpdateDate, currentEori, params, searchRequests)
 
-    def emailRequest(emailId: EmailAddress = EmailAddress(TEST_EMAIL),
-                     templateId: String = "customs_financials_new_statement_notification",
-                     params: Map[String, String] = Map("recipientName_line1" -> TEST_COMPANY),
-                     force: Boolean = false,
-                     enrolment: Option[String] = Some(EORI_VALUE)): EmailRequest = {
+    def emailRequest(
+      emailId: EmailAddress = EmailAddress(TEST_EMAIL),
+      templateId: String = "customs_financials_new_statement_notification",
+      params: Map[String, String] = Map("recipientName_line1" -> TEST_COMPANY),
+      force: Boolean = false,
+      enrolment: Option[String] = Some(EORI_VALUE)
+    ): EmailRequest =
       EmailRequest(List(emailId), templateId, params, force, enrolment, None, None)
-    }
   }
 }

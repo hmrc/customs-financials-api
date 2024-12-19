@@ -44,8 +44,8 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
       "successfully sent the request for C79Certificate" in new Setup {
         when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(Future.successful(Nil))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
-        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
-          Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any))
+          .thenReturn(Future.successful(true))
 
         running(app) {
           val result = route(app, request).value
@@ -54,19 +54,18 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
 
           verify(mockDataStoreService, times(1)).getEoriHistory(any)(any)
           verify(mockHistoricDocumentService, times(1)).sendHistoricDocumentRequest(any)(any)
-          verify(mockHistDocReqSearchCacheService,
-            times(1)).saveHistoricDocumentRequestSearch(any)
+          verify(mockHistDocReqSearchCacheService, times(1)).saveHistoricDocumentRequestSearch(any)
         }
       }
 
       "successfully sent the multiple requests when historic eoris found" in new Setup {
-        when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(
-          Future.successful(Seq(eori, EORI("Historic-EORI1"), EORI("Historic-EORI2"))))
+        when(mockDataStoreService.getEoriHistory(meq(eori))(any))
+          .thenReturn(Future.successful(Seq(eori, EORI("Historic-EORI1"), EORI("Historic-EORI2"))))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
-        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
-          Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any))
+          .thenReturn(Future.successful(true))
 
         running(app) {
           val result = route(app, request).value
@@ -75,21 +74,20 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
 
           verify(mockDataStoreService, times(1)).getEoriHistory(any)(any)
           verify(mockHistoricDocumentService, times(3)).sendHistoricDocumentRequest(any)(any)
-          verify(mockHistDocReqSearchCacheService,
-            times(1)).saveHistoricDocumentRequestSearch(any)
+          verify(mockHistDocReqSearchCacheService, times(1)).saveHistoricDocumentRequestSearch(any)
         }
       }
 
       "successfully sent the request for DutyDefermentStatement" in new Setup {
         when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(Future.successful(Nil))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
-        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any)).thenReturn(
-          Future.successful(true))
+        when(mockHistDocReqSearchCacheService.saveHistoricDocumentRequestSearch(any))
+          .thenReturn(Future.successful(true))
 
-        val req: FakeRequest[AnyContentAsJson] = FakeRequest(
-          POST,
-          controllers.routes.HistoricDocumentRequestController.makeRequest().url).withJsonBody(
-          Json.toJson(frontEndRequest.copy(documentType = FileRole("DutyDefermentStatement"), dan = Some("dan"))))
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, controllers.routes.HistoricDocumentRequestController.makeRequest().url).withJsonBody(
+            Json.toJson(frontEndRequest.copy(documentType = FileRole("DutyDefermentStatement"), dan = Some("dan")))
+          )
 
         running(app) {
           val result = route(app, req).value
@@ -110,8 +108,8 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
       }
 
       "historic document request fails for one of the historic eoris" in new Setup {
-        when(mockDataStoreService.getEoriHistory(meq(eori))(any)).thenReturn(
-          Future.successful(Seq(EORI("Historic-EORI1"), EORI("Historic-EORI2"))))
+        when(mockDataStoreService.getEoriHistory(meq(eori))(any))
+          .thenReturn(Future.successful(Seq(EORI("Historic-EORI1"), EORI("Historic-EORI2"))))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(false))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(true))
         when(mockHistoricDocumentService.sendHistoricDocumentRequest(any)(any)).thenReturn(Future.successful(false))
@@ -129,9 +127,9 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
   }
 
   trait Setup {
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    val mockHistoricDocumentService: HistoricDocumentService = mock[HistoricDocumentService]
-    val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
+    val mockAuthConnector: CustomAuthConnector                                      = mock[CustomAuthConnector]
+    val mockHistoricDocumentService: HistoricDocumentService                        = mock[HistoricDocumentService]
+    val mockDataStoreService: DataStoreConnector                                    = mock[DataStoreConnector]
     val mockHistDocReqSearchCacheService: HistoricDocumentRequestSearchCacheService =
       mock[HistoricDocumentRequestSearchCacheService]
 
@@ -142,24 +140,28 @@ class HistoricDocumentGetSpecificClaimRequestControllerSpec extends SpecBase {
       None
     )
 
-    val eori: EORI = EORI(EORI_VALUE)
+    val eori: EORI             = EORI(EORI_VALUE)
     val enrolments: Enrolments = Enrolments(
-      Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, eori.value)), "activated")))
+      Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, eori.value)), "activated"))
+    )
 
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
-    val app: Application = GuiceApplicationBuilder().overrides(
-      inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
-      inject.bind[DataStoreConnector].toInstance(mockDataStoreService),
-      inject.bind[HistoricDocumentService].toInstance(mockHistoricDocumentService),
-      inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService)
-    ).configure(
-      "microservice.metrics.enabled" -> false,
-      "metrics.enabled" -> false,
-      "auditing.enabled" -> false
-    ).build()
+    val app: Application = GuiceApplicationBuilder()
+      .overrides(
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector),
+        inject.bind[DataStoreConnector].toInstance(mockDataStoreService),
+        inject.bind[HistoricDocumentService].toInstance(mockHistoricDocumentService),
+        inject.bind[HistoricDocumentRequestSearchCacheService].toInstance(mockHistDocReqSearchCacheService)
+      )
+      .configure(
+        "microservice.metrics.enabled" -> false,
+        "metrics.enabled"              -> false,
+        "auditing.enabled"             -> false
+      )
+      .build()
 
-    val request: FakeRequest[AnyContentAsJson] = FakeRequest(
-      "POST",
-      routes.HistoricDocumentRequestController.makeRequest().url).withJsonBody(Json.toJson(frontEndRequest))
+    val request: FakeRequest[AnyContentAsJson] =
+      FakeRequest("POST", routes.HistoricDocumentRequestController.makeRequest().url)
+        .withJsonBody(Json.toJson(frontEndRequest))
   }
 }

@@ -24,29 +24,31 @@ class HistoricalStatementRetrievalInterfaceMetadataSpec extends SpecBase {
 
     "return correct output" in {
 
-      val eoriNumber = EORI("test_eori")
-      val statReqId = "test_statReqId"
-      val statementType = FileRole("import_vat")
-      val periodStartYear = "2024"
+      val eoriNumber       = EORI("test_eori")
+      val statReqId        = "test_statReqId"
+      val statementType    = FileRole("import_vat")
+      val periodStartYear  = "2024"
       val periodStartMonth = "2"
-      val periodEndYear = "2024"
-      val periodEndMonth = "4"
-      val dan = Some("12345678")
+      val periodEndYear    = "2024"
+      val periodEndMonth   = "4"
+      val dan              = Some("12345678")
 
-      val ob = HistoricalStatementRetrievalInterfaceMetadata(statementRequestID = statReqId,
+      val ob = HistoricalStatementRetrievalInterfaceMetadata(
+        statementRequestID = statReqId,
         eori = eoriNumber,
         statementType = statementType,
         periodStartYear = periodStartYear,
         periodStartMonth = periodStartMonth,
         periodEndYear = periodEndYear,
         periodEndMonth = periodEndMonth,
-        DAN = dan)
+        DAN = dan
+      )
 
       ob.toString mustBe
         s"HistoricalStatementRetrievalInterfaceMetadata(statementRequestID:" +
-          s" $statReqId, eori: xxx, statementType: $statementType, periodStartYear:" +
-          s" $periodStartYear, periodStartMonth: $periodStartMonth, periodEndYear:" +
-          s" $periodEndYear, periodEndMonth: $periodEndMonth, DAN: $dan"
+        s" $statReqId, eori: xxx, statementType: $statementType, periodStartYear:" +
+        s" $periodStartYear, periodStartMonth: $periodStartMonth, periodEndYear:" +
+        s" $periodEndYear, periodEndMonth: $periodEndMonth, DAN: $dan"
     }
   }
 }

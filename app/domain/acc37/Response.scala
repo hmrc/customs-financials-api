@@ -20,17 +20,19 @@ import config.MetaConfig.RETURN_PARAM_POSITION
 import play.api.libs.json.{Json, OFormat}
 
 case class Response(amendCorrespondenceAddressResponse: AmendCorrespondenceAddressResponse) {
-  val mdtpError: Boolean = amendCorrespondenceAddressResponse
-    .responseCommon
-    .returnParameters.exists(_.exists(_.paramName == RETURN_PARAM_POSITION))
+  val mdtpError: Boolean = amendCorrespondenceAddressResponse.responseCommon.returnParameters.exists(
+    _.exists(_.paramName == RETURN_PARAM_POSITION)
+  )
 }
 
 case class AmendCorrespondenceAddressResponse(responseCommon: ResponseCommon)
 
-case class ResponseCommon(status: String,
-                          statusText: Option[String],
-                          processingDate: String,
-                          returnParameters: Option[Array[ReturnParameter]])
+case class ResponseCommon(
+  status: String,
+  statusText: Option[String],
+  processingDate: String,
+  returnParameters: Option[Array[ReturnParameter]]
+)
 
 case class ReturnParameter(paramName: String, paramValue: String)
 
@@ -53,12 +55,14 @@ object Response {
 
 case class ErrorResponse(errorDetail: ErrorDetail)
 
-case class ErrorDetail(timestamp: String,
-                       correlationId: String,
-                       errorCode: String,
-                       errorMessage: String,
-                       source: String,
-                       sourceFaultDetail: SourceFaultDetail)
+case class ErrorDetail(
+  timestamp: String,
+  correlationId: String,
+  errorCode: String,
+  errorMessage: String,
+  source: String,
+  sourceFaultDetail: SourceFaultDetail
+)
 
 case class SourceFaultDetail(detail: Array[String])
 
