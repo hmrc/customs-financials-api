@@ -18,7 +18,7 @@ package models
 
 import domain.Notification
 import models.requests.EmailRequest
-import utils.Utils.emptyString
+import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, emptyString}
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,6 +38,8 @@ object EmailTemplate {
   private val EXCISE_DUTY_DUE_DATE                 = 29
   private val EXCISE_DUTY_DUE_DATE_FEB             = 28
   private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 16
+  private val DD1920_STT_DUE_DATE                  = 25
+  private val DD1720_STT_DUE_DATE                  = 15
   private val emailDateFormatter                   = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
   def fromNotification(
@@ -171,10 +173,7 @@ object EmailTemplate {
     for {
       periodEndMonth <- metadata.get("PeriodEndMonth")
       periodEndYear  <- metadata.get("PeriodEndYear")
-      dutyText        = statementType match {
-                          case "Excise" => "The total excise owed will be collected by direct debit on or before"
-                          case _        => "The total Duty and VAT owed will be collected by direct debit on or after"
-                        }
+      dutyText        = getDutyText(statementType)
     } yield List(
       Some("date"     -> createDutyDefermentDueDate(statementType, periodEndMonth.toInt, periodEndYear.toInt)),
       metadata
@@ -185,16 +184,28 @@ object EmailTemplate {
     ).flatten.toMap
   }
 
+  private def getDutyText(statementType: String): String =
+    statementType match {
+      case EXCISE_STT_TYPE | DD1920_STT_TYPE =>
+        "The total excise owed will be collected by direct debit on or before"
+      case _                                 =>
+        "The total Duty and VAT owed will be collected by direct debit on or after"
+    }
+
   def createDutyDefermentDueDate(defermentStatementType: String, periodEndMonth: Int, periodEndYear: Int): String = {
     val oneMonth = 1
 
     val dueDate = defermentStatementType match {
-      case "Excise" =>
+      case EXCISE_STT_TYPE =>
         Try {
           LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE)
         }.getOrElse {
           LocalDate.of(periodEndYear, periodEndMonth, EXCISE_DUTY_DUE_DATE_FEB)
         }
+
+      case DD1920_STT_TYPE => LocalDate.of(periodEndYear, periodEndMonth, DD1920_STT_DUE_DATE)
+
+      case DD1720_STT_TYPE => LocalDate.of(periodEndYear, periodEndMonth, DD1720_STT_DUE_DATE)
 
       case _ => LocalDate.of(periodEndYear, periodEndMonth, CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE).plusMonths(oneMonth)
     }

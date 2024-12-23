@@ -43,6 +43,10 @@ object Utils {
 
   val UTC_TIME_ZONE = "UTC"
 
+  val EXCISE_STT_TYPE: String = "Excise"
+  val DD1920_STT_TYPE: String = "DD1920"
+  val DD1720_STT_TYPE: String = "DD1720"
+
   def dateTimeAsIso8601(dateTime: LocalDateTime): String =
     s"${DateTimeFormatter.ISO_DATE_TIME.format(dateTime.truncatedTo(ChronoUnit.SECONDS))}Z"
 
