@@ -173,12 +173,7 @@ object EmailTemplate {
     for {
       periodEndMonth <- metadata.get("PeriodEndMonth")
       periodEndYear  <- metadata.get("PeriodEndYear")
-      dutyText        = statementType match {
-                          case EXCISE_STT_TYPE | DD1920_STT_TYPE =>
-                            "The total excise owed will be collected by direct debit on or before"
-                          case _                                 =>
-                            "The total Duty and VAT owed will be collected by direct debit on or after"
-                        }
+      dutyText        = getDutyText(statementType)
     } yield List(
       Some("date"     -> createDutyDefermentDueDate(statementType, periodEndMonth.toInt, periodEndYear.toInt)),
       metadata
@@ -188,6 +183,14 @@ object EmailTemplate {
       Some("DutyText" -> dutyText)
     ).flatten.toMap
   }
+
+  private def getDutyText(statementType: String): String =
+    statementType match {
+      case EXCISE_STT_TYPE | DD1920_STT_TYPE =>
+        "The total excise owed will be collected by direct debit on or before"
+      case _                                 =>
+        "The total Duty and VAT owed will be collected by direct debit on or after"
+    }
 
   def createDutyDefermentDueDate(defermentStatementType: String, periodEndMonth: Int, periodEndYear: Int): String = {
     val oneMonth = 1

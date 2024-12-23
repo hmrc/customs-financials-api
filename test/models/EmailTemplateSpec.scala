@@ -18,6 +18,7 @@ package models
 
 import domain.Notification
 import utils.SpecBase
+import utils.TestData.{MONTH_2, MONTH_9, YEAR_2019, YEAR_2020}
 
 import java.time.LocalDate
 import scala.collection.immutable.{HashMap, Map}
@@ -252,6 +253,33 @@ class EmailTemplateSpec extends SpecBase {
           unknownNotification,
           companyName
         ) mustBe expectedEmailTemplate
+      }
+    }
+  }
+
+  "createDutyDefermentDueDate" should {
+
+    "return correct Due date" when {
+
+      "defermentStatementType is Weekly" in new Setup {
+        EmailTemplate.createDutyDefermentDueDate("Weekly", MONTH_9, YEAR_2019) mustBe "16 Oct 2019"
+      }
+
+      "defermentStatementType is Excise" in new Setup {
+        EmailTemplate.createDutyDefermentDueDate("Excise", MONTH_2, YEAR_2019) mustBe "28 Feb 2019"
+        EmailTemplate.createDutyDefermentDueDate("Excise", MONTH_2, YEAR_2020) mustBe "29 Feb 2020"
+      }
+
+      "defermentStatementType is DD1920" in new Setup {
+        EmailTemplate.createDutyDefermentDueDate("DD1920", MONTH_9, YEAR_2019) mustBe "25 Sep 2019"
+      }
+
+      "defermentStatementType is DD1720" in new Setup {
+        EmailTemplate.createDutyDefermentDueDate("DD1720", MONTH_9, YEAR_2019) mustBe "15 Sep 2019"
+      }
+
+      "defermentStatementType is Supplementary" in new Setup {
+        EmailTemplate.createDutyDefermentDueDate("Supplementary", MONTH_9, YEAR_2019) mustBe "16 Oct 2019"
       }
     }
   }
