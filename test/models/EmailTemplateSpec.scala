@@ -28,14 +28,14 @@ class EmailTemplateSpec extends SpecBase {
 
     "return correct email template" when {
 
-      "file role is DutyDefermentStatement" in new Setup {
+      "file role is DutyDefermentStatement and statement type is Weekly" in new Setup {
 
         val expectedParams: Map[String, String] = HashMap(
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
           "date"                   -> "16 Sep 2018",
-          "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
+          "DutyText"               -> dutyText01
         )
 
         val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
@@ -47,7 +47,99 @@ class EmailTemplateSpec extends SpecBase {
             )
           )
 
-        EmailTemplate.fromNotification(emailAddress, ddNotification, companyName) mustBe
+        EmailTemplate.fromNotification(emailAddress, ddNotification(weeklyParams), companyName) mustBe
+          expectedDDEmailTemplate
+      }
+
+      "file role is DutyDefermentStatement and statement type is DD1920" in new Setup {
+
+        val expectedParams: Map[String, String] = HashMap(
+          "recipientName_line1"    -> companyName,
+          "DefermentStatementType" -> "dd1920",
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "25 Aug 2018",
+          "DutyText"               -> dutyText02
+        )
+
+        val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
+          Some(
+            DutyDefermentStatementEmail(
+              emailAddress,
+              eoriNumber,
+              expectedParams ++ Map("recipientName_line1" -> companyName)
+            )
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotification(dd1920Params), companyName) mustBe
+          expectedDDEmailTemplate
+      }
+
+      "file role is DutyDefermentStatement and statement type is DD1720" in new Setup {
+
+        val expectedParams: Map[String, String] = HashMap(
+          "recipientName_line1"    -> companyName,
+          "DefermentStatementType" -> "dd1720",
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "15 Aug 2018",
+          "DutyText"               -> dutyText01
+        )
+
+        val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
+          Some(
+            DutyDefermentStatementEmail(
+              emailAddress,
+              eoriNumber,
+              expectedParams ++ Map("recipientName_line1" -> companyName)
+            )
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotification(dd1720Params), companyName) mustBe
+          expectedDDEmailTemplate
+      }
+
+      "file role is DutyDefermentStatement and statement type is Excise" in new Setup {
+
+        val expectedParams: Map[String, String] = HashMap(
+          "recipientName_line1"    -> companyName,
+          "DefermentStatementType" -> "excise",
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "29 Aug 2018",
+          "DutyText"               -> dutyText02
+        )
+
+        val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
+          Some(
+            DutyDefermentStatementEmail(
+              emailAddress,
+              eoriNumber,
+              expectedParams ++ Map("recipientName_line1" -> companyName)
+            )
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotification(exciseParams), companyName) mustBe
+          expectedDDEmailTemplate
+      }
+
+      "file role is DutyDefermentStatement and statement type is Supplementary" in new Setup {
+
+        val expectedParams: Map[String, String] = HashMap(
+          "recipientName_line1"    -> companyName,
+          "DefermentStatementType" -> "supplementary",
+          "PeriodIssueNumber"      -> "4",
+          "date"                   -> "16 Sep 2018",
+          "DutyText"               -> dutyText01
+        )
+
+        val expectedDDEmailTemplate: Option[DutyDefermentStatementEmail] =
+          Some(
+            DutyDefermentStatementEmail(
+              emailAddress,
+              eoriNumber,
+              expectedParams ++ Map("recipientName_line1" -> companyName)
+            )
+          )
+
+        EmailTemplate.fromNotification(emailAddress, ddNotification(supplementaryParams), companyName) mustBe
           expectedDDEmailTemplate
       }
 
@@ -167,47 +259,56 @@ class EmailTemplateSpec extends SpecBase {
   trait Setup {
 
     val emailAddress: EmailAddress = EmailAddress("test_mail@test.com")
-    val eoriNumber                 = "test_eori"
+    val eoriNumber: String         = "test_eori"
 
-    val fileRoleDDStatement           = "DutyDefermentStatement"
-    val fileRoleC79Certificate        = "C79Certificate"
-    val fileRoleSecurityStatement     = "SecurityStatement"
-    val fileRolePostponedVATStatement = "PostponedVATStatement"
-    val fileRoleStandingAuthority     = "StandingAuthority"
-    val fileRoleCDSCashAccount        = "CDSCashAccount"
-    val fileRoleUnknown               = "Unknown"
+    val fileRoleDDStatement: String           = "DutyDefermentStatement"
+    val fileRoleC79Certificate: String        = "C79Certificate"
+    val fileRoleSecurityStatement: String     = "SecurityStatement"
+    val fileRolePostponedVATStatement: String = "PostponedVATStatement"
+    val fileRoleStandingAuthority: String     = "StandingAuthority"
+    val fileRoleCDSCashAccount: String        = "CDSCashAccount"
+    val fileRoleUnknown: String               = "Unknown"
 
-    val fileNameValue = "test_file"
-    val fileSizeValue = 999L
+    val fileNameValue: String = "test_file"
+    val fileSizeValue: Long   = 999L
 
-    val statementRequestIDKey   = "statementRequestID"
-    val statementRequestIDValue = "1abcdeff2-a2b1-abcd-abcd-0123456789"
+    val statementRequestIDKey: String   = "statementRequestID"
+    val statementRequestIDValue: String = "1abcdeff2-a2b1-abcd-abcd-0123456789"
 
     val companyName: String = "test_company"
+    val dutyText01: String  = "The total Duty and VAT owed will be collected by direct debit on or after"
+    val dutyText02: String  = "The total excise owed will be collected by direct debit on or before"
 
-    val year            = 2024
-    val monthOfTheYear  = 2
-    val dayOfMonth      = 26
-    val date: LocalDate = LocalDate.of(year, monthOfTheYear, dayOfMonth)
+    val year: Int           = 2024
+    val monthOfTheYear: Int = 2
+    val dayOfMonth: Int     = 26
+    val date: LocalDate     = LocalDate.of(year, monthOfTheYear, dayOfMonth)
 
-    val params: Map[String, String] = Map(
-      "PeriodStartYear"        -> "2017",
-      "PeriodStartMonth"       -> "5",
-      "PeriodEndYear"          -> "2018",
-      "PeriodEndMonth"         -> "8",
-      "PeriodIssueNumber"      -> "4",
-      "DefermentStatementType" -> "Weekly",
-      "Something"              -> "Random"
-    )
+    private def params(sttType: String): Map[String, String] =
+      Map(
+        "PeriodStartYear"        -> "2017",
+        "PeriodStartMonth"       -> "5",
+        "PeriodEndYear"          -> "2018",
+        "PeriodEndMonth"         -> "8",
+        "PeriodIssueNumber"      -> "4",
+        "DefermentStatementType" -> sttType,
+        "Something"              -> "Random"
+      )
 
-    val ddNotification: Notification = Notification(
+    def ddNotification(paramType: Map[String, String]): Notification = Notification(
       eori = EORI(eoriNumber),
       fileRole = FileRole(fileRoleDDStatement),
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = paramType
     )
+
+    val weeklyParams: Map[String, String]        = params("Weekly")
+    val dd1920Params: Map[String, String]        = params("DD1920")
+    val dd1720Params: Map[String, String]        = params("DD1720")
+    val exciseParams: Map[String, String]        = params("Excise")
+    val supplementaryParams: Map[String, String] = params("Supplementary")
 
     val ddNotificationHistoric: Notification = Notification(
       eori = EORI(eoriNumber),
@@ -215,7 +316,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+      metadata = weeklyParams ++ Map(statementRequestIDKey -> statementRequestIDValue)
     )
 
     val ddEmailHistoricTemplate: Option[HistoricDutyDefermentStatementEmail] =
@@ -229,7 +330,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
 
     val c79CertificateHistoricNotification: Notification = Notification(
@@ -238,7 +339,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+      metadata = weeklyParams ++ Map(statementRequestIDKey -> statementRequestIDValue)
     )
 
     val securityStatementNotification: Notification = Notification(
@@ -247,7 +348,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
 
     val securityStatementHistoricNotification: Notification = Notification(
@@ -256,7 +357,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+      metadata = weeklyParams ++ Map(statementRequestIDKey -> statementRequestIDValue)
     )
 
     val pVATStatementNotification: Notification = Notification(
@@ -265,7 +366,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
 
     val pVATStatementHistoricNotification: Notification = Notification(
@@ -274,7 +375,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params ++ Map(statementRequestIDKey -> statementRequestIDValue)
+      metadata = weeklyParams ++ Map(statementRequestIDKey -> statementRequestIDValue)
     )
 
     val standingAuthNotification: Notification = Notification(
@@ -283,7 +384,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
 
     val cdsCashAccountNotification: Notification = Notification(
@@ -292,7 +393,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
 
     val unknownNotification: Notification = Notification(
@@ -301,7 +402,7 @@ class EmailTemplateSpec extends SpecBase {
       fileName = fileNameValue,
       fileSize = fileSizeValue,
       created = Some(date),
-      metadata = params
+      metadata = weeklyParams
     )
   }
 }
