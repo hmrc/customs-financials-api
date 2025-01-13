@@ -42,7 +42,6 @@ In dev/test environments, the upstream services are stubbed out using the [custo
 | GET    /customs-financials-api/eori/:eori/notifications                    | Request to retrieve notifications for given EORI                                                                         |                
 | DELETE /customs-financials-api/eori/:eori/notifications/:fileRole          | Request to delete non requested notifications for given EORI                                                                         |                
 | DELETE /customs-financials-api/eori/:eori/requested-notifications/:fileRole| Request to delete requested notifications for given EORI                                                                         |                
-| GET    /customs-financials-api/subscriptions/subscriptionsdisplay          | Request to retrieve verified email                                                                         |
 
 ### POST  /customs-financials-api/eori/accounts
 
@@ -571,58 +570,6 @@ Accept | application/vnd.hmrc.1.0+json
 #### Response code specification:
 * **200** If the request is processed successful and a resource is created
 * **403** This status code will be returned in case of incorrect data, incorrect data format, missing parameters etc are provided in the request
-
-
-### GET /customs-financials-api/subscriptions/subscriptionsdisplay
-
-#### Request headers specification:
-HTTP Header | Acceptable value
-------------|-----------------
-Content-Type | application/json
-Accept | application/vnd.hmrc.1.0+json
-
-### Response body
-```json
- {"verifiedEmail":"test@test.com"}
-```
-#### Response code specification:
-* **200** If the request is processed successful and a resource is created
-* **400** This status code will be returned in case of incorrect data, incorrect data format, missing parameters etc are provided in the request
-
-#### Request headers specification:
-HTTP Header | Acceptable value
-------------|-----------------
-Content-Type | application/json
-Accept | application/vnd.hmrc.1.0+json
-
-### Request body
-```json
- {
-    "id":"123",
-    "eori":"GB123456789012",
-    "caseNumber":"NDRC-11",
-    "applicationName":"test",
-    "documentType":"C285",
-    "properties":{
-       "nonce":"nonce",
-       "uploadedFiles":[
-          {
-             "upscanReference":"abc-ashk",
-             "downloadUrl":"test.com",
-             "uploadTimeStamp":"2020-12-12T09:30:47Z",
-             "checkSum":"sum",
-             "fileName":"test",
-             "fileMimeType":"pdf",
-             "fileSize":"12",
-             "previousUrl":"url"
-          }
-       ]
-    }
- }
-```
-#### Response code specification:
-* **204** If the request has been stored successfully in mongo
-* **400** This status code will be returned in case of failure to store file upload request in mongo, incorrect data, incorrect data format, missing parameters etc are provided in the request
 
 ## Running the application locally
 
