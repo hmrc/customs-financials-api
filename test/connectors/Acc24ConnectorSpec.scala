@@ -17,65 +17,97 @@
 package connectors
 
 import models.EORI
-import models.requests.HistoricDocumentRequest
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
+import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
+import play.api.{Application, Configuration}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
 import utils.TestData.{FILE_ROLE_C79_CERTIFICATE, MONTH_10, YEAR_2019}
 import utils.Utils.emptyString
+import utils.WireMockSupportProvider
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  equalTo, equalToJson, getRequestedFor, noContent, ok, post, serverError, urlPathMatching
+}
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
+import config.MetaConfig.Platform.MDTP
 
-class Acc24ConnectorSpec extends SpecBase {
+class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "sendHistoricDocumentRequest" should {
     "return true when a successful request has been made" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(NO_CONTENT, emptyString)))
 
-      running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
-        result mustBe true
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(historicStatementEndPointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(noContent)
+      )
+
+      val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
+      result mustBe true
     }
 
     "return false if any other 2xx status code is returned" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(HttpResponse(OK, emptyString)))
 
-      running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
-        result mustBe false
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(historicStatementEndPointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(ok)
+      )
+
+      val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
+      result mustBe false
     }
 
     "return false if an exception from Acc24 is returned" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
 
-      running(app) {
-        val result = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
-        result mustBe false
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(historicStatementEndPointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(serverError)
+      )
+
+      val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
+      result mustBe false
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc24 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |            context-base = "/customs-financials-hods-stub"
+         |            bearer-token = "test1234567"
+         |            serviceName="hods-acc24"
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val historicStatementEndPointUrl = "/customs-financials-hods-stub/accounts/cmdghistoricalstatementretrieval/v1"
 
     val historicDocumentRequest: HistoricDocumentRequest =
       HistoricDocumentRequest(
@@ -88,17 +120,7 @@ class Acc24ConnectorSpec extends SpecBase {
         Some("dan")
       )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
+    val app: Application = application().configure(config).build()
 
     val connector: Acc24Connector = app.injector.instanceOf[Acc24Connector]
   }
