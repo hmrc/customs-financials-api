@@ -19,7 +19,7 @@ import play.api.Configuration
 import uk.gov.hmrc.http.test.WireMockSupport
 import org.scalatest.Suite
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  getRequestedFor, postRequestedFor, put, putRequestedFor, urlPathMatching
+  deleteRequestedFor, getRequestedFor, postRequestedFor, put, putRequestedFor, urlPathMatching
 }
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod.{DELETE, GET, POST, PUT}
@@ -37,10 +37,11 @@ trait WireMockSupportProvider extends WireMockSupport {
   protected def verifyEndPointUrlHit(urlToVerify: String, methodType: RequestMethod = GET): Unit =
     wireMockServer.verify(
       methodType match {
-        case POST => postRequestedFor(urlPathMatching(urlToVerify))
-        case PUT  => putRequestedFor(urlPathMatching(urlToVerify))
-        case GET  => getRequestedFor(urlPathMatching(urlToVerify))
-        case _    => throw new RuntimeException("Invalid method type")
+        case GET    => getRequestedFor(urlPathMatching(urlToVerify))
+        case POST   => postRequestedFor(urlPathMatching(urlToVerify))
+        case PUT    => putRequestedFor(urlPathMatching(urlToVerify))
+        case DELETE => deleteRequestedFor(urlPathMatching(urlToVerify))
+        case _      => throw new RuntimeException("Invalid method type")
       }
     )
 }
