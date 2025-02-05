@@ -17,65 +17,109 @@
 package connectors
 
 import models.requests.GuaranteeAccountTransactionsRequest
-import models.responses.{GetGGATransactionResponse, GuaranteeTransactionsResponse, ResponseCommon, ResponseDetail}
-import models.{AccountNumber, ExceededThresholdErrorException, NoAssociatedDataException}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
+import models.responses.{
+  GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon,
+  ResponseDetail
+}
+import models.{AccountNumber, ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
+import play.api.{Application, Configuration}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import com.typesafe.config.ConfigFactory
+import config.MetaConfig.Platform.MDTP
+import play.api.libs.json.Json
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class Acc28ConnectorSpec extends SpecBase {
+class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "retrieveGuaranteeTransactions" should {
     "return a list of declarations on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request))
-        result mustBe Right(List.empty)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(retrieveGuaranteeTransactionsUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(ok(Json.toJson(response).toString))
+      )
+
+      val result: Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]] =
+        await(connector.retrieveGuaranteeTransactions(request))
+
+      result mustBe Right(List.empty)
+
+      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse))
 
-      running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request))
-        result mustBe Left(NoAssociatedDataException)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(retrieveGuaranteeTransactionsUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(ok(Json.toJson(noDataResponse).toString))
+      )
+
+      val result: Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]] =
+        await(connector.retrieveGuaranteeTransactions(request))
+
+      result mustBe Left(NoAssociatedDataException)
+
+      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse))
 
-      running(app) {
-        val result = await(connector.retrieveGuaranteeTransactions(request))
-        result mustBe Left(ExceededThresholdErrorException)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(retrieveGuaranteeTransactionsUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(ok(Json.toJson(tooMuchDataRequestedResponse).toString))
+      )
+
+      val result: Either[ErrorResponse, Seq[GuaranteeTransactionDeclaration]] =
+        await(connector.retrieveGuaranteeTransactions(request))
+
+      result mustBe Left(ExceededThresholdErrorException)
+
+      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc28 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |            context-base = "/customs-financials-hods-stub"
+         |            bearer-token = "test1234567"
+         |            serviceName="hods-acc28"
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val retrieveGuaranteeTransactionsUrl = "/customs-financials-hods-stub/accounts/getggatransactionlisting/v1"
 
     val request: GuaranteeAccountTransactionsRequest = GuaranteeAccountTransactionsRequest(
       AccountNumber("GAN"),
@@ -108,17 +152,7 @@ class Acc28ConnectorSpec extends SpecBase {
       )
     )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
+    val app: Application = application().configure(config).build()
 
     val connector: Acc28Connector = app.injector.instanceOf[Acc28Connector]
   }

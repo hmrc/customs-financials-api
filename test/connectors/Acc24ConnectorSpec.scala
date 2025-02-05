@@ -30,7 +30,7 @@ import utils.Utils.emptyString
 import utils.WireMockSupportProvider
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalTo, equalToJson, getRequestedFor, noContent, ok, post, serverError, urlPathMatching
+  equalTo, getRequestedFor, noContent, ok, post, serverError, urlPathMatching
 }
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory

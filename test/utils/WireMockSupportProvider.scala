@@ -25,7 +25,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod.{DELETE, GET, POST, PUT}
 
 trait WireMockSupportProvider extends WireMockSupport {
-  me: Suite =>
+  this: Suite =>
 
   val X_FORWARDED_HOST = "X-Forwarded-Host"
   val CONTENT_TYPE     = "Content-Type"
