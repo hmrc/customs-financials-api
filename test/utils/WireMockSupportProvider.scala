@@ -19,7 +19,7 @@ import play.api.Configuration
 import uk.gov.hmrc.http.test.WireMockSupport
 import org.scalatest.Suite
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  deleteRequestedFor, getRequestedFor, postRequestedFor, put, putRequestedFor, urlPathMatching
+  deleteRequestedFor, getRequestedFor, postRequestedFor, putRequestedFor, urlPathMatching
 }
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod.{DELETE, GET, POST, PUT}

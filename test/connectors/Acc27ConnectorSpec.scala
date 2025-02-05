@@ -23,7 +23,7 @@ import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, getRequestedFor, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 import com.typesafe.config.ConfigFactory
