@@ -32,6 +32,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import com.github.tomakehurst.wiremock.client.WireMock.{
   equalTo, equalToJson, getRequestedFor, noContent, ok, post, serverError, urlPathMatching
 }
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
@@ -53,6 +54,8 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe true
+
+      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
 
     "return false if any other 2xx status code is returned" in new Setup {
@@ -68,6 +71,8 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe false
+
+      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
 
     "return false if an exception from Acc24 is returned" in new Setup {
@@ -83,6 +88,8 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe false
+
+      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
   }
 
