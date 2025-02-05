@@ -16,54 +16,70 @@
 
 package connectors
 
+import com.typesafe.config.ConfigFactory
+import domain.AccountWithAuthorities
 import models.EORI
 import models.responses.StandingAuthoritiesResponse
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
+import play.api.{Application, Configuration}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, ok, post, urlPathMatching}
+import config.MetaConfig.Platform.MDTP
 
 import scala.concurrent.Future
 
-class Acc29ConnectorSpec extends SpecBase {
+class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "getStandingAuthorities" should {
     "return a list of authorities on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result = await(connector.getStandingAuthorities(EORI("someEori")))
-        result mustBe Seq.empty
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(getStandingAuthoritiesUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .willReturn(ok(Json.toJson(response).toString))
+      )
+
+      val result: Seq[AccountWithAuthorities] = await(connector.getStandingAuthorities(EORI("someEori")))
+      result mustBe Seq.empty
+
+      verifyEndPointUrlHit(getStandingAuthoritiesUrl, POST)
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc29 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |            context-base = "/customs-financials-hods-stub"
+         |            bearer-token = "test1234567"
+         |            serviceName="hods-acc29"
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val getStandingAuthoritiesUrl = "/customs-financials-hods-stub/accounts/getstandingauthoritydetails/v1"
 
     val response: StandingAuthoritiesResponse = StandingAuthoritiesResponse(EORI("someEORI"), List.empty)
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
+    val app: Application = application().configure(config).build()
 
     val connector: Acc29Connector = app.injector.instanceOf[Acc29Connector]
   }
