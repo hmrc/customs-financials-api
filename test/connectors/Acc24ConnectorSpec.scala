@@ -29,7 +29,9 @@ import utils.TestData.{FILE_ROLE_C79_CERTIFICATE, MONTH_10, YEAR_2019}
 import utils.Utils.emptyString
 import utils.WireMockSupportProvider
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, noContent, ok, post, serverError, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  equalTo, matchingJsonPath, noContent, ok, post, serverError, urlPathMatching
+}
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory
 
@@ -47,6 +49,12 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.statementType == 'C79Certificate')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.DAN == 'dan')]")
+          )
           .willReturn(noContent)
       )
 
@@ -64,6 +72,12 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.statementType == 'C79Certificate')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.DAN == 'dan')]")
+          )
           .willReturn(ok)
       )
 
@@ -81,6 +95,12 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.statementType == 'C79Certificate')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.HistoricalStatementRetrievalInterfaceMetadata[?(@.DAN == 'dan')]")
+          )
           .willReturn(serverError)
       )
 
@@ -99,9 +119,6 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
          |  acc24 {
          |            host = $wireMockHost
          |            port = $wireMockPort
-         |            context-base = "/customs-financials-hods-stub"
-         |            bearer-token = "test1234567"
-         |            serviceName="hods-acc24"
          |        }
          |  }
          |}

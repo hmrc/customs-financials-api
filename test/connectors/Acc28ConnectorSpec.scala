@@ -16,11 +16,8 @@
 
 package connectors
 
-import models.requests.GuaranteeAccountTransactionsRequest
-import models.responses.{
-  GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon,
-  ResponseDetail
-}
+import models.requests.{GuaranteeAccountTransactionsRequest, RequestCommon}
+import models.requests.*
 import models.{AccountNumber, ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Application, Configuration}
 import play.api.inject.bind
@@ -28,11 +25,16 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory
+import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import play.api.libs.json.Json
+import models.responses.{
+  GetGGATransactionResponse, GuaranteeTransactionDeclaration, GuaranteeTransactionsResponse, ResponseCommon,
+  ResponseDetail
+}
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -48,6 +50,13 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramName == 'REGIME')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramValue == 'CDS')]")
+          )
+          .withRequestBody(matchingJsonPath("$.getGGATransactionListing[?(@.requestDetail.gan == 'GAN')]"))
           .willReturn(ok(Json.toJson(response).toString))
       )
 
@@ -67,6 +76,13 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramName == 'REGIME')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramValue == 'CDS')]")
+          )
+          .withRequestBody(matchingJsonPath("$.getGGATransactionListing[?(@.requestDetail.gan == 'GAN')]"))
           .willReturn(ok(Json.toJson(noDataResponse).toString))
       )
 
@@ -86,6 +102,13 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramName == 'REGIME')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getGGATransactionListing[?(@.requestCommon.requestParameters.paramValue == 'CDS')]")
+          )
+          .withRequestBody(matchingJsonPath("$.getGGATransactionListing[?(@.requestDetail.gan == 'GAN')]"))
           .willReturn(ok(Json.toJson(tooMuchDataRequestedResponse).toString))
       )
 

@@ -28,8 +28,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import config.MetaConfig.Platform.MDTP
+import models.requests.manageAuthorities.{
+  AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest
+}
+import utils.TestData.EORI_VALUE
 
 import scala.concurrent.Future
 
@@ -44,10 +48,12 @@ class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(matchingJsonPath("$.requestCommon[?(@.regime == 'CDS')]"))
+          .withRequestBody(matchingJsonPath("$.requestDetail[?(@.ownerEori == 'testEORI')]"))
           .willReturn(ok(Json.toJson(response).toString))
       )
 
-      val result: Seq[AccountWithAuthorities] = await(connector.getStandingAuthorities(EORI("someEori")))
+      val result: Seq[AccountWithAuthorities] = await(connector.getStandingAuthorities(EORI(EORI_VALUE)))
       result mustBe Seq.empty
 
       verifyEndPointUrlHit(getStandingAuthoritiesUrl, POST)
@@ -62,9 +68,6 @@ class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
          |  acc29 {
          |            host = $wireMockHost
          |            port = $wireMockPort
-         |            context-base = "/customs-financials-hods-stub"
-         |            bearer-token = "test1234567"
-         |            serviceName="hods-acc29"
          |        }
          |  }
          |}
@@ -77,7 +80,7 @@ class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
     val getStandingAuthoritiesUrl = "/customs-financials-hods-stub/accounts/getstandingauthoritydetails/v1"
 
-    val response: StandingAuthoritiesResponse = StandingAuthoritiesResponse(EORI("someEORI"), List.empty)
+    val response: StandingAuthoritiesResponse = StandingAuthoritiesResponse(EORI(EORI_VALUE), List.empty)
 
     val app: Application = application().configure(config).build()
 
