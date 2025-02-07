@@ -142,8 +142,7 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
         Some("dan")
       )
 
-    val app: Application = application().configure(config).build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc24Connector = app.injector.instanceOf[Acc24Connector]
   }
 }

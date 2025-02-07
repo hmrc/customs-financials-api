@@ -109,8 +109,7 @@ class Acc37ConnectorSpec extends SpecBase with WireMockSupportProvider {
       Some(EmailAddress("somedata@email.com"))
     )
 
-    val app: Application = application().configure(config).build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc37Connector = app.injector.instanceOf[Acc37Connector]
   }
 }

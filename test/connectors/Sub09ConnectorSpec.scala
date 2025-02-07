@@ -20,37 +20,65 @@ import domain.sub09.*
 import models.EORI
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.Application
+import play.api.{Application, Configuration}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.COUNTRY_CODE_GB
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, matchingJsonPath, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.GET
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
+import utils.TestData.EORI_VALUE_1
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
 
-class Sub09ConnectorSpec extends SpecBase {
+class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "getSubscriptions" should {
     "return a json on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result = await(connector.getSubscriptions(EORI("someEori")))
-        result mustBe response
-      }
+      wireMockServer.stubFor(
+        get(urlPathMatching(sub09GetSubscriptionsEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withQueryParam("EORI", equalTo(EORI_VALUE_1))
+          .withQueryParam("regime", equalTo(REGIME_CDS))
+          .willReturn(ok(Json.toJson(response).toString))
+      )
+
+      val result: SubscriptionResponse = await(connector.getSubscriptions(EORI(EORI_VALUE_1)))
+      result mustBe response
+
+      verifyEndPointUrlHit(sub09GetSubscriptionsEndpointUrl, GET)
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  sub09 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier                       = HeaderCarrier()
-    val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder                   = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier       = HeaderCarrier()
+    val sub09GetSubscriptionsEndpointUrl = "/customs-financials-hods-stub/subscriptions/subscriptiondisplay/v1"
+
     val responseCommon: ResponseCommon                   = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
       CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
@@ -70,7 +98,7 @@ class Sub09ConnectorSpec extends SpecBase {
     )
 
     val responseDetail: ResponseDetail = ResponseDetail(
-      Some(EORI("someEori")),
+      Some(EORI(EORI_VALUE_1)),
       None,
       None,
       "CDSFullName",
@@ -92,18 +120,7 @@ class Sub09ConnectorSpec extends SpecBase {
     val response: SubscriptionResponse =
       SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Sub09Connector = app.injector.instanceOf[Sub09Connector]
   }
 }
