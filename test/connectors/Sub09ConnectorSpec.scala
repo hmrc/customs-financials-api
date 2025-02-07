@@ -31,10 +31,13 @@ import utils.TestData.COUNTRY_CODE_GB
 import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, matchingJsonPath, ok, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.GET
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import utils.TestData.EORI_VALUE_1
 import com.typesafe.config.ConfigFactory
 
+import java.util
+import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.concurrent.Future
 
 class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
@@ -42,14 +45,16 @@ class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
   "getSubscriptions" should {
     "return a json on a successful response" in new Setup {
 
+      val queryParams: util.Map[String, StringValuePattern] =
+        Map(PARAM_NAME_EORI -> equalTo(EORI_VALUE_1), PARAM_NAME_REGIME -> equalTo(REGIME_CDS)).asJava
+
       wireMockServer.stubFor(
         get(urlPathMatching(sub09GetSubscriptionsEndpointUrl))
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
-          .withQueryParam("EORI", equalTo(EORI_VALUE_1))
-          .withQueryParam("regime", equalTo(REGIME_CDS))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withQueryParams(queryParams)
           .willReturn(ok(Json.toJson(response).toString))
       )
 

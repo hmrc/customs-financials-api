@@ -32,6 +32,12 @@ trait WireMockSupportProvider extends WireMockSupport {
   val ACCEPT           = "Accept"
   val AUTHORIZATION    = "Authorization"
 
+  val AUTH_BEARER_TOKEN_VALUE = "Bearer test1234567"
+
+  val PARAM_NAME_EORI   = "EORI"
+  val PARAM_NAME_eori   = "eori"
+  val PARAM_NAME_REGIME = "regime"
+
   def config: Configuration
 
   protected def verifyEndPointUrlHit(urlToVerify: String, methodType: RequestMethod = GET, count: Int = 1): Unit =
