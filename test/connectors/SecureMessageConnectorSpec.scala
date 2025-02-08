@@ -23,22 +23,25 @@ import models.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.test.Helpers.running
-import play.api.{Application, inject}
+import play.api.{Application, Configuration, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.{COUNTRY_CODE_GB, ERROR_MSG, REGIME, TEST_EMAIL}
 import utils.Utils.emptyString
+import com.typesafe.config.ConfigFactory
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import config.MetaConfig.Platform.MDTP
 
 import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SecureMessageConnectorSpec extends SpecBase {
+class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "SecureMessageConnector" should {
     "Populate Request" in new Setup {
@@ -84,16 +87,28 @@ class SecureMessageConnectorSpec extends SpecBase {
 
         when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
+        wireMockServer.stubFor(
+          post(urlPathMatching(secureMessageEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo("application/json"))
+            .withHeader(ACCEPT, equalTo("application/json"))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.recipient[?(@.regime == 'cds')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.recipient[?(@.taxIdentifier.name == 'HMRC-CUS-ORG')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.tags[?(@.notificationType == 'CDS Financials')]")
+            )
+            .willReturn(ok(Json.toJson(response).toString))
+        )
 
-        running(app) {
-          connector.sendSecureMessage(histDoc = doc).map { result =>
-            result mustBe Right(Response(eori.value))
-          }
-        }
+        val result: Either[String, Response] = await(connector.sendSecureMessage(histDoc = doc))
+        result mustBe Right(Response(eori.value))
+
+        verifyEndPointUrlHit(secureMessageEndpointUrl, POST)
       }
 
       "return error response when exception occurs while getting VerifiedEmail" in new Setup {
@@ -116,8 +131,25 @@ class SecureMessageConnectorSpec extends SpecBase {
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  secureMessage {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
+    implicit val hc: HeaderCarrier       = HeaderCarrier()
+    val secureMessageEndpointUrl: String = "/secure-messaging/v4/message"
+
     val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
     val requestBuilder: RequestBuilder = mock[RequestBuilder]
     val eori: EORI                     = EORI("GB333186811543")
@@ -217,17 +249,9 @@ class SecureMessageConnectorSpec extends SpecBase {
     val response: secureMessage.Response         = secureMessage.Response("GB333186811543")
     val mockDataStoreService: DataStoreConnector = mock[DataStoreConnector]
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder),
-        inject.bind[DataStoreConnector].toInstance(mockDataStoreService)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
+    val app: Application = application()
+      .overrides(inject.bind[DataStoreConnector].toInstance(mockDataStoreService))
+      .configure(config)
       .build()
 
     val connector: SecureMessageConnector = app.injector.instanceOf[SecureMessageConnector]
