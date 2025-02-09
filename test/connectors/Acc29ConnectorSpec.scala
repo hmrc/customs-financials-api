@@ -40,7 +40,7 @@ class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
           .withRequestBody(matchingJsonPath("$.requestCommon[?(@.regime == 'CDS')]"))
           .withRequestBody(matchingJsonPath("$.requestDetail[?(@.ownerEori == 'testEORI')]"))
           .willReturn(ok(Json.toJson(response).toString))

@@ -42,7 +42,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
           .withRequestBody(
             matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
           )
@@ -70,7 +70,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
           .withRequestBody(
             matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
           )
@@ -98,7 +98,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
           .withRequestBody(
             matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
           )
@@ -126,7 +126,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
           .withHeader(CONTENT_TYPE, equalTo("application/json"))
           .withHeader(ACCEPT, equalTo("application/json"))
-          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
           .withRequestBody(
             matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
           )
