@@ -32,7 +32,7 @@ import config.MetaConfig.Platform.MDTP
 import utils.TestData.EORI_VALUE
 import utils.Utils.emptyString
 
-import scala.concurrent.Future
+
 
 class Acc38ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

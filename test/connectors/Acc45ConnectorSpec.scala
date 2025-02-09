@@ -21,24 +21,18 @@ import models.requests.{
   CashAccountStatementRequestDetail
 }
 import models.responses.*
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  badRequest, created, equalTo, matchingJsonPath, ok, post, serverError, serviceUnavailable, urlPathMatching
+  aResponse, badRequest, created, equalTo, matchingJsonPath, ok, post, serverError, serviceUnavailable, urlPathMatching
 }
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
-
-import scala.concurrent.Future
 
 class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -233,32 +227,33 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
-      "Not Found Error is thrown from API call" in new Setup {
-        val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-        val requestBuilder: RequestBuilder = mock[RequestBuilder]
+      "SERVICE_UNAVAILABLE error is thrown when the api fails" in new Setup {
 
-        val application: Application = GuiceApplicationBuilder()
-          .overrides(
-            bind[HttpClientV2].toInstance(mockHttpClient),
-            bind[RequestBuilder].toInstance(requestBuilder)
-          )
-          .configure("microservice.metrics.enabled" -> false, "metrics.enabled" -> false, "auditing.enabled" -> false)
-          .build()
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc45CashAccountStatementRequestEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo("application/json"))
+            .withHeader(ACCEPT, equalTo("application/json"))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestDetail.can == '12345678910')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestDetail.eori == 'GB123456789012345')]")
+            )
+            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+        )
 
-        val acc45Connector: Acc45Connector = application.injector.instanceOf[Acc45Connector]
+        val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
 
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+        val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
+        errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
+        errorDetail.errorMessage must not be empty
 
-        running(application) {
-          val result = await(acc45Connector.submitStatementRequest(reqDetail01))
-
-          val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
-          errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
-          errorDetail.errorMessage must not be empty
-        }
+        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
     }
   }

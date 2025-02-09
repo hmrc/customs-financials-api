@@ -20,23 +20,17 @@ import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.acc40.*
 import domain.{Acc40Response, AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
 import models.EORI
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.{SpecBase, WireMockSupportProvider}
-import utils.TestData.{EORI_VALUE_1, ERROR_MSG}
+import utils.TestData.EORI_VALUE_1
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
-import config.MetaConfig.Platform.MDTP
-
-import scala.concurrent.Future
 
 class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -98,30 +92,31 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
     }
 
     "return error response when exception occurs while making the POST call" in new Setup {
-      val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc40SearchAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
+      val result: Either[Acc40Response, AuthoritiesFound] =
+        await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
 
-      running(application) {
-        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
-        result mustBe Left(ErrorResponse)
-      }
+      result mustBe Left(ErrorResponse)
+
+      verifyEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return Right if a valid response with authorities returned" in new Setup {

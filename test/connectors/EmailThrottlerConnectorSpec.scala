@@ -28,8 +28,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, 
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 
-import scala.concurrent.Future
-
 class EmailThrottlerConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "return true when the api responds with 202" in new Setup {

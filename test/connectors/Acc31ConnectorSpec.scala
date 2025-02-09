@@ -35,7 +35,7 @@ import config.MetaConfig.Platform.MDTP
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+
 
 class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

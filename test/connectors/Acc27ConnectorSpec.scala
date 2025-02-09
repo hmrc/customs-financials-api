@@ -26,7 +26,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.Future
+
 
 class Acc27ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

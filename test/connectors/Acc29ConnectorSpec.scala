@@ -35,7 +35,7 @@ import models.requests.manageAuthorities.{
 }
 import utils.TestData.EORI_VALUE
 
-import scala.concurrent.Future
+
 
 class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

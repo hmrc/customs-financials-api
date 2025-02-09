@@ -18,18 +18,13 @@ package connectors
 
 import domain.sub09.*
 import models.EORI
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.COUNTRY_CODE_GB
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, matchingJsonPath, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, ok, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.GET
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
@@ -38,7 +33,6 @@ import com.typesafe.config.ConfigFactory
 
 import java.util
 import scala.jdk.CollectionConverters.MapHasAsJava
-import scala.concurrent.Future
 
 class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

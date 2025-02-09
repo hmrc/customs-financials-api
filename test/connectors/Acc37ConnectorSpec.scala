@@ -33,7 +33,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 import utils.TestData.EORI_VALUE
 
-import scala.concurrent.Future
+
 
 class Acc37ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

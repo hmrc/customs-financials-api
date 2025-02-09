@@ -37,7 +37,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+
 
 class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

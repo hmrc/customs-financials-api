@@ -19,25 +19,20 @@ package connectors
 import domain.StandingAuthority
 import models.requests.manageAuthorities.*
 import models.{AccountNumber, EORI}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
 import com.typesafe.config.ConfigFactory
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import utils.Utils.emptyString
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalTo, matchingJsonPath, noContent, ok, post, serverError, urlPathMatching
+  aResponse, equalTo, matchingJsonPath, noContent, ok, post, serverError, urlPathMatching
 }
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import utils.TestData.EORI_VALUE
 
 import java.time.LocalDate
-import scala.concurrent.Future
 import config.MetaConfig.Platform.MDTP
 
 class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
@@ -114,30 +109,26 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
     }
 
     "return false when Future is failed with exception" in new Setup {
-      val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc30ManageAccountAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.manageStandingAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.manageStandingAuthoritiesRequest[?(@.requestDetail.ownerEori == 'testEORI')]")
+          )
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
+      result mustBe false
 
-      running(application) {
-        val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
-        result mustBe false
-      }
+      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
   }
 
@@ -188,30 +179,26 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
     }
 
     "return false when the api fails" in new Setup {
-      val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc30ManageAccountAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.manageStandingAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.manageStandingAuthoritiesRequest[?(@.requestDetail.ownerEori == 'testEORI')]")
+          )
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
+      result mustBe false
 
-      running(application) {
-        val result = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
-        result mustBe false
-      }
+      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
   }
 

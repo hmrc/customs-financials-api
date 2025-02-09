@@ -35,7 +35,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.Future
 import config.MetaConfig.Platform.MDTP
 
 class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {

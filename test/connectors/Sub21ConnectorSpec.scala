@@ -34,7 +34,7 @@ import utils.TestData.EORI_VALUE_1
 import com.typesafe.config.ConfigFactory
 import config.MetaConfig.Platform.MDTP
 
-import scala.concurrent.Future
+
 
 class Sub21ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

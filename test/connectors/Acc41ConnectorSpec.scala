@@ -20,25 +20,17 @@ import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.acc41.*
 import domain.{Acc41ErrorResponse, Acc41Response, AuthoritiesCsvGenerationResponse}
 import models.EORI
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.{SpecBase, WireMockSupportProvider}
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
-import config.MetaConfig.Platform.MDTP
-import utils.TestData.ERROR_MSG
+import com.github.tomakehurst.wiremock.http.Fault
 import utils.Utils.emptyString
 import utils.TestData.EORI_VALUE_1
-
-import scala.concurrent.Future
 
 class Acc41ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -75,30 +67,31 @@ class Acc41ConnectorSpec extends SpecBase with WireMockSupportProvider {
     }
 
     "return Left Acc41ErrorResponse when POST api call throws exception" in new Setup {
-      val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder = mock[RequestBuilder]
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc41AuthoritiesCsvGenerationEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("Bearer test1234567"))
+          .withRequestBody(
+            matchingJsonPath("$.standingAuthoritiesForEORIRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.standingAuthoritiesForEORIRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.standingAuthoritiesForEORIRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
+      val result: Either[Acc41Response, AuthoritiesCsvGenerationResponse] =
+        await(connector.initiateAuthoritiesCSV(EORI(EORI_VALUE_1), Some(EORI("someAltEori"))))
 
-      running(application) {
-        val result = await(connector.initiateAuthoritiesCSV(EORI("someEori"), Some(EORI("someAltEori"))))
-        result mustBe Left(Acc41ErrorResponse)
-      }
+      result mustBe Left(Acc41ErrorResponse)
+
+      verifyEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
     }
 
     "return Right AuthoritiesCsvGeneration when no alternateEORI" in new Setup {
