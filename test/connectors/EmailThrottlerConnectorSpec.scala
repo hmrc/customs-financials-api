@@ -17,19 +17,16 @@
 package connectors
 
 import models.requests.EmailRequest
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import utils.Utils.emptyString
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, ok, post, serverError, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 
 import scala.concurrent.Future
@@ -63,33 +60,15 @@ class EmailThrottlerConnectorSpec extends SpecBase with WireMockSupportProvider 
     verifyEndPointUrlHit(sendEmailEndpointUrl, POST)
   }
 
-  "return false when the api fails" in new Setup {
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+  "return false when the api fails due to connection reset" in new Setup {
+    wireMockServer.stubFor(
+      post(urlPathMatching(sendEmailEndpointUrl))
+        .withRequestBody(equalToJson(Json.toJson(request).toString))
+        .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+    )
 
-    when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-    when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-    when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-    when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
-
-    val application: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
-    val emailThrottlerConnector: EmailThrottlerConnector = application.injector.instanceOf[EmailThrottlerConnector]
-
-    running(application) {
-      val result = await(emailThrottlerConnector.sendEmail(request))
-      result mustBe false
-    }
+    val result: Boolean = await(connector.sendEmail(request))
+    result mustBe false
   }
 
   override def config: Configuration = Configuration(
