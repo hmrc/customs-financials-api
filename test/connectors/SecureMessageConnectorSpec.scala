@@ -90,8 +90,8 @@ class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
         wireMockServer.stubFor(
           post(urlPathMatching(secureMessageEndpointUrl))
             .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
-            .withHeader(CONTENT_TYPE, equalTo("application/json"))
-            .withHeader(ACCEPT, equalTo("application/json"))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
             .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
             .withRequestBody(
               matchingJsonPath("$.recipient[?(@.regime == 'cds')]")

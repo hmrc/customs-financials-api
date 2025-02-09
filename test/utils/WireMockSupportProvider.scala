@@ -32,7 +32,8 @@ trait WireMockSupportProvider extends WireMockSupport {
   val ACCEPT           = "Accept"
   val AUTHORIZATION    = "Authorization"
 
-  val AUTH_BEARER_TOKEN_VALUE = "Bearer test1234567"
+  val AUTH_BEARER_TOKEN_VALUE       = "Bearer test1234567"
+  val CONTENT_TYPE_APPLICATION_JSON = "application/json"
 
   val PARAM_NAME_EORI   = "EORI"
   val PARAM_NAME_eori   = "eori"
