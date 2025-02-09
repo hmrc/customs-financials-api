@@ -43,7 +43,7 @@ class EmailThrottlerConnectorSpec extends SpecBase with WireMockSupportProvider 
     val result: Boolean = await(connector.sendEmail(request))
     result mustBe true
 
-    verifyEndPointUrlHit(sendEmailEndpointUrl, POST)
+    verifyExactlyOneEndPointUrlHit(sendEmailEndpointUrl, POST)
   }
 
   "return false when the api responds with a successful response that isn't 204" in new Setup {
@@ -57,7 +57,7 @@ class EmailThrottlerConnectorSpec extends SpecBase with WireMockSupportProvider 
     val result: Boolean = await(connector.sendEmail(request))
     result mustBe false
 
-    verifyEndPointUrlHit(sendEmailEndpointUrl, POST)
+    verifyExactlyOneEndPointUrlHit(sendEmailEndpointUrl, POST)
   }
 
   "return false when the api fails due to connection reset" in new Setup {

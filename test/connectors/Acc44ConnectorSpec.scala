@@ -74,7 +74,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Right(cashAccTranSearchResponseContainerWithDeclarationOb)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "response has paymentsWithdrawalsAndTransfers" in new Setup {
@@ -107,7 +107,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Right(cashAccTranSearchResponseContainerOb)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
     }
 
@@ -166,7 +166,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "EIS returns 201 to MDTP with errorDetails" in new Setup {
@@ -197,7 +197,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status 500 due to backEnd error" in new Setup {
@@ -228,7 +228,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "request times out with Http status 500 due to EIS system error" in new Setup {
@@ -268,7 +268,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "request times out with Http status 400 due to EIS schema error" in new Setup {
@@ -308,7 +308,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "INTERNAL_SERVER_ERROR is returned from ETMP" in new Setup {
@@ -339,7 +339,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "4xx error is returned from ETMP" in new Setup {
@@ -370,7 +370,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with errorDetails" in new Setup {
@@ -401,7 +401,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(errorDetails)
 
-        verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with object other " +
@@ -445,7 +445,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
           result mustBe Left(errorDetails)
 
-          verifyEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+          verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
         }
     }
   }

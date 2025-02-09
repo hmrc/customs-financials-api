@@ -66,7 +66,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(NoAuthoritiesFound)
 
-      verifyEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return Left with error response if the error message present in the response" in new Setup {
@@ -94,7 +94,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(ErrorResponse)
 
-      verifyEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return error response when exception occurs while making the POST call" in new Setup {
@@ -171,7 +171,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           )
         )
 
-      verifyEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "search type value" should {

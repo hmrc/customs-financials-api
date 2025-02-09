@@ -65,7 +65,7 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Right(List.empty)
 
-      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
+      verifyExactlyOneEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data" in new Setup {
@@ -91,7 +91,7 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(NoAssociatedDataException)
 
-      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
+      verifyExactlyOneEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
@@ -117,7 +117,7 @@ class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(ExceededThresholdErrorException)
 
-      verifyEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
+      verifyExactlyOneEndPointUrlHit(retrieveGuaranteeTransactionsUrl, POST)
     }
   }
 

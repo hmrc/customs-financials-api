@@ -71,7 +71,7 @@ class Acc41ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(Acc41ErrorResponse)
 
-      verifyEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
     }
 
     "return Left Acc41ErrorResponse when POST api call throws exception" in new Setup {
@@ -128,7 +128,7 @@ class Acc41ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
 
-      verifyEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
     }
 
     "return Right AuthoritiesCsvGeneration when successful response containing a requestAcceptedDate" in new Setup {
@@ -161,7 +161,7 @@ class Acc41ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Right(AuthoritiesCsvGenerationResponse(Some("020-06-09T21:59:56Z")))
 
-      verifyEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc41AuthoritiesCsvGenerationEndpointUrl, POST)
     }
   }
 

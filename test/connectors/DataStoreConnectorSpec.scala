@@ -17,23 +17,17 @@
 package connectors
 
 import models.{AddressInformation, CompanyInformation, EORI, EmailAddress}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.COUNTRY_CODE_GB
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{get, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.GET
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import utils.TestData.EORI_VALUE_1
 
 class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
@@ -50,37 +44,19 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
       result mustBe emailResponse.address
 
-      verifyEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
     }
 
     "return None when an unknown exception happens from the data-store" in new Setup {
-      val mockHttpClient: HttpClientV2          = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder        = mock[RequestBuilder]
-      implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+      wireMockServer.stubFor(
+        get(urlPathMatching(customDataStoreVerifiedEmailUrl))
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+      val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
+      result mustBe empty
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
-
-      val dataStoreConnector: DataStoreConnector = application.injector.instanceOf[DataStoreConnector]
-
-      running(application) {
-        val result = await(dataStoreConnector.getVerifiedEmail(EORI(EORI_VALUE_1)))
-        result mustBe None
-      }
+      verifyEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
     }
   }
 
@@ -95,38 +71,21 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Seq[EORI] = await(connector.getEoriHistory(EORI(EORI_VALUE_1)))
       result mustBe Seq(EORI(EORI_VALUE_1))
 
+      verifyExactlyOneEndPointUrlHit(customDataStoreEoriHistoryUrl, GET)
+    }
+
+    "return an empty sequence if connection is rest while calling api" in new Setup {
+      wireMockServer.stubFor(
+        get(urlPathMatching(customDataStoreEoriHistoryUrl))
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
+
+      val result: Seq[EORI] = await(connector.getEoriHistory(EORI(EORI_VALUE_1)))
+      result mustBe empty
+
       verifyEndPointUrlHit(customDataStoreEoriHistoryUrl, GET)
     }
 
-    "return an empty sequence if an exception was thrown from the data-store" in new Setup {
-      val mockHttpClient: HttpClientV2          = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder        = mock[RequestBuilder]
-      implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
-
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
-
-      val dataStoreConnector: DataStoreConnector = application.injector.instanceOf[DataStoreConnector]
-
-      running(application) {
-        val result = await(dataStoreConnector.getEoriHistory(EORI(EORI_VALUE_1)))
-        result mustBe Seq.empty
-      }
-    }
   }
 
   "getCompanyName" should {
@@ -141,7 +100,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
       result mustBe Some("test_company")
 
-      verifyEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
     }
 
     "return companyName when consent returned is other than 1" in new Setup {
@@ -154,38 +113,18 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
       result mustBe Some("test_company")
 
-      verifyEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
     }
 
-    "return None when an unknown exception happens from the data-store" in {
-      val mockHttpClient: HttpClientV2          = mock[HttpClientV2]
-      val requestBuilder: RequestBuilder        = mock[RequestBuilder]
-      implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+    "return None when an unknown exception happens from the data-store" in new Setup {
 
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new NotFoundException("error")))
+      wireMockServer.stubFor(
+        get(urlPathMatching(customDataStoreCompanyInfoUrl))
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
 
-      val application: Application = GuiceApplicationBuilder()
-        .overrides(
-          bind[HttpClientV2].toInstance(mockHttpClient),
-          bind[RequestBuilder].toInstance(requestBuilder)
-        )
-        .configure(
-          "microservice.metrics.enabled" -> false,
-          "metrics.enabled"              -> false,
-          "auditing.enabled"             -> false
-        )
-        .build()
-
-      val dataStoreConnector: DataStoreConnector = application.injector.instanceOf[DataStoreConnector]
-
-      running(application) {
-        dataStoreConnector.getCompanyName(EORI(EORI_VALUE_1)).map { cname =>
-          cname mustBe None
-        }
-      }
+      val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
+      result mustBe empty
     }
   }
 

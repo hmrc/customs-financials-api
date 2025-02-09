@@ -57,7 +57,7 @@ class Acc38ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Response = await(connector.getAccountContactDetails(AccountNumber("dan"), EORI(EORI_VALUE)))
       result mustBe response
 
-      verifyEndPointUrlHit(acc38DutyDefermentContactDetailsEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc38DutyDefermentContactDetailsEndpointUrl, POST)
     }
   }
 

@@ -40,15 +40,23 @@ trait WireMockSupportProvider extends WireMockSupport {
 
   def config: Configuration
 
-  protected def verifyEndPointUrlHit(urlToVerify: String, methodType: RequestMethod = GET, count: Int = 1): Unit =
+  protected def verifyExactlyOneEndPointUrlHit(urlToVerify: String, methodType: RequestMethod = GET): Unit =
     wireMockServer.verify(
-      count,
-      methodType match {
-        case GET    => getRequestedFor(urlPathMatching(urlToVerify))
-        case POST   => postRequestedFor(urlPathMatching(urlToVerify))
-        case PUT    => putRequestedFor(urlPathMatching(urlToVerify))
-        case DELETE => deleteRequestedFor(urlPathMatching(urlToVerify))
-        case _      => throw new RuntimeException("Invalid method type")
-      }
+      1,
+      buildRequestPatternForRequestedUrl(urlToVerify, methodType)
     )
+
+  protected def verifyEndPointUrlHit(urlToVerify: String, methodType: RequestMethod = GET): Unit =
+    wireMockServer.verify(
+      buildRequestPatternForRequestedUrl(urlToVerify, methodType)
+    )
+
+  private def buildRequestPatternForRequestedUrl(urlToVerify: String, methodType: RequestMethod) =
+    methodType match {
+      case GET    => getRequestedFor(urlPathMatching(urlToVerify))
+      case POST   => postRequestedFor(urlPathMatching(urlToVerify))
+      case PUT    => putRequestedFor(urlPathMatching(urlToVerify))
+      case DELETE => deleteRequestedFor(urlPathMatching(urlToVerify))
+      case _      => throw new RuntimeException("Invalid method type")
+    }
 }

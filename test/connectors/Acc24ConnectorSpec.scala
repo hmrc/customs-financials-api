@@ -61,7 +61,7 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe true
 
-      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
 
     "return false if any other 2xx status code is returned" in new Setup {
@@ -84,7 +84,7 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe false
 
-      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
 
     "return false if an exception from Acc24 is returned" in new Setup {
@@ -107,7 +107,7 @@ class Acc24ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.sendHistoricDocumentRequest(historicDocumentRequest))
       result mustBe false
 
-      verifyEndPointUrlHit(historicStatementEndPointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(historicStatementEndPointUrl, POST)
     }
   }
 

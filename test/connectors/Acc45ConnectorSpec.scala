@@ -69,7 +69,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Right(responseCommon01)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "request is not successful due to business error - 'Request could not be processed'" in new Setup {
@@ -95,7 +95,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Right(responseCommon02)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "request is not successful due to business error - 'Exceeded maximum threshold of transactions'" in new Setup {
@@ -121,7 +121,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Right(responseCommon03)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
     }
 
@@ -149,7 +149,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Left(errorResponseDetails01)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "requests has missing required properties" in new Setup {
@@ -175,7 +175,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Left(errorResponseDetails02)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "Backend system faces Internal Server Error" in new Setup {
@@ -201,7 +201,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
         result mustBe Left(errorResponseDetails03)
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "Backend system sends ServiceUnavailable error" in new Setup {
@@ -230,7 +230,7 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
         errorDetail.errorMessage must not be empty
 
-        verifyEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }
 
       "Not Found Error is thrown from API call" in new Setup {

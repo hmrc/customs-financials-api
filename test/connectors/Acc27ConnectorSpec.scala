@@ -46,7 +46,7 @@ class Acc27ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: JsObject = await(connector.getAccounts(requestBody))
       result mustBe Json.obj("someOther" -> "value")
 
-      verifyEndPointUrlHit(getAccountsUrl, POST)
+      verifyExactlyOneEndPointUrlHit(getAccountsUrl, POST)
     }
   }
 

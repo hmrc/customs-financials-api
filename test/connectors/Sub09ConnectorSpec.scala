@@ -61,7 +61,7 @@ class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: SubscriptionResponse = await(connector.getSubscriptions(EORI(EORI_VALUE_1)))
       result mustBe response
 
-      verifyEndPointUrlHit(sub09GetSubscriptionsEndpointUrl, GET)
+      verifyExactlyOneEndPointUrlHit(sub09GetSubscriptionsEndpointUrl, GET)
     }
   }
 

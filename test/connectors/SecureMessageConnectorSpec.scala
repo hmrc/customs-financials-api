@@ -108,7 +108,7 @@ class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
         val result: Either[String, Response] = await(connector.sendSecureMessage(histDoc = doc))
         result mustBe Right(Response(eori.value))
 
-        verifyEndPointUrlHit(secureMessageEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(secureMessageEndpointUrl, POST)
       }
 
       "return error response when exception occurs while getting VerifiedEmail" in new Setup {

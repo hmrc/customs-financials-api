@@ -60,7 +60,7 @@ class Acc37ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe response
 
-      verifyEndPointUrlHit(acc37UpdateAccountContactDetailsEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc37UpdateAccountContactDetailsEndpointUrl, POST)
     }
   }
 

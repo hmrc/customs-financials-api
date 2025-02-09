@@ -64,7 +64,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
       result mustBe true
 
-      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
 
     "return false when the api responds with a successful response that isn't 204" in new Setup {
@@ -87,7 +87,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
       result mustBe false
 
-      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
 
     "return false when the api fails" in new Setup {
@@ -110,7 +110,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
       result mustBe false
 
-      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
 
     "return false when Future is failed with exception" in new Setup {
@@ -162,7 +162,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
       result mustBe true
 
-      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
 
     "return false when the api responds with a successful response that isn't 204" in new Setup {
@@ -184,7 +184,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
       result mustBe false
 
-      verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
     }
 
     "return false when the api fails" in new Setup {

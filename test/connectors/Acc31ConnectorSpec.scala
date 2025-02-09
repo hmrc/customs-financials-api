@@ -65,7 +65,7 @@ class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Right(Some(CashTransactionsResponseDetail(None, None, None)))
 
-      verifyEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data" in new Setup {
@@ -92,7 +92,7 @@ class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(NoAssociatedDataException)
 
-      verifyEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data " +
@@ -120,7 +120,7 @@ class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(NoAssociatedDataException)
 
-        verifyEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
       }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
@@ -147,7 +147,7 @@ class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       result mustBe Left(ExceededThresholdErrorException)
 
-      verifyEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold " +
@@ -175,7 +175,7 @@ class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
         result mustBe Left(ExceededThresholdErrorException)
 
-        verifyEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
+        verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
       }
   }
 

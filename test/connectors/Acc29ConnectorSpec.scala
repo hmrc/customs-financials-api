@@ -56,7 +56,7 @@ class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: Seq[AccountWithAuthorities] = await(connector.getStandingAuthorities(EORI(EORI_VALUE)))
       result mustBe Seq.empty
 
-      verifyEndPointUrlHit(getStandingAuthoritiesUrl, POST)
+      verifyExactlyOneEndPointUrlHit(getStandingAuthoritiesUrl, POST)
     }
   }
 

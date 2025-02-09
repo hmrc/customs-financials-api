@@ -51,7 +51,7 @@ class Sub21ConnectorSpec extends SpecBase with WireMockSupportProvider {
       val result: HistoricEoriResponse = await(connector.getEORIHistory(EORI(EORI_VALUE_1)))
       result mustBe response
 
-      verifyEndPointUrlHit(sub21CheckEORIValidEndpointUrl, GET)
+      verifyExactlyOneEndPointUrlHit(sub21CheckEORIValidEndpointUrl, GET)
     }
   }
 
