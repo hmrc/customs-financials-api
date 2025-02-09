@@ -18,7 +18,6 @@ package connectors
 
 import models.requests.EmailRequest
 import play.api.{Application, Configuration}
-import play.api.inject.bind
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
@@ -69,6 +68,8 @@ class EmailThrottlerConnectorSpec extends SpecBase with WireMockSupportProvider 
 
     val result: Boolean = await(connector.sendEmail(request))
     result mustBe false
+
+    verifyEndPointUrlHit(sendEmailEndpointUrl, POST)
   }
 
   override def config: Configuration = Configuration(
