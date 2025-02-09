@@ -16,25 +16,18 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.http.RequestMethod.GET
 import models.EORI
 import models.responses.*
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import utils.Utils.emptyString
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, matchingJsonPath, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, ok, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.GET
-import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import play.api.libs.json.Json
 import utils.TestData.EORI_VALUE_1
 import com.typesafe.config.ConfigFactory
-import config.MetaConfig.Platform.MDTP
-
-
 
 class Sub21ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

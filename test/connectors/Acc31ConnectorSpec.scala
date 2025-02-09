@@ -22,8 +22,6 @@ import models.responses.{
 }
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
@@ -34,8 +32,6 @@ import com.typesafe.config.ConfigFactory
 import config.MetaConfig.Platform.MDTP
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

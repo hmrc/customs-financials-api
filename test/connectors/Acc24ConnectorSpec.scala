@@ -17,18 +17,13 @@
 package connectors
 
 import models.EORI
-import models.requests.{HistoricDocumentRequest, HistoricStatementRequest}
+import models.requests.HistoricDocumentRequest
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
 import utils.TestData.{FILE_ROLE_C79_CERTIFICATE, MONTH_10, YEAR_2019}
-import utils.Utils.emptyString
 import utils.WireMockSupportProvider
-import uk.gov.hmrc.http.HttpReads.Implicits.*
 import com.github.tomakehurst.wiremock.client.WireMock.{
   equalTo, matchingJsonPath, noContent, ok, post, serverError, urlPathMatching
 }

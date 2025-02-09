@@ -16,19 +16,15 @@
 
 package connectors
 
-import models.requests.{GuaranteeAccountTransactionsRequest, RequestCommon}
 import models.requests.*
 import models.{AccountNumber, ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.typesafe.config.ConfigFactory
-import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import play.api.libs.json.Json
 import models.responses.{
@@ -37,7 +33,6 @@ import models.responses.{
 }
 
 import java.time.LocalDate
-
 
 class Acc28ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

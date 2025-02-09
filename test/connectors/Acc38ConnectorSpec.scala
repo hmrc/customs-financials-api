@@ -19,8 +19,6 @@ package connectors
 import domain.acc38.{GetCorrespondenceAddressResponse, Response}
 import models.{AccountNumber, EORI}
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,8 +29,6 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 import utils.TestData.EORI_VALUE
 import utils.Utils.emptyString
-
-
 
 class Acc38ConnectorSpec extends SpecBase with WireMockSupportProvider {
 

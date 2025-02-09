@@ -21,8 +21,6 @@ import domain.AccountWithAuthorities
 import models.EORI
 import models.responses.StandingAuthoritiesResponse
 import play.api.{Application, Configuration}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
@@ -30,12 +28,7 @@ import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import config.MetaConfig.Platform.MDTP
-import models.requests.manageAuthorities.{
-  AuthoritiesRequestCommon, AuthoritiesRequestDetail, StandingAuthoritiesRequest
-}
 import utils.TestData.EORI_VALUE
-
-
 
 class Acc29ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
