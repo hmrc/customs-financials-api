@@ -26,8 +26,6 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 import com.typesafe.config.ConfigFactory
 
-
-
 class Acc27ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "getAccounts" should {
