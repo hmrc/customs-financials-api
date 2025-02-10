@@ -19,9 +19,11 @@ package connectors
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.*
 import models.responses.ErrorCode.{code400, code500}
-import models.responses.ErrorSource.mdtp
+import models.responses.ErrorSource.{backEnd, mdtp}
 import models.responses.PaymentType.Payment
-import models.responses.SourceFaultDetailMsg.REQUEST_SCHEMA_VALIDATION_ERROR
+import models.responses.SourceFaultDetailMsg.{
+  BACK_END_FAILURE, REQUEST_SCHEMA_VALIDATION_ERROR, SERVER_CONNECTION_ERROR
+}
 import play.api.{Application, Configuration}
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,7 +39,6 @@ import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -379,7 +380,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
           post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
             .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
             .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
-            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo("application/json"))
             .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
             .withRequestBody(
               matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
@@ -405,7 +406,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with object other " +
-        "than errorDetails" ignore new Setup {
+        "than errorDetails" in new Setup {
 
           val cashAccTranSearchResponseContainerWithNoResponseDetailsOb: CashAccountTransactionSearchResponseContainer =
             cashAccTranSearchResponseContainerOb.copy(
@@ -443,7 +444,13 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
           val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
             await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
 
-          result mustBe Left(errorDetails)
+          val resultErrorDetails: ErrorDetail = result.swap.getOrElse(errorDetails1)
+
+          resultErrorDetails.correlationId mustBe "MDTP_ID"
+          resultErrorDetails.errorCode mustBe SERVICE_UNAVAILABLE.toString
+          resultErrorDetails.errorMessage mustBe SERVER_CONNECTION_ERROR
+          resultErrorDetails.source mustBe backEnd
+          resultErrorDetails.sourceFaultDetail mustBe SourceFaultDetail(Seq(BACK_END_FAILURE))
 
           verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
         }
@@ -479,8 +486,18 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
         "f058ebd6-02f7-4d3f-942e-904344e8cde5",
         code500,
         "Internal Server Error",
-        "Backend",
-        SourceFaultDetail(Seq("Failure in backend System"))
+        backEnd,
+        SourceFaultDetail(Seq(BACK_END_FAILURE))
+      )
+
+    val errorDetails1: ErrorDetail =
+      ErrorDetail(
+        "2024-01-21T11:30:47Z",
+        "MDTP_ID",
+        SERVICE_UNAVAILABLE.toString,
+        SERVER_CONNECTION_ERROR,
+        backEnd,
+        SourceFaultDetail(Seq(BACK_END_FAILURE))
       )
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =
