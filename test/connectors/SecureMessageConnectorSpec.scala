@@ -22,7 +22,6 @@ import domain.secureMessage.*
 import models.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.inject.bind
 import play.api.test.Helpers.running
 import play.api.{Application, Configuration, inject}
 import uk.gov.hmrc.http.HeaderCarrier

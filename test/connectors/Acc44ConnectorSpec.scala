@@ -38,8 +38,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "cashAccountTransactionSearch" should {
