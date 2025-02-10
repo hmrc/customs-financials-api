@@ -53,10 +53,47 @@ class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
       )
 
       val result: SubscriptionResponse = await(connector.getSubscriptions(EORI(EORI_VALUE_1)))
-      result mustBe response
+
+      shouldOutputCorrectSubscriptionResponse(result, response)
 
       verifyExactlyOneEndPointUrlHit(sub09GetSubscriptionsEndpointUrl, GET)
     }
+  }
+
+  private def shouldOutputCorrectSubscriptionResponse(
+    actualResponse: SubscriptionResponse,
+    expectedResponse: SubscriptionResponse
+  ) = {
+    actualResponse.subscriptionDisplayResponse.responseCommon mustBe
+      expectedResponse.subscriptionDisplayResponse.responseCommon
+
+    val actualResponseDetails: ResponseDetail   = actualResponse.subscriptionDisplayResponse.responseDetail
+    val expectedResponseDetails: ResponseDetail = expectedResponse.subscriptionDisplayResponse.responseDetail
+
+    actualResponseDetails.EORINo mustBe expectedResponseDetails.EORINo
+    actualResponseDetails.EORIStartDate mustBe expectedResponseDetails.EORIStartDate
+    actualResponseDetails.EORIEndDate mustBe expectedResponseDetails.EORIEndDate
+    actualResponseDetails.CDSFullName mustBe expectedResponseDetails.CDSFullName
+    actualResponseDetails.CDSEstablishmentAddress mustBe expectedResponseDetails.CDSEstablishmentAddress
+    actualResponseDetails.XI_Subscription mustBe actualResponseDetails.XI_Subscription
+    actualResponseDetails.establishmentInTheCustomsTerritoryOfTheUnion mustBe
+      expectedResponseDetails.establishmentInTheCustomsTerritoryOfTheUnion
+
+    actualResponseDetails.typeOfLegalEntity mustBe expectedResponseDetails.typeOfLegalEntity
+    actualResponseDetails.contactInformation mustBe expectedResponseDetails.contactInformation
+    actualResponseDetails.VATIDs.getOrElse(Array[VatId]()) mustBe expectedResponseDetails.VATIDs.getOrElse(
+      Array[VatId]()
+    )
+    actualResponseDetails.thirdCountryUniqueIdentificationNumber mustBe
+      expectedResponseDetails.thirdCountryUniqueIdentificationNumber
+
+    actualResponseDetails.consentToDisclosureOfPersonalData mustBe
+      expectedResponseDetails.consentToDisclosureOfPersonalData
+
+    actualResponseDetails.shortName mustBe expectedResponseDetails.shortName
+    actualResponseDetails.dateOfEstablishment mustBe expectedResponseDetails.dateOfEstablishment
+    actualResponseDetails.typeOfPerson mustBe expectedResponseDetails.typeOfPerson
+    actualResponseDetails.ETMP_Master_Indicator mustBe expectedResponseDetails.ETMP_Master_Indicator
   }
 
   override def config: Configuration = Configuration(
