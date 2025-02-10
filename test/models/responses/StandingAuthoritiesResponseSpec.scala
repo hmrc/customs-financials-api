@@ -24,18 +24,17 @@ import utils.TestData.{BANK_ACCOUNT, DATE_STRING, EORI_VALUE_1}
 
 class StandingAuthoritiesResponseSpec extends SpecBase {
 
-  "Json Reads" should {
-    "generate correct output" in new Setup {
-      import StandingAuthoritiesResponse.standingAuthoritiesRequestReads
+  "standingAuthoritiesResponseFormat" should {
+
+    "generate correct output for Json Reads" in new Setup {
+      import StandingAuthoritiesResponse.standingAuthoritiesResponseFormat
 
       Json.fromJson(Json.parse(standingAuthoritiesResponseJsonString)) mustBe JsSuccess(
         standingAuthoritiesResponseObject
       )
     }
-  }
 
-  "Json Writes" should {
-    "generate correct output" in new Setup {
+    "generate correct output for Json Writes" in new Setup {
       Json.toJson(standingAuthoritiesResponseObject) mustBe Json.parse(standingAuthoritiesResponseJsonString)
     }
   }
