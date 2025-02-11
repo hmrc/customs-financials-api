@@ -18,39 +18,103 @@ package connectors
 
 import domain.sub09.*
 import models.EORI
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.COUNTRY_CODE_GB
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, get, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.GET
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
+import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
+import utils.TestData.EORI_VALUE_1
+import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.Future
+import java.util
+import scala.jdk.CollectionConverters.MapHasAsJava
 
-class Sub09ConnectorSpec extends SpecBase {
+class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "getSubscriptions" should {
     "return a json on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.get(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result = await(connector.getSubscriptions(EORI("someEori")))
-        result mustBe response
-      }
+      val queryParams: util.Map[String, StringValuePattern] =
+        Map(PARAM_NAME_EORI -> equalTo(EORI_VALUE_1), PARAM_NAME_REGIME -> equalTo(REGIME_CDS)).asJava
+
+      wireMockServer.stubFor(
+        get(urlPathMatching(sub09GetSubscriptionsEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withQueryParams(queryParams)
+          .willReturn(ok(Json.toJson(response).toString))
+      )
+
+      val result: SubscriptionResponse = await(connector.getSubscriptions(EORI(EORI_VALUE_1)))
+
+      shouldOutputCorrectSubscriptionResponse(result, response)
+
+      verifyExactlyOneEndPointUrlHit(sub09GetSubscriptionsEndpointUrl, GET)
     }
   }
 
+  private def shouldOutputCorrectSubscriptionResponse(
+    actualResponse: SubscriptionResponse,
+    expectedResponse: SubscriptionResponse
+  ) = {
+    actualResponse.subscriptionDisplayResponse.responseCommon mustBe
+      expectedResponse.subscriptionDisplayResponse.responseCommon
+
+    val actualResponseDetails: ResponseDetail   = actualResponse.subscriptionDisplayResponse.responseDetail
+    val expectedResponseDetails: ResponseDetail = expectedResponse.subscriptionDisplayResponse.responseDetail
+
+    actualResponseDetails.EORINo mustBe expectedResponseDetails.EORINo
+    actualResponseDetails.EORIStartDate mustBe expectedResponseDetails.EORIStartDate
+    actualResponseDetails.EORIEndDate mustBe expectedResponseDetails.EORIEndDate
+    actualResponseDetails.CDSFullName mustBe expectedResponseDetails.CDSFullName
+    actualResponseDetails.CDSEstablishmentAddress mustBe expectedResponseDetails.CDSEstablishmentAddress
+    actualResponseDetails.XI_Subscription mustBe actualResponseDetails.XI_Subscription
+    actualResponseDetails.establishmentInTheCustomsTerritoryOfTheUnion mustBe
+      expectedResponseDetails.establishmentInTheCustomsTerritoryOfTheUnion
+
+    actualResponseDetails.typeOfLegalEntity mustBe expectedResponseDetails.typeOfLegalEntity
+    actualResponseDetails.contactInformation mustBe expectedResponseDetails.contactInformation
+    actualResponseDetails.VATIDs.getOrElse(Array[VatId]()) mustBe expectedResponseDetails.VATIDs.getOrElse(
+      Array[VatId]()
+    )
+    actualResponseDetails.thirdCountryUniqueIdentificationNumber mustBe
+      expectedResponseDetails.thirdCountryUniqueIdentificationNumber
+
+    actualResponseDetails.consentToDisclosureOfPersonalData mustBe
+      expectedResponseDetails.consentToDisclosureOfPersonalData
+
+    actualResponseDetails.shortName mustBe expectedResponseDetails.shortName
+    actualResponseDetails.dateOfEstablishment mustBe expectedResponseDetails.dateOfEstablishment
+    actualResponseDetails.typeOfPerson mustBe expectedResponseDetails.typeOfPerson
+    actualResponseDetails.ETMP_Master_Indicator mustBe expectedResponseDetails.ETMP_Master_Indicator
+  }
+
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  sub09 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier                       = HeaderCarrier()
-    val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder                   = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier       = HeaderCarrier()
+    val sub09GetSubscriptionsEndpointUrl = "/customs-financials-hods-stub/subscriptions/subscriptiondisplay/v1"
+
     val responseCommon: ResponseCommon                   = ResponseCommon("OK", None, "2020-10-05T09:30:47Z", None)
     val cdsEstablishmentAddress: CdsEstablishmentAddress =
       CdsEstablishmentAddress("Example Street", "Example", Some("A00 0AA"), COUNTRY_CODE_GB)
@@ -70,7 +134,7 @@ class Sub09ConnectorSpec extends SpecBase {
     )
 
     val responseDetail: ResponseDetail = ResponseDetail(
-      Some(EORI("someEori")),
+      Some(EORI(EORI_VALUE_1)),
       None,
       None,
       "CDSFullName",
@@ -92,18 +156,7 @@ class Sub09ConnectorSpec extends SpecBase {
     val response: SubscriptionResponse =
       SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Sub09Connector = app.injector.instanceOf[Sub09Connector]
   }
 }

@@ -16,44 +16,70 @@
 
 package connectors
 
-import domain.acc37.{AmendCorrespondenceAddressResponse, ContactDetails, ResponseCommon}
+import domain.acc37.{AmendCorrespondenceAddressResponse, ContactDetails, Response, ResponseCommon}
 import models.{AccountNumber, EORI, EmailAddress}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
+import play.api.libs.json.Json
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
+import com.typesafe.config.ConfigFactory
 import utils.TestData.COUNTRY_CODE_GB
 import utils.Utils.emptyString
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import config.MetaConfig.Platform.MDTP
+import utils.TestData.EORI_VALUE
 
-import scala.concurrent.Future
-
-class Acc37ConnectorSpec extends SpecBase {
+class Acc37ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "updateAccountContactDetails" should {
     "return an acc37 response on a successful api call" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result =
-          await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI("someEori"), acc37ContactInfo))
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc37UpdateAccountContactDetailsEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath("$.amendCorrespondenceAddressRequest[?(@.requestCommon.originatingSystem == 'Digital')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.amendCorrespondenceAddressRequest[?(@.requestDetail.eori == 'testEORI')]")
+          )
+          .willReturn(ok(Json.toJson(response).toString))
+      )
 
-        result mustBe response
-      }
+      val result: Response =
+        await(connector.updateAccountContactDetails(AccountNumber("dan"), EORI(EORI_VALUE), acc37ContactInfo))
+
+      result mustBe response
+
+      verifyExactlyOneEndPointUrlHit(acc37UpdateAccountContactDetailsEndpointUrl, POST)
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc37 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val acc37UpdateAccountContactDetailsEndpointUrl =
+      "/customs-financials-hods-stub/accounts/amendcorrespondenceaddress/v1"
 
     val response: domain.acc37.Response = domain.acc37.Response(
       AmendCorrespondenceAddressResponse(
@@ -79,18 +105,7 @@ class Acc37ConnectorSpec extends SpecBase {
       Some(EmailAddress("somedata@email.com"))
     )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc37Connector = app.injector.instanceOf[Acc37Connector]
   }
 }

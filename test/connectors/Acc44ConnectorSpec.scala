@@ -19,53 +19,94 @@ package connectors
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.*
 import models.responses.ErrorCode.{code400, code500}
-import models.responses.ErrorSource.mdtp
+import models.responses.ErrorSource.{backEnd, mdtp}
 import models.responses.PaymentType.Payment
-import models.responses.SourceFaultDetailMsg.REQUEST_SCHEMA_VALIDATION_ERROR
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
+import models.responses.SourceFaultDetailMsg.{
+  BACK_END_FAILURE, REQUEST_SCHEMA_VALIDATION_ERROR, SERVER_CONNECTION_ERROR
+}
+import play.api.{Application, Configuration}
 import play.api.http.Status.*
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import utils.SpecBase
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.*
 import utils.Utils.emptyString
+import com.typesafe.config.ConfigFactory
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  badRequest, created, equalTo, matchingJsonPath, ok, post, serverError, serviceUnavailable, urlPathMatching
+}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import config.MetaConfig.Platform.MDTP
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class Acc44ConnectorSpec extends SpecBase {
+class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "cashAccountTransactionSearch" should {
 
     "return success response" when {
 
       "response has declarations" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any))
-          .thenReturn(Future.successful(cashAccTranSearchResponseContainerWithDeclarationOb))
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(
+              ok(Json.toJson(cashAccTranSearchResponseContainerWithDeclarationOb).toString)
+            )
+        )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { successResponse =>
-          successResponse mustBe Right(cashAccTranSearchResponseContainerWithDeclarationOb)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Right(cashAccTranSearchResponseContainerWithDeclarationOb)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "response has paymentsWithdrawalsAndTransfers" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(cashAccTranSearchResponseContainerOb))
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { successResponse =>
-          successResponse mustBe Right(cashAccTranSearchResponseContainerOb)
-        }
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(
+              ok(Json.toJson(cashAccTranSearchResponseContainerOb).toString)
+            )
+        )
 
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Right(cashAccTranSearchResponseContainerOb)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
     }
 
@@ -97,43 +138,96 @@ class Acc44ConnectorSpec extends SpecBase {
       }
 
       "EIS returns 201 to MDTP without responseDetails in success response" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(
-          Future.successful(
-            HttpResponse(CREATED, Json.toJson(cashAccTranSearchResponseContainerWith201EISCodeOb), Map())
-          )
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(created.withBody(Json.toJson(cashAccTranSearchResponseContainerWith201EISCodeOb).toString))
         )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { successResponse =>
-          successResponse mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Right(cashAccTranSearchResponseContainerWith201EISCodeOb)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "EIS returns 201 to MDTP with errorDetails" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any))
-          .thenReturn(Future.successful(HttpResponse(CREATED, Json.toJson(ErrorDetailContainer(errorDetails)), Map())))
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { successResponse =>
-          successResponse mustBe Left(errorDetails)
-        }
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(created.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
+        )
+
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status 500 due to backEnd error" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(
-          Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map()))
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(badRequest.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
         )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "request times out with Http status 500 due to EIS system error" in new Setup {
@@ -147,17 +241,33 @@ class Acc44ConnectorSpec extends SpecBase {
             SourceFaultDetail(Seq("Failure in backend System"))
           )
 
-        val errorDetailJsString: JsValue = Json.toJson(errorDetails)
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(serverError.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
+        )
 
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any))
-          .thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "request times out with Http status 400 due to EIS schema error" in new Setup {
@@ -171,56 +281,126 @@ class Acc44ConnectorSpec extends SpecBase {
             SourceFaultDetail(Seq("Failure in backend System"))
           )
 
-        val errorDetailJsString: JsValue = Json.toJson(errorDetails)
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(badRequest.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
+        )
 
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any))
-          .thenReturn(Future.successful(HttpResponse(OK, errorDetailJsString, Map())))
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "INTERNAL_SERVER_ERROR is returned from ETMP" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(
-          Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, Json.toJson(ErrorDetailContainer(errorDetails)), Map()))
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(serverError.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
         )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "4xx error is returned from ETMP" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(
-          Future.successful(HttpResponse(BAD_REQUEST, Json.toJson(ErrorDetailContainer(errorDetails)), Map()))
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(badRequest.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
         )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with errorDetails" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(
-          Future.successful(HttpResponse(SERVICE_UNAVAILABLE, Json.toJson(ErrorDetailContainer(errorDetails)), Map()))
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo("application/json"))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(serviceUnavailable.withBody(Json.toJson(ErrorDetailContainer(errorDetails)).toString))
         )
 
-        connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-          failureRes mustBe Left(errorDetails)
-        }
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with object other " +
@@ -232,44 +412,70 @@ class Acc44ConnectorSpec extends SpecBase {
                 cashAccTranSearchResponseContainerOb.cashAccountTransactionSearchResponse.copy(responseDetail = None)
             )
 
-          when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-          when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-          when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-          when(requestBuilder.execute(any, any)).thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                Json.toJson(cashAccTranSearchResponseContainerWithNoResponseDetailsOb),
-                Map()
+          wireMockServer.stubFor(
+            post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+              .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+              .withHeader(CONTENT_TYPE, equalTo("application/json"))
+              .withHeader(ACCEPT, equalTo("application/json"))
+              .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+              .withRequestBody(
+                matchingJsonPath(
+                  "$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+                )
               )
-            )
+              .withRequestBody(
+                matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+              )
+              .withRequestBody(
+                matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+              )
+              .withRequestBody(
+                matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+              )
+              .willReturn(
+                serviceUnavailable.withBody(
+                  Json.toJson(cashAccTranSearchResponseContainerWithNoResponseDetailsOb).toString
+                )
+              )
           )
 
-          connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails).map { failureRes =>
-            failureRes mustBe Left(errorDetails)
-          }
+          val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+            await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+          val resultErrorDetails: ErrorDetail = result.swap.getOrElse(errorDetails1)
+
+          resultErrorDetails.correlationId mustBe "MDTP_ID"
+          resultErrorDetails.errorCode mustBe SERVICE_UNAVAILABLE.toString
+          resultErrorDetails.errorMessage mustBe SERVER_CONNECTION_ERROR
+          resultErrorDetails.source mustBe backEnd
+          resultErrorDetails.sourceFaultDetail mustBe SourceFaultDetail(Seq(BACK_END_FAILURE))
+
+          verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
         }
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc44 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    val acc44CashTransactionSearchEndpointUrl = "/customs-financials-hods-stub/accounts/cashaccounttransactionsearch/v1"
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc44Connector = app.injector.instanceOf[Acc44Connector]
 
     val errorDetails: ErrorDetail =
@@ -278,8 +484,18 @@ class Acc44ConnectorSpec extends SpecBase {
         "f058ebd6-02f7-4d3f-942e-904344e8cde5",
         code500,
         "Internal Server Error",
-        "Backend",
-        SourceFaultDetail(Seq("Failure in backend System"))
+        backEnd,
+        SourceFaultDetail(Seq(BACK_END_FAILURE))
+      )
+
+    val errorDetails1: ErrorDetail =
+      ErrorDetail(
+        "2024-01-21T11:30:47Z",
+        "MDTP_ID",
+        SERVICE_UNAVAILABLE.toString,
+        SERVER_CONNECTION_ERROR,
+        backEnd,
+        SourceFaultDetail(Seq(BACK_END_FAILURE))
       )
 
     val cashAccTransactionSearchRequestDetails: CashAccountTransactionSearchRequestDetails =

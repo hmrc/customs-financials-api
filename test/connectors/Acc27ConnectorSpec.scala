@@ -16,52 +16,64 @@
 
 package connectors
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, equalToJson, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import config.MetaConfig.Platform.MDTP
+import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.Future
-
-class Acc27ConnectorSpec extends SpecBase {
+class Acc27ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "getAccounts" should {
     "return a json on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(Json.obj("someOther" -> "value")))
 
-      running(app) {
-        val result = await(connector.getAccounts(requestBody))
-        result mustBe Json.obj("someOther" -> "value")
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(getAccountsUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(equalToJson(requestBody.toString))
+          .willReturn(ok(Json.obj("someOther" -> "value").toString))
+      )
+
+      val result: JsObject = await(connector.getAccounts(requestBody))
+      result mustBe Json.obj("someOther" -> "value")
+
+      verifyExactlyOneEndPointUrlHit(getAccountsUrl, POST)
     }
   }
 
-  trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val requestBody: JsObject          = Json.obj("some" -> "value")
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc27 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |            context-base = "/customs-financials-hods-stub"
+         |            bearer-token = "test1234567"
+         |            endpoint = "/accounts/getaccountsandbalances/v1"
+         |            serviceName="hods-acc27"
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
+  trait Setup {
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    val requestBody: JsObject      = Json.obj("some" -> "value")
+
+    val getAccountsUrl = "/customs-financials-hods-stub/accounts/getaccountsandbalances/v1"
+
+    val app: Application = application().configure(config).build()
 
     val connector: Acc27Connector = app.injector.instanceOf[Acc27Connector]
   }

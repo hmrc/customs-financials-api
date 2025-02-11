@@ -20,96 +20,184 @@ import models.responses.{
   CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
   GetCashAccountTransactionListingResponse
 }
-import models.{ExceededThresholdErrorException, NoAssociatedDataException}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
+import play.api.{Application, Configuration}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
+import utils.{SpecBase, WireMockSupportProvider}
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import com.typesafe.config.ConfigFactory
+import config.MetaConfig.Platform.MDTP
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
-class Acc31ConnectorSpec extends SpecBase {
+class Acc31ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "retrieveCashTransactions" should {
 
     "return a list of declarations on a successful response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response))
 
-      running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Right(Some(CashTransactionsResponseDetail(None, None, None)))
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc31GetCashAccountTransactionListingEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath(
+              "$.getCashAccountTransactionListingRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+            )
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getCashAccountTransactionListingRequest[?(@.requestDetail.CAN == 'can')]")
+          )
+          .willReturn(ok(Json.toJson(response).toString))
+      )
+
+      val result: Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
+        await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+
+      result mustBe Right(Some(CashTransactionsResponseDetail(None, None, None)))
+
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse))
 
-      running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Left(NoAssociatedDataException)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc31GetCashAccountTransactionListingEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath(
+              "$.getCashAccountTransactionListingRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+            )
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getCashAccountTransactionListingRequest[?(@.requestDetail.CAN == 'can')]")
+          )
+          .willReturn(ok(Json.toJson(noDataResponse).toString))
+      )
+
+      val result: Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
+        await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+
+      result mustBe Left(NoAssociatedDataException)
+
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return NoAssociatedData error response when responded with no associated data " +
       "and maxTransactionsExceeded field is set to true" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(noDataResponse02))
 
-        running(app) {
-          connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map { result =>
-            result mustBe Left(NoAssociatedDataException)
-          }
-        }
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc31GetCashAccountTransactionListingEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath(
+                "$.getCashAccountTransactionListingRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+              )
+            )
+            .withRequestBody(
+              matchingJsonPath("$.getCashAccountTransactionListingRequest[?(@.requestDetail.CAN == 'can')]")
+            )
+            .willReturn(ok(Json.toJson(noDataResponse02).toString))
+        )
+
+        val result: Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
+          await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+
+        result mustBe Left(NoAssociatedDataException)
+
+        verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
       }
 
     "return ExceededThreshold error response when responded with exceeded threshold" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse))
 
-      running(app) {
-        val result = await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
-        result mustBe Left(ExceededThresholdErrorException)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc31GetCashAccountTransactionListingEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath(
+              "$.getCashAccountTransactionListingRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+            )
+          )
+          .withRequestBody(
+            matchingJsonPath("$.getCashAccountTransactionListingRequest[?(@.requestDetail.CAN == 'can')]")
+          )
+          .willReturn(ok(Json.toJson(tooMuchDataRequestedResponse).toString))
+      )
+
+      val result: Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
+        await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+
+      result mustBe Left(ExceededThresholdErrorException)
+
+      verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
     }
 
     "return ExceededThreshold error response when responded with exceeded threshold " +
       "and maxTransactionsExceeded field is set to false" in new Setup {
-        when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-        when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-        when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-        when(requestBuilder.execute(any, any)).thenReturn(Future.successful(tooMuchDataRequestedResponse02))
 
-        running(app) {
-          connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()).map { result =>
-            result mustBe Left(ExceededThresholdErrorException)
-          }
-        }
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc31GetCashAccountTransactionListingEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath(
+                "$.getCashAccountTransactionListingRequest[?(@.requestCommon.originatingSystem == 'MDTP')]"
+              )
+            )
+            .withRequestBody(
+              matchingJsonPath("$.getCashAccountTransactionListingRequest[?(@.requestDetail.CAN == 'can')]")
+            )
+            .willReturn(ok(Json.toJson(tooMuchDataRequestedResponse02).toString))
+        )
+
+        val result: Either[ErrorResponse, Option[CashTransactionsResponseDetail]] =
+          await(connector.retrieveCashTransactions("can", LocalDate.now(), LocalDate.now()))
+
+        result mustBe Left(ExceededThresholdErrorException)
+
+        verifyExactlyOneEndPointUrlHit(acc31GetCashAccountTransactionListingEndpointUrl, POST)
       }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc31 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
-    val noAssociatedDataMessage        = "025-No associated data found"
-    val exceedsThresholdMessage        = "091-The query has exceeded the threshold, please refine the search"
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val acc31GetCashAccountTransactionListingEndpointUrl =
+      "/customs-financials-hods-stub/accounts/getcashaccounttransactionlisting/v1"
+
+    val noAssociatedDataMessage = "025-No associated data found"
+    val exceedsThresholdMessage = "091-The query has exceeded the threshold, please refine the search"
 
     val response: CashTransactionsResponse = CashTransactionsResponse(
       GetCashAccountTransactionListingResponse(
@@ -146,18 +234,7 @@ class Acc31ConnectorSpec extends SpecBase {
       )
     )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc31Connector = app.injector.instanceOf[Acc31Connector]
   }
 }

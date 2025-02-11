@@ -18,120 +18,193 @@ package connectors
 
 import config.MetaConfig.Platform.{MDTP, REGIME_CDS}
 import domain.acc40.*
-import domain.{AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
+import domain.{Acc40Response, AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
 import models.EORI
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
+
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.SpecBase
-import utils.TestData.{EORI_VALUE_1, ERROR_MSG}
+import utils.{SpecBase, WireMockSupportProvider}
+import utils.TestData.EORI_VALUE_1
+import com.typesafe.config.ConfigFactory
+import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, matchingJsonPath, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.http.Fault
+import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 
-import scala.concurrent.Future
-
-class Acc40ConnectorSpec extends SpecBase {
+class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   "searchAuthorities" should {
 
     "return Left no authorities when no authorities returned in the response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.successful(response(None, Some("0"), None, None, None)))
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc40SearchAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(ok(Json.toJson(response(None, Some("0"), None, None, None)).toString))
+      )
 
-      running(app) {
-        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
-        result mustBe Left(NoAuthoritiesFound)
-      }
+      val result: Either[Acc40Response, AuthoritiesFound] =
+        await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
+
+      result mustBe Left(NoAuthoritiesFound)
+
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return Left with error response if the error message present in the response" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any))
-        .thenReturn(Future.successful(response(Some("error message"), Some("0"), None, None, None)))
 
-      running(app) {
-        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
-        result mustBe Left(ErrorResponse)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc40SearchAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(ok(Json.toJson(response(Some("error message"), Some("0"), None, None, None)).toString))
+      )
+
+      val result: Either[Acc40Response, AuthoritiesFound] =
+        await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
+
+      result mustBe Left(ErrorResponse)
+
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return error response when exception occurs while making the POST call" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
-      running(app) {
-        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
-        result mustBe Left(ErrorResponse)
-      }
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc40SearchAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+      )
+
+      val result: Either[Acc40Response, AuthoritiesFound] =
+        await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
+
+      result mustBe Left(ErrorResponse)
+
+      verifyEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "return Right if a valid response with authorities returned" in new Setup {
-      when(requestBuilder.withBody(any())(any(), any(), any())).thenReturn(requestBuilder)
-      when(requestBuilder.setHeader(any[(String, String)]())).thenReturn(requestBuilder)
-      when(mockHttpClient.post(any)(any)).thenReturn(requestBuilder)
-      when(requestBuilder.execute(any, any)).thenReturn(
-        Future.successful(
-          response(
-            None,
-            Some("1"),
-            Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
-            None,
-            None
-          )
-        )
-      )
 
-      running(app) {
-        val result = await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
-        result mustBe
-          Right(
-            AuthoritiesFound(
-              Some("1"),
-              None,
-              None,
-              Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0"))))
+      wireMockServer.stubFor(
+        post(urlPathMatching(acc40SearchAuthoritiesEndpointUrl))
+          .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+          .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+          .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestCommon.regime == 'CDS')]")
+          )
+          .withRequestBody(
+            matchingJsonPath("$.searchAuthoritiesRequest[?(@.requestDetail.requestingEORI == 'someEORI')]")
+          )
+          .willReturn(
+            ok(
+              Json
+                .toJson(
+                  response(
+                    None,
+                    Some("1"),
+                    Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0")))),
+                    None,
+                    None
+                  )
+                )
+                .toString
             )
           )
-      }
+      )
+
+      val result: Either[Acc40Response, AuthoritiesFound] =
+        await(connector.searchAuthorities(EORI(EORI_VALUE_1), EORI(EORI_VALUE_1)))
+
+      result mustBe
+        Right(
+          AuthoritiesFound(
+            Some("1"),
+            None,
+            None,
+            Some(Seq(CashAccount(Account("accountNumber", "accountType", "accountOwner"), Some("10.0"))))
+          )
+        )
+
+      verifyExactlyOneEndPointUrlHit(acc40SearchAuthoritiesEndpointUrl, POST)
     }
 
     "search type value" should {
       "return 0 for GB EORI searchID" in new Setup {
-        running(app) {
-          val searchTypeValue = connector.searchType(EORI("GB123456789012"))
-          searchTypeValue mustBe "0"
-        }
+        val searchTypeValue: String = connector.searchType(EORI("GB123456789012"))
+        searchTypeValue mustBe "0"
       }
 
       "return 0 for XI EORI searchID" in new Setup {
-        running(app) {
-          val searchTypeValue = connector.searchType(EORI("XI123456789012"))
-          searchTypeValue mustBe "0"
-        }
+        val searchTypeValue: String = connector.searchType(EORI("XI123456789012"))
+        searchTypeValue mustBe "0"
       }
 
       "return 1 for account number searchID" in new Setup {
-        running(app) {
-          val searchTypeValue = connector.searchType(EORI("1234567"))
-          searchTypeValue mustBe "1"
-        }
+        val searchTypeValue: String = connector.searchType(EORI("1234567"))
+        searchTypeValue mustBe "1"
       }
     }
   }
 
+  override def config: Configuration = Configuration(
+    ConfigFactory.parseString(
+      s"""
+         |microservice {
+         |  services {
+         |  acc40 {
+         |            host = $wireMockHost
+         |            port = $wireMockPort
+         |        }
+         |  }
+         |}
+         |""".stripMargin
+    )
+  )
+
   trait Setup {
-    implicit val hc: HeaderCarrier     = HeaderCarrier()
-    val mockHttpClient: HttpClientV2   = mock[HttpClientV2]
-    val requestBuilder: RequestBuilder = mock[RequestBuilder]
+    implicit val hc: HeaderCarrier        = HeaderCarrier()
+    val acc40SearchAuthoritiesEndpointUrl = "/customs-financials-hods-stub/accounts/searchauthorities/v1"
 
     def response(
       error: Option[String],
@@ -154,17 +227,7 @@ class Acc40ConnectorSpec extends SpecBase {
         )
       )
 
-    val app: Application = GuiceApplicationBuilder()
-      .overrides(
-        bind[HttpClientV2].toInstance(mockHttpClient),
-        bind[RequestBuilder].toInstance(requestBuilder)
-      )
-      .configure(
-        "microservice.metrics.enabled" -> false,
-        "metrics.enabled"              -> false,
-        "auditing.enabled"             -> false
-      )
-      .build()
+    val app: Application = application().configure(config).build()
 
     val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
   }
