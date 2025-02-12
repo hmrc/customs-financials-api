@@ -52,7 +52,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1"    -> TEST_COMPANY,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sep 2018",
+          "date"                   -> "16 Sept 2018",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
         )
 
@@ -97,7 +97,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1"    -> TEST_COMPANY,
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sep 2018",
+          "date"                   -> "16 Sept 2018",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
         )
 

@@ -35,7 +35,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sep 2018",
+          "date"                   -> "16 Sept 2018",
           "DutyText"               -> dutyText01
         )
 
@@ -127,7 +127,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sep 2018",
+          "date"                   -> "16 Sept 2018",
           "DutyText"               -> dutyText01
         )
 
@@ -271,11 +271,11 @@ class EmailTemplateSpec extends SpecBase {
       }
 
       "defermentStatementType is DD1920" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("DD1920", MONTH_9, YEAR_2019) mustBe "25 Sep 2019"
+        EmailTemplate.createDutyDefermentDueDate("DD1920", MONTH_9, YEAR_2019) mustBe "25 Sept 2019"
       }
 
       "defermentStatementType is DD1720" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("DD1720", MONTH_9, YEAR_2019) mustBe "15 Sep 2019"
+        EmailTemplate.createDutyDefermentDueDate("DD1720", MONTH_9, YEAR_2019) mustBe "15 Sept 2019"
       }
 
       "defermentStatementType is Supplementary" in new Setup {
