@@ -9,10 +9,8 @@
         "status": "STABLE",
         "endpointsEnabled": true,
         "access": {
-          "type": "PRIVATE",
-          "whitelistedApplicationIds": []
-        },
-        "endpointsEnabled": true
+          "type": "PRIVATE"
+        }
       }
     ]
   }
