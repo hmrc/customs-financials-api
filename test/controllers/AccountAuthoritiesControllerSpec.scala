@@ -20,11 +20,12 @@ import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain.*
 import models.requests.manageAuthorities.*
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.*
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Result}
+import play.api.mvc.Results.Forbidden
+import play.api.mvc.{AnyContent, AnyContentAsEmpty, AnyContentAsJson, Request, Result}
 import play.api.test.*
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
@@ -46,6 +47,12 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
         .thenReturn(Future.successful(accountWithAuthorities))
 
+      when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+        .thenAnswer { invocation =>
+          val block = invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+          block(new RequestWithEori(traderEORI, getRequest))
+        }
+
       running(app) {
         val result = route(app, getRequest).value
 
@@ -58,6 +65,16 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any))
         .thenReturn(Future.successful(Enrolments(Set())))
 
+      when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+        .thenReturn(Future.successful(Forbidden("Enrolment Identifier EORINumber not found")))
+
+      when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+        .thenAnswer { invocation =>
+          val handleRequestWithEori =
+            invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+          handleRequestWithEori(new RequestWithEori(traderEORI, getRequest))
+        }
+
       running(app) {
         val result = route(app, getRequest).value
 
@@ -68,8 +85,14 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     "return 503 (service unavailable)" when {
       "get account authorities call fails with BadRequestException (4xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any))
+        when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
           .thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
+
+        when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+          .thenAnswer { invocation =>
+            val block = invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+            block(new RequestWithEori(traderEORI, getRequest))
+          }
 
         running(app) {
           val result = route(app, getRequest).value
@@ -79,8 +102,14 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       }
 
       "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any))
+        when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
           .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+
+        when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+          .thenAnswer { invocation =>
+            val block = invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+            block(new RequestWithEori(traderEORI, getRequest))
+          }
 
         running(app) {
           val result = route(app, getRequest).value
@@ -93,8 +122,14 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     "return 500 (InternalServerError)" when {
       "get account authorities call fails with InternalServerException (5xx) and error message contains" +
         " 'JSON validation'" in new Setup {
-          when(mockAccountAuthorityService.getAccountAuthorities(any))
+          when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
             .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
+
+          when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+            .thenAnswer { invocation =>
+              val block = invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+              block(new RequestWithEori(traderEORI, getRequest))
+            }
 
           running(app) {
             val result = route(app, getRequest).value
@@ -109,8 +144,14 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       "get account authorities call fails with BAD_REQUEST and contains " +
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 
-          when(mockAccountAuthorityService.getAccountAuthorities(any))
+          when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
             .thenReturn(Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
+
+          when(mockAuthorisedRequest.invokeBlock(any[Request[_]], any()))
+            .thenAnswer { invocation =>
+              val block = invocation.getArgument(1).asInstanceOf[RequestWithEori[AnyContent] => Future[Result]]
+              block(new RequestWithEori(traderEORI, getRequest))
+            }
 
           running(app) {
             val result: Future[Result] = route(app, getRequest).value
@@ -299,7 +340,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       )
 
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
-      FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
+      FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get().url)
 
     val noAccountsForEoriMsg: String =
       """returned 400.
@@ -326,6 +367,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
 
     val mockAuthConnector: CustomAuthConnector               = mock[CustomAuthConnector]
     val mockAccountAuthorityService: AccountAuthorityService = mock[AccountAuthorityService]
+    val mockAuthorisedRequest: AuthorisedRequest             = mock[AuthorisedRequest]
 
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 

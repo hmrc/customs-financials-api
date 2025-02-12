@@ -13,7 +13,7 @@ POST          /customs-financials-api/account/cash/transaction-search           
 
 POST          /customs-financials-api/accounts/cashaccountstatementrequest/v1             controllers.CashTransactionsController.submitCashAccStatementRequest()
 
-GET           /customs-financials-api/:eori/account-authorities                           controllers.AccountAuthoritiesController.get(eori: models.EORI)
+GET           /customs-financials-api/account-authorities                           controllers.AccountAuthoritiesController.get()
 POST          /customs-financials-api/:eori/account-authorities/grant                     controllers.AccountAuthoritiesController.grant(eori: models.EORI)
 POST          /customs-financials-api/:eori/account-authorities/revoke                    controllers.AccountAuthoritiesController.revoke(eori: models.EORI)
 
