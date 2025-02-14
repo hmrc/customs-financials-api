@@ -66,24 +66,28 @@ class AccountAuthoritiesController @Inject() (
       }
   }
 
-  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-        service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
+  def grant: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+
+    val eori = request.eori
+
+    withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
+      service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
+        case true  => NoContent
+        case false => InternalServerError
       }
+    }
   }
 
-  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-        service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
+  def revoke: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
+
+    val eori = request.eori
+
+    withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
+      service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
+        case true  => NoContent
+        case false => InternalServerError
       }
+    }
   }
 
   private def hasNoAccountsForEoriMsg(exceptionMsg: String): Boolean =

@@ -17,7 +17,7 @@
 package services
 
 import connectors.{Acc29Connector, Acc30Connector}
-import domain.*
+import domain._
 import models.requests.manageAuthorities.*
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}

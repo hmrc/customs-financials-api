@@ -17,7 +17,7 @@
 package services
 
 import domain.{Notification, StandingAuthority, acc41}
-import models.*
+import models._
 import models.requests.ParamName.UCR
 import models.requests.manageAuthorities.*
 import models.requests.*
