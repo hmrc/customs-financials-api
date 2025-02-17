@@ -17,7 +17,6 @@
 package controllers
 
 import domain.AccountWithAuthorities
-import models.EORI
 import models.requests.manageAuthorities.{GrantAuthorityRequest, RevokeAuthorityRequest}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
@@ -41,7 +40,6 @@ class AccountAuthoritiesController @Inject() (
 
   def get: Action[AnyContent] = authorisedRequest async { request =>
     val eori = request.eori
-
     service
       .getAccountAuthorities(eori)
       .map { (accountWithAuthorities: Seq[AccountWithAuthorities]) =>
@@ -67,9 +65,7 @@ class AccountAuthoritiesController @Inject() (
   }
 
   def grant: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-
     val eori = request.eori
-
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
       service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
         case true  => NoContent
@@ -79,9 +75,7 @@ class AccountAuthoritiesController @Inject() (
   }
 
   def revoke: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-
     val eori = request.eori
-
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
       service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
         case true  => NoContent

@@ -299,8 +299,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, traderEORI.value)), "activated"))
       )
 
-    val getRequestNoEori: RequestWithEori[AnyContentAsEmpty.type] =
-      new RequestWithEori(null, FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get().url))
+    val getRequestNoEori: RequestWithEori[AnyContentAsEmpty.type] = getRequest(null)
 
     def getRequest(eori: EORI): RequestWithEori[AnyContentAsEmpty.type] = {
       val fakeRequest = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get().url)
