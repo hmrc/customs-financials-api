@@ -38,7 +38,7 @@ class AccountAuthoritiesController @Inject() (
 
   val log: Logger = Logger(this.getClass)
 
-  def get: Action[AnyContent] = authorisedRequest async { request =>
+  def get: Action[AnyContent] = authorisedRequest async { implicit request =>
     val eori = request.eori
     service
       .getAccountAuthorities(eori)

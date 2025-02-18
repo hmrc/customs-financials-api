@@ -13,9 +13,9 @@ POST          /customs-financials-api/account/cash/transaction-search           
 
 POST          /customs-financials-api/accounts/cashaccountstatementrequest/v1             controllers.CashTransactionsController.submitCashAccStatementRequest()
 
-GET           /customs-financials-api/account-authorities                           controllers.AccountAuthoritiesController.get()
-POST          /customs-financials-api/account-authorities/grant                     controllers.AccountAuthoritiesController.grant()
-POST          /customs-financials-api/account-authorities/revoke                    controllers.AccountAuthoritiesController.revoke()
+GET           /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.get()
+POST          /customs-financials-api/account-authorities/grant                           controllers.AccountAuthoritiesController.grant()
+POST          /customs-financials-api/account-authorities/revoke                          controllers.AccountAuthoritiesController.revoke()
 
 POST          /customs-financials-api/duty-deferment/update-contact-details               controllers.DutyDefermentContactDetailsController.updateContactDetails()
 POST          /customs-financials-api/duty-deferment/contact-details                      controllers.DutyDefermentContactDetailsController.getContactDetails()
