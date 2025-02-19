@@ -20,12 +20,11 @@ import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import domain.*
 import models.requests.manageAuthorities.*
 import models.{AccountNumber, AccountStatus, AccountType, EORI}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.*
-import play.api.mvc.Results.Forbidden
-import play.api.mvc.{AnyContent, AnyContentAsEmpty, AnyContentAsJson, Request, Result}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Result}
 import play.api.test.*
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
@@ -78,16 +77,16 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           status(result) mustBe SERVICE_UNAVAILABLE
         }
       }
+    }
 
-      "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(any))
-          .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+    "get account authorities call fails with InternalServerException (5xx) " in new Setup {
+      when(mockAccountAuthorityService.getAccountAuthorities(any))
+        .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
 
-        running(app) {
-          val result = route(app, getRequest).value
+      running(app) {
+        val result = route(app, getRequest).value
 
-          status(result) mustBe SERVICE_UNAVAILABLE
-        }
+        status(result) mustBe SERVICE_UNAVAILABLE
       }
     }
 
@@ -163,31 +162,31 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           status(result) mustBe SERVICE_UNAVAILABLE
         }
       }
+    }
 
-      "get account authorities call fails with InternalServerException (5xx) " in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
-          .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+    "get account authorities call fails with InternalServerException (5xx) " in new Setup {
+      when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
+        .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
 
-        running(app) {
-          val result = route(app, getRequestV2(traderEORI)).value
+      running(app) {
+        val result = route(app, getRequestV2(traderEORI)).value
 
-          status(result) mustBe SERVICE_UNAVAILABLE
-        }
+        status(result) mustBe SERVICE_UNAVAILABLE
       }
     }
 
     "return 500 (InternalServerError)" when {
       "get account authorities call fails with InternalServerException (5xx) and error message contains" +
         " 'JSON validation'" in new Setup {
-        when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
-          .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
+          when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
+            .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
 
-        running(app) {
-          val result = route(app, getRequestV2(traderEORI)).value
+          running(app) {
+            val result = route(app, getRequestV2(traderEORI)).value
 
-          status(result) mustBe INTERNAL_SERVER_ERROR
+            status(result) mustBe INTERNAL_SERVER_ERROR
+          }
         }
-      }
     }
 
     "return 200 (OK) and return empty AccountWithAuthorities" when {
@@ -195,16 +194,16 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       "get account authorities call fails with BAD_REQUEST and contains " +
         "could not find accounts related to eori message in SourceFaultDetail" in new Setup {
 
-        when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
-          .thenReturn(Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
+          when(mockAccountAuthorityService.getAccountAuthorities(eqTo(traderEORI)))
+            .thenReturn(Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
 
-        running(app) {
-          val result: Future[Result] = route(app, getRequestV2(traderEORI)).value
+          running(app) {
+            val result: Future[Result] = route(app, getRequestV2(traderEORI)).value
 
-          status(result) mustBe OK
-          contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
+            status(result) mustBe OK
+            contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
+          }
         }
-      }
     }
   }
 
@@ -227,18 +226,18 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           status(result) mustBe NO_CONTENT
         }
       }
+    }
 
-      "delegate to the service and auditEditAuthority" in new Setup {
+    "delegate to the service and auditEditAuthority" in new Setup {
 
-        val editAuth: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
+      val editAuth: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
 
-        when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
-          .thenReturn(Future.successful(true))
+      when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
+        .thenReturn(Future.successful(true))
 
-        running(app) {
-          val result = route(app, grantRequest(editAuth)).value
-          status(result) mustBe NO_CONTENT
-        }
+      running(app) {
+        val result = route(app, grantRequest(editAuth)).value
+        status(result) mustBe NO_CONTENT
       }
     }
 
@@ -301,18 +300,18 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           status(result) mustBe NO_CONTENT
         }
       }
+    }
 
-      "delegate to the service and auditEditAuthority" in new Setup {
+    "delegate to the service and auditEditAuthority" in new Setup {
 
-        val editAuth: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
+      val editAuth: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
 
-        when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
-          .thenReturn(Future.successful(true))
+      when(mockAccountAuthorityService.grantAccountAuthorities(eqTo(editAuth), eqTo(traderEORI))(any))
+        .thenReturn(Future.successful(true))
 
-        running(app) {
-          val result = route(app, grantRequestV2(editAuth, traderEORI)).value
-          status(result) mustBe NO_CONTENT
-        }
+      running(app) {
+        val result = route(app, grantRequestV2(editAuth, traderEORI)).value
+        status(result) mustBe NO_CONTENT
       }
     }
 
@@ -378,36 +377,36 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
             status(result) mustBe NO_CONTENT
           }
         }
+      }
+    }
 
-        "revoking for a guarantee account" in new Setup {
-          val revokeGuaranteeRequest: RevokeAuthorityRequest =
-            revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
+    "revoking for a guarantee account" in new Setup {
+      val revokeGuaranteeRequest: RevokeAuthorityRequest =
+        revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
 
-          when(
-            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any)
-          )
-            .thenReturn(Future.successful(true))
+      when(
+        mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any)
+      )
+        .thenReturn(Future.successful(true))
 
-          running(app) {
-            val result = route(app, revokeRequestV2(revokeGuaranteeRequest, traderEORI)).value
-            status(result) mustBe NO_CONTENT
-          }
-        }
+      running(app) {
+        val result = route(app, revokeRequestV2(revokeGuaranteeRequest, traderEORI)).value
+        status(result) mustBe NO_CONTENT
+      }
+    }
 
-        "revoking for a deferment account" in new Setup {
-          val revokeDefermentRequest: RevokeAuthorityRequest =
-            revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
+    "revoking for a deferment account" in new Setup {
+      val revokeDefermentRequest: RevokeAuthorityRequest =
+        revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
 
-          when(
-            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any)
-          )
-            .thenReturn(Future.successful(true))
+      when(
+        mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any)
+      )
+        .thenReturn(Future.successful(true))
 
-          running(app) {
-            val result = route(app, revokeRequestV2(revokeDefermentRequest, traderEORI)).value
-            status(result) mustBe NO_CONTENT
-          }
-        }
+      running(app) {
+        val result = route(app, revokeRequestV2(revokeDefermentRequest, traderEORI)).value
+        status(result) mustBe NO_CONTENT
       }
     }
 
@@ -473,36 +472,36 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
             status(result) mustBe NO_CONTENT
           }
         }
+      }
+    }
 
-        "revoking for a guarantee account" in new Setup {
-          val revokeGuaranteeRequest: RevokeAuthorityRequest =
-            revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
+    "revoking for a guarantee account" in new Setup {
+      val revokeGuaranteeRequest: RevokeAuthorityRequest =
+        revokeAuthorityRequest.copy(accountType = CdsGeneralGuaranteeAccount)
 
-          when(
-            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any)
-          )
-            .thenReturn(Future.successful(true))
+      when(
+        mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeGuaranteeRequest), eqTo(traderEORI))(any)
+      )
+        .thenReturn(Future.successful(true))
 
-          running(app) {
-            val result = route(app, revokeRequest(revokeGuaranteeRequest)).value
-            status(result) mustBe NO_CONTENT
-          }
-        }
+      running(app) {
+        val result = route(app, revokeRequest(revokeGuaranteeRequest)).value
+        status(result) mustBe NO_CONTENT
+      }
+    }
 
-        "revoking for a deferment account" in new Setup {
-          val revokeDefermentRequest: RevokeAuthorityRequest =
-            revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
+    "revoking for a deferment account" in new Setup {
+      val revokeDefermentRequest: RevokeAuthorityRequest =
+        revokeAuthorityRequest.copy(accountType = CdsDutyDefermentAccount)
 
-          when(
-            mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any)
-          )
-            .thenReturn(Future.successful(true))
+      when(
+        mockAccountAuthorityService.revokeAccountAuthorities(eqTo(revokeDefermentRequest), eqTo(traderEORI))(any)
+      )
+        .thenReturn(Future.successful(true))
 
-          running(app) {
-            val result = route(app, revokeRequest(revokeDefermentRequest)).value
-            status(result) mustBe NO_CONTENT
-          }
-        }
+      running(app) {
+        val result = route(app, revokeRequest(revokeDefermentRequest)).value
+        status(result) mustBe NO_CONTENT
       }
     }
 

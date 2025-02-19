@@ -1,10 +1,10 @@
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.itSettings
+import AppDependencies.bootstrapVersion
 
 val appName = "customs-financials-api"
 
 val scala3_3_4 = "3.3.4"
-val bootstrapVersion = "9.5.0"
 val silencerVersion = "1.7.16"
 
 val testDirectory = "test"
