@@ -17,7 +17,7 @@
 package services
 
 import connectors.{Acc29Connector, Acc30Connector}
-import domain.*
+import domain._
 import models.EORI
 import models.requests.manageAuthorities.{GrantAuthorityRequest, RevokeAuthorityRequest}
 import uk.gov.hmrc.http.HeaderCarrier
