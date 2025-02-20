@@ -75,8 +75,8 @@ class UtilsSpec extends SpecBase {
 
     "currentDateTimeAsRFC7231" should {
       "return correct output datetime string " in {
-        val localDateTime = LocalDateTime.of(YEAR_2023, MONTH_9, DAY_14, HOUR_16, MINUTES_30, SECONDS_30)
-        currentDateTimeAsRFC7231(localDateTime) mustBe "Thu, 14 Sept 2023 16:30:30 GMT"
+        val localDateTime = LocalDateTime.of(YEAR_2023, MONTH_10, DAY_14, HOUR_16, MINUTES_30, SECONDS_30)
+        currentDateTimeAsRFC7231(localDateTime) mustBe "Sat, 14 Oct 2023 16:30:30 GMT"
       }
     }
 
@@ -225,7 +225,7 @@ class UtilsSpec extends SpecBase {
         }
 
         intercept[RuntimeException] {
-          iso8601DateFormatter.parse("Thu, 14 Sept 2023 16:30:30 GMT")
+          iso8601DateFormatter.parse("Thu, 14 Oct 2023 16:30:30 GMT")
         }
       }
     }

@@ -25,7 +25,6 @@ import models.requests.EmailRequest
 import org.mockito.ArgumentMatchers.{any, eq => is}
 import org.mockito.Mockito.{verify, when}
 import org.mockito.{ArgumentMatchers, Mockito}
-import play.api.http.Status.BAD_REQUEST
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.AnyContentAsJson
@@ -104,10 +103,10 @@ class MetadataControllerSpec extends SpecBase {
           |       "fileSize": 75251,
           |       "metadata": [
           |           {"metadata": "PeriodStartYear", "value": "2017"},
-          |           {"metadata": "PeriodStartMonth", "value": "5"},
+          |           {"metadata": "PeriodStartMonth", "value": "6"},
           |           {"metadata": "PeriodStartDay", "value": "5"},
           |           {"metadata": "PeriodEndYear", "value": "2018"},
-          |           {"metadata": "PeriodEndMonth", "value": "8"},
+          |           {"metadata": "PeriodEndMonth", "value": "9"},
           |           {"metadata": "PeriodEndDay", "value": "5"},
           |           {"metadata": "PeriodIssueNumber", "value": "4"},
           |           {"metadata": "FileType", "value": "PDF"},
@@ -137,7 +136,7 @@ class MetadataControllerSpec extends SpecBase {
         val params: Map[String, String] = Map(
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sept 2018",
+          "date"                   -> "16 Oct 2018",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after",
           "recipientName_line1"    -> TEST_COMPANY
         )
@@ -749,7 +748,7 @@ class MetadataControllerSpec extends SpecBase {
         |    },
         |    {
         |        "eori":"someEORI",
-        |        "fileName": "statement-2018-09-19.pdf",
+        |        "fileName": "statement-2018-10-19.pdf",
         |        "fileSize": 2417804,
         |        "metadata": [
         |            {"metadata": "checksum", "value": "whatever"},
@@ -757,9 +756,9 @@ class MetadataControllerSpec extends SpecBase {
         |            {"metadata": "FileRole", "value": "SecurityStatement"},
         |            {"metadata": "fileSize", "value": "9000"},
         |            {"metadata": "FileType", "value": "PDF"},
-        |            {"metadata": "issueDate", "value": "19/09/2018"},
+        |            {"metadata": "issueDate", "value": "19/10/2018"},
         |            {"metadata": "PeriodEndDay", "value": "19"},
-        |            {"metadata": "PeriodEndMonth", "value": "9"},
+        |            {"metadata": "PeriodEndMonth", "value": "10"},
         |            {"metadata": "PeriodEndYear", "value": "2018"},
         |            {"metadata": "PeriodStartDay", "value": "13"},
         |            {"metadata": "PeriodStartMonth", "value": "9"},

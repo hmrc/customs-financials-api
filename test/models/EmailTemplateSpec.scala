@@ -18,7 +18,7 @@ package models
 
 import domain.Notification
 import utils.SpecBase
-import utils.TestData.{MONTH_2, MONTH_9, YEAR_2019, YEAR_2020}
+import utils.TestData.{MONTH_2, MONTH_7, YEAR_2019, YEAR_2020}
 
 import java.time.LocalDate
 import scala.collection.immutable.{HashMap, Map}
@@ -35,7 +35,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sept 2018",
+          "date"                   -> "16 Aug 2018",
           "DutyText"               -> dutyText01
         )
 
@@ -58,7 +58,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "dd1920",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "25 Aug 2018",
+          "date"                   -> "25 Jul 2018",
           "DutyText"               -> dutyText02
         )
 
@@ -81,7 +81,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "dd1720",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "15 Aug 2018",
+          "date"                   -> "15 Jul 2018",
           "DutyText"               -> dutyText01
         )
 
@@ -104,7 +104,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "excise",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "29 Aug 2018",
+          "date"                   -> "29 Jul 2018",
           "DutyText"               -> dutyText02
         )
 
@@ -127,7 +127,7 @@ class EmailTemplateSpec extends SpecBase {
           "recipientName_line1"    -> companyName,
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Sept 2018",
+          "date"                   -> "16 Aug 2018",
           "DutyText"               -> dutyText01
         )
 
@@ -262,7 +262,7 @@ class EmailTemplateSpec extends SpecBase {
     "return correct Due date" when {
 
       "defermentStatementType is Weekly" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("Weekly", MONTH_9, YEAR_2019) mustBe "16 Oct 2019"
+        EmailTemplate.createDutyDefermentDueDate("Weekly", MONTH_7, YEAR_2019) mustBe "16 Aug 2019"
       }
 
       "defermentStatementType is Excise" in new Setup {
@@ -271,15 +271,15 @@ class EmailTemplateSpec extends SpecBase {
       }
 
       "defermentStatementType is DD1920" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("DD1920", MONTH_9, YEAR_2019) mustBe "25 Sept 2019"
+        EmailTemplate.createDutyDefermentDueDate("DD1920", MONTH_7, YEAR_2019) mustBe "25 Jul 2019"
       }
 
       "defermentStatementType is DD1720" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("DD1720", MONTH_9, YEAR_2019) mustBe "15 Sept 2019"
+        EmailTemplate.createDutyDefermentDueDate("DD1720", MONTH_7, YEAR_2019) mustBe "15 Jul 2019"
       }
 
       "defermentStatementType is Supplementary" in new Setup {
-        EmailTemplate.createDutyDefermentDueDate("Supplementary", MONTH_9, YEAR_2019) mustBe "16 Oct 2019"
+        EmailTemplate.createDutyDefermentDueDate("Supplementary", MONTH_7, YEAR_2019) mustBe "16 Aug 2019"
       }
     }
   }
@@ -317,7 +317,7 @@ class EmailTemplateSpec extends SpecBase {
         "PeriodStartYear"        -> "2017",
         "PeriodStartMonth"       -> "5",
         "PeriodEndYear"          -> "2018",
-        "PeriodEndMonth"         -> "8",
+        "PeriodEndMonth"         -> "7",
         "PeriodIssueNumber"      -> "4",
         "DefermentStatementType" -> sttType,
         "Something"              -> "Random"
