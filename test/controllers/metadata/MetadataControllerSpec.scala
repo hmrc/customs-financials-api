@@ -276,10 +276,10 @@ class MetadataControllerSpec extends SpecBase {
           |       "fileSize": 75251,
           |       "metadata": [
           |            {"metadata": "PeriodStartYear", "value": "2017"},
-          |            {"metadata": "PeriodStartMonth", "value": "5"},
+          |            {"metadata": "PeriodStartMonth", "value": "4"},
           |            {"metadata": "PeriodStartDay", "value": "5"},
           |            {"metadata": "PeriodEndYear", "value": "2018"},
-          |            {"metadata": "PeriodEndMonth", "value": "8"},
+          |            {"metadata": "PeriodEndMonth", "value": "7"},
           |            {"metadata": "PeriodEndDay", "value": "5"},
           |            {"metadata": "PeriodIssueNumber", "value": "1"},
           |            {"metadata": "FileType", "value": "PDF"},
@@ -306,7 +306,7 @@ class MetadataControllerSpec extends SpecBase {
 
         val params: Map[String, String] = Map(
           "DefermentStatementType" -> "supplementary",
-          "date"                   -> "16 Sept 2018",
+          "date"                   -> "16 Aug 2018",
           "PeriodIssueNumber"      -> "1",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after",
           "recipientName_line1"    -> TEST_COMPANY
