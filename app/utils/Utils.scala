@@ -22,14 +22,28 @@ import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
 import play.api.libs.json.Writes
 
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
+import java.time.temporal.{ChronoField, ChronoUnit}
+import java.util.Locale
+import scala.jdk.CollectionConverters._
 
 object Utils {
   val emptyString                             = ""
   val threeColons                             = ":::"
   val rfc7231DateTimePattern                  = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
-  val httpDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern(rfc7231DateTimePattern)
+
+  val abbreviatedMonth = Map(
+    1L -> "Jan", 2L -> "Feb", 3L -> "Mar", 4L -> "Apr",
+    5L -> "May", 6L -> "Jun", 7L -> "Jul", 8L -> "Aug",
+    9L -> "Sep", 10L -> "Oct", 11L -> "Nov", 12L -> "Dec"
+  ).map { case (k, v) => (k: java.lang.Long) -> v }.asJava
+
+  val httpDateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
+    .appendPattern("EEE, dd ")
+    .appendText(ChronoField.MONTH_OF_YEAR, abbreviatedMonth)
+    .appendPattern(" yyyy HH:mm:ss 'GMT'")
+    .toFormatter(Locale.ENGLISH)
+
   val iso8601DateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 
   val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
