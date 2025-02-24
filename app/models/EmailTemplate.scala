@@ -40,7 +40,7 @@ object EmailTemplate {
   private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 16
   private val DD1920_STT_DUE_DATE                  = 25
   private val DD1720_STT_DUE_DATE                  = 15
-  private val emailDateFormatter                   = DateTimeFormatter.ofPattern("dd MMM yyyy")
+  private val emailDateFormatter                   = DateTimeFormatter.ofPattern("dd MMMM yyyy")
 
   def fromNotification(
     emailAddress: EmailAddress,

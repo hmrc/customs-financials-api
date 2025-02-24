@@ -39,9 +39,9 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           None,
           Map(
             "PeriodStartYear"        -> "2017",
-            "PeriodStartMonth"       -> "6",
+            "PeriodStartMonth"       -> "5",
             "PeriodEndYear"          -> "2018",
-            "PeriodEndMonth"         -> "9",
+            "PeriodEndMonth"         -> "8",
             "PeriodIssueNumber"      -> "4",
             "DefermentStatementType" -> "Weekly",
             "Something"              -> "Random"
@@ -52,7 +52,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1"    -> TEST_COMPANY,
           "DefermentStatementType" -> "weekly",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Oct 2018",
+          "date"                   -> "16 September 2018",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
         )
 
@@ -84,9 +84,9 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           None,
           Map(
             "PeriodStartYear"        -> "2017",
-            "PeriodStartMonth"       -> "6",
+            "PeriodStartMonth"       -> "5",
             "PeriodEndYear"          -> "2018",
-            "PeriodEndMonth"         -> "9",
+            "PeriodEndMonth"         -> "8",
             "PeriodIssueNumber"      -> "4",
             "DefermentStatementType" -> "Supplementary",
             "Something"              -> "Random"
@@ -97,7 +97,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1"    -> TEST_COMPANY,
           "DefermentStatementType" -> "supplementary",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "16 Oct 2018",
+          "date"                   -> "16 September 2018",
           "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after"
         )
 
@@ -144,7 +144,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
           "recipientName_line1"    -> TEST_COMPANY,
           "DefermentStatementType" -> "excise",
           "PeriodIssueNumber"      -> "4",
-          "date"                   -> "29 Aug 2018",
+          "date"                   -> "29 August 2018",
           "DutyText"               -> "The total excise owed will be collected by direct debit on or before"
         )
 
@@ -442,7 +442,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         val periodEndMonth         = 2
         val defermentStatementType = "Excise"
 
-        val expectedDate = "29 Feb 2020"
+        val expectedDate = "29 February 2020"
         val actualDate   = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate
@@ -453,7 +453,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         val periodEndMonth         = 2
         val defermentStatementType = "Excise"
 
-        val expectedDate = "28 Feb 2018"
+        val expectedDate = "28 February 2018"
         val actualDate   = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate
@@ -464,7 +464,7 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         val periodEndMonth         = 9
         val defermentStatementType = "anything that isn't Excise..."
 
-        val expectedDate = "16 Oct 2018"
+        val expectedDate = "16 October 2018"
         val actualDate   = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate
@@ -475,12 +475,11 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
         val periodEndMonth         = 12
         val defermentStatementType = "anything that isn't Excise..."
 
-        val expectedDate = "16 Jan 2019"
+        val expectedDate = "16 January 2019"
         val actualDate   = EmailTemplate.createDutyDefermentDueDate(defermentStatementType, periodEndMonth, periodEndYear)
 
         actualDate mustBe expectedDate
       }
     }
   }
-
 }
