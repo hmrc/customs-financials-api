@@ -89,7 +89,7 @@ class SDESNotificationsControllerSpec extends SpecBase {
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
       running(app) {
-        val result = route(app, getRequestV2).value
+        val result          = route(app, getRequestV2).value
         val expectedContent = Json.toJson(notification)
         status(result) mustBe OK
         contentAsJson(result) mustBe expectedContent
@@ -244,13 +244,13 @@ class SDESNotificationsControllerSpec extends SpecBase {
           FILE_SIZE_1000L,
           None,
           Map(
-            "periodStartYear" -> "2019",
+            "periodStartYear"  -> "2019",
             "periodStartMonth" -> "1",
-            "fileType" -> "csv",
-            "fileRole" -> "C79Certificate",
-            "fileName" -> CSV_FILE_NAME,
-            "downloadURL" -> "http://localhost/abc.csv",
-            "fileSize" -> "1000"
+            "fileType"         -> "csv",
+            "fileRole"         -> "C79Certificate",
+            "fileName"         -> CSV_FILE_NAME,
+            "downloadURL"      -> "http://localhost/abc.csv",
+            "fileSize"         -> "1000"
           )
         )
       ),

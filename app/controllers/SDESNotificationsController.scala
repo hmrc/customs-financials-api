@@ -32,7 +32,7 @@ class SDESNotificationsController @Inject() (
   notificationCache: NotificationCache,
   authorisedRequest: AuthorisedRequest,
   dateTimeService: DateTimeService,
-  cc: ControllerComponents,
+  cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with ControllerChecks {
@@ -51,14 +51,14 @@ class SDESNotificationsController @Inject() (
   def getNotificationsV2: Action[AnyContent] = authorisedRequest async {
     implicit request: RequestWithEori[AnyContent] =>
 
-    val eori: EORI = EORI(request.eori.value)
+      val eori: EORI = EORI(request.eori.value)
 
-    matchingEoriNumber(eori) { verifiedEori =>
-      notificationCache
-        .getNotifications(verifiedEori)
-        .map(_.getOrElse(NotificationsForEori(verifiedEori, Nil, Some(dateTimeService.utcDateTime))))
-        .map(notification => Ok(Json.toJson(notification)))
-    }
+      matchingEoriNumber(eori) { verifiedEori =>
+        notificationCache
+          .getNotifications(verifiedEori)
+          .map(_.getOrElse(NotificationsForEori(verifiedEori, Nil, Some(dateTimeService.utcDateTime))))
+          .map(notification => Ok(Json.toJson(notification)))
+      }
   }
 
   def deleteRequestedNotifications(eori: EORI, fileRole: FileRole): Action[AnyContent] = authorisedRequest async {
