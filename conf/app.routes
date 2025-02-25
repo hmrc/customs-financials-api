@@ -35,6 +35,10 @@ GET           /customs-financials-api/eori/:eori/notifications                  
 DELETE        /customs-financials-api/eori/:eori/notifications/:fileRole                  controllers.SDESNotificationsController.deleteNonRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
 DELETE        /customs-financials-api/eori/:eori/requested-notifications/:fileRole        controllers.SDESNotificationsController.deleteRequestedNotifications(eori: models.EORI, fileRole: models.FileRole)
 
+GET           /customs-financials-api/eori/notifications                                  controllers.SDESNotificationsController.getNotificationsV2()
+DELETE        /customs-financials-api/eori/notifications/:fileRole                        controllers.SDESNotificationsController.deleteNonRequestedNotificationsV2(fileRole: models.FileRole)
+DELETE        /customs-financials-api/eori/requested-notifications/:fileRole              controllers.SDESNotificationsController.deleteRequestedNotificationsV2(fileRole: models.FileRole)
+
 GET           /api/conf/1.0/*file                                                         controllers.Assets.at(path="/public/api/conf/1.0", file)
 
 POST          /customs/statements/StatementSearchFailureNotification                      controllers.StatementSearchFailureNotificationController.processNotification()

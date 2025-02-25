@@ -55,30 +55,20 @@ class SDESNotificationsControllerSpec extends SpecBase {
       }
     }
 
-    "return seq of notifications from a mongo when there are some" in new Setup {
-      val notification: NotificationsForEori = NotificationsForEori(
-        eori,
-        Seq(
-          Notification(
-            eori,
-            FILE_ROLE_C79_CERTIFICATE,
-            CSV_FILE_NAME,
-            FILE_SIZE_1000L,
-            None,
-            Map(
-              "periodStartYear"  -> "2019",
-              "periodStartMonth" -> "1",
-              "fileType"         -> "csv",
-              "fileRole"         -> "C79Certificate",
-              "fileName"         -> CSV_FILE_NAME,
-              "downloadURL"      -> "http://localhost/abc.csv",
-              "fileSize"         -> "1000"
-            )
-          )
-        ),
-        Some(LocalDateTime.parse("2021-07-07T10:05:29.352", DateTimeFormatter.ISO_DATE_TIME))
-      )
+    "return no notifications from a mongo when there isn't any for V2" in new Setup {
+      when(mockNotificationCache.getNotifications(any)).thenReturn(Future.successful(None))
+      when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
+      when(mockDateTimeService.utcDateTime)
+        .thenReturn(LocalDateTime.of(YEAR_2021, MONTH_7, DAY_7, HOUR_10, MINUTES_5, SECONDS_29, MILI_SECONDS_352))
 
+      running(app) {
+        val result = route(app, getRequestV2).value
+        status(result) mustBe 200
+        contentAsJson(result).as[NotificationsForEori].notifications mustBe Nil
+      }
+    }
+
+    "return seq of notifications from a mongo when there are some" in new Setup {
       when(mockNotificationCache.getNotifications(ArgumentMatchers.eq(eori)))
         .thenReturn(Future.successful(Some(notification)))
 
@@ -86,6 +76,20 @@ class SDESNotificationsControllerSpec extends SpecBase {
 
       running(app) {
         val result          = route(app, getRequest).value
+        val expectedContent = Json.toJson(notification)
+        status(result) mustBe OK
+        contentAsJson(result) mustBe expectedContent
+      }
+    }
+
+    "return seq of notifications from a mongo when there are some for V2" in new Setup {
+      when(mockNotificationCache.getNotifications(ArgumentMatchers.eq(eori)))
+        .thenReturn(Future.successful(Some(notification)))
+
+      when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
+
+      running(app) {
+        val result = route(app, getRequestV2).value
         val expectedContent = Json.toJson(notification)
         status(result) mustBe OK
         contentAsJson(result) mustBe expectedContent
@@ -123,6 +127,19 @@ class SDESNotificationsControllerSpec extends SpecBase {
       }
     }
 
+    "delete notifications successfully for V2" in new Setup {
+      when(mockNotificationCache.removeByFileRole(any, any)).thenReturn(Future.successful(()))
+      when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(DELETE, s"/customs-financials-api/eori/notifications/C79Certificate")
+
+      running(app) {
+        val result = route(app, req).value
+        status(result) mustBe OK
+      }
+    }
+
     "return an error when different EORINumber found in auth record" in new Setup {
       when(mockAuthConnector.authorise[Enrolments](any, any)(any, any))
         .thenReturn(Future.successful(enrolments))
@@ -147,6 +164,19 @@ class SDESNotificationsControllerSpec extends SpecBase {
 
       val req: FakeRequest[AnyContentAsEmpty.type] =
         FakeRequest(DELETE, s"/customs-financials-api/eori/${eori.value}/requested-notifications/C79Certificate")
+
+      running(app) {
+        val result = route(app, req).value
+        status(result) mustBe OK
+      }
+    }
+
+    "delete notifications successfully for V2" in new Setup {
+      when(mockNotificationCache.removeRequestedByFileRole(any, any)).thenReturn(Future.successful(()))
+      when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(DELETE, s"/customs-financials-api/eori/requested-notifications/C79Certificate")
 
       running(app) {
         val result = route(app, req).value
@@ -200,5 +230,31 @@ class SDESNotificationsControllerSpec extends SpecBase {
 
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, "/customs-financials-api/eori/123456789/notifications")
+
+    val getRequestV2: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/customs-financials-api/eori/notifications")
+
+    val notification: NotificationsForEori = NotificationsForEori(
+      eori,
+      Seq(
+        Notification(
+          eori,
+          FILE_ROLE_C79_CERTIFICATE,
+          CSV_FILE_NAME,
+          FILE_SIZE_1000L,
+          None,
+          Map(
+            "periodStartYear" -> "2019",
+            "periodStartMonth" -> "1",
+            "fileType" -> "csv",
+            "fileRole" -> "C79Certificate",
+            "fileName" -> CSV_FILE_NAME,
+            "downloadURL" -> "http://localhost/abc.csv",
+            "fileSize" -> "1000"
+          )
+        )
+      ),
+      Some(LocalDateTime.parse("2021-07-07T10:05:29.352", DateTimeFormatter.ISO_DATE_TIME))
+    )
   }
 }
