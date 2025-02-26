@@ -48,6 +48,19 @@ class SDESNotificationsController @Inject() (
     }
   }
 
+  def getNotificationsV2: Action[AnyContent] = authorisedRequest async {
+    implicit request: RequestWithEori[AnyContent] =>
+
+      val eori: EORI = EORI(request.eori.value)
+
+      matchingEoriNumber(eori) { verifiedEori =>
+        notificationCache
+          .getNotifications(verifiedEori)
+          .map(_.getOrElse(NotificationsForEori(verifiedEori, Nil, Some(dateTimeService.utcDateTime))))
+          .map(notification => Ok(Json.toJson(notification)))
+      }
+  }
+
   def deleteRequestedNotifications(eori: EORI, fileRole: FileRole): Action[AnyContent] = authorisedRequest async {
     implicit req =>
       matchingEoriNumber(eori) { verifiedEori =>
@@ -57,8 +70,32 @@ class SDESNotificationsController @Inject() (
       }
   }
 
+  def deleteRequestedNotificationsV2(fileRole: FileRole): Action[AnyContent] = authorisedRequest async {
+    implicit request: RequestWithEori[AnyContent] =>
+
+      val eori: EORI = EORI(request.eori.value)
+
+      matchingEoriNumber(eori) { verifiedEori =>
+        notificationCache
+          .removeRequestedByFileRole(verifiedEori, fileRole)
+          .map(_ => Ok(Json.obj("Status" -> "Ok")))
+      }
+  }
+
   def deleteNonRequestedNotifications(eori: EORI, fileRole: FileRole): Action[AnyContent] = authorisedRequest async {
     implicit req =>
+      matchingEoriNumber(eori) { verifiedEori =>
+        notificationCache
+          .removeByFileRole(verifiedEori, fileRole)
+          .map(_ => Ok(Json.obj("Status" -> "Ok")))
+      }
+  }
+
+  def deleteNonRequestedNotificationsV2(fileRole: FileRole): Action[AnyContent] = authorisedRequest async {
+    implicit request: RequestWithEori[AnyContent] =>
+
+      val eori: EORI = EORI(request.eori.value)
+
       matchingEoriNumber(eori) { verifiedEori =>
         notificationCache
           .removeByFileRole(verifiedEori, fileRole)
