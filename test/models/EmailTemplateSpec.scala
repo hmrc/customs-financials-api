@@ -17,13 +17,37 @@
 package models
 
 import domain.Notification
+import models.EmailTemplate.emailDateFormatter
 import utils.SpecBase
-import utils.TestData.{MONTH_2, MONTH_9, YEAR_2019, YEAR_2020}
+import utils.TestData.{
+  DAY_1, DAY_11, DAY_15, DAY_16, HOUR_11, MINUTES_30, MONTH_2, MONTH_7, MONTH_9, YEAR_2019, YEAR_2020, YEAR_2023
+}
 
-import java.time.LocalDate
+import java.time.{LocalDate, ZoneOffset, ZonedDateTime}
 import scala.collection.immutable.{HashMap, Map}
 
 class EmailTemplateSpec extends SpecBase {
+
+  "emailDateFormatter" should {
+    "format date correctly" in {
+      val testDateTime  = LocalDate.of(YEAR_2023, MONTH_9, DAY_15)
+      val formattedDate = emailDateFormatter.format(testDateTime)
+
+      formattedDate mustBe "15 Sep 2023"
+    }
+
+    "use correct month abbreviations" in {
+      val testCases = Seq(
+        LocalDate.of(YEAR_2019, MONTH_7, DAY_11) -> "11 Jul 2019",
+        LocalDate.of(YEAR_2023, MONTH_9, DAY_1)  -> "01 Sep 2023",
+        LocalDate.of(YEAR_2020, MONTH_2, DAY_16) -> "16 Feb 2020"
+      )
+
+      testCases.foreach { case (date, expected) =>
+        EmailTemplate.emailDateFormatter.format(date) mustBe expected
+      }
+    }
+  }
 
   "fromNotification" should {
 

@@ -44,7 +44,7 @@ object EmailTemplate {
   private val DD1920_STT_DUE_DATE                  = 25
   private val DD1720_STT_DUE_DATE                  = 15
 
-  private val emailDateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
+  val emailDateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
     .appendPattern("dd ")
     .appendText(ChronoField.MONTH_OF_YEAR, abbreviatedMonth)
     .appendPattern(" yyyy")
