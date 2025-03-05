@@ -19,6 +19,7 @@ package controllers
 import connectors.Sub09Connector
 import domain.sub09.*
 import models.EORI
+import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -26,9 +27,10 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
-import utils.TestData.COUNTRY_CODE_GB
+import utils.TestData.{COUNTRY_CODE_GB, EORI_VALUE_1}
 
 import scala.concurrent.Future
 
@@ -85,7 +87,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, requestWithEori).value
         status(result) mustBe OK
       }
     }
@@ -95,21 +97,32 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.failed(UpstreamErrorResponse("failed", NOT_FOUND, NOT_FOUND, Map.empty)))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, requestWithEori).value
         status(result) mustBe NOT_FOUND
       }
     }
   }
 
   trait Setup {
-    val request: FakeRequest[AnyContentAsEmpty.type] =
-      FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
+    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/customs-financials-api/eori/validate")
+      
+    val requestWithEori = new RequestWithEori(EORI(EORI_VALUE_1), fakeRequest)
+
+    val enrolments: Enrolments =
+      Enrolments(
+        Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, EORI_VALUE_1)), "activated"))
+      )
+      
     val mockAuthConnector: CustomAuthConnector       = mock[CustomAuthConnector]
     val mockSub09Connector: Sub09Connector           = mock[Sub09Connector]
+    
+    when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
     val app: Application = GuiceApplicationBuilder()
       .overrides(
-        inject.bind[Sub09Connector].toInstance(mockSub09Connector)
+        inject.bind[Sub09Connector].toInstance(mockSub09Connector),
+        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector)
       )
       .configure(
         "microservice.metrics.enabled" -> false,

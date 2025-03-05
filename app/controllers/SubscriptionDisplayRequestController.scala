@@ -17,7 +17,6 @@
 package controllers
 
 import connectors.Sub09Connector
-import models.EORI
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -26,13 +25,18 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class SubscriptionDisplayRequestController @Inject() (connector: Sub09Connector, cc: ControllerComponents)(implicit
+class SubscriptionDisplayRequestController @Inject() (
+  connector: Sub09Connector,
+  cc: ControllerComponents,
+  authorisedRequest: AuthorisedRequest
+)(implicit
   ec: ExecutionContext
 ) extends BackendController(cc) {
 
   val log: LoggerLike = Logger(this.getClass)
 
-  def validateEORI(eori: EORI): Action[AnyContent] = Action.async {
+  def validateEORI: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
+    val eori = request.eori
 
     connector
       .getSubscriptions(eori)
