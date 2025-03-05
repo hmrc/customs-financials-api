@@ -106,17 +106,17 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
   trait Setup {
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, "/customs-financials-api/eori/validate")
-      
+
     val requestWithEori = new RequestWithEori(EORI(EORI_VALUE_1), fakeRequest)
 
     val enrolments: Enrolments =
       Enrolments(
         Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, EORI_VALUE_1)), "activated"))
       )
-      
-    val mockAuthConnector: CustomAuthConnector       = mock[CustomAuthConnector]
-    val mockSub09Connector: Sub09Connector           = mock[Sub09Connector]
-    
+
+    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
+    val mockSub09Connector: Sub09Connector     = mock[Sub09Connector]
+
     when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
 
     val app: Application = GuiceApplicationBuilder()
