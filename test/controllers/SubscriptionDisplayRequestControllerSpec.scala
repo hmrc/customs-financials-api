@@ -16,19 +16,17 @@
 
 package controllers
 
-import config.MetaConfig.Platform.{ENROLMENT_IDENTIFIER, ENROLMENT_KEY}
 import connectors.Sub09Connector
 import domain.sub09.*
 import models.EORI
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
-import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import utils.SpecBase
-import utils.TestData.{COUNTRY_CODE_GB, EORI_VALUE_1}
+import utils.TestData.{COUNTRY_CODE_GB, EORI_JSON, EORI_STRING}
 
 import scala.concurrent.Future
 
@@ -40,7 +38,7 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
       when(mockSub09Connector.getSubscriptions(any)).thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, requestWithEori).value
+        val result = route(app, request).value
         status(result) mustBe OK
       }
     }
@@ -49,27 +47,44 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
       when(mockSub09Connector.getSubscriptions(any)).thenReturn(Future.successful(responseWithNoStatusText))
 
       running(app) {
-        val result = route(app, requestWithEori).value
+        val result = route(app, request).value
+        status(result) mustBe NOT_FOUND
+      }
+    }
+  }
+
+  "validateEORIV2" should {
+
+    "return OK when response has statusText" in new Setup {
+      when(mockSub09Connector.getSubscriptions(EORI(EORI_STRING)))
+        .thenReturn(Future.successful(response))
+
+      running(app) {
+        val result = route(app, fakeRequest).value
+        status(result) mustBe OK
+      }
+    }
+
+    "return NotFound when response has no statusText" in new Setup {
+      when(mockSub09Connector.getSubscriptions(EORI(EORI_STRING)))
+        .thenReturn(Future.successful(responseWithNoStatusText))
+
+      running(app) {
+        val result = route(app, fakeRequest).value
         status(result) mustBe NOT_FOUND
       }
     }
   }
 
   trait Setup {
-    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
-      FakeRequest(GET, "/customs-financials-api/eori/validate")
+    val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
 
-    val requestWithEori = new RequestWithEori(EORI(EORI_VALUE_1), fakeRequest)
+    val fakeRequest: FakeRequest[AnyContentAsJson] =
+      FakeRequest(POST, "/customs-financials-api/eori/validate")
+        .withJsonBody(EORI_JSON)
 
-    val enrolments: Enrolments =
-      Enrolments(
-        Set(Enrolment(ENROLMENT_KEY, Seq(EnrolmentIdentifier(ENROLMENT_IDENTIFIER, EORI_VALUE_1)), "activated"))
-      )
-
-    val mockAuthConnector: CustomAuthConnector = mock[CustomAuthConnector]
-    val mockSub09Connector: Sub09Connector     = mock[Sub09Connector]
-
-    when(mockAuthConnector.authorise[Enrolments](any, any)(any, any)).thenReturn(Future.successful(enrolments))
+    val mockSub09Connector: Sub09Connector = mock[Sub09Connector]
 
     val responseCommon: ResponseCommon =
       ResponseCommon("OK", Some("Processed successfully"), "2020-10-05T09:30:47Z", None)
@@ -124,8 +139,7 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
 
     val app: Application = application()
       .overrides(
-        inject.bind[Sub09Connector].toInstance(mockSub09Connector),
-        inject.bind[CustomAuthConnector].toInstance(mockAuthConnector)
+        inject.bind[Sub09Connector].toInstance(mockSub09Connector)
       )
       .configure(
         "microservice.metrics.enabled" -> false,

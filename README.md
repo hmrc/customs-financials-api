@@ -25,22 +25,23 @@ The MDG integrations are:
 
 In dev/test environments, the upstream services are stubbed out using the [customs-financials-hods-stub](https://github.com/hmrc/customs-financials-hods-stub/).
 
-| Path                                                                        | Description                                                                                       |
-|-----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------- |
-| POST   /customs-financials-api/eori/accounts                                | Request to retrieve accounts & balances                                                     |                
-| POST   /customs-financials-api/historic-document-request                    | Request to retrieve historic document                                                                    |                
-| POST   /customs-financials-api/account/guarantee/open-transactions          | Request to retrieve guarantee transactions summary                                                                         |                
-| POST   /customs-financials-api/account/guarantee/open-transactions-detail   | Request to retrieve guarantee transactions detail                                                                          |                
-| POST   /customs-financials-api/account/cash/transactions                    | Request to retrieve cash transactions summary                                                                         |                
-| POST   /customs-financials-api/account/cash/transactions-detail             | Request to retrieve cash transactions detail                                                                         |                
-| GET    /customs-financials-api/account-authorities                          | Request to retrieve account authorities                                                                         |                
-| POST   /customs-financials-api/account-authorities/grant                    | Request to grant authority on account                                                                         |                
-| POST   /customs-financials-api/account-authorities/revoke                   | Request to revoke authority on account                                                                         |                
-| POST   /customs-financials-api/duty-deferment/update-contact-details        | Request to update duty deferment contact details                                                                        |                
-| POST   /customs-financials-api/duty-deferment/contact-details               | Request to retrieve duty deferment contact details                                                                         |                
-| GET    /customs-financials-api/eori/validate                                | Request to validate EORI                                                                         |                
-| GET    /customs-financials-api/eori/:eori/notifications                     | Request to retrieve notifications for given EORI                                                                         |                
-| DELETE /customs-financials-api/eori/:eori/notifications/:fileRole           | Request to delete non requested notifications for given EORI                                                                         |                
+| Path                                                                       | Description                                                                                       |
+|----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------- |
+| POST   /customs-financials-api/eori/accounts                               | Request to retrieve accounts & balances                                                     |                
+| POST   /customs-financials-api/historic-document-request                   | Request to retrieve historic document                                                                    |                
+| POST   /customs-financials-api/account/guarantee/open-transactions         | Request to retrieve guarantee transactions summary                                                                         |                
+| POST   /customs-financials-api/account/guarantee/open-transactions-detail  | Request to retrieve guarantee transactions detail                                                                          |                
+| POST   /customs-financials-api/account/cash/transactions                   | Request to retrieve cash transactions summary                                                                         |                
+| POST   /customs-financials-api/account/cash/transactions-detail            | Request to retrieve cash transactions detail                                                                         |                
+| GET    /customs-financials-api/account-authorities                         | Request to retrieve account authorities                                                                         |                
+| POST   /customs-financials-api/account-authorities/grant                   | Request to grant authority on account                                                                         |                
+| POST   /customs-financials-api/account-authorities/revoke                  | Request to revoke authority on account                                                                         |                
+| POST   /customs-financials-api/duty-deferment/update-contact-details       | Request to update duty deferment contact details                                                                        |                
+| POST   /customs-financials-api/duty-deferment/contact-details              | Request to retrieve duty deferment contact details                                                                         |                
+| GET    /customs-financials-api/eori/:eori/validate                         | Request to validate EORI                                                                         |                
+| POST   /customs-financials-api/eori/validate                               | Request to validate EORI                                                                         |                
+| GET    /customs-financials-api/eori/:eori/notifications                    | Request to retrieve notifications for given EORI                                                                         |                
+| DELETE /customs-financials-api/eori/:eori/notifications/:fileRole          | Request to delete non requested notifications for given EORI                                                                         |                
 | DELETE /customs-financials-api/eori/:eori/requested-notifications/:fileRole | Request to delete requested notifications for given EORI                                                                         |                
 
 ### POST  /customs-financials-api/eori/accounts
@@ -513,13 +514,31 @@ Accept | application/vnd.hmrc.1.0+json
 * **200** If the request is processed successful and a resource is created
 * **400** This status code will be returned in case of incorrect data, incorrect data format, missing parameters etc are provided in the request
 
-### GET /customs-financials-api/eori/validate
+### GET /customs-financials-api/eori/:eori/validate
 
 #### Request headers specification:
 HTTP Header | Acceptable value
 ------------|-----------------
 Content-Type | application/json
 Accept | application/vnd.hmrc.1.0+json
+
+### Response body
+```json
+ {"getCorrespondenceAddressResponse":{"responseCommon":{"status":"OK","processingDate":""}}}
+```
+
+### POST /customs-financials-api/eori/validate
+
+#### Request headers specification:
+HTTP Header | Acceptable value
+------------|-----------------
+Content-Type | application/json
+Accept | application/vnd.hmrc.1.0+json
+
+### Request body
+```json
+{"eori":"testEORI"}
+```
 
 ### Response body
 ```json
