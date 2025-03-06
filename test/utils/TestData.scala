@@ -26,7 +26,7 @@ object TestData {
   val EORI_VALUE                  = "testEORI"
   val EORI_VALUE_1                = "someEORI"
   val EORI_REQUEST: EoriRequest   = EoriRequest("testEoriRequest")
-  val EORI_REQUEST_STRING: String = """{"eori": "testEoriRequest"}""".stripMargin
+  val EORI_REQUEST_STRING: String = """{"eori": "testEoriRequest"}"""
   val EORI_STRING: String         = "testEoriRequest"
   val EORI_JSON: JsValue          = Json.toJson(EoriRequest(EORI_STRING))
 
