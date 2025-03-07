@@ -18,7 +18,8 @@ package controllers
 
 import connectors.Sub09Connector
 import models.EORI
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import models.requests.EoriRequest
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import play.api.{Logger, LoggerLike}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -33,6 +34,23 @@ class SubscriptionDisplayRequestController @Inject() (connector: Sub09Connector,
   val log: LoggerLike = Logger(this.getClass)
 
   def validateEORI(eori: EORI): Action[AnyContent] = Action.async {
+
+    connector
+      .getSubscriptions(eori)
+      .map { subscriptionDisplay =>
+        if (subscriptionDisplay.subscriptionDisplayResponse.responseCommon.statusText.isDefined) {
+          Ok
+        } else {
+          NotFound
+        }
+      }
+      .recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
+        NotFound
+      }
+  }
+
+  def validateEORIV2: Action[EoriRequest] = Action.async(parse.json[EoriRequest]) { implicit request =>
+    val eori = EORI(request.body.eori)
 
     connector
       .getSubscriptions(eori)

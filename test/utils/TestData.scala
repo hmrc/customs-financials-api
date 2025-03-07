@@ -17,12 +17,18 @@
 package utils
 
 import models.FileRole
+import models.requests.EoriRequest
+import play.api.libs.json.{JsValue, Json}
 
 import java.time.LocalDate
 
 object TestData {
-  val EORI_VALUE   = "testEORI"
-  val EORI_VALUE_1 = "someEORI"
+  val EORI_VALUE                  = "testEORI"
+  val EORI_VALUE_1                = "someEORI"
+  val EORI_REQUEST: EoriRequest   = EoriRequest("testEoriRequest")
+  val EORI_REQUEST_STRING: String = """{"eori": "testEoriRequest"}"""
+  val EORI_STRING: String         = "testEoriRequest"
+  val EORI_JSON: JsValue          = Json.toJson(EoriRequest(EORI_STRING))
 
   val TEST_EMAIL   = "test@test.com"
   val TEST_COMPANY = "companyName"

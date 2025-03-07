@@ -45,8 +45,6 @@ object GuaranteeTransactionsResponse {
       }
     )
 
-  implicit val errorResponseFormat: OFormat[ErrorResponse] = Json.format[ErrorResponse]
-
   implicit val responseCommonFormat: OFormat[ResponseCommon] = Json.format[ResponseCommon]
 
   implicit val defAmountsFormat: OFormat[DefAmounts] = Json.format[DefAmounts]

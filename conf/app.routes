@@ -26,6 +26,7 @@ POST          /customs-financials-api/duty-deferment/update-contact-details     
 POST          /customs-financials-api/duty-deferment/contact-details                      controllers.DutyDefermentContactDetailsController.getContactDetails()
 
 GET           /customs-financials-api/eori/:eori/validate                                 controllers.SubscriptionDisplayRequestController.validateEORI(eori: models.EORI)
+POST          /customs-financials-api/eori/validate                                       controllers.SubscriptionDisplayRequestController.validateEORIV2()
 
 POST          /customs-financials-api/search-authorities                                  controllers.SearchAuthoritiesController.searchAuthorities()
 

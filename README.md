@@ -26,7 +26,7 @@ The MDG integrations are:
 In dev/test environments, the upstream services are stubbed out using the [customs-financials-hods-stub](https://github.com/hmrc/customs-financials-hods-stub/).
 
 | Path                                                                       | Description                                                                                       |
-| ---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------- |
+|----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------- |
 | POST   /customs-financials-api/eori/accounts                               | Request to retrieve accounts & balances                                                     |                
 | POST   /customs-financials-api/historic-document-request                   | Request to retrieve historic document                                                                    |                
 | POST   /customs-financials-api/account/guarantee/open-transactions         | Request to retrieve guarantee transactions summary                                                                         |                
@@ -39,9 +39,10 @@ In dev/test environments, the upstream services are stubbed out using the [custo
 | POST   /customs-financials-api/duty-deferment/update-contact-details       | Request to update duty deferment contact details                                                                        |                
 | POST   /customs-financials-api/duty-deferment/contact-details              | Request to retrieve duty deferment contact details                                                                         |                
 | GET    /customs-financials-api/eori/:eori/validate                         | Request to validate EORI                                                                         |                
+| POST   /customs-financials-api/eori/validate                               | Request to validate EORI                                                                         |                
 | GET    /customs-financials-api/eori/:eori/notifications                    | Request to retrieve notifications for given EORI                                                                         |                
 | DELETE /customs-financials-api/eori/:eori/notifications/:fileRole          | Request to delete non requested notifications for given EORI                                                                         |                
-| DELETE /customs-financials-api/eori/:eori/requested-notifications/:fileRole| Request to delete requested notifications for given EORI                                                                         |                
+| DELETE /customs-financials-api/eori/:eori/requested-notifications/:fileRole | Request to delete requested notifications for given EORI                                                                         |                
 
 ### POST  /customs-financials-api/eori/accounts
 
@@ -526,6 +527,41 @@ Accept | application/vnd.hmrc.1.0+json
  {"getCorrespondenceAddressResponse":{"responseCommon":{"status":"OK","processingDate":""}}}
 ```
 
+### POST /customs-financials-api/eori/validate
+
+#### Request headers specification:
+HTTP Header | Acceptable value
+------------|-----------------
+Content-Type | application/json
+Accept | application/vnd.hmrc.1.0+json
+
+### Request body
+```json
+{"eori":"testEORI"}
+```
+
+### Response
+200 or 404
+
+### Intermediate SUB09 Response
+```json
+{
+  "subscriptionDisplayResponse": {
+    "responseCommon": {
+      "status": "OK",
+      "processingDate": "2016-08-17T19:33:47Z",
+      "statusText": "Optional status text from ETMP",
+      "returnParameters": [
+        {
+          "paramName": "POSITION",
+          "paramValue": "LINK"
+        }
+      ]
+    }
+  }
+}
+```
+
 #### Response code specification:
 * **200** If the request is processed successful and a resource is created
 * **400** This status code will be returned in case of incorrect data, incorrect data format, missing parameters etc are provided in the request
@@ -537,6 +573,7 @@ HTTP Header | Acceptable value
 ------------|-----------------
 Content-Type | application/json
 Accept | application/vnd.hmrc.1.0+json
+
 ### Response body
 ```json
  {"eori":"123456789","notifications":[{"eori":"123456789","fileRole":"C79Certificate","fileName":"abc.csv","fileSize":1000,"metadata":{"downloadURL":"http://localhost/abc.csv","fileRole":"C79Certificate","fileName":"abc.csv","periodStartMonth":"1","periodStartYear":"2019","fileType":"csv","fileSize":"1000"}}],"lastUpdated":{"$date":{"$numberLong":"1625652329352"}}}
