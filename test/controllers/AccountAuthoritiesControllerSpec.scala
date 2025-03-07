@@ -132,7 +132,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         .thenReturn(Future.successful(accountWithAuthorities))
 
       running(app) {
-        val result = route(app, getRequestV2(traderEORI)).value
+        val result = route(app, getRequestV2(Some(traderEORI))).value
 
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.toJson(accountWithAuthorities)
@@ -157,7 +157,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
           .thenReturn(Future.failed(UpstreamErrorResponse("4xx", FORBIDDEN, FORBIDDEN)))
 
         running(app) {
-          val result = route(app, getRequestV2(traderEORI)).value
+          val result = route(app, getRequestV2(Some(traderEORI))).value
 
           status(result) mustBe SERVICE_UNAVAILABLE
         }
@@ -169,7 +169,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
         .thenReturn(Future.failed(UpstreamErrorResponse("5xx", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
 
       running(app) {
-        val result = route(app, getRequestV2(traderEORI)).value
+        val result = route(app, getRequestV2(Some(traderEORI))).value
 
         status(result) mustBe SERVICE_UNAVAILABLE
       }
@@ -182,7 +182,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
             .thenReturn(Future.failed(UpstreamErrorResponse("JSON validation", INTERNAL_SERVER_ERROR)))
 
           running(app) {
-            val result = route(app, getRequestV2(traderEORI)).value
+            val result = route(app, getRequestV2(Some(traderEORI))).value
 
             status(result) mustBe INTERNAL_SERVER_ERROR
           }
@@ -198,7 +198,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
             .thenReturn(Future.failed(UpstreamErrorResponse(noAccountsForEoriMsg, BAD_REQUEST)))
 
           running(app) {
-            val result: Future[Result] = route(app, getRequestV2(traderEORI)).value
+            val result: Future[Result] = route(app, getRequestV2(Some(traderEORI))).value
 
             status(result) mustBe OK
             contentAsJson(result) mustBe Json.toJson(Seq.empty[AccountWithAuthorities])
@@ -555,13 +555,13 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
     val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
 
-    def getRequestV2(eori: EORI): RequestWithEori[AnyContentAsEmpty.type] = {
+    def getRequestV2(eori: Option[EORI]): RequestWithEori[AnyContentAsEmpty.type] = {
       val fakeRequest = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.getV2().url)
 
-      new RequestWithEori(eori, fakeRequest)
+      new RequestWithEori(eori.getOrElse(EORI("testEORI")), fakeRequest)
     }
 
-    val getRequestNoEori: RequestWithEori[AnyContentAsEmpty.type] = getRequestV2(null)
+    val getRequestNoEori: RequestWithEori[AnyContentAsEmpty.type] = getRequestV2(None)
 
     val noAccountsForEoriMsg: String =
       """returned 400.
