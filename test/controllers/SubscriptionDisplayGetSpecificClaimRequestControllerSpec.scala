@@ -85,7 +85,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, getRequest).value
         status(result) mustBe OK
       }
     }
@@ -95,7 +95,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.failed(UpstreamErrorResponse("failed", NOT_FOUND, NOT_FOUND, Map.empty)))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, getRequest).value
         status(result) mustBe NOT_FOUND
       }
     }
@@ -149,7 +149,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, fakeRequest).value
+        val result = route(app, postRequest).value
         status(result) mustBe OK
       }
     }
@@ -159,17 +159,17 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
         .thenReturn(Future.failed(UpstreamErrorResponse("failed", NOT_FOUND, NOT_FOUND, Map.empty)))
 
       running(app) {
-        val result = route(app, fakeRequest).value
+        val result = route(app, postRequest).value
         status(result) mustBe NOT_FOUND
       }
     }
   }
 
   trait Setup {
-    val request: FakeRequest[AnyContentAsEmpty.type] =
+    val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
 
-    val fakeRequest: FakeRequest[AnyContentAsJson] =
+    val postRequest: FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, "/customs-financials-api/eori/validate")
         .withJsonBody(EORI_JSON)
 

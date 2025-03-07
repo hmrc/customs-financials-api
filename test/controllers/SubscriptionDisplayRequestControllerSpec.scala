@@ -25,6 +25,7 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.SpecBase
 import utils.TestData.{COUNTRY_CODE_GB, EORI_JSON, EORI_STRING}
 
@@ -38,7 +39,7 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
       when(mockSub09Connector.getSubscriptions(any)).thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, getRequest).value
         status(result) mustBe OK
       }
     }
@@ -47,7 +48,7 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
       when(mockSub09Connector.getSubscriptions(any)).thenReturn(Future.successful(responseWithNoStatusText))
 
       running(app) {
-        val result = route(app, request).value
+        val result = route(app, getRequest).value
         status(result) mustBe NOT_FOUND
       }
     }
@@ -60,7 +61,7 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
         .thenReturn(Future.successful(response))
 
       running(app) {
-        val result = route(app, fakeRequest).value
+        val result = route(app, postRequest).value
         status(result) mustBe OK
       }
     }
@@ -70,17 +71,27 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
         .thenReturn(Future.successful(responseWithNoStatusText))
 
       running(app) {
-        val result = route(app, fakeRequest).value
+        val result = route(app, postRequest).value
+        status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "return NotFound when UpstreamErrorResponse is received with NOT_FOUND status" in new Setup {
+      when(mockSub09Connector.getSubscriptions(EORI(EORI_STRING)))
+        .thenReturn(Future.failed(UpstreamErrorResponse("Not Found", NOT_FOUND)))
+
+      running(app) {
+        val result = route(app, postRequest).value
         status(result) mustBe NOT_FOUND
       }
     }
   }
 
   trait Setup {
-    val request: FakeRequest[AnyContentAsEmpty.type] =
+    val getRequest: FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, "/customs-financials-api/eori/testEORI/validate")
 
-    val fakeRequest: FakeRequest[AnyContentAsJson] =
+    val postRequest: FakeRequest[AnyContentAsJson] =
       FakeRequest(POST, "/customs-financials-api/eori/validate")
         .withJsonBody(EORI_JSON)
 

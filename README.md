@@ -540,9 +540,26 @@ Accept | application/vnd.hmrc.1.0+json
 {"eori":"testEORI"}
 ```
 
-### Response body
+### Response
+200 or 404
+
+### Intermediate SUB09 Response
 ```json
- {"getCorrespondenceAddressResponse":{"responseCommon":{"status":"OK","processingDate":""}}}
+{
+  "subscriptionDisplayResponse": {
+    "responseCommon": {
+      "status": "OK",
+      "processingDate": "2016-08-17T19:33:47Z",
+      "statusText": "Optional status text from ETMP",
+      "returnParameters": [
+        {
+          "paramName": "POSITION",
+          "paramValue": "LINK"
+        }
+      ]
+    }
+  }
+}
 ```
 
 #### Response code specification:
@@ -556,6 +573,7 @@ HTTP Header | Acceptable value
 ------------|-----------------
 Content-Type | application/json
 Accept | application/vnd.hmrc.1.0+json
+
 ### Response body
 ```json
  {"eori":"123456789","notifications":[{"eori":"123456789","fileRole":"C79Certificate","fileName":"abc.csv","fileSize":1000,"metadata":{"downloadURL":"http://localhost/abc.csv","fileRole":"C79Certificate","fileName":"abc.csv","periodStartMonth":"1","periodStartYear":"2019","fileType":"csv","fileSize":"1000"}}],"lastUpdated":{"$date":{"$numberLong":"1625652329352"}}}
