@@ -21,7 +21,6 @@ import domain.acc40.*
 import domain.{Acc40Response, AuthoritiesFound, ErrorResponse, NoAuthoritiesFound}
 import models.EORI
 import play.api.{Application, Configuration}
-
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{SpecBase, WireMockSupportProvider}
@@ -31,6 +30,11 @@ import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
+import config.AppConfig
+import org.mockito.Mockito.when
+import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.inject.bind
 
 class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -180,6 +184,64 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
         searchTypeValue mustBe "0"
       }
 
+      "return 0 for EU Eori search Id" when {
+        "eu-eori-enabled is set to true" in new Setup {
+          def config: Configuration = Configuration(
+            ConfigFactory.parseString(
+              s"""
+                 |microservice {
+                 |  services {
+                 |  acc40 {
+                 |            host = $wireMockHost
+                 |            port = $wireMockPort
+                 |        }
+                 |  }
+                 |}
+                 |features {
+                 |eu-eori-enabled = true
+                 |}
+                 |""".stripMargin
+            )
+          )
+
+          override val app: Application          = application().configure(config).build()
+          override val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
+
+          val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
+          searchTypeValue mustBe "0"
+
+        }
+      }
+
+      "return 1 for EU Eori search Id" when {
+        "eu-eori-enabled is set to false" in new Setup {
+          def config: Configuration = Configuration(
+            ConfigFactory.parseString(
+              s"""
+                 |microservice {
+                 |  services {
+                 |  acc40 {
+                 |            host = $wireMockHost
+                 |            port = $wireMockPort
+                 |        }
+                 |  }
+                 |}
+                 |features {
+                 |eu-eori-enabled = false
+                 |}
+                 |""".stripMargin
+            )
+          )
+
+          override val app: Application          = application().configure(config).build()
+          override val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
+
+          val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
+
+          searchTypeValue mustBe "1"
+        }
+      }
+
       "return 1 for account number searchID" in new Setup {
         val searchTypeValue: String = connector.searchType(EORI("1234567"))
         searchTypeValue mustBe "1"
@@ -227,8 +289,7 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
         )
       )
 
-    val app: Application = application().configure(config).build()
-
+    val app: Application          = application().configure(config).build()
     val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
   }
 }
