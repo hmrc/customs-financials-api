@@ -40,6 +40,7 @@ object Utils {
   val comma                = ","
   val gbEoriPrefix         = "GB"
   val xIEoriPrefix         = "XI"
+  val euEoriRegex          = "^[A-Z]{2}[0-9A-Z]{1,15}$".r
 
   val UTC_TIME_ZONE = "UTC"
 

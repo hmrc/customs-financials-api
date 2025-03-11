@@ -178,4 +178,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   lazy val mongoHistDocSearchTtl: Long =
     configuration.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")
+
+  lazy val isEuEoriEnabled: Boolean = configuration.get[Boolean]("features.eu-eori-enabled")
 }
