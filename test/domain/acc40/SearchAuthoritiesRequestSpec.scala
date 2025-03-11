@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.libs.json.{JsValue, Json}
 import utils.SpecBase
 
-class RequestSpec extends SpecBase {
+class SearchAuthoritiesRequestSpec extends SpecBase {
   "SearchAuthoritiesRequest JSON writes" should {
     "should correctly serialize to JSON" in {
       val requestCommon = RequestCommon(
