@@ -30,11 +30,6 @@ import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, matchingJsonPath, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
-import config.AppConfig
-import org.mockito.Mockito.when
-import play.api.inject.guice.GuiceApplicationBuilder
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.inject.bind
 
 class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -208,8 +203,8 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
           override val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
 
           val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
-          searchTypeValue mustBe "0"
 
+          searchTypeValue mustBe "0"
         }
       }
 

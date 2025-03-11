@@ -21,9 +21,9 @@ import utils.SpecBase
 
 class AppConfigSpec extends SpecBase {
 
-  "Appconfig" should {
-    "load configuration values correctly" in new Setup {
-      appConfig.euEoriEnabled mustBe false
+  "euEoriEnabled" should {
+    "return the correct value" in new Setup {
+      appConfig.isEuEoriEnabled mustBe false
     }
   }
 

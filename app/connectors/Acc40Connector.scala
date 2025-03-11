@@ -88,7 +88,7 @@ class Acc40Connector @Inject() (
   def searchType(searchID: EORI): String =
     searchID.value match {
       case searchEori if searchEori.startsWith(gbEoriPrefix) || searchEori.startsWith(xIEoriPrefix) => "0"
-      case searchEori if appConfig.euEoriEnabled && euEoriRegex.matches(searchEori)                 => "0"
+      case searchEori if appConfig.isEuEoriEnabled && euEoriRegex.matches(searchEori)               => "0"
       case _                                                                                        => "1"
     }
 }
