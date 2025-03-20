@@ -4,7 +4,7 @@ import AppDependencies.bootstrapVersion
 
 val appName = "customs-financials-api"
 
-val scala3_3_4      = "3.3.4"
+val scala3_3_5      = "3.3.5"
 val silencerVersion = "1.7.16"
 
 val testDirectory            = "test"
@@ -12,7 +12,7 @@ val scalaStyleConfigFile     = "scalastyle-config.xml"
 val testScalaStyleConfigFile = "test-scalastyle-config.xml"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := scala3_3_4
+ThisBuild / scalaVersion := scala3_3_5
 
 lazy val it = project
   .enablePlugins(PlayScala)
