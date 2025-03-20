@@ -482,5 +482,4 @@ class EmailGetSpecificClaimRequestSpec extends SpecBase {
       }
     }
   }
-
 }

@@ -84,6 +84,12 @@ object TestData {
   val NUMBER_9  = 9
   val NUMBER_10 = 10
 
+  val OneL      = 1L
+  val FiveL     = 5L
+  val NineL     = 9L
+  val ThirteenL = 13L
+  val TwentyL   = 20L
+
   val COUNTRY_CODE_GB = "GB"
 
   val REGIME = "cds"

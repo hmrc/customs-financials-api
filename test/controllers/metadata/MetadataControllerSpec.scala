@@ -25,7 +25,6 @@ import models.requests.EmailRequest
 import org.mockito.ArgumentMatchers.{any, eq => is}
 import org.mockito.Mockito.{verify, when}
 import org.mockito.{ArgumentMatchers, Mockito}
-import play.api.http.Status.BAD_REQUEST
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.AnyContentAsJson

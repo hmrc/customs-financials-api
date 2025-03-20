@@ -20,7 +20,10 @@ import models.responses.StatementSearchFailureNotificationErrorResponse
 import utils.TestData.*
 import utils.Utils.*
 
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import scala.jdk.CollectionConverters.*
+import java.time.{LocalDate, LocalDateTime, ZoneOffset, ZonedDateTime}
+import java.util.Locale
 
 class UtilsSpec extends SpecBase {
 
@@ -39,6 +42,65 @@ class UtilsSpec extends SpecBase {
     "rfc7231DateTimePattern" should {
       "return correct value" in {
         rfc7231DateTimePattern mustBe "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+      }
+    }
+
+    "abbreviatedMonth" should {
+      "populate correct month abbreviations" in {
+        val expectedMap = Map(
+          1L  -> "Jan",
+          2L  -> "Feb",
+          3L  -> "Mar",
+          4L  -> "Apr",
+          5L  -> "May",
+          6L  -> "Jun",
+          7L  -> "Jul",
+          8L  -> "Aug",
+          9L  -> "Sep",
+          10L -> "Oct",
+          11L -> "Nov",
+          12L -> "Dec"
+        )
+
+        val actualMap = abbreviatedMonth.asScala.toMap
+
+        actualMap mustBe expectedMap
+      }
+
+      "correctly retrieve abbreviations for selected months" in {
+        abbreviatedMonth.get(OneL) mustBe "Jan"
+        abbreviatedMonth.get(FiveL) mustBe "May"
+        abbreviatedMonth.get(NineL) mustBe "Sep"
+      }
+
+      "return null for invalid month values" in {
+        Option(abbreviatedMonth.get(ThirteenL)) mustBe None
+        Option(abbreviatedMonth.get(TwentyL)) mustBe None
+      }
+    }
+
+    "httpDateFormatter" should {
+      "format date according to RFC 7231 format" in {
+        val simpleFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(rfc7231DateTimePattern, Locale.ENGLISH)
+
+        val testDatetime  = ZonedDateTime.of(YEAR_2023, MONTH_9, DAY_15, HOUR_11, MINUTES_30, 0, 0, ZoneOffset.UTC)
+        val formattedDate = httpDateFormatter.format(testDatetime)
+
+        formattedDate mustBe "Fri, 15 Sep 2023 11:30:00 GMT"
+      }
+
+      "use correct month abbreviations" in {
+        val testCases = Seq(
+          LocalDate.of(YEAR_2019, MONTH_7, DAY_11) -> "Thu, 11 Jul 2019 00:00:00 GMT",
+          LocalDate.of(YEAR_2023, MONTH_9, DAY_1)  -> "Fri, 01 Sep 2023 00:00:00 GMT",
+          LocalDate.of(YEAR_2020, MONTH_2, DAY_16) -> "Sun, 16 Feb 2020 00:00:00 GMT"
+        )
+
+        testCases.foreach { case (date, expected) =>
+          val dateTime      = date.atStartOfDay(ZoneOffset.UTC)
+          val formattedDate = httpDateFormatter.format(dateTime)
+          formattedDate mustBe expected
+        }
       }
     }
 
