@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import java.time.temporal.{ChronoField, ChronoUnit}
 import java.util.Locale
-import scala.jdk.CollectionConverters.*
+import scala.jdk.CollectionConverters.MapHasAsJava
 
 object Utils {
   val emptyString    = ""

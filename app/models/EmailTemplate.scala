@@ -22,9 +22,8 @@ import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, abbreviat
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
-import java.time.temporal.{ChronoField, ChronoUnit}
+import java.time.temporal.ChronoField
 import java.util.Locale
-import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 sealed trait EmailTemplate {

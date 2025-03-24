@@ -21,7 +21,7 @@ import utils.TestData.*
 import utils.Utils.*
 
 import java.time.format.DateTimeFormatter
-import scala.jdk.CollectionConverters.*
+import scala.jdk.CollectionConverters.MapHasAsScala
 import java.time.{LocalDate, LocalDateTime, ZoneOffset, ZonedDateTime}
 import java.util.Locale
 

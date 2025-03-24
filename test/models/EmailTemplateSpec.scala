@@ -21,7 +21,7 @@ import models.EmailTemplate.emailDateFormatter
 import utils.SpecBase
 import utils.TestData.{DAY_1, DAY_11, DAY_15, DAY_16, MONTH_2, MONTH_7, MONTH_9, YEAR_2019, YEAR_2020, YEAR_2023}
 
-import java.time.{LocalDate, ZoneOffset, ZonedDateTime}
+import java.time.LocalDate
 import scala.collection.immutable.{HashMap, Map}
 
 class EmailTemplateSpec extends SpecBase {
