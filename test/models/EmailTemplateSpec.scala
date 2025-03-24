@@ -40,6 +40,7 @@ class EmailTemplateSpec extends SpecBase {
         LocalDate.of(YEAR_2023, MONTH_9, DAY_1)  -> "01 Sep 2023",
         LocalDate.of(YEAR_2020, MONTH_2, DAY_16) -> "16 Feb 2020"
       )
+
       testCases.foreach { case (date, expected) =>
         EmailTemplate.emailDateFormatter.format(date) mustBe expected
       }

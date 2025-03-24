@@ -18,7 +18,7 @@ package models
 
 import domain.Notification
 import models.requests.EmailRequest
-import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, abbreviatedMonth, emptyString}
+import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, abbreviatedMonth, emptyString, singleSpace}
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
@@ -45,9 +45,9 @@ object EmailTemplate {
   private val DD1720_STT_DUE_DATE                  = 15
 
   val emailDateFormatter: DateTimeFormatter = DateTimeFormatterBuilder()
-    .appendPattern("dd ")
+    .appendPattern(s"dd$singleSpace")
     .appendText(ChronoField.MONTH_OF_YEAR, abbreviatedMonth)
-    .appendPattern(" yyyy")
+    .appendPattern(s"${singleSpace}yyyy")
     .toFormatter(Locale.ENGLISH)
 
   def fromNotification(

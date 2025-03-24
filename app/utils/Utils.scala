@@ -28,9 +28,16 @@ import java.util.Locale
 import scala.jdk.CollectionConverters.*
 
 object Utils {
-  val emptyString            = ""
-  val threeColons            = ":::"
-  val rfc7231DateTimePattern = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+  val emptyString    = ""
+  val threeColons    = ":::"
+  val englishLangKey = "en"
+  val welshLangKey   = "cy"
+  val singleSpace    = " "
+  val hyphen         = "-"
+  val comma          = ","
+  val gbEoriPrefix   = "GB"
+  val xIEoriPrefix   = "XI"
+  val euEoriRegex    = "^[A-Z]{2}[0-9A-Z]{1,15}$".r
 
   val abbreviatedMonth = Map(
     1L  -> "Jan",
@@ -48,22 +55,14 @@ object Utils {
   ).map { case (k, v) => (k: java.lang.Long) -> v }.asJava
 
   val httpDateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
-    .appendPattern("EEE, dd ")
+    .appendPattern(s"EEE, dd$singleSpace")
     .appendText(ChronoField.MONTH_OF_YEAR, abbreviatedMonth)
-    .appendPattern(" yyyy HH:mm:ss 'GMT'")
+    .appendPattern(s"${singleSpace}yyyy HH:mm:ss 'GMT'")
     .toFormatter(Locale.ENGLISH)
 
   val iso8601DateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
-
-  val iso8601DateTimeRegEx = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
-  val englishLangKey       = "en"
-  val welshLangKey         = "cy"
-  val singleSpace          = " "
-  val hyphen               = "-"
-  val comma                = ","
-  val gbEoriPrefix         = "GB"
-  val xIEoriPrefix         = "XI"
-  val euEoriRegex          = "^[A-Z]{2}[0-9A-Z]{1,15}$".r
+  val rfc7231DateTimePattern                  = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+  val iso8601DateTimeRegEx                    = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
 
   val UTC_TIME_ZONE = "UTC"
 
