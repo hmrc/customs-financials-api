@@ -18,10 +18,12 @@ package models
 
 import domain.Notification
 import models.requests.EmailRequest
-import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, emptyString}
+import utils.Utils.{DD1720_STT_TYPE, DD1920_STT_TYPE, EXCISE_STT_TYPE, abbreviatedMonth, emptyString, singleSpace}
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
+import java.time.temporal.ChronoField
+import java.util.Locale
 import scala.util.Try
 
 sealed trait EmailTemplate {
@@ -40,7 +42,12 @@ object EmailTemplate {
   private val CUSTOMS_DUTY_AND_IMPORT_VAT_DUE_DATE = 16
   private val DD1920_STT_DUE_DATE                  = 25
   private val DD1720_STT_DUE_DATE                  = 15
-  private val emailDateFormatter                   = DateTimeFormatter.ofPattern("dd MMM yyyy")
+
+  val emailDateFormatter: DateTimeFormatter = DateTimeFormatterBuilder()
+    .appendPattern(s"dd$singleSpace")
+    .appendText(ChronoField.MONTH_OF_YEAR, abbreviatedMonth)
+    .appendPattern(s"${singleSpace}yyyy")
+    .toFormatter(Locale.ENGLISH)
 
   def fromNotification(
     emailAddress: EmailAddress,
