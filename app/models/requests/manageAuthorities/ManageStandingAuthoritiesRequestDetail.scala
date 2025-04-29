@@ -30,8 +30,7 @@ case class ManageStandingAuthoritiesRequestDetail(
 object ManageStandingAuthoritiesRequestDetail {
 
   def grantAuthority(
-    grantAuthorityRequest: GrantAuthorityRequest,
-    eori: EORI
+    grantAuthorityRequest: GrantAuthorityRequest
   ): ManageStandingAuthoritiesRequestDetail = {
 
     val accountNumbers = (
@@ -50,7 +49,7 @@ object ManageStandingAuthoritiesRequestDetail {
     )
 
     ManageStandingAuthoritiesRequestDetail(
-      eori,
+      ownerEori = grantAuthorityRequest.ownerEori,
       isGrant = true,
       grantAuthorityRequest.authorisedUser.userName,
       grantAuthorityRequest.authorisedUser.userRole,
@@ -59,8 +58,7 @@ object ManageStandingAuthoritiesRequestDetail {
   }
 
   def revokeAuthority(
-    revokeAuthorityRequest: RevokeAuthorityRequest,
-    eori: EORI
+    revokeAuthorityRequest: RevokeAuthorityRequest
   ): ManageStandingAuthoritiesRequestDetail = {
 
     val accountNumbers = List(revokeAuthorityRequest.accountNumber)
@@ -68,7 +66,7 @@ object ManageStandingAuthoritiesRequestDetail {
     val authority = Authority(revokeAuthorityRequest.authorisedEori, None, None, None)
 
     ManageStandingAuthoritiesRequestDetail(
-      eori,
+      ownerEori = revokeAuthorityRequest.ownerEori,
       isGrant = false,
       revokeAuthorityRequest.authorisedUser.userName,
       revokeAuthorityRequest.authorisedUser.userRole,

@@ -38,14 +38,14 @@ class Acc30Connector @Inject() (
   mdgHeaders: MdgHeaders
 )(implicit executionContext: ExecutionContext) {
 
-  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI): Future[Boolean] =
+  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest): Future[Boolean] =
     makeRequest(
-      ManageStandingAuthoritiesRequestDetail.grantAuthority(grantAuthorityRequest, eori)
+      ManageStandingAuthoritiesRequestDetail.grantAuthority(grantAuthorityRequest)
     )
 
-  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI): Future[Boolean] =
+  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest): Future[Boolean] =
     makeRequest(
-      ManageStandingAuthoritiesRequestDetail.revokeAuthority(revokeAuthorityRequest, eori)
+      ManageStandingAuthoritiesRequestDetail.revokeAuthority(revokeAuthorityRequest)
     )
 
   private def makeRequest(detail: ManageStandingAuthoritiesRequestDetail): Future[Boolean] = {

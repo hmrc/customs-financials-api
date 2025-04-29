@@ -35,23 +35,23 @@ class AccountAuthorityService @Inject() (
   def getAccountAuthorities(eori: EORI): Future[Seq[AccountWithAuthorities]] =
     acc29Connector.getStandingAuthorities(eori)
 
-  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit
+  def grantAccountAuthorities(grantAuthorityRequest: GrantAuthorityRequest)(implicit
     hc: HeaderCarrier
   ): Future[Boolean] = {
 
     if (grantAuthorityRequest.editRequest) {
-      auditingService.auditEditAuthority(grantAuthorityRequest, eori)
+      auditingService.auditEditAuthority(grantAuthorityRequest)
     } else {
-      auditingService.auditGrantAuthority(grantAuthorityRequest, eori)
+      auditingService.auditGrantAuthority(grantAuthorityRequest)
     }
 
-    acc30Connector.grantAccountAuthorities(grantAuthorityRequest, eori)
+    acc30Connector.grantAccountAuthorities(grantAuthorityRequest)
   }
 
-  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI)(implicit
+  def revokeAccountAuthorities(revokeAuthorityRequest: RevokeAuthorityRequest)(implicit
     hc: HeaderCarrier
   ): Future[Boolean] = {
-    auditingService.auditRevokeAuthority(revokeAuthorityRequest, eori)
-    acc30Connector.revokeAccountAuthorities(revokeAuthorityRequest, eori)
+    auditingService.auditRevokeAuthority(revokeAuthorityRequest)
+    acc30Connector.revokeAccountAuthorities(revokeAuthorityRequest)
   }
 }

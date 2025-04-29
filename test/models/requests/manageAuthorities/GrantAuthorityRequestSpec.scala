@@ -52,13 +52,13 @@ class GrantAuthorityRequestSpec extends SpecBase {
         |},
         |"authority": {
         |"authorisedEori": "GB12345",
-        |"authorisedFromDate": "someStartDate"
-        |"authorisedToDate": "someDate"
+        |"authorisedFromDate": "someStartDate",
+        |"authorisedToDate": "someDate",
         |"viewBalance": true
         |},
         |"authorisedUser": {
-        |"userName": "testName"
-        |"userRole: "testRole"
+        |"userName": "testName",
+        |"userRole": "testRole"
         |},
         |"editRequest": true,
         |"ownerEori": "GB12345"
@@ -69,7 +69,7 @@ class GrantAuthorityRequestSpec extends SpecBase {
       accounts = Accounts(
         cash = Some("cash-account"),
         dutyDeferments = Seq("dd-data-1", "dd-data-2"),
-        guarantee = Some("guarentee-account")
+        guarantee = Some("guarantee-account")
       ),
       authority = StandingAuthority(
         authorisedEori = EORI("GB12345"),

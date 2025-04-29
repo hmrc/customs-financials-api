@@ -49,10 +49,11 @@ class RevokeAuthorityRequestSpec extends SpecBase {
         |"accountType": "DutyDeferment",
         |"authorisedEori": "GB12345",
         |"authorisedUser": {
-        |"userName": "testName"
-        |"userRole: "testRole"
+        |"userName": "testName",
+        |"userRole": "testRole"
         |},
         |"ownerEori": "GB98765"
+        |}
         |""".stripMargin
 
     val revokeAuthorityRequestObject: RevokeAuthorityRequest = RevokeAuthorityRequest(

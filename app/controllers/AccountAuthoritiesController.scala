@@ -91,42 +91,38 @@ class AccountAuthoritiesController @Inject() (
       }
   }
 
-  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-        service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
-      }
-  }
+//  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
+//    implicit request: RequestWithEori[JsValue] =>
+//      withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
+//        service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
+//          case true  => NoContent
+//          case false => InternalServerError
+//        }
+//      }
+//  }
 
   def grantV2: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-    val eori = request.eori
-
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-      service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
+      service.grantAccountAuthorities(grantAuthorityRequest).map {
         case true  => NoContent
         case false => InternalServerError
       }
     }
   }
 
-  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-        service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
-      }
-  }
+//  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
+//    implicit request: RequestWithEori[JsValue] =>
+//      withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
+//        service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
+//          case true  => NoContent
+//          case false => InternalServerError
+//        }
+//      }
+//  }
 
   def revokeV2: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-    val eori = request.eori
-
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-      service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
+      service.revokeAccountAuthorities(revokeAuthorityRequest).map {
         case true  => NoContent
         case false => InternalServerError
       }
