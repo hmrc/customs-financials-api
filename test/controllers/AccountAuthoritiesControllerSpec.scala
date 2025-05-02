@@ -559,7 +559,7 @@ class AccountAuthoritiesControllerSpec extends SpecBase {
       FakeRequest(GET, controllers.routes.AccountAuthoritiesController.get(traderEORI).url)
 
     def getRequestV2(eori: Option[EORI]): RequestWithEori[AnyContentAsEmpty.type] = {
-      val fakeRequest = FakeRequest(GET, controllers.routes.AccountAuthoritiesController.getV2().url)
+      val fakeRequest = FakeRequest(POST, controllers.routes.AccountAuthoritiesController.getV2().url)
 
       new RequestWithEori(eori.getOrElse(EORI("testEORI")), fakeRequest)
     }

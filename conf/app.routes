@@ -17,7 +17,7 @@ GET           /customs-financials-api/:eori/account-authorities                 
 #POST          /customs-financials-api/:eori/account-authorities/grant                     controllers.AccountAuthoritiesController.grant(eori: models.EORI)
 #POST          /customs-financials-api/:eori/account-authorities/revoke                    controllers.AccountAuthoritiesController.revoke(eori: models.EORI)
 
-GET           /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.getV2()
+POST          /customs-financials-api/account-authorities                                 controllers.AccountAuthoritiesController.getV2()
 POST          /customs-financials-api/account-authorities/grant                           controllers.AccountAuthoritiesController.grantV2()
 POST          /customs-financials-api/account-authorities/revoke                          controllers.AccountAuthoritiesController.revokeV2()
 
