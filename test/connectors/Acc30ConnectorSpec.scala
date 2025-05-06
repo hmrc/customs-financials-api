@@ -56,7 +56,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(noContent)
       )
 
-      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest))
       result mustBe true
 
       verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -79,7 +79,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(ok(emptyString))
       )
 
-      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest))
       result mustBe false
 
       verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -102,7 +102,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(serverError)
       )
 
-      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest))
       result mustBe false
 
       verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -125,7 +125,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
-      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.grantAccountAuthorities(grantRequest))
       result mustBe false
 
       verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -150,7 +150,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(noContent)
       )
 
-      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest))
       result mustBe true
 
       verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -172,7 +172,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(ok(emptyString))
       )
 
-      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest))
       result mustBe false
 
       verifyExactlyOneEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -195,7 +195,7 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
-      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest, EORI(EORI_VALUE)))
+      val result: Boolean = await(connector.revokeAccountAuthorities(revokeRequest))
       result mustBe false
 
       verifyEndPointUrlHit(acc30ManageAccountAuthoritiesEndpointUrl, POST)
@@ -226,14 +226,16 @@ class Acc30ConnectorSpec extends SpecBase with WireMockSupportProvider {
       Accounts(None, Seq.empty, None),
       StandingAuthority(EORI("authorised"), LocalDate.now().toString, None, viewBalance = true),
       AuthorisedUser("someUser", "someRole"),
-      editRequest = true
+      editRequest = true,
+      ownerEori = EORI(EORI_VALUE)
     )
 
     val revokeRequest: RevokeAuthorityRequest = RevokeAuthorityRequest(
       AccountNumber("GAN"),
       CdsCashAccount,
       EORI(EORI_VALUE),
-      AuthorisedUser("someUser", "someRole")
+      AuthorisedUser("someUser", "someRole"),
+      ownerEori = EORI(EORI_VALUE)
     )
 
     val app: Application = application().configure(config).build()

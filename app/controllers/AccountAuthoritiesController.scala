@@ -39,32 +39,7 @@ class AccountAuthoritiesController @Inject() (
 
   val log: Logger = Logger(this.getClass)
 
-  def get(eori: EORI): Action[AnyContent] = authorisedRequest async {
-    service
-      .getAccountAuthorities(eori)
-      .map { (accountWithAuthorities: Seq[AccountWithAuthorities]) =>
-        Ok(Json.toJson(accountWithAuthorities))
-      }
-      .recover {
-        case UpstreamErrorResponse(msg, INTERNAL_SERVER_ERROR, _, _) if msg.contains("JSON validation") =>
-          log.error(s"getAccountAuthorities failed: $msg")
-          InternalServerError("JSON Validation Error")
-
-        case UpstreamErrorResponse(msg, BAD_REQUEST, _, _) if hasNoAccountsForEoriMsg(msg) =>
-          log.error(s"Bad Request as no accounts found related to ${eori.value}")
-          Ok(Json.toJson(Seq.empty[AccountWithAuthorities]))
-
-        case UpstreamErrorResponse(msg, status_code, _, _) =>
-          log.error(s"getAccountAuthorities failed with status code: $status_code and error is : $msg")
-          ServiceUnavailable
-
-        case NonFatal(error) =>
-          log.error(s"getAccountAuthorities failed: ${error.getMessage}")
-          ServiceUnavailable
-      }
-  }
-
-  def getV2: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
+  def get: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
     val eori = request.eori
 
     service
@@ -91,42 +66,18 @@ class AccountAuthoritiesController @Inject() (
       }
   }
 
-  def grant(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-        service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
-      }
-  }
-
-  def grantV2: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-    val eori = request.eori
-
+  def grant: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[GrantAuthorityRequest] { grantAuthorityRequest =>
-      service.grantAccountAuthorities(grantAuthorityRequest, eori).map {
+      service.grantAccountAuthorities(grantAuthorityRequest).map {
         case true  => NoContent
         case false => InternalServerError
       }
     }
   }
 
-  def revoke(eori: EORI): Action[JsValue] = authorisedRequest.async(parse.json) {
-    implicit request: RequestWithEori[JsValue] =>
-      withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-        service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
-          case true  => NoContent
-          case false => InternalServerError
-        }
-      }
-  }
-
-  def revokeV2: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
-    val eori = request.eori
-
+  def revoke: Action[JsValue] = authorisedRequest.async(parse.json) { implicit request: RequestWithEori[JsValue] =>
     withJsonBody[RevokeAuthorityRequest] { revokeAuthorityRequest =>
-      service.revokeAccountAuthorities(revokeAuthorityRequest, eori).map {
+      service.revokeAccountAuthorities(revokeAuthorityRequest).map {
         case true  => NoContent
         case false => InternalServerError
       }

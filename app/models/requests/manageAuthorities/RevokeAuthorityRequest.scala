@@ -23,7 +23,8 @@ case class RevokeAuthorityRequest(
   accountNumber: AccountNumber,
   accountType: RevokeAccountType,
   authorisedEori: EORI,
-  authorisedUser: AuthorisedUser
+  authorisedUser: AuthorisedUser,
+  ownerEori: EORI
 )
 
 object RevokeAuthorityRequest {

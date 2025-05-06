@@ -47,12 +47,13 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = false
+        editRequest = false,
+        EORI(EORI_VALUE)
       )
 
       val auditRequest =
         """{
-          "ownerEORI":"someEORI",
+          "ownerEORI":"testEORI",
           "authorisedEORI":"agentEORI",
           "action":"Grant Authority",
           "accounts" : [
@@ -74,7 +75,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditGrantAuthority(grantAuthorityRequest, EORI("someEORI"))
+        service.auditGrantAuthority(grantAuthorityRequest)
         val result = extendedDataEventCaptor.getValue
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "ManageAuthority"
@@ -89,12 +90,13 @@ class AuditingServiceSpec extends SpecBase {
         Accounts(Some("9876543210"), Seq("12345678"), Some("GAN123456")),
         StandingAuthority(EORI("agentEORI"), "2020-11-01", Some("2020-12-31"), viewBalance = true),
         AuthorisedUser("John Smith", "Managing Director"),
-        editRequest = true
+        editRequest = true,
+        EORI(EORI_VALUE)
       )
 
       val auditRequest: String =
         """{
-          "ownerEORI":"someEORI",
+          "ownerEORI":"testEORI",
           "authorisedEORI":"agentEORI",
           "action":"Update Authority",
           "accountType": "CDSCash",
@@ -113,7 +115,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditEditAuthority(updateAuthorityRequest, EORI("someEORI"))
+        service.auditEditAuthority(updateAuthorityRequest)
         val result = extendedDataEventCaptor.getValue
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "UpdateAuthority"
@@ -125,7 +127,7 @@ class AuditingServiceSpec extends SpecBase {
     "audit the ACC30 revoke authority request data cash account" in new Setup {
       val auditRequest =
         """{
-            "ownerEORI":"someEORI",
+            "ownerEORI":"testEORI",
             "authorisedEORI":"agentEORI",
             "action":"Revoke Authority",
             "accountType":"CDSCash",
@@ -138,7 +140,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsCashAccount,
         EORI("agentEORI"),
-        AuthorisedUser("John Smith", "Managing Director")
+        AuthorisedUser("John Smith", "Managing Director"),
+        EORI(EORI_VALUE)
       )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
@@ -148,7 +151,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditRevokeAuthority(revokeAuthorityRequest, EORI("someEORI"))
+        service.auditRevokeAuthority(revokeAuthorityRequest)
         val result = extendedDataEventCaptor.getValue
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "ManageAuthority"
@@ -160,7 +163,7 @@ class AuditingServiceSpec extends SpecBase {
     "audit the ACC30 revoke authority request data duty deferment account" in new Setup {
       val auditRequest =
         """{
-            "ownerEORI":"someEORI",
+            "ownerEORI":"testEORI",
             "authorisedEORI":"agentEORI",
             "action":"Revoke Authority",
             "accountType":"DutyDeferment",
@@ -173,7 +176,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsDutyDefermentAccount,
         EORI("agentEORI"),
-        AuthorisedUser("John Smith", "Managing Director")
+        AuthorisedUser("John Smith", "Managing Director"),
+        EORI(EORI_VALUE)
       )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
@@ -183,7 +187,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditRevokeAuthority(revokeAuthorityRequest, EORI("someEORI"))
+        service.auditRevokeAuthority(revokeAuthorityRequest)
         val result = extendedDataEventCaptor.getValue
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "ManageAuthority"
@@ -195,7 +199,7 @@ class AuditingServiceSpec extends SpecBase {
     "audit the ACC30 revoke authority request data guarantee account" in new Setup {
       val auditRequest =
         """{
-            "ownerEORI":"someEORI",
+            "ownerEORI":"testEORI",
             "authorisedEORI":"agentEORI",
             "action":"Revoke Authority",
             "accountType":"GeneralGuarantee",
@@ -208,7 +212,8 @@ class AuditingServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsGeneralGuaranteeAccount,
         EORI("agentEORI"),
-        AuthorisedUser("John Smith", "Managing Director")
+        AuthorisedUser("John Smith", "Managing Director"),
+        EORI(EORI_VALUE)
       )
 
       val extendedDataEventCaptor: ArgumentCaptor[ExtendedDataEvent] =
@@ -218,7 +223,7 @@ class AuditingServiceSpec extends SpecBase {
         when(mockAuditConnector.sendExtendedEvent(extendedDataEventCaptor.capture())(any, any))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        service.auditRevokeAuthority(revokeAuthorityRequest, EORI("someEORI"))
+        service.auditRevokeAuthority(revokeAuthorityRequest)
         val result = extendedDataEventCaptor.getValue
         result.detail mustBe Json.parse(auditRequest)
         result.auditType mustBe "ManageAuthority"

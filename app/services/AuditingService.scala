@@ -64,7 +64,7 @@ class AuditingService @Inject() (appConfig: AppConfig, auditConnector: AuditConn
 
   private val referrer: HeaderCarrier => String = _.headers(Seq(HeaderNames.REFERER)).headOption.fold(hyphen)(_._2)
 
-  def auditEditAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit
+  def auditEditAuthority(grantAuthorityRequest: GrantAuthorityRequest)(implicit
     hc: HeaderCarrier
   ): Future[AuditResult] = {
     val accountDetails =
@@ -73,7 +73,7 @@ class AuditingService @Inject() (appConfig: AppConfig, auditConnector: AuditConn
 
     val auditJson: JsValue = Json.toJson(
       EditAuthorityRequestAuditDetail(
-        eori,
+        grantAuthorityRequest.ownerEori,
         grantAuthorityRequest.authority.authorisedEori,
         EDIT_AUTHORITY_ACTION,
         accountDetails.accountType,
@@ -89,12 +89,12 @@ class AuditingService @Inject() (appConfig: AppConfig, auditConnector: AuditConn
     audit(AuditModel(EDIT_AUTHORITY_ACTION, auditJson, UPDATE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditGrantAuthority(grantAuthorityRequest: GrantAuthorityRequest, eori: EORI)(implicit
+  def auditGrantAuthority(grantAuthorityRequest: GrantAuthorityRequest)(implicit
     hc: HeaderCarrier
   ): Future[AuditResult] = {
     val auditJson = Json.toJson(
       GrantAuthorityRequestAuditDetail(
-        eori,
+        grantAuthorityRequest.ownerEori,
         grantAuthorityRequest.authority.authorisedEori,
         GRANT_AUTHORITY_ACTION,
         convertToAuditRequest(grantAuthorityRequest.accounts),
@@ -109,12 +109,12 @@ class AuditingService @Inject() (appConfig: AppConfig, auditConnector: AuditConn
     audit(AuditModel(GRANT_AUTHORITY_ACTION, auditJson, MANAGE_AUTHORITY_AUDIT_TYPE))
   }
 
-  def auditRevokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest, eori: EORI)(implicit
+  def auditRevokeAuthority(revokeAuthorityRequest: RevokeAuthorityRequest)(implicit
     hc: HeaderCarrier
   ): Future[AuditResult] = {
     val auditJson = Json.toJson(
       RevokeAuthorityRequestAuditDetail(
-        eori,
+        revokeAuthorityRequest.ownerEori,
         revokeAuthorityRequest.authorisedEori,
         REVOKE_AUTHORITY_ACTION,
         RevokeAccountType.toAuditLabel(revokeAuthorityRequest.accountType),

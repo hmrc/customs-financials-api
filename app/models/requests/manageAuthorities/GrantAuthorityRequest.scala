@@ -17,13 +17,15 @@
 package models.requests.manageAuthorities
 
 import domain.StandingAuthority
+import models.EORI
 import play.api.libs.json.{Json, OFormat}
 
 case class GrantAuthorityRequest(
   accounts: Accounts,
   authority: StandingAuthority,
   authorisedUser: AuthorisedUser,
-  editRequest: Boolean
+  editRequest: Boolean,
+  ownerEori: EORI
 )
 
 object GrantAuthorityRequest {

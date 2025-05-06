@@ -27,6 +27,7 @@ import play.api.test.Helpers.running
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import utils.TestData.EORI_VALUE
 import utils.SpecBase
 
 import scala.concurrent.*
@@ -63,29 +64,30 @@ class AccountAuthorityServiceSpec extends SpecBase {
         Accounts(Some("345"), Seq("123", "754"), Some("54345")),
         StandingAuthority(EORI("authorisedEori"), "2018-11-09", None, viewBalance = true),
         AuthorisedUser("some name", "some role"),
-        editRequest = false
+        editRequest = false,
+        EORI(EORI_VALUE)
       )
 
       "propagate the connector's result when true" in new Setup {
-        when(mockAuditingService.auditGrantAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+        when(mockAuditingService.auditGrantAuthority(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori)))
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest)))
             .thenReturn(Future.successful(true))
 
-          val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest, EORI("testEORI")))
+          val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest))
           actualResult mustBe true
         }
       }
 
       "propagate the connector's result when false" in new Setup {
-        when(mockAuditingService.auditGrantAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+        when(mockAuditingService.auditGrantAuthority(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest), eqTo(eori)))
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthorityRequest)))
             .thenReturn(Future.successful(false))
 
-          val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest, EORI("testEORI")))
+          val actualResult = await(service.grantAccountAuthorities(grantAuthorityRequest))
           actualResult mustBe false
         }
       }
@@ -93,14 +95,14 @@ class AccountAuthorityServiceSpec extends SpecBase {
       "return true when grantAuthorityRequest has editRequest is true" in new Setup {
         val grantAuthRequestWithEditRequest: GrantAuthorityRequest = grantAuthorityRequest.copy(editRequest = true)
 
-        when(mockAuditingService.auditEditAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+        when(mockAuditingService.auditEditAuthority(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthRequestWithEditRequest), eqTo(eori)))
+          when(mockAcc30Connector.grantAccountAuthorities(eqTo(grantAuthRequestWithEditRequest)))
             .thenReturn(Future.successful(true))
 
           val actualResult =
-            await(service.grantAccountAuthorities(grantAuthRequestWithEditRequest, EORI("testEORI")))
+            await(service.grantAccountAuthorities(grantAuthRequestWithEditRequest))
 
           actualResult mustBe true
         }
@@ -113,29 +115,30 @@ class AccountAuthorityServiceSpec extends SpecBase {
         AccountNumber("123"),
         CdsCashAccount,
         EORI("authorisedEori"),
-        AuthorisedUser("some name", "some role")
+        AuthorisedUser("some name", "some role"),
+        EORI(EORI_VALUE)
       )
 
       "propagate the connector's result when true" in new Setup {
-        when(mockAuditingService.auditRevokeAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+        when(mockAuditingService.auditRevokeAuthority(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori)))
+          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest)))
             .thenReturn(Future.successful(true))
 
-          val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest, EORI("testEORI")))
+          val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest))
           actualResult mustBe true
         }
       }
 
       "propagate the connector's result when false" in new Setup {
-        when(mockAuditingService.auditRevokeAuthority(any, any)(any)).thenReturn(Future.successful(AuditResult.Success))
+        when(mockAuditingService.auditRevokeAuthority(any)(any)).thenReturn(Future.successful(AuditResult.Success))
 
         running(app) {
-          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest), eqTo(eori)))
+          when(mockAcc30Connector.revokeAccountAuthorities(eqTo(revokeAuthorityRequest)))
             .thenReturn(Future.successful(false))
 
-          val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest, EORI("testEORI")))
+          val actualResult = await(service.revokeAccountAuthorities(revokeAuthorityRequest))
           actualResult mustBe false
         }
       }
@@ -146,7 +149,6 @@ class AccountAuthorityServiceSpec extends SpecBase {
     implicit val hc: HeaderCarrier                  = HeaderCarrier()
     implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-    val eori: EORI                           = EORI("testEORI")
     val mockAcc29Connector: Acc29Connector   = mock[Acc29Connector]
     val mockAcc30Connector: Acc30Connector   = mock[Acc30Connector]
     val mockAuditingService: AuditingService = mock[AuditingService]
