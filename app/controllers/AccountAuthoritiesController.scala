@@ -18,13 +18,15 @@ package controllers
 
 import domain.AccountWithAuthorities
 import models.EORI
+import models.requests.EoriRequest
 import models.requests.manageAuthorities.{GrantAuthorityRequest, RevokeAuthorityRequest}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, AnyContentAsJson, ControllerComponents}
 import services.AccountAuthorityService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.Utils.emptyString
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -40,7 +42,7 @@ class AccountAuthoritiesController @Inject() (
   val log: Logger = Logger(this.getClass)
 
   def get: Action[AnyContent] = authorisedRequest async { implicit request: RequestWithEori[AnyContent] =>
-    val eori = request.eori
+    val eori = EORI(parseRequestBody(request).eori)
 
     service
       .getAccountAuthorities(eori)
@@ -86,4 +88,13 @@ class AccountAuthoritiesController @Inject() (
 
   private def hasNoAccountsForEoriMsg(exceptionMsg: String): Boolean =
     exceptionMsg.contains("could not find accounts related to eori")
+
+  private def parseRequestBody(request: RequestWithEori[AnyContent]) = {
+    import models.requests.EoriRequest.format
+
+    request.body match {
+      case anyContentJson: AnyContentAsJson => Json.fromJson(anyContentJson.json).getOrElse(EoriRequest(emptyString))
+      case _                                => EoriRequest(emptyString)
+    }
+  }
 }
