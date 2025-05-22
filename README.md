@@ -11,6 +11,20 @@ This application lives in the "protected" zone. It integrates with:
 * Secure Payments Service (SPS) via Messaging Delivery Group (MDG)
 * Enterprise Tax Management Platform (ETMP) via MDG
 
+The MDG integrations are:
+
+* DUD09 (ACC27) Accounts and Balances
+* ACC24 Historic document requests
+* ACC28 Guarantee transactions
+* ACC29 Retrieve standing authorities
+* ACC30 Manage standing authorities (change permissions)
+* ACC31 Retrieve cash account transaction listings
+* ACC37 Amend duty deferment contact details
+* ACC38 Retrieve duty deferment contact details
+* SUB09 View account authorities
+* SUB21 Retrieve EORI history
+* DEC64 Submit file upload
+
 ## Running the service
 
 *From the root directory*
@@ -55,9 +69,7 @@ The easiest way to get started with these is via the service manager CLI - you c
 
 ### Login enrolments
 
-The service can be accessed by using below enrolments and with below sample EORI numbers, via http://localhost:9949/auth-login-stub/gg-sign-in (on local) or https://<host:port>/auth-login-stub/gg-sign-in on DEV/QA/STAGING
-
-Redirect URL - `/customs/payment-records`
+The service's endpoints (that need Enrolment to access) can be accessed by using below enrolments
 
 | Enrolment Key	 | Identifier Name | Identifier Value |
 |----------------|-----------------|------------------|
@@ -99,39 +111,6 @@ The minimum requirement for test coverage is 90%. Builds will fail when the proj
 
 Different features can be enabled / disabled per-environment via the `app-config-<env>` project by setting `features.some-feature: true`
 
-## Helpful commands
-
-| Command                                       | Description                                                                                                 |
-|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `sbt runAllChecks`                            | Runs all standard code checks                                                                               |
-| `sbt clean`                                   | Cleans code                                                                                                 |
-| `sbt compile`                                 | Better to say 'Compiles the code'                                                                           |
-| `sbt coverage`                                | Prints code coverage                                                                                        |
-| `sbt test`                                    | Runs unit tests                                                                                             |
-| `sbt it/test`                                 | Runs integration tests                                                                                      |
-| `sbt scalafmtCheckAll`                        | Runs code formatting checks based on .scalafmt.conf                                                         |
-| `sbt scalastyle`                              | Runs code style checks based on /scalastyle-config.xml                                                      |
-| `sbt Test/scalastyle`                         | Runs code style checks for unit test code /test-scalastyle-config.xml                                       |
-| `sbt coverageReport`                          | Produces a code coverage report                                                                             |
-| `sbt "test/testOnly *TEST_FILE_NAME*"`        | runs tests for a single file                                                                                |
-| `sbt clean coverage test coverageReport`      | Generates a unit test coverage report that you can find here target/scala-3.3.5/scoverage-report/index.html |
-| `sbt "run -Dfeatures.some-feature-name=true"` | enables a feature locally without risking exposure                                                          |
-
-
-The MDG integrations are:
-
-* DUD09 (ACC27) Accounts and Balances
-* ACC24 Historic document requests
-* ACC28 Guarantee transactions
-* ACC29 Retrieve standing authorities
-* ACC30 Manage standing authorities (change permissions)
-* ACC31 Retrieve cash account transaction listings
-* ACC37 Amend duty deferment contact details 
-* ACC38 Retrieve duty deferment contact details
-* SUB09 View account authorities
-* SUB21 Retrieve EORI history
-* DEC64 Submit file upload
-
 In dev/test environments, the upstream services are stubbed out using the [customs-financials-hods-stub](https://github.com/hmrc/customs-financials-hods-stub/).
 
 ## Available Routes
@@ -148,7 +127,7 @@ Application entrypoint:  `/customs/payment-records`
 | POST   /customs-financials-api/account/guarantee/open-transactions-detail   | Request to retrieve guarantee transactions detail            |                
 | POST   /customs-financials-api/account/cash/transactions                    | Request to retrieve cash transactions summary                |                
 | POST   /customs-financials-api/account/cash/transactions-detail             | Request to retrieve cash transactions detail                 |                
-| GET    /customs-financials-api/account-authorities                          | Request to retrieve account authorities                      |                
+| POST    /customs-financials-api/account-authorities                         | Request to retrieve account authorities                      |                
 | POST   /customs-financials-api/account-authorities/grant                    | Request to grant authority on account                        |                
 | POST   /customs-financials-api/account-authorities/revoke                   | Request to revoke authority on account                       |                
 | POST   /customs-financials-api/duty-deferment/update-contact-details        | Request to update duty deferment contact details             |                
@@ -726,19 +705,20 @@ Returns true/false
 * **200** If the request is processed successful and a resource is created
 * **403** This status code will be returned in case of incorrect data, incorrect data format, missing parameters etc are provided in the request
 
+## Helpful commands
 
-
-## Running tests
- 
-There is just one test source tree in the `test` folder. Use `sbt test` to run them.
-
-To get a unit test coverage report, you can run `sbt clean coverage test coverageReport`,
-then open the resulting coverage report `target/scala-2.12/scoverage-report/index.html` in a web browser.
-
-Test coverage threshold is set at 90% - so if you commit any significant amount of implementation code without writing 
-tests, you can expect the build to fail.
-
-## All tests and checks
-This is a sbt command alias specific to this project. It will run a scala style check, run unit tests, run integration
-tests and produce a coverage report:
-> `sbt runAllChecks`
+| Command                                       | Description                                                                                                 |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `sbt runAllChecks`                            | Runs all standard code checks                                                                               |
+| `sbt clean`                                   | Cleans code                                                                                                 |
+| `sbt compile`                                 | Better to say 'Compiles the code'                                                                           |
+| `sbt coverage`                                | Prints code coverage                                                                                        |
+| `sbt test`                                    | Runs unit tests                                                                                             |
+| `sbt it/test`                                 | Runs integration tests                                                                                      |
+| `sbt scalafmtCheckAll`                        | Runs code formatting checks based on .scalafmt.conf                                                         |
+| `sbt scalastyle`                              | Runs code style checks based on /scalastyle-config.xml                                                      |
+| `sbt Test/scalastyle`                         | Runs code style checks for unit test code /test-scalastyle-config.xml                                       |
+| `sbt coverageReport`                          | Produces a code coverage report                                                                             |
+| `sbt "test/testOnly *TEST_FILE_NAME*"`        | runs tests for a single file                                                                                |
+| `sbt clean coverage test coverageReport`      | Generates a unit test coverage report that you can find here target/scala-3.3.5/scoverage-report/index.html |
+| `sbt "run -Dfeatures.some-feature-name=true"` | enables a feature locally without risking exposure                                                          |
