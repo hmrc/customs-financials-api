@@ -21,6 +21,10 @@ The MDG integrations are:
 * ACC31 Retrieve cash account transaction listings
 * ACC37 Amend duty deferment contact details
 * ACC38 Retrieve duty deferment contact details
+* ACC40	Search Authorities
+* ACC41	Request All Authorities for EORI
+* ACC44	Cash Account Transaction Search
+* ACC45	Cash Account Statement Request
 * SUB09 View account authorities
 * SUB21 Retrieve EORI history
 * DEC64 Submit file upload
