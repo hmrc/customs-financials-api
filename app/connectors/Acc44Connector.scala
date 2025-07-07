@@ -28,7 +28,7 @@ import models.responses.SourceFaultDetailMsg.*
 import models.responses.{
   CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail
 }
-import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.*
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
@@ -128,6 +128,22 @@ class Acc44Connector @Inject() (
                 )
               }
 
+            case NOT_FOUND =>
+              if (isResponseContainsErrorDetails(res)) {
+                Left(retrieveErrorDetailsResponse(res))
+              } else {
+                Left(
+                  ErrorDetail(
+                    dateTimeService.currentDateTimeAsIso8601,
+                    "MDTP_ID",
+                    res.status.toString,
+                    BACK_END_FAILURE,
+                    backEnd,
+                    SourceFaultDetail(Seq(BACK_END_FAILURE))
+                  )
+                )
+              }
+
             case _ =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
@@ -147,7 +163,6 @@ class Acc44Connector @Inject() (
         }
         .recover { case exception: Throwable =>
           log.error("Error occurred while calling backend System")
-
           Left(
             ErrorDetail(
               dateTimeService.currentDateTimeAsIso8601,
@@ -193,7 +208,7 @@ class Acc44Connector @Inject() (
     Json.fromJson[CashAccountTransactionSearchResponseContainer](res.json).get
 
   private def isResponseContainsErrorDetails(res: HttpResponse) =
-    Json.fromJson[ErrorDetailContainer](res.json).isSuccess
+    if (res.body.isEmpty) false else Json.fromJson[ErrorDetailContainer](res.json).isSuccess
 
   private def retrieveErrorDetailsResponse(res: HttpResponse): ErrorDetail =
     Json.fromJson[ErrorDetailContainer](res.json).get.errorDetail

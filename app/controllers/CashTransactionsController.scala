@@ -93,6 +93,7 @@ class CashTransactionsController @Inject() (service: CashTransactionsService, cc
 
     errorDetail.errorCode match {
       case "400"                                                   => BadRequest(errorDetail)
+      case "404"                                                   => NotFound(errorDetail)
       case "500"                                                   => InternalServerError(errorDetail)
       case etmpErrorCode if etmpErrorCodes.contains(etmpErrorCode) => Created(errorDetail)
       case _                                                       => ServiceUnavailable(errorDetail)

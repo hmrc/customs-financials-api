@@ -34,6 +34,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.SpecBase
 import utils.TestData.*
+import models.responses.ErrorCode.{code400, code404, code500}
+import models.responses.ErrorSource.{backEnd, mdtp}
+import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
 
 import java.time.LocalDate
 import scala.concurrent.*
@@ -348,7 +351,22 @@ class CashTransactionsServiceSpec extends SpecBase {
         }
       }
     }
+
+    "return Left[ErrorDetails] when api returns 404 error code" in new Setup {
+      when(mockAcc44Connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+        .thenReturn(Future.successful(Left(errorDetails)))
+
+      when(mockAuditingService.auditCashAccountTransactionsSearch(any)(any))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      running(app) {
+        val result = await(service.retrieveCashAccountTransactions(cashAccTransactionSearchRequestDetails))
+
+        result mustBe Left(errorDetails)
+      }
+    }
   }
+
   "submitCashAccountStatementRequest" should {
 
     "return Left with ErrorDetail if api request fails" in new Setup {
@@ -459,6 +477,16 @@ class CashTransactionsServiceSpec extends SpecBase {
     val mockAcc44Connector: Acc44Connector   = mock[Acc44Connector]
     val mockAcc45Connector: Acc45Connector   = mock[Acc45Connector]
     val mockAuditingService: AuditingService = mock[AuditingService]
+
+    val errorDetails: ErrorDetail =
+      ErrorDetail(
+        "2024-01-21T11:30:47Z",
+        "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+        code404,
+        BACK_END_FAILURE,
+        backEnd,
+        SourceFaultDetail(Seq(BACK_END_FAILURE))
+      )
 
     val cashAccSttReqDetail: CashAccountStatementRequestDetail =
       CashAccountStatementRequestDetail("GB123456789012345", "12345678910", "2024-05-10", "2024-05-20")

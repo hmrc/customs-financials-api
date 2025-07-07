@@ -22,13 +22,13 @@ import models.requests.SearchType.P
 import models.requests.{
   CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails
 }
-import models.responses.ErrorCode.{code400, code500}
+import models.responses.ErrorCode.{code400, code404, code500}
 import models.responses.EtmpErrorCode.code001
 import models.responses.PaymentType.Payment
 import models.responses.{Acc45ResponseCommon, ErrorDetail, *}
 import models.{EORI, ExceededThresholdErrorException, NoAssociatedDataException}
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.{any, eq => is}
+import org.mockito.ArgumentMatchers.{any, eq as is}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
@@ -234,6 +234,18 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
 
+    "return error response for 404 error code" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
+        .thenReturn(Future.successful(Left(errorDetails.copy(errorCode = code404))))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe NOT_FOUND
+        contentAsJson(result) mustBe Json.toJson(errorDetails.copy(errorCode = code404))
+      }
+    }
+
     "return error response for 500 error code" in new Setup {
       when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
@@ -288,6 +300,7 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
   }
+
   "submitCashAccStatementRequest" should {
 
     "return ResponseCommon for success scenario" in new Setup {

@@ -115,4 +115,6 @@ object TestData {
   val IMPORTERS_EORI_NUMBER         = "GB1234567"
 
   val ORIGINATING_SYSTEM = "MDTP"
+
+  val CORRELATION_ID = "MDTP_ID"
 }
