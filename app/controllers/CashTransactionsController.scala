@@ -78,6 +78,7 @@ class CashTransactionsController @Inject() (service: CashTransactionsService, cc
   private def handleCashAccSttResFailures(errorDetail: ErrorDetail): Result =
     errorDetail.errorCode match {
       case "400" => BadRequest(Json.toJson(errorDetail))
+      case "404" => NotFound(Json.toJson(errorDetail))
       case "500" => InternalServerError(Json.toJson(errorDetail))
       case _     => ServiceUnavailable(Json.toJson(errorDetail))
     }
