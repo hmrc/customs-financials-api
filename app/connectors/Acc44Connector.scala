@@ -94,7 +94,9 @@ class Acc44Connector @Inject() (
 
   private def postValidRequest(
     cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestContainer
-  ): Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] =
+  ): Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
+    val errorStatusList = List(BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND)
+
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-transaction-search") {
       httpClient
         .post(url"${appConfig.acc44CashTransactionSearchEndpoint}")(HeaderCarrier())
@@ -103,8 +105,7 @@ class Acc44Connector @Inject() (
         .execute[HttpResponse]
         .map { res =>
           res.status match {
-            case OK => validateAndProcessIncomingSuccessResponse(res)
-
+            case OK      => validateAndProcessIncomingSuccessResponse(res)
             case CREATED =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
@@ -112,7 +113,7 @@ class Acc44Connector @Inject() (
                 Right(retrieveCashAccountTransactionSsearchResponse(res))
               }
 
-            case BAD_REQUEST | INTERNAL_SERVER_ERROR =>
+            case resStatus if errorStatusList.contains(resStatus) =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
               } else {
@@ -121,30 +122,13 @@ class Acc44Connector @Inject() (
                     dateTimeService.currentDateTimeAsIso8601,
                     "MDTP_ID",
                     res.status.toString,
-                    SERVER_CONNECTION_ERROR,
+                    if (resStatus == NOT_FOUND) BACK_END_FAILURE else SERVER_CONNECTION_ERROR,
                     backEnd,
                     SourceFaultDetail(Seq(BACK_END_FAILURE))
                   )
                 )
               }
-
-            case NOT_FOUND =>
-              if (isResponseContainsErrorDetails(res)) {
-                Left(retrieveErrorDetailsResponse(res))
-              } else {
-                Left(
-                  ErrorDetail(
-                    dateTimeService.currentDateTimeAsIso8601,
-                    "MDTP_ID",
-                    res.status.toString,
-                    BACK_END_FAILURE,
-                    backEnd,
-                    SourceFaultDetail(Seq(BACK_END_FAILURE))
-                  )
-                )
-              }
-
-            case _ =>
+            case _                                                =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
               } else {
@@ -175,6 +159,7 @@ class Acc44Connector @Inject() (
           )
         }
     }
+  }
 
   private def validateAndProcessIncomingSuccessResponse(
     res: HttpResponse
