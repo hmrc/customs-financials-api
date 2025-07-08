@@ -26,7 +26,7 @@ import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
 import models.responses.SourceFaultDetailMsg.*
 import models.responses.{
-  CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail
+  CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, ErrorSource, SourceFaultDetail
 }
 import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.*
@@ -105,7 +105,8 @@ class Acc44Connector @Inject() (
         .execute[HttpResponse]
         .map { res =>
           res.status match {
-            case OK      => validateAndProcessIncomingSuccessResponse(res)
+            case OK => validateAndProcessIncomingSuccessResponse(res)
+
             case CREATED =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
@@ -118,9 +119,7 @@ class Acc44Connector @Inject() (
                 Left(retrieveErrorDetailsResponse(res))
               } else {
                 Left(
-                  ErrorDetail(
-                    dateTimeService.currentDateTimeAsIso8601,
-                    "MDTP_ID",
+                  populateErrorDetails(
                     res.status.toString,
                     if (resStatus == NOT_FOUND) BACK_END_FAILURE else SERVER_CONNECTION_ERROR,
                     backEnd,
@@ -128,14 +127,13 @@ class Acc44Connector @Inject() (
                   )
                 )
               }
-            case _                                                =>
+
+            case _ =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
               } else {
                 Left(
-                  ErrorDetail(
-                    dateTimeService.currentDateTimeAsIso8601,
-                    "MDTP_ID",
+                  populateErrorDetails(
                     res.status.toString,
                     SERVER_CONNECTION_ERROR,
                     backEnd,
@@ -147,15 +145,9 @@ class Acc44Connector @Inject() (
         }
         .recover { case exception: Throwable =>
           log.error("Error occurred while calling backend System")
+
           Left(
-            ErrorDetail(
-              dateTimeService.currentDateTimeAsIso8601,
-              "MDTP_ID",
-              code500,
-              exception.getMessage,
-              etmp,
-              SourceFaultDetail(Seq(ETMP_FAILURE))
-            )
+            populateErrorDetails(code500, exception.getMessage, etmp, SourceFaultDetail(Seq(ETMP_FAILURE)))
           )
         }
     }
@@ -197,4 +189,19 @@ class Acc44Connector @Inject() (
 
   private def retrieveErrorDetailsResponse(res: HttpResponse): ErrorDetail =
     Json.fromJson[ErrorDetailContainer](res.json).get.errorDetail
+
+  private def populateErrorDetails(
+    errorCode: String,
+    errorMessage: String,
+    source: String,
+    sourceFaultDetail: SourceFaultDetail
+  ) =
+    ErrorDetail(
+      dateTimeService.currentDateTimeAsIso8601,
+      "MDTP_ID",
+      errorCode,
+      errorMessage,
+      source,
+      sourceFaultDetail
+    )
 }
