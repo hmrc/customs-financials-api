@@ -94,9 +94,7 @@ class Acc44Connector @Inject() (
 
   private def postValidRequest(
     cashAccTransSearchRequestContainer: CashAccountTransactionSearchRequestContainer
-  ): Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] = {
-    val errorStatusList = List(BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND)
-
+  ): Future[Either[ErrorDetail, CashAccountTransactionSearchResponseContainer]] =
     metricsReporterService.withResponseTimeLogging("hods.post.cash-account-transaction-search") {
       httpClient
         .post(url"${appConfig.acc44CashTransactionSearchEndpoint}")(HeaderCarrier())
@@ -114,7 +112,7 @@ class Acc44Connector @Inject() (
                 Right(retrieveCashAccountTransactionSsearchResponse(res))
               }
 
-            case resStatus if errorStatusList.contains(resStatus) =>
+            case resStatus =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
               } else {
@@ -122,20 +120,6 @@ class Acc44Connector @Inject() (
                   populateErrorDetails(
                     res.status.toString,
                     if (resStatus == NOT_FOUND) BACK_END_FAILURE else SERVER_CONNECTION_ERROR,
-                    backEnd,
-                    SourceFaultDetail(Seq(BACK_END_FAILURE))
-                  )
-                )
-              }
-
-            case _ =>
-              if (isResponseContainsErrorDetails(res)) {
-                Left(retrieveErrorDetailsResponse(res))
-              } else {
-                Left(
-                  populateErrorDetails(
-                    res.status.toString,
-                    SERVER_CONNECTION_ERROR,
                     backEnd,
                     SourceFaultDetail(Seq(BACK_END_FAILURE))
                   )
@@ -151,7 +135,6 @@ class Acc44Connector @Inject() (
           )
         }
     }
-  }
 
   private def validateAndProcessIncomingSuccessResponse(
     res: HttpResponse
