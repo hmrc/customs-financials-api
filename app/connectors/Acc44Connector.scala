@@ -26,9 +26,9 @@ import models.responses.ErrorCode.code500
 import models.responses.ErrorSource.{backEnd, etmp, mdtp}
 import models.responses.SourceFaultDetailMsg.*
 import models.responses.{
-  CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, SourceFaultDetail
+  CashAccountTransactionSearchResponseContainer, ErrorDetail, ErrorDetailContainer, ErrorSource, SourceFaultDetail
 }
-import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.*
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
@@ -112,32 +112,14 @@ class Acc44Connector @Inject() (
                 Right(retrieveCashAccountTransactionSsearchResponse(res))
               }
 
-            case BAD_REQUEST | INTERNAL_SERVER_ERROR =>
+            case resStatus =>
               if (isResponseContainsErrorDetails(res)) {
                 Left(retrieveErrorDetailsResponse(res))
               } else {
                 Left(
-                  ErrorDetail(
-                    dateTimeService.currentDateTimeAsIso8601,
-                    "MDTP_ID",
+                  populateErrorDetails(
                     res.status.toString,
-                    SERVER_CONNECTION_ERROR,
-                    backEnd,
-                    SourceFaultDetail(Seq(BACK_END_FAILURE))
-                  )
-                )
-              }
-
-            case _ =>
-              if (isResponseContainsErrorDetails(res)) {
-                Left(retrieveErrorDetailsResponse(res))
-              } else {
-                Left(
-                  ErrorDetail(
-                    dateTimeService.currentDateTimeAsIso8601,
-                    "MDTP_ID",
-                    res.status.toString,
-                    SERVER_CONNECTION_ERROR,
+                    if (resStatus == NOT_FOUND) BACK_END_FAILURE else SERVER_CONNECTION_ERROR,
                     backEnd,
                     SourceFaultDetail(Seq(BACK_END_FAILURE))
                   )
@@ -149,14 +131,7 @@ class Acc44Connector @Inject() (
           log.error("Error occurred while calling backend System")
 
           Left(
-            ErrorDetail(
-              dateTimeService.currentDateTimeAsIso8601,
-              "MDTP_ID",
-              code500,
-              exception.getMessage,
-              etmp,
-              SourceFaultDetail(Seq(ETMP_FAILURE))
-            )
+            populateErrorDetails(code500, exception.getMessage, etmp, SourceFaultDetail(Seq(ETMP_FAILURE)))
           )
         }
     }
@@ -193,8 +168,23 @@ class Acc44Connector @Inject() (
     Json.fromJson[CashAccountTransactionSearchResponseContainer](res.json).get
 
   private def isResponseContainsErrorDetails(res: HttpResponse) =
-    Json.fromJson[ErrorDetailContainer](res.json).isSuccess
+    if (res.body.isEmpty) false else Json.fromJson[ErrorDetailContainer](res.json).isSuccess
 
   private def retrieveErrorDetailsResponse(res: HttpResponse): ErrorDetail =
     Json.fromJson[ErrorDetailContainer](res.json).get.errorDetail
+
+  private def populateErrorDetails(
+    errorCode: String,
+    errorMessage: String,
+    source: String,
+    sourceFaultDetail: SourceFaultDetail
+  ) =
+    ErrorDetail(
+      dateTimeService.currentDateTimeAsIso8601,
+      "MDTP_ID",
+      errorCode,
+      errorMessage,
+      source,
+      sourceFaultDetail
+    )
 }

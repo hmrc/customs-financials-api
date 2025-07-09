@@ -20,6 +20,7 @@ import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.requests.*
 import models.responses.*
+import models.responses.ErrorSource.backEnd
 import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
 import play.api.http.Status.*
 import play.api.libs.json.{JsValue, Json}
@@ -87,9 +88,11 @@ class Acc45Connector @Inject() (
 
           log.info(s"submitCashAccountStatementResponse :  $response")
           response.status match {
-            case OK | CREATED                        => Right(handleSuccessCase(response.json))
-            case BAD_REQUEST | INTERNAL_SERVER_ERROR => Left(handleErrorCase(response.json))
-            case _                                   =>
+            case OK | CREATED                                    => Right(handleSuccessCase(response.json))
+            case BAD_REQUEST | INTERNAL_SERVER_ERROR | NOT_FOUND =>
+              if (response.body.isEmpty) Left(handleNotFoundErrorCase) else Left(handleErrorCase(response.json))
+
+            case _ =>
               Left(handleUnknownErrorCase(SERVICE_UNAVAILABLE.toString, response.status.toString, BACK_END_FAILURE))
           }
         }
@@ -113,6 +116,16 @@ class Acc45Connector @Inject() (
       exceptionDetails,
       ErrorSource.mdtp,
       SourceFaultDetail(Seq(sourceFaultDetail))
+    )
+
+  private def handleNotFoundErrorCase: ErrorDetail =
+    ErrorDetail(
+      dateTimeService.currentDateTimeAsIso8601,
+      "MDTP_ID",
+      NOT_FOUND.toString,
+      BACK_END_FAILURE,
+      backEnd,
+      SourceFaultDetail(Seq(BACK_END_FAILURE))
     )
 
   private def handleSuccessCase(jsonObject: JsValue): Acc45ResponseCommon =

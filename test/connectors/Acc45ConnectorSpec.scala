@@ -28,11 +28,14 @@ import utils.{SpecBase, WireMockSupportProvider}
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  aResponse, badRequest, created, equalTo, matchingJsonPath, ok, post, serverError, serviceUnavailable, urlPathMatching
+  aResponse, badRequest, created, equalTo, matchingJsonPath, notFound, ok, post, serverError, serviceUnavailable,
+  urlPathMatching
 }
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
+import models.responses.ErrorSource.backEnd
+import models.responses.SourceFaultDetailMsg.BACK_END_FAILURE
 
 class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
@@ -223,6 +226,37 @@ class Acc45ConnectorSpec extends SpecBase with WireMockSupportProvider {
         val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
         errorDetail.errorCode mustBe SERVICE_UNAVAILABLE.toString
         errorDetail.errorMessage must not be empty
+
+        verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
+      }
+
+      "Backend system sends NOT_FOUND error" in new Setup {
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc45CashAccountStatementRequestEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestDetail.can == '12345678910')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountStatementRequest[?(@.requestDetail.eori == 'GB123456789012345')]")
+            )
+            .willReturn(notFound())
+        )
+
+        val result: Either[ErrorDetail, Acc45ResponseCommon] = await(connector.submitStatementRequest(reqDetail01))
+
+        val errorDetail: ErrorDetail = result.left.getOrElse(defaultErrorDetail)
+
+        errorDetail.errorCode mustBe NOT_FOUND.toString
+        errorDetail.source mustBe backEnd
+        errorDetail.errorMessage mustBe BACK_END_FAILURE
 
         verifyExactlyOneEndPointUrlHit(acc45CashAccountStatementRequestEndpointUrl, POST)
       }

@@ -22,7 +22,7 @@ import models.requests.SearchType.P
 import models.requests.{
   CashAccountPaymentDetails, CashAccountStatementRequestDetail, CashAccountTransactionSearchRequestDetails
 }
-import models.responses.ErrorCode.{code400, code500}
+import models.responses.ErrorCode.{code400, code404, code500}
 import models.responses.EtmpErrorCode.code001
 import models.responses.PaymentType.Payment
 import models.responses.{Acc45ResponseCommon, ErrorDetail, *}
@@ -234,6 +234,18 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
 
+    "return error response for 404 error code" in new Setup {
+      when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
+        .thenReturn(Future.successful(Left(errorDetails.copy(errorCode = code404))))
+
+      running(app) {
+        val result = route(app, retrieveCashAccountTransactions).value
+
+        status(result) mustBe NOT_FOUND
+        contentAsJson(result) mustBe Json.toJson(errorDetails.copy(errorCode = code404))
+      }
+    }
+
     "return error response for 500 error code" in new Setup {
       when(mockCashTransactionsService.retrieveCashAccountTransactions(any)(any))
         .thenReturn(
@@ -288,6 +300,7 @@ class CashTransactionsControllerSpec extends SpecBase {
       }
     }
   }
+
   "submitCashAccStatementRequest" should {
 
     "return ResponseCommon for success scenario" in new Setup {
@@ -427,6 +440,36 @@ class CashTransactionsControllerSpec extends SpecBase {
         val result = route(app, submitCashAccStatementRequest).value
 
         status(result) mustBe SERVICE_UNAVAILABLE
+        contentAsJson(result) mustBe Json.toJson(response)
+      }
+    }
+
+    "return ErrorDetails for NotFound scenarios as business error" in new Setup {
+
+      val acc45ResStr: String =
+        """
+          |{
+          |  "timestamp": "2024-01-21T11:30:47Z",
+          |  "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+          |  "errorCode": "404",
+          |  "errorMessage": "Failure in backend System",
+          |  "source": "Backend",
+          |  "sourceFaultDetail": {
+          |    "detail": [
+          |      "Failure in backend System"
+          |    ]
+          |  }
+          |}""".stripMargin
+
+      val response: ErrorDetail = Json.fromJson[ErrorDetail](Json.parse(acc45ResStr)).get
+
+      when(mockCashTransactionsService.submitCashAccountStatementRequest(ArgumentMatchers.eq(cashAccSttRequest))(any))
+        .thenReturn(Future.successful(Left(response)))
+
+      running(app) {
+        val result = route(app, submitCashAccStatementRequest).value
+
+        status(result) mustBe NOT_FOUND
         contentAsJson(result) mustBe Json.toJson(response)
       }
     }

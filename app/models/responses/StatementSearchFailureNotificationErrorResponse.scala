@@ -149,6 +149,7 @@ object ErrorSource {
 
 object ErrorCode {
   val code400 = "400"
+  val code404 = "404"
   val code500 = "500"
 }
 

@@ -18,7 +18,7 @@ package connectors
 
 import models.requests.{CashAccountPaymentDetails, CashAccountTransactionSearchRequestDetails, SearchType}
 import models.responses.*
-import models.responses.ErrorCode.{code400, code500}
+import models.responses.ErrorCode.{code400, code404, code500}
 import models.responses.ErrorSource.{backEnd, mdtp}
 import models.responses.PaymentType.Payment
 import models.responses.SourceFaultDetailMsg.{
@@ -33,7 +33,7 @@ import utils.Utils.emptyString
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
 import com.github.tomakehurst.wiremock.client.WireMock.{
-  badRequest, created, equalTo, matchingJsonPath, ok, post, serverError, serviceUnavailable, urlPathMatching
+  badRequest, created, equalTo, matchingJsonPath, notFound, ok, post, serverError, serviceUnavailable, urlPathMatching
 }
 import com.github.tomakehurst.wiremock.http.RequestMethod.POST
 import config.MetaConfig.Platform.MDTP
@@ -123,15 +123,14 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
           s"""($canFieldSchemaPath: string "123456789091234567" is too long ($lengthErrorMsg))""".stripMargin
 
         val sourceFaultDetail: SourceFaultDetail = SourceFaultDetail(Seq(REQUEST_SCHEMA_VALIDATION_ERROR))
-        val correlationId                        = "MDTP_ID"
 
         val defaultErrorDetails: ErrorDetail =
-          ErrorDetail(emptyString, correlationId, BAD_REQUEST.toString, emptyString, mdtp, sourceFaultDetail)
+          ErrorDetail(emptyString, CORRELATION_ID, BAD_REQUEST.toString, emptyString, mdtp, sourceFaultDetail)
 
         val actualErrorDetails: ErrorDetail = result.swap.getOrElse(defaultErrorDetails)
 
         actualErrorDetails.errorMessage mustBe expectedErrorMsg
-        actualErrorDetails.correlationId mustBe correlationId
+        actualErrorDetails.correlationId mustBe CORRELATION_ID
         actualErrorDetails.errorCode mustBe BAD_REQUEST.toString
         actualErrorDetails.source mustBe mdtp
         actualErrorDetails.sourceFaultDetail mustBe sourceFaultDetail
@@ -372,6 +371,41 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
         verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
       }
 
+      "404 error is returned from ETMP" in new Setup {
+
+        wireMockServer.stubFor(
+          post(urlPathMatching(acc44CashTransactionSearchEndpointUrl))
+            .withHeader(X_FORWARDED_HOST, equalTo(MDTP))
+            .withHeader(CONTENT_TYPE, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(ACCEPT, equalTo(CONTENT_TYPE_APPLICATION_JSON))
+            .withHeader(AUTHORIZATION, equalTo(AUTH_BEARER_TOKEN_VALUE))
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestCommon.originatingSystem == 'MDTP')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.can == '12345678909')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.ownerEORI == 'GB123456789')]")
+            )
+            .withRequestBody(
+              matchingJsonPath("$.cashAccountTransactionSearchRequest[?(@.requestDetail.searchType == 'P')]")
+            )
+            .willReturn(notFound())
+        )
+
+        val result: Either[ErrorDetail, CashAccountTransactionSearchResponseContainer] =
+          await(connector.cashAccountTransactionSearch(cashAccTransactionSearchRequestDetails))
+
+        val resultErrorDetails: ErrorDetail = result.swap.getOrElse(errorDetails)
+
+        resultErrorDetails.errorCode mustBe code404
+        resultErrorDetails.correlationId mustBe CORRELATION_ID
+        resultErrorDetails.errorMessage mustBe BACK_END_FAILURE
+
+        verifyExactlyOneEndPointUrlHit(acc44CashTransactionSearchEndpointUrl, POST)
+      }
+
       "api call produces Http status code apart from 200, 400, 500 due to backEnd error with errorDetails" in new Setup {
 
         wireMockServer.stubFor(
@@ -444,7 +478,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
 
           val resultErrorDetails: ErrorDetail = result.swap.getOrElse(errorDetails1)
 
-          resultErrorDetails.correlationId mustBe "MDTP_ID"
+          resultErrorDetails.correlationId mustBe CORRELATION_ID
           resultErrorDetails.errorCode mustBe SERVICE_UNAVAILABLE.toString
           resultErrorDetails.errorMessage mustBe SERVER_CONNECTION_ERROR
           resultErrorDetails.source mustBe backEnd
@@ -491,7 +525,7 @@ class Acc44ConnectorSpec extends SpecBase with WireMockSupportProvider {
     val errorDetails1: ErrorDetail =
       ErrorDetail(
         "2024-01-21T11:30:47Z",
-        "MDTP_ID",
+        CORRELATION_ID,
         SERVICE_UNAVAILABLE.toString,
         SERVER_CONNECTION_ERROR,
         backEnd,
