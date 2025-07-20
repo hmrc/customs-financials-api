@@ -45,8 +45,7 @@ lazy val microservice = Project(appName, file("."))
       ".*(BuildInfo|Routes|testOnly).*"
     ).mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
-    ScoverageKeys.coverageMinimumBranchTotal := 89,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")),
     scalacOptions += "-Wconf:msg=Flag.*repeatedly:s",

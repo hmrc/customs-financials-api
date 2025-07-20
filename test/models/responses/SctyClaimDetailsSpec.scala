@@ -19,6 +19,7 @@ package models.responses
 import models.claims.responses.{Goods, Reimbursement, SctyClaimDetails}
 import utils.SpecBase
 import utils.Utils.emptyString
+import play.api.libs.json.{JsResultException, JsSuccess, Json}
 
 class SctyClaimDetailsSpec extends SpecBase {
 
@@ -91,6 +92,27 @@ class SctyClaimDetailsSpec extends SpecBase {
     }
   }
 
+  "SctyClaimDetails.format" should {
+
+    "generate correct output for Json Reads" in new Setup {
+      import SctyClaimDetails.format
+
+      Json.fromJson(Json.parse(claimsDetailsJsString)) mustBe JsSuccess(compareResult)
+    }
+
+    "generate correct output for Json Writes" in new Setup {
+      Json.toJson(compareResult) mustBe Json.parse(claimsDetailsJsString)
+    }
+
+    "throw exception for invalid Json" in {
+      val invalidJson = "{ \"CDFPayCaseNumber\": \"12346\", \"claimantEORI123\": \"GB1234567\" }"
+
+      intercept[JsResultException] {
+        Json.parse(invalidJson).as[SctyClaimDetails]
+      }
+    }
+  }
+
   trait Setup {
     val testRefund: Option[String]            = Some("Resolved-Refund")
     val testManual: Option[String]            = Some("Resolved-Manual BTA")
@@ -136,5 +158,30 @@ class SctyClaimDetailsSpec extends SpecBase {
         Option(emptyString),
         testReimbursement
       )
+
+    val claimsDetailsJsString: String =
+      """{"CDFPayCaseNumber":"",
+        |"declarationID":"",
+        |"reasonForSecurity":"",
+        |"procedureCode":"",
+        |"caseStatus":"",
+        |"caseSubStatus":"",
+        |"goods":[{"itemNumber":"","goodsDescription":""},{"itemNumber":"","goodsDescription":""}],
+        |"declarantEORI":"",
+        |"importerEORI":"",
+        |"claimantEORI":"",
+        |"totalCustomsClaimAmount":"",
+        |"totalVATClaimAmount":"",
+        |"totalClaimAmount":"",
+        |"totalReimbursementAmount":"",
+        |"claimStartDate":"",
+        |"claimantName":"",
+        |"claimantEmailAddress":"",
+        |"closedDate":"",
+        |"reimbursements":[
+        |{"reimbursementDate":"","reimbursementAmount":"","taxType":"","reimbursementMethod":""},
+        |{"reimbursementDate":"","reimbursementAmount":"","taxType":"","reimbursementMethod":""}
+        |]
+        |}""".stripMargin
   }
 }

@@ -117,4 +117,6 @@ object TestData {
   val ORIGINATING_SYSTEM = "MDTP"
 
   val CORRELATION_ID = "MDTP_ID"
+
+  val TEST_DATE: LocalDate = LocalDate.of(YEAR_2023, MONTH_6, DAY_11)
 }
