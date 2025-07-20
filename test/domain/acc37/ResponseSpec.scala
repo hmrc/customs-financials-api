@@ -70,7 +70,7 @@ class ResponseSpec extends SpecBase {
     }
   }
 
-  "AmendCorrespondenceAddressResponse.format" should {
+  "AmendCorrespondenceAddressResponse.updateResponseFormat" should {
 
     "generate correct output for Json Reads" in new Setup {
       import AmendCorrespondenceAddressResponse.updateResponseFormat
