@@ -16,7 +16,7 @@
 
 package utils
 
-import models.FileRole
+import models.{AccountNumber, AccountType, FileRole}
 import models.requests.EoriRequest
 import play.api.libs.json.{JsValue, Json}
 
@@ -119,4 +119,10 @@ object TestData {
   val CORRELATION_ID = "MDTP_ID"
 
   val TEST_DATE: LocalDate = LocalDate.of(YEAR_2023, MONTH_6, DAY_11)
+
+  val TEST_STATUS  = "pending"
+  val TEST_ACK_REF = "1234567890abcdefgh"
+
+  val CDS_CASH_ACC_TYPE: AccountType = AccountType("CDSCash")
+  val TEST_ACC_NUMBER: AccountNumber = AccountNumber(BANK_ACCOUNT)
 }

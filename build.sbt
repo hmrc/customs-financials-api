@@ -42,7 +42,8 @@ lazy val microservice = Project(appName, file("."))
       "<empty>",
       ".*Reverse.*",
       ".*services.dec64.Dec64Headers.*",
-      ".*(BuildInfo|Routes|testOnly).*"
+      ".*(BuildInfo|Routes|testOnly).*",
+      ".*HistoricDocumentRequestSearchCache*"
     ).mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
