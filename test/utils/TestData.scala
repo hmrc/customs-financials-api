@@ -19,6 +19,7 @@ package utils
 import models.{AccountNumber, AccountType, FileRole}
 import models.requests.EoriRequest
 import play.api.libs.json.{JsValue, Json}
+import models.EORI
 
 import java.time.LocalDate
 
@@ -29,6 +30,7 @@ object TestData {
   val EORI_REQUEST_STRING: String = """{"eori": "testEoriRequest"}"""
   val EORI_STRING: String         = "testEoriRequest"
   val EORI_JSON: JsValue          = Json.toJson(EoriRequest(EORI_STRING))
+  val TEST_EORI: EORI             = EORI(EORI_VALUE)
 
   val TEST_EMAIL   = "test@test.com"
   val TEST_COMPANY = "companyName"
