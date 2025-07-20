@@ -17,7 +17,7 @@
 package domain
 
 import utils.SpecBase
-import play.api.libs.json.{JsResultException, JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, Json}
 
 class Acc41ResponseSpec extends SpecBase {
 
