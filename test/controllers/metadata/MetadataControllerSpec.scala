@@ -145,6 +145,58 @@ class MetadataControllerSpec extends SpecBase {
       }
     }
 
+    "do not send email when 4th week duty deferment statement is available but server error occurs while " +
+      "sending the email" in new Setup {
+        val dd4emailRequest: JsValue = Json.parse("""
+          |[
+          |    {
+          |       "eori":"testEORI-12345",
+          |       "fileName": "vat-2018-05.pdf",
+          |       "fileSize": 75251,
+          |       "metadata": [
+          |           {"metadata": "PeriodStartYear", "value": "2017"},
+          |           {"metadata": "PeriodStartMonth", "value": "5"},
+          |           {"metadata": "PeriodStartDay", "value": "5"},
+          |           {"metadata": "PeriodEndYear", "value": "2018"},
+          |           {"metadata": "PeriodEndMonth", "value": "8"},
+          |           {"metadata": "PeriodEndDay", "value": "5"},
+          |           {"metadata": "PeriodIssueNumber", "value": "4"},
+          |           {"metadata": "FileType", "value": "PDF"},
+          |           {"metadata": "FileRole", "value": "DutyDefermentStatement"},
+          |           {"metadata": "DefermentStatementType", "value": "Weekly"},
+          |           {"metadata": "DutyOverLimit", "value": "Y"},
+          |           {"metadata": "DutyPaymentType", "value": "DirectDebit"}
+          |       ]
+          |    }
+          |]
+            """.stripMargin)
+
+        when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.failed(new RuntimeException("Connection Error")))
+        when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
+        when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(testEori))(any))
+          .thenReturn(Future.successful(Some(emailAddress)))
+        when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+        when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+        running(app) {
+          val req: FakeRequest[AnyContentAsJson] = FakeRequest(POST, "/metadata").withJsonBody(dd4emailRequest)
+          val result                             = route(app, req).value
+
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.obj("Status" -> "Ok")
+
+          val params: Map[String, String] = Map(
+            "DefermentStatementType" -> "weekly",
+            "PeriodIssueNumber"      -> "4",
+            "date"                   -> "16 Sep 2018",
+            "DutyText"               -> "The total Duty and VAT owed will be collected by direct debit on or after",
+            "recipientName_line1"    -> TEST_COMPANY
+          )
+
+          verify(mockEmailThrottler).sendEmail(is(emailRequest(params = params)))(any)
+        }
+      }
+
     "do not send email when companyName is not available " in new Setup {
       val dd4emailRequest: JsValue = Json.parse("""
           |[
@@ -670,6 +722,45 @@ class MetadataControllerSpec extends SpecBase {
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_postponed_vat_notification")))(any)
 
         verify(mockDataStore, Mockito.times(1)).getVerifiedEmail(any)(any)
+      }
+    }
+
+    "do not send email when a requested PVAT statement is available but historic statement is not retrieved" in new Setup {
+      val requestedPVATStatementNotificationRequest: JsValue = Json.parse(s"""
+           |[
+           |    {
+           |        "eori":"testEORI",
+           |        "fileName": "vat-2018-05.pdf",
+           |        "fileSize": 75251,
+           |        "metadata": [
+           |            {"metadata": "PeriodStartYear", "value": "2017"},
+           |            {"metadata": "PeriodStartMonth", "value": "5"},
+           |            {"metadata": "PeriodStartDay", "value": "5"},
+           |            {"metadata": "PeriodEndYear", "value": "2018"},
+           |            {"metadata": "PeriodEndMonth", "value": "8"},
+           |            {"metadata": "PeriodEndDay", "value": "5"},
+           |            {"metadata": "FileType", "value": "PDF"},
+           |            {"metadata": "FileRole", "value": "PostponedVATStatement"},
+           |            {"metadata": "statementRequestID", "value": "1abcdefg2-a2b1-abcd-abcd-0123456789"}
+           |        ]
+           |    }
+           |]
+            """.stripMargin)
+
+      when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
+      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
+
+      when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
+        .thenReturn(Future.successful(None))
+
+      running(app) {
+        val req: FakeRequest[AnyContentAsJson] =
+          FakeRequest(POST, "/metadata").withJsonBody(requestedPVATStatementNotificationRequest)
+
+        val result = route(app, req).value
+        status(result) mustBe OK
       }
     }
 
