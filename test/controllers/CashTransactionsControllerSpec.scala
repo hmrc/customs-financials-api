@@ -31,14 +31,14 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{any, eq => is}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
 import play.api.test.*
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import services.CashTransactionsService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SpecBase
-import utils.TestData.{DAY_1, MONTH_1, MONTH_6, YEAR_2020}
+import utils.TestData.{CAN, DAY_1, MONTH_1, MONTH_6, TEST_DATE, YEAR_2020}
+import play.api.libs.json.{JsResultException, JsSuccess, JsValue, Json}
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -476,6 +476,27 @@ class CashTransactionsControllerSpec extends SpecBase {
 
   }
 
+  "CashTransactionsRequest.cashTransactionRequestFormat" should {
+    "generate correct output for Json Reads" in new Setup {
+
+      import CashTransactionsRequest.cashTransactionRequestFormat
+
+      Json.fromJson(Json.parse(cashTransReqJsString)) mustBe JsSuccess(cashTransReqOb)
+    }
+
+    "generate correct output for Json Writes" in new Setup {
+      Json.toJson(cashTransReqOb) mustBe Json.parse(cashTransReqJsString)
+    }
+
+    "throw exception for invalid Json" in {
+      val invalidJson = "{ \"can\": \"123456\", \"to\": \"test_event\" }"
+
+      intercept[JsResultException] {
+        Json.parse(invalidJson).as[CashTransactionsRequest]
+      }
+    }
+  }
+
   trait Setup {
 
     val sevenHundred = "-789.01"
@@ -514,6 +535,10 @@ class CashTransactionsControllerSpec extends SpecBase {
 
     val cashTranSearchRequestDetailsWithSearchTypePOb: CashAccountTransactionSearchRequestDetails =
       CashAccountTransactionSearchRequestDetails(can, ownerEoriGB, P, None, Some(cashAccountPaymentDetailsOb))
+
+    val cashTransReqOb: CashTransactionsRequest = CashTransactionsRequest(CAN, TEST_DATE, TEST_DATE)
+
+    val cashTransReqJsString: String = """{"can":"12345678909","from":"2023-06-11","to":"2023-06-11"}""".stripMargin
 
     val errorDetails: ErrorDetail = ErrorDetail(
       timestamp = "2024-01-17T09:30:47Z",

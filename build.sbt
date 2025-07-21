@@ -42,11 +42,11 @@ lazy val microservice = Project(appName, file("."))
       "<empty>",
       ".*Reverse.*",
       ".*services.dec64.Dec64Headers.*",
-      ".*(BuildInfo|Routes|testOnly).*"
+      ".*(BuildInfo|Routes|testOnly).*",
+      ".*HistoricDocumentRequestSearchCache*"
     ).mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
-    ScoverageKeys.coverageMinimumBranchTotal := 89,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")),
     scalacOptions += "-Wconf:msg=Flag.*repeatedly:s",

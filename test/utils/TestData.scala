@@ -16,19 +16,22 @@
 
 package utils
 
-import models.FileRole
+import models.{AccountNumber, AccountType, FileRole}
 import models.requests.EoriRequest
 import play.api.libs.json.{JsValue, Json}
+import models.EORI
 
 import java.time.LocalDate
 
 object TestData {
   val EORI_VALUE                  = "testEORI"
   val EORI_VALUE_1                = "someEORI"
+  val XI_EORI_NUMBER              = "XI12345678"
   val EORI_REQUEST: EoriRequest   = EoriRequest("testEoriRequest")
   val EORI_REQUEST_STRING: String = """{"eori": "testEoriRequest"}"""
   val EORI_STRING: String         = "testEoriRequest"
   val EORI_JSON: JsValue          = Json.toJson(EoriRequest(EORI_STRING))
+  val TEST_EORI: EORI             = EORI(EORI_VALUE)
 
   val TEST_EMAIL   = "test@test.com"
   val TEST_COMPANY = "companyName"
@@ -91,6 +94,8 @@ object TestData {
   val TwentyL   = 20L
 
   val COUNTRY_CODE_GB = "GB"
+  val COUNTRY_NAME    = "UNITED KINGDOM"
+  val TEST_CITY       = "London"
 
   val REGIME = "cds"
 
@@ -117,4 +122,15 @@ object TestData {
   val ORIGINATING_SYSTEM = "MDTP"
 
   val CORRELATION_ID = "MDTP_ID"
+
+  val TEST_DATE: LocalDate = LocalDate.of(YEAR_2023, MONTH_6, DAY_11)
+
+  val TEST_STATUS  = "pending"
+  val TEST_ACK_REF = "1234567890abcdefgh"
+
+  val CDS_CASH_ACC_TYPE: AccountType = AccountType("CDSCash")
+  val TEST_ACC_NUMBER: AccountNumber = AccountNumber(BANK_ACCOUNT)
+  val TAX_TYPE_ID                    = "test_tax_id"
+  val REASON_FOR_SECURITY            = "Reason1"
+  val TEST_TRANS_TYPE                = "Payment"
 }
