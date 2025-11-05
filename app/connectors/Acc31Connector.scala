@@ -19,10 +19,7 @@ package connectors
 import config.AppConfig
 import config.MetaConfig.Platform.MDTP
 import models.requests.*
-import models.responses.{
-  CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail,
-  GetCashAccountTransactionListingResponse
-}
+import models.responses.{CashTransactionsResponse, CashTransactionsResponseCommon, CashTransactionsResponseDetail, GetCashAccountTransactionListingResponse}
 import models.{ErrorResponse, ExceededThresholdErrorException, NoAssociatedDataException}
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.{Logger, LoggerLike}
@@ -33,6 +30,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 class Acc31Connector @Inject() (
@@ -71,6 +69,7 @@ class Acc31Connector @Inject() (
         .post(url"${appConfig.acc31GetCashAccountTransactionListingEndpoint}")(HeaderCarrier())
         .withBody[CashTransactionsRequest](cashTransactionsRequest)
         .setHeader(mdgHeaders.headers(appConfig.acc31BearerToken, appConfig.acc31HostHeader): _*)
+        .transform(_.withRequestTimeout(appConfig.requestTimeout))
         .execute[CashTransactionsResponse]
 
       eventualResponse.map(ctr => cashAccountTransactions(ctr.getCashAccountTransactionListingResponse))

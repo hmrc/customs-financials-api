@@ -20,6 +20,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.{Duration, DurationInt}
 
 @Singleton
 class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Configuration) {
@@ -180,4 +181,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
     configuration.get[Long]("mongodb.historic-document-request-search.timeToLiveInSeconds")
 
   lazy val isEuEoriEnabled: Boolean = configuration.get[Boolean]("features.eu-eori-enabled")
+  
+  lazy val requestTimeout: Duration = configuration.get[Int]("timeouts.acc31").millis
 }
