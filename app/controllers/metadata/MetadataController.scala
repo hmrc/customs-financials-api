@@ -76,8 +76,7 @@ class MetadataController @Inject() (
   }
 
   private def sendEmailIfVerified(notification: Notification)(implicit hc: HeaderCarrier): Future[Boolean] =
-    dataStore
-      .getVerifiedEmail
+    dataStore.getVerifiedEmail
       .flatMap {
         case Some(emailAddress) =>
           val companyNameResult: Future[Option[String]] =
