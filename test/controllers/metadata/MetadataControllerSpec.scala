@@ -45,8 +45,8 @@ class MetadataControllerSpec extends SpecBase {
   "addNotifications" should {
 
     "return 200" in new Setup {
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
@@ -59,8 +59,8 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "return 200 when companyName retrieval throws exception" in new Setup {
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
@@ -73,7 +73,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "return 200 when VerifiedEmail is returned as None " in new Setup {
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -84,7 +84,7 @@ class MetadataControllerSpec extends SpecBase {
     }
 
     "return 200 when VerifiedEmail retrieval throws exception" in new Setup {
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.failed(new RuntimeException(errorMsg)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -120,10 +120,10 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(testEori))(any))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any))
         .thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -172,10 +172,10 @@ class MetadataControllerSpec extends SpecBase {
             """.stripMargin)
 
         when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.failed(new RuntimeException("Connection Error")))
-        when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-        when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(testEori))(any))
+        when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+        when(mockDataStore.getVerifiedEmail(any))
           .thenReturn(Future.successful(Some(emailAddress)))
-        when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+        when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
         when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
         running(app) {
@@ -222,10 +222,10 @@ class MetadataControllerSpec extends SpecBase {
           |]
         """.stripMargin)
 
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(ArgumentMatchers.eq(testEori))(any))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any))
         .thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(None))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -254,9 +254,9 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(is(testEori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -295,9 +295,9 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(is(testEori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -345,9 +345,9 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(is(testEori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -394,9 +394,9 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
-      when(mockDataStore.getVerifiedEmail(is(testEori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -439,8 +439,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -476,8 +476,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(is(eori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -521,8 +521,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -558,8 +558,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(is(eori))(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -603,8 +603,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       running(app) {
@@ -640,8 +640,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -700,8 +700,8 @@ class MetadataControllerSpec extends SpecBase {
         """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))
@@ -721,7 +721,7 @@ class MetadataControllerSpec extends SpecBase {
         verify(mockEmailThrottler, Mockito.times(1))
           .sendEmail(is(emailRequest(templateId = "customs_financials_requested_postponed_vat_notification")))(any)
 
-        verify(mockDataStore, Mockito.times(1)).getVerifiedEmail(any)(any)
+        verify(mockDataStore, Mockito.times(1)).getVerifiedEmail(any)
       }
     }
 
@@ -748,8 +748,8 @@ class MetadataControllerSpec extends SpecBase {
             """.stripMargin)
 
       when(mockEmailThrottler.sendEmail(any)(any)).thenReturn(Future.successful(true))
-      when(mockDataStore.getVerifiedEmail(any)(any)).thenReturn(Future.successful(Some(emailAddress)))
-      when(mockDataStore.getCompanyName(any)(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
+      when(mockDataStore.getVerifiedEmail(any)).thenReturn(Future.successful(Some(emailAddress)))
+      when(mockDataStore.getCompanyName(any)).thenReturn(Future.successful(Some(TEST_COMPANY)))
       when(mockNotificationCache.putNotifications(any)).thenReturn(Future.successful(()))
 
       when(mockHistDocReqCacheService.retrieveHistDocRequestSearchDocForStatementReqId(any))

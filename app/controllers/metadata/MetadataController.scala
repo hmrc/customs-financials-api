@@ -77,11 +77,11 @@ class MetadataController @Inject() (
 
   private def sendEmailIfVerified(notification: Notification)(implicit hc: HeaderCarrier): Future[Boolean] =
     dataStore
-      .getVerifiedEmail(notification.eori)
+      .getVerifiedEmail
       .flatMap {
         case Some(emailAddress) =>
           val companyNameResult: Future[Option[String]] =
-            dataStore.getCompanyName(notification.eori).recoverWith { case exc: Exception =>
+            dataStore.getCompanyName.recoverWith { case exc: Exception =>
               log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
               Future(Some(emptyString))
             }

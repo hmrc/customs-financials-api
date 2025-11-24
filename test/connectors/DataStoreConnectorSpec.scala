@@ -41,7 +41,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(ok(Json.toJson(emailResponse).toString))
       )
 
-      val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
+      val result: Option[EmailAddress] = await(connector.getVerifiedEmail)
       result mustBe emailResponse.address
 
       verifyExactlyOneEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
@@ -53,7 +53,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
-      val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
+      val result: Option[EmailAddress] = await(connector.getVerifiedEmail)
       result mustBe empty
 
       verifyEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
@@ -97,7 +97,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(ok(Json.toJson(companyNameResponse).toString))
       )
 
-      val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
+      val result: Option[String] = await(connector.getCompanyName)
       result mustBe Some("test_company")
 
       verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
@@ -110,7 +110,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(ok(Json.toJson(companyNameResponse.copy(consent = "2")).toString))
       )
 
-      val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
+      val result: Option[String] = await(connector.getCompanyName)
       result mustBe Some("test_company")
 
       verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
@@ -123,7 +123,7 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
-      val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
+      val result: Option[String] = await(connector.getCompanyName)
       result mustBe empty
     }
   }
@@ -145,9 +145,9 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   trait Setup {
     implicit val hc: HeaderCarrier      = HeaderCarrier()
-    val customDataStoreVerifiedEmailUrl = "/customs-data-store/eori/someEORI/verified-email"
-    val customDataStoreEoriHistoryUrl   = "/customs-data-store/eori/someEORI/eori-history"
-    val customDataStoreCompanyInfoUrl   = "/customs-data-store/eori/someEORI/company-information"
+    val customDataStoreVerifiedEmailUrl = "/customs-data-store/eori/verified-email"
+    val customDataStoreEoriHistoryUrl   = "/customs-data-store/eori/eori-history"
+    val customDataStoreCompanyInfoUrl   = "/customs-data-store/eori/company-information"
 
     val emailResponse: EmailResponse             = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI(EORI_VALUE_1), None, None)))
