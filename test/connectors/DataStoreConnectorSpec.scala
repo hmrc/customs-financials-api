@@ -16,19 +16,17 @@
 
 package connectors
 
-import models.{AddressInformation, CompanyInformation, EORI, EmailAddress}
-import play.api.{Application, Configuration}
-import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{SpecBase, WireMockSupportProvider}
-import utils.TestData.COUNTRY_CODE_GB
-import com.typesafe.config.ConfigFactory
-import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, post, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.http.RequestMethod.{GET, POST}
-
-import utils.TestData.EORI_VALUE_1
+import com.typesafe.config.ConfigFactory
+import models.{AddressInformation, CompanyInformation, EORI, EmailAddress}
+import play.api.libs.json.Json
+import play.api.test.Helpers.*
+import play.api.{Application, Configuration}
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.TestData.{COUNTRY_CODE_GB, EORI_VALUE_1}
+import utils.{SpecBase, WireMockSupportProvider}
 
 class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
 

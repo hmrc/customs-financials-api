@@ -41,7 +41,7 @@ class DataStoreConnector @Inject() (http: HttpClientV2, metricsReporter: Metrics
     metricsReporter.withResponseTimeLogging(resourceName = "customs-data-store.get.verified-email") {
 
       val dataStoreEmailEndpoint = url"${appConfig.dataStoreEndpoint}/eori/verified-email-third-party"
-      val body = Json.obj("eori" -> eori)
+      val body                   = Json.obj("eori" -> eori)
 
       http
         .post(dataStoreEmailEndpoint)
@@ -56,7 +56,7 @@ class DataStoreConnector @Inject() (http: HttpClientV2, metricsReporter: Metrics
 
   def getEoriHistory(eori: EORI)(implicit hc: HeaderCarrier): Future[Seq[EORI]] = {
     val dataStoreHistoryEndpoint = url"${appConfig.dataStoreEndpoint}/eori/eori-history-third-party"
-    val body = Json.obj("eori" -> eori)
+    val body                     = Json.obj("eori" -> eori)
 
     metricsReporter
       .withResponseTimeLogging("customs-data-store.get.eori-history") {
@@ -76,7 +76,7 @@ class DataStoreConnector @Inject() (http: HttpClientV2, metricsReporter: Metrics
     metricsReporter
       .withResponseTimeLogging("customs-data-store.get.company-name") {
         val dataStoreCorpEndpoint = url"${appConfig.dataStoreEndpoint}/eori/company-information-third-party"
-        val body = Json.obj("eori" -> eori)
+        val body                  = Json.obj("eori" -> eori)
 
         http
           .post(dataStoreCorpEndpoint)
