@@ -24,9 +24,9 @@ import utils.{SpecBase, WireMockSupportProvider}
 import utils.TestData.COUNTRY_CODE_GB
 import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, post, urlPathMatching}
 import com.github.tomakehurst.wiremock.http.Fault
-import com.github.tomakehurst.wiremock.http.RequestMethod.GET
+import com.github.tomakehurst.wiremock.http.RequestMethod.{GET, POST}
 
 import utils.TestData.EORI_VALUE_1
 
@@ -37,26 +37,26 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
     "return the email from the data-store response" in new Setup {
 
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreVerifiedEmailUrl))
+        post(urlPathMatching(customDataStoreVerifiedEmailUrl))
           .willReturn(ok(Json.toJson(emailResponse).toString))
       )
 
       val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
       result mustBe emailResponse.address
 
-      verifyExactlyOneEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreVerifiedEmailUrl, POST)
     }
 
     "return None when an unknown exception happens from the data-store" in new Setup {
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreVerifiedEmailUrl))
+        post(urlPathMatching(customDataStoreVerifiedEmailUrl))
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
       val result: Option[EmailAddress] = await(connector.getVerifiedEmail(EORI(EORI_VALUE_1)))
       result mustBe empty
 
-      verifyEndPointUrlHit(customDataStoreVerifiedEmailUrl, GET)
+      verifyEndPointUrlHit(customDataStoreVerifiedEmailUrl, POST)
     }
   }
 
@@ -64,26 +64,26 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
 
     "return EORIHistory on a successful response from the data-store" in new Setup {
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreEoriHistoryUrl))
+        post(urlPathMatching(customDataStoreEoriHistoryUrl))
           .willReturn(ok(Json.toJson(eoriHistoryResponse).toString))
       )
 
       val result: Seq[EORI] = await(connector.getEoriHistory(EORI(EORI_VALUE_1)))
       result mustBe Seq(EORI(EORI_VALUE_1))
 
-      verifyExactlyOneEndPointUrlHit(customDataStoreEoriHistoryUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreEoriHistoryUrl, POST)
     }
 
     "return an empty sequence if connection is rest while calling api" in new Setup {
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreEoriHistoryUrl))
+        post(urlPathMatching(customDataStoreEoriHistoryUrl))
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
       val result: Seq[EORI] = await(connector.getEoriHistory(EORI(EORI_VALUE_1)))
       result mustBe empty
 
-      verifyEndPointUrlHit(customDataStoreEoriHistoryUrl, GET)
+      verifyEndPointUrlHit(customDataStoreEoriHistoryUrl, POST)
     }
 
   }
@@ -93,33 +93,33 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
     "return companyName on a successful response from the data-store" in new Setup {
 
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreCompanyInfoUrl))
+        post(urlPathMatching(customDataStoreCompanyInfoUrl))
           .willReturn(ok(Json.toJson(companyNameResponse).toString))
       )
 
       val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
       result mustBe Some("test_company")
 
-      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, POST)
     }
 
     "return companyName when consent returned is other than 1" in new Setup {
 
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreCompanyInfoUrl))
+        post(urlPathMatching(customDataStoreCompanyInfoUrl))
           .willReturn(ok(Json.toJson(companyNameResponse.copy(consent = "2")).toString))
       )
 
       val result: Option[String] = await(connector.getCompanyName(EORI(EORI_VALUE_1)))
       result mustBe Some("test_company")
 
-      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, GET)
+      verifyExactlyOneEndPointUrlHit(customDataStoreCompanyInfoUrl, POST)
     }
 
     "return None when an unknown exception happens from the data-store" in new Setup {
 
       wireMockServer.stubFor(
-        get(urlPathMatching(customDataStoreCompanyInfoUrl))
+        post(urlPathMatching(customDataStoreCompanyInfoUrl))
           .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
       )
 
@@ -145,9 +145,9 @@ class DataStoreConnectorSpec extends SpecBase with WireMockSupportProvider {
 
   trait Setup {
     implicit val hc: HeaderCarrier      = HeaderCarrier()
-    val customDataStoreVerifiedEmailUrl = "/customs-data-store/eori/someEORI/verified-email"
-    val customDataStoreEoriHistoryUrl   = "/customs-data-store/eori/someEORI/eori-history"
-    val customDataStoreCompanyInfoUrl   = "/customs-data-store/eori/someEORI/company-information"
+    val customDataStoreVerifiedEmailUrl = "/customs-data-store/eori/verified-email-third-party"
+    val customDataStoreEoriHistoryUrl   = "/customs-data-store/eori/eori-history-third-party"
+    val customDataStoreCompanyInfoUrl   = "/customs-data-store/eori/company-information-third-party"
 
     val emailResponse: EmailResponse             = EmailResponse(Some(EmailAddress("some@email.com")), None)
     val eoriHistoryResponse: EoriHistoryResponse = EoriHistoryResponse(Seq(EoriPeriod(EORI(EORI_VALUE_1), None, None)))
