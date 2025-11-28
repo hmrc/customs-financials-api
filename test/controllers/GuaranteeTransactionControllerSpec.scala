@@ -76,8 +76,8 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
       val result = route(app, request).value
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
-        "Invalid GuaranteeAccountTransactionsRequest payload:" +
-        " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+        "{\"statusCode\":400,\"message\":\"Invalid GuaranteeAccountTransactionsRequest payload: " +
+        "List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))\"}"
     }
   }
 
@@ -193,8 +193,8 @@ class GuaranteeTransactionControllerSpec extends SpecBase {
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe
-        "Invalid GuaranteeAccountTransactionsRequest payload:" +
-        " List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))"
+        "{\"statusCode\":400,\"message\":\"Invalid GuaranteeAccountTransactionsRequest payload: " +
+        "List((/gan,List(JsonValidationError(List(error.path.missing),ArraySeq()))))\"}"
     }
   }
 

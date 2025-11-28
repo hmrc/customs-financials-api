@@ -89,7 +89,6 @@ class DataStoreConnector @Inject() (http: HttpClientV2, metricsReporter: Metrics
         log.error(s"Call to data stored failed for getCompanyName exception=$e")
         None
       }
-
 }
 
 case class EoriPeriod(eori: EORI, validFrom: Option[String], validUntil: Option[String])
