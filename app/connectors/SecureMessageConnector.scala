@@ -46,14 +46,14 @@ class SecureMessageConnector @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val companyNameResult: Future[Option[String]] =
-      dataStore.getCompanyName.recoverWith { case exc: Exception =>
+      dataStore.getCompanyName(EORI(histDoc.currentEori)).recoverWith { case exc: Exception =>
         log.error(s"Company name retrieval failed with error ::${exc.getMessage}")
         Future(Some(emptyString))
       }
 
     val result = for {
       companyName: Option[String]        <- companyNameResult
-      emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail
+      emailAddress: Option[EmailAddress] <- dataStore.getVerifiedEmail(EORI(histDoc.currentEori))
     } yield {
 
       val request: Request =

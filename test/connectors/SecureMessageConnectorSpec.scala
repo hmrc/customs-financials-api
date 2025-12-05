@@ -66,10 +66,10 @@ class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
     "sendSecureMessage" should {
       "successfully post httpclient" in new Setup {
 
-        when(mockDataStoreService.getCompanyName(any))
+        when(mockDataStoreService.getCompanyName(any)(any))
           .thenReturn(Future.successful(Option("test")))
 
-        when(mockDataStoreService.getVerifiedEmail(any))
+        when(mockDataStoreService.getVerifiedEmail(any)(any))
           .thenReturn(Future.successful(Option(EmailAddress("email"))))
 
         running(app) {
@@ -81,10 +81,10 @@ class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       "successfully post httpclient when getCompanyName call fails and verified email has empty values" in new Setup {
 
-        when(mockDataStoreService.getCompanyName(any))
+        when(mockDataStoreService.getCompanyName(any)(any))
           .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
-        when(mockDataStoreService.getVerifiedEmail(any)).thenReturn(Future.successful(None))
+        when(mockDataStoreService.getVerifiedEmail(any)(any)).thenReturn(Future.successful(None))
 
         wireMockServer.stubFor(
           post(urlPathMatching(secureMessageEndpointUrl))
@@ -112,9 +112,9 @@ class SecureMessageConnectorSpec extends SpecBase with WireMockSupportProvider {
 
       "return error response when exception occurs while getting VerifiedEmail" in new Setup {
 
-        when(mockDataStoreService.getCompanyName(any)).thenReturn(Future.successful(None))
+        when(mockDataStoreService.getCompanyName(any)(any)).thenReturn(Future.successful(None))
 
-        when(mockDataStoreService.getVerifiedEmail(any))
+        when(mockDataStoreService.getVerifiedEmail(any)(any))
           .thenReturn(Future.failed(new RuntimeException(ERROR_MSG)))
 
         running(app) {
