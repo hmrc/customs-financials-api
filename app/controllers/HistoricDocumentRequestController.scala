@@ -51,8 +51,10 @@ class HistoricDocumentRequestController @Inject() (
             allEoris.map(frontEndRequest.toHistoricDocumentRequest)
           result                                                <- Future.sequence(historicDocumentRequests.map(service.sendHistoricDocumentRequest))
         } yield {
-          log.info(s"${allEoris.size} ${historicDocumentRequests.map(_.documentType.value).mkString(", ")} " +
-            s"Historic Documents requested. Statement Request Id: ${historicDocumentRequests.map(_.statementRequestID).mkString(", ")}")
+          log.info(
+            s"${allEoris.size} ${historicDocumentRequests.map(_.documentType.value).mkString(", ")} " +
+              s"Historic Documents requested. Statement Request Id: ${historicDocumentRequests.map(_.statementRequestID).mkString(", ")}"
+          )
           if (result.contains(false)) {
             ServiceUnavailable
           } else {
