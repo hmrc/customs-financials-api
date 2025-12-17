@@ -129,7 +129,7 @@ class MetadataController @Inject() (
                 histDocReq
             }
 
-            log.info(s"sending email for statementRequestID ::: $statementRequestID")
+            log.info(s"sending email to ${histDocReq.currentEori} for statementRequestID ::: $statementRequestID")
             sendEmailIfVerified(notification)
           }
 
