@@ -53,7 +53,7 @@ class HistoricDocumentRequestController @Inject() (
         } yield {
           log.info(
             s"${allEoris.size} ${historicDocumentRequests.map(_.documentType.value).mkString(", ")} " +
-              s"Historic Documents requested. Statement Request Id: ${historicDocumentRequests.map(_.statementRequestID).mkString(", ")}"
+              s"Historic Documents requested for EORI: ${allEoris.map(_.value).mkString(", ")}. Statement Request Id: ${historicDocumentRequests.map(_.statementRequestID).mkString(", ")}"
           )
           if (result.contains(false)) {
             ServiceUnavailable
