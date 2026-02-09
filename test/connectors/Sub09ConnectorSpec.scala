@@ -67,8 +67,8 @@ class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
     actualResponse.subscriptionDisplayResponse.responseCommon mustBe
       expectedResponse.subscriptionDisplayResponse.responseCommon
 
-    val actualResponseDetails: ResponseDetail   = actualResponse.subscriptionDisplayResponse.responseDetail
-    val expectedResponseDetails: ResponseDetail = expectedResponse.subscriptionDisplayResponse.responseDetail
+    val actualResponseDetails: ResponseDetail   = actualResponse.subscriptionDisplayResponse.responseDetail.value
+    val expectedResponseDetails: ResponseDetail = expectedResponse.subscriptionDisplayResponse.responseDetail.value
 
     actualResponseDetails.EORINo mustBe expectedResponseDetails.EORINo
     actualResponseDetails.EORIStartDate mustBe expectedResponseDetails.EORIStartDate
@@ -154,7 +154,7 @@ class Sub09ConnectorSpec extends SpecBase with WireMockSupportProvider {
     )
 
     val response: SubscriptionResponse =
-      SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
+      SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, Option(responseDetail)))
 
     val app: Application          = application().configure(config).build()
     val connector: Sub09Connector = app.injector.instanceOf[Sub09Connector]
