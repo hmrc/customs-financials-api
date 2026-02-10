@@ -79,7 +79,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
       )
 
       val response: SubscriptionResponse =
-        SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
+        SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, Option(responseDetail)))
 
       when(mockSub09Connector.getSubscriptions(any))
         .thenReturn(Future.successful(response))
@@ -143,7 +143,7 @@ class SubscriptionDisplayGetSpecificClaimRequestControllerSpec extends SpecBase 
       )
 
       val response: SubscriptionResponse =
-        SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, responseDetail))
+        SubscriptionResponse(SubscriptionDisplayResponse(responseCommon, Option(responseDetail)))
 
       when(mockSub09Connector.getSubscriptions(EORI(EORI_STRING)))
         .thenReturn(Future.successful(response))

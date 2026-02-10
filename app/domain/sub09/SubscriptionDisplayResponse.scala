@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class SubscriptionResponse(subscriptionDisplayResponse: SubscriptionDisplayResponse)
 
-case class SubscriptionDisplayResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetail)
+case class SubscriptionDisplayResponse(responseCommon: ResponseCommon, responseDetail: Option[ResponseDetail])
 
 case class CdsEstablishmentAddress(
   streetAndNumber: String,

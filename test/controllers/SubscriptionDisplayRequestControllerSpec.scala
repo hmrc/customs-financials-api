@@ -143,10 +143,12 @@ class SubscriptionDisplayRequestControllerSpec extends SpecBase {
     )
 
     val response: SubscriptionResponse =
-      SubscriptionResponse(domain.sub09.SubscriptionDisplayResponse(responseCommon, responseDetail))
+      SubscriptionResponse(domain.sub09.SubscriptionDisplayResponse(responseCommon, Option(responseDetail)))
 
     val responseWithNoStatusText: SubscriptionResponse =
-      SubscriptionResponse(domain.sub09.SubscriptionDisplayResponse(responseCommonWithNoStatusText, responseDetail))
+      SubscriptionResponse(
+        domain.sub09.SubscriptionDisplayResponse(responseCommonWithNoStatusText, Option(responseDetail))
+      )
 
     val app: Application = application()
       .overrides(
