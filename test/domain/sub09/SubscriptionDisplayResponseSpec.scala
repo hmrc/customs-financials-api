@@ -301,7 +301,7 @@ class SubscriptionDisplayResponseSpec extends SpecBase {
     )
 
     val subscriptionDisplayResponseOb: SubscriptionDisplayResponse =
-      SubscriptionDisplayResponse(responseCommonOb, Option(responseDetailsOb))
+      SubscriptionDisplayResponse(responseCommonOb, responseDetailsOb)
 
     val subscriptionResponseOb: SubscriptionResponse = SubscriptionResponse(subscriptionDisplayResponseOb)
 
