@@ -10,7 +10,7 @@ object AppDependencies {
     ws,
     "uk.gov.hmrc"               %% "bootstrap-backend-play-30" % bootstrapVersion,
     "uk.gov.hmrc.mongo"         %% "hmrc-mongo-play-30"        % mongoVersion,
-    "com.github.java-json-tools" % "json-schema-validator"     % "2.2.14"
+    ("com.github.java-json-tools" % "json-schema-validator"     % "2.2.14").exclude ("org.mozilla", "rhino")
   )
 
   val test: Seq[ModuleID] = Seq(
