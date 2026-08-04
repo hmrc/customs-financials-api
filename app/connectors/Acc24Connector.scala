@@ -49,7 +49,6 @@ class Acc24Connector @Inject() (
         .setHeader(mdgHeaders.headers(appConfig.acc24BearerToken, appConfig.acc24HostHeader): _*)
         .execute[HttpResponse]
         .map { response =>
-          log.info(s"HistoricDocumentResponse :  $response")
           response.status match {
             case Status.NO_CONTENT => true
             case _                 => false

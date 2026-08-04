@@ -237,6 +237,11 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
         }
       }
 
+      "return 1 for GAN searchID" in new Setup {
+        val searchTypeValue: String = connector.searchType(EORI("GAN009327"))
+        searchTypeValue mustBe "1"
+      }
+
       "return 1 for account number searchID" in new Setup {
         val searchTypeValue: String = connector.searchType(EORI("1234567"))
         searchTypeValue mustBe "1"
