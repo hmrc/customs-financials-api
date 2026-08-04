@@ -70,7 +70,6 @@ class Acc29Connector @Inject() (
               )
             )
           )
-          println("account response test: " + responseWithOwner.accounts)
           responseWithOwner.accounts
         }
     }
