@@ -60,15 +60,7 @@ class Acc29Connector @Inject() (
         .execute[StandingAuthoritiesResponse]
         .map { response =>
           val responseWithOwner = response.copy(
-            accounts = response.accounts.map(account =>
-              AccountWithAuthorities(
-                accountType = account.accountType,
-                accountNumber = account.accountNumber,
-                accountStatus = account.accountStatus,
-                ownerEori = Some(response.ownerEori),
-                authorities = account.authorities
-              )
-            )
+            accounts = response.accounts.map(_.copy(ownerEori = Some(response.ownerEori)))
           )
           responseWithOwner.accounts
         }
