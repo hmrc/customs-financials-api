@@ -89,7 +89,7 @@ class Acc40Connector @Inject() (
     searchID.value match {
       case searchEori if searchEori.startsWith(ganPrefix)                                           => "1"
       case searchEori if searchEori.startsWith(gbEoriPrefix) || searchEori.startsWith(xIEoriPrefix) => "0"
-      case searchEori if appConfig.isEuEoriEnabled && euEoriRegex.matches(searchEori)               => "0"
+      case searchEori if euEoriRegex.matches(searchEori)                                            => "0"
       case _                                                                                        => "1"
     }
 }
