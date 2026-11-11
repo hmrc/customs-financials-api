@@ -21,12 +21,6 @@ import utils.SpecBase
 
 class AppConfigSpec extends SpecBase {
 
-  "euEoriEnabled" should {
-    "return the correct value" in new Setup {
-      appConfig.isEuEoriEnabled mustBe false
-    }
-  }
-
   "mongoHistDocSearchCollectionName" should {
     "return correct name for the collection" in new Setup {
       appConfig.mongoHistDocSearchCollectionName mustBe "historic-document-request-search"

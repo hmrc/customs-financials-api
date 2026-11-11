@@ -179,62 +179,9 @@ class Acc40ConnectorSpec extends SpecBase with WireMockSupportProvider {
         searchTypeValue mustBe "0"
       }
 
-      "return 0 for EU Eori search Id" when {
-        "eu-eori-enabled is set to true" in new Setup {
-          def config: Configuration = Configuration(
-            ConfigFactory.parseString(
-              s"""
-                 |microservice {
-                 |  services {
-                 |  acc40 {
-                 |            host = $wireMockHost
-                 |            port = $wireMockPort
-                 |        }
-                 |  }
-                 |}
-                 |features {
-                 |eu-eori-enabled = true
-                 |}
-                 |""".stripMargin
-            )
-          )
-
-          override val app: Application          = application().configure(config).build()
-          override val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
-
-          val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
-
-          searchTypeValue mustBe "0"
-        }
-      }
-
-      "return 1 for EU Eori search Id" when {
-        "eu-eori-enabled is set to false" in new Setup {
-          def config: Configuration = Configuration(
-            ConfigFactory.parseString(
-              s"""
-                 |microservice {
-                 |  services {
-                 |  acc40 {
-                 |            host = $wireMockHost
-                 |            port = $wireMockPort
-                 |        }
-                 |  }
-                 |}
-                 |features {
-                 |eu-eori-enabled = false
-                 |}
-                 |""".stripMargin
-            )
-          )
-
-          override val app: Application          = application().configure(config).build()
-          override val connector: Acc40Connector = app.injector.instanceOf[Acc40Connector]
-
-          val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
-
-          searchTypeValue mustBe "1"
-        }
+      "return 0 for EU EORI searchID" in new Setup {
+        val searchTypeValue: String = connector.searchType(EORI("FR123456789012"))
+        searchTypeValue mustBe "0"
       }
 
       "return 1 for GAN searchID" in new Setup {

@@ -111,7 +111,6 @@ The minimum requirement for test coverage is 90%. Builds will fail when the proj
 | Flag            | Description                                                                                                                      |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------|
 | onlyOpenItems   | It is used to send the 'Open Items' request filter for ACC28. If set to 'true' then results will be filtered by open items only. |
-| eu-eori-enabled | enable or disable logic related to EU EORI numbers                                                                               |
 
 Different features can be enabled / disabled per-environment via the `app-config-<env>` project by setting `features.some-feature: true`
 
@@ -122,6 +121,8 @@ In dev/test environments, the upstream services are stubbed out using the [custo
 You can find a list of microservice specific routes here - `/conf/app.routes`
 
 Application entrypoint:  `/customs/payment-records`
+
+EU EORI support is permanent functionality in every environment. There is no feature switch or GB-only fallback.
 
 | Path                                                                        | Description                                                  |
 |-----------------------------------------------------------------------------|--------------------------------------------------------------|
