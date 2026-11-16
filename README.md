@@ -26,7 +26,6 @@ The MDG integrations are:
 * ACC44	Cash Account Transaction Search
 * ACC45	Cash Account Statement Request
 * SUB09 View account authorities
-* SUB21 Retrieve EORI history
 * DEC64 Submit file upload
 
 ## Running the service

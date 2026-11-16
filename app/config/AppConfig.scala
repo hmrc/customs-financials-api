@@ -137,13 +137,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   lazy val acc37BearerToken: String = getConfString("acc37.bearer-token", "test")
 
-  lazy val sub21CheckEORIValidEndpoint: String =
-    baseUrl("sub21") +
-      getConfString("sub21.context-base", "/") +
-      getConfString("sub21.historicEoriEndpoint", "/")
-
-  lazy val sub21BearerToken: String = getConfString("sub21.bearer-token", "test")
-
   lazy val sub09GetSubscriptionsEndpoint: String =
     baseUrl("sub09") +
       getConfString("sub09.context-base", "/") +
